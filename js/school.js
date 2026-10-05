@@ -199,7 +199,10 @@ const statusElement =
     document.getElementById(
         "institutionStatus"
    );
-
+const institutionNameElement =
+    document.getElementById(
+        "institutionName"
+    );
 // =====================================================
 // Display Institution
 // =====================================================
@@ -229,6 +232,12 @@ if (institutionIdElement) {
 
 }
 
+if (institutionNameElement) {
+
+    institutionNameElement.textContent =
+        institution.name;
+
+}
 
 if (statusElement) {
 
@@ -240,17 +249,7 @@ if (statusElement) {
 }
 
 
-const institutionNameElement =
-    document.getElementById(
-        "institutionName"
-    );
 
-if (institutionNameElement) {
-
-    institutionNameElement.textContent =
-        institution.name || "School";
-
-}
 
 // =====================================================
 // Navigation Helper
