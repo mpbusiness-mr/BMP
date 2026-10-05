@@ -198,8 +198,7 @@ editButton.addEventListener(
     "click",
     function () {
 
-        alert(
-            "Edit Institution module will be added next."
-        );
+        window.location.href =
+            `edit-institution.html?id=${encodeURIComponent(institutionId)}`;
     }
 );
