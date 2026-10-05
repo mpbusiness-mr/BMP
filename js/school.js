@@ -229,12 +229,16 @@ receiptsButton.addEventListener(
 // Reports
 // =====================================================
 
+// =====================================================
+// Reports
+// =====================================================
+
 reportsButton.addEventListener(
     "click",
     function () {
 
         window.location.href =
-            `reports.html?id=${encodeURIComponent(
+            `school-reports.html?id=${encodeURIComponent(
                 institution.id
             )}`;
     }
