@@ -27,13 +27,7 @@ if (!institutionId) {
 // Get Institution ID
 // =====================================================
 
-const urlParams =
-    new URLSearchParams(
-        window.location.search
-    );
 
-const institutionId =
-    urlParams.get("id");
 
 
 // =====================================================
