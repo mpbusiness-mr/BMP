@@ -1,14 +1,17 @@
-// Elements
+// Admin Panel Navigation
 
+
+// Institutions button
 const institutionsButton =
     document.getElementById("institutionsButton");
 
+
+// Activity Logs button
 const activityLogsButton =
     document.getElementById("activityLogsButton");
 
 
-// Institutions
-
+// Open Institutions
 institutionsButton.addEventListener(
     "click",
     function () {
@@ -19,8 +22,7 @@ institutionsButton.addEventListener(
 );
 
 
-// Activity Logs
-
+// Open Activity Logs
 activityLogsButton.addEventListener(
     "click",
     function () {
