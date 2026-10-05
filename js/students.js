@@ -1,9 +1,3 @@
-// =====================================================
-// BMP Students Management
-// =====================================================
-
-
-// Get institution ID from URL
 const urlParams =
     new URLSearchParams(
         window.location.search
@@ -13,14 +7,16 @@ const institutionId =
     urlParams.get("id");
 
 
-// Get institutions
+/* Get institutions */
+
 const institutions =
     JSON.parse(
-        localStorage.getItem("bmpInstitutions")
+        localStorage.getItem(
+            "bmpInstitutions"
+        )
     ) || [];
 
 
-// Find institution
 const institution =
     institutions.find(
         item =>
@@ -28,42 +24,67 @@ const institution =
     );
 
 
-// =====================================================
-// Elements
-// =====================================================
+/* Elements */
 
 const pageTitle =
-    document.getElementById("pageTitle");
+    document.getElementById(
+        "pageTitle"
+    );
 
 const pageSubtitle =
-    document.getElementById("pageSubtitle");
+    document.getElementById(
+        "pageSubtitle"
+    );
 
 const institutionIdElement =
-    document.getElementById("institutionId");
+    document.getElementById(
+        "institutionId"
+    );
 
 const institutionNameElement =
-    document.getElementById("institutionName");
+    document.getElementById(
+        "institutionName"
+    );
 
 const totalStudentsElement =
-    document.getElementById("totalStudents");
+    document.getElementById(
+        "totalStudents"
+    );
+
+const academicYearFilter =
+    document.getElementById(
+        "academicYearFilter"
+    );
 
 const searchStudent =
-    document.getElementById("searchStudent");
+    document.getElementById(
+        "searchStudent"
+    );
 
 const stageFilter =
-    document.getElementById("stageFilter");
+    document.getElementById(
+        "stageFilter"
+    );
 
 const classFilter =
-    document.getElementById("classFilter");
+    document.getElementById(
+        "classFilter"
+    );
 
 const studentsTableBody =
-    document.getElementById("studentsTableBody");
+    document.getElementById(
+        "studentsTableBody"
+    );
 
 const emptyState =
-    document.getElementById("emptyState");
+    document.getElementById(
+        "emptyState"
+    );
 
 const addStudentButton =
-    document.getElementById("addStudentButton");
+    document.getElementById(
+        "addStudentButton"
+    );
 
 const emptyAddStudentButton =
     document.getElementById(
@@ -71,29 +92,31 @@ const emptyAddStudentButton =
     );
 
 const backButton =
-    document.getElementById("backButton");
+    document.getElementById(
+        "backButton"
+    );
 
 
-// =====================================================
-// Check Institution
-// =====================================================
+/* Check institution */
 
 if (!institution) {
 
-    alert("School not found.");
+    alert(
+        "School not found."
+    );
 
     window.location.href =
         "institutions.html";
 
-} else {
+}
+else {
 
     initializeStudents();
+
 }
 
 
-// =====================================================
-// Initialize
-// =====================================================
+/* Initialize */
 
 function initializeStudents() {
 
@@ -113,40 +136,140 @@ function initializeStudents() {
         institution.name;
 
 
+    loadAcademicYearFilter();
+
     loadClassFilter();
 
     renderStudents();
+
 }
 
 
-// =====================================================
-// Get Students
-// =====================================================
+/* Get students */
 
 function getStudents() {
 
     return JSON.parse(
-        localStorage.getItem("bmpStudents")
+        localStorage.getItem(
+            "bmpStudents"
+        )
     ) || [];
+
 }
 
 
-// =====================================================
-// Save Students
-// =====================================================
+/* Load academic years */
 
-function saveStudents(students) {
+function loadAcademicYearFilter() {
 
-    localStorage.setItem(
-        "bmpStudents",
-        JSON.stringify(students)
+    const students =
+        getStudents();
+
+
+    const institutionStudents =
+        students.filter(
+            student =>
+                student.institutionId ===
+                institution.id
+        );
+
+
+    const academicYears =
+        [
+            ...new Set(
+                institutionStudents
+                    .map(
+                        student =>
+                            student.academicYear
+                    )
+                    .filter(
+                        year =>
+                            year
+                    )
+            )
+        ];
+
+
+    /*
+        Sort newest academic year
+        first.
+    */
+
+    academicYears.sort(
+        function (
+            a,
+            b
+        ) {
+
+            return (
+                Number(
+                    b.split("-")[0]
+                ) -
+                Number(
+                    a.split("-")[0]
+                )
+            );
+
+        }
     );
+
+
+    academicYearFilter.innerHTML = `
+        <option value="all">
+            All Academic Years
+        </option>
+    `;
+
+
+    academicYears.forEach(
+        year => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value =
+                year;
+
+            option.textContent =
+                year;
+
+            academicYearFilter.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    /*
+        Select current academic year
+        if it exists.
+    */
+
+    const currentYear =
+        new Date().getFullYear();
+
+    const currentAcademicYear =
+        `${currentYear}-${currentYear + 1}`;
+
+
+    if (
+        academicYears.includes(
+            currentAcademicYear
+        )
+    ) {
+
+        academicYearFilter.value =
+            currentAcademicYear;
+
+    }
+
 }
 
 
-// =====================================================
-// Load Classes
-// =====================================================
+/* Load classes */
 
 function loadClassFilter() {
 
@@ -161,84 +284,68 @@ function loadClassFilter() {
     `;
 
 
-    let classes = [];
+    let numberOfClasses =
+        0;
 
 
-    if (stage === "primary") {
+    if (
+        stage ===
+        "primary"
+    ) {
 
-        classes = [
-            "Class 1",
-            "Class 2",
-            "Class 3",
-            "Class 4",
-            "Class 5",
-            "Class 6"
-        ];
+        numberOfClasses = 6;
 
     }
+    else if (
+        stage ===
+        "preparatory"
+    ) {
 
-    else if (stage === "preparatory") {
-
-        classes = [
-            "Class 1",
-            "Class 2",
-            "Class 3",
-            "Class 4"
-        ];
+        numberOfClasses = 4;
 
     }
+    else if (
+        stage ===
+        "secondary"
+    ) {
 
-    else if (stage === "secondary") {
-
-        classes = [
-            "Class 1",
-            "Class 2",
-            "Class 3"
-        ];
+        numberOfClasses = 3;
 
     }
-
     else {
 
-        classes = [
-            "Class 1",
-            "Class 2",
-            "Class 3",
-            "Class 4",
-            "Class 5",
-            "Class 6"
-        ];
+        numberOfClasses = 6;
+
     }
 
 
-    classes.forEach(
-        className => {
+    for (
+        let i = 1;
+        i <= numberOfClasses;
+        i++
+    ) {
 
-            const option =
-                document.createElement(
-                    "option"
-                );
-
-
-            option.value =
-                className;
-
-
-            option.textContent =
-                className;
-
-
-            classFilter.appendChild(
-                option
+        const option =
+            document.createElement(
+                "option"
             );
-        }
-    );
+
+        option.value =
+            String(i);
+
+        option.textContent =
+            `Class ${i}`;
+
+        classFilter.appendChild(
+            option
+        );
+
+    }
+
 }
 
 
-// =====================================================
-// Render Students
-// =====================================================
+/* Render students */
 
 function renderStudents() {
 
@@ -246,7 +353,11 @@ function renderStudents() {
         getStudents();
 
 
-    // Only students belonging to this school
+    /*
+        Only students belonging
+        to this institution.
+    */
+
     const institutionStudents =
         allStudents.filter(
             student =>
@@ -255,15 +366,8 @@ function renderStudents() {
         );
 
 
-    // Update total
-    totalStudentsElement.textContent =
-        institutionStudents.length;
-
-
-    const searchValue =
-        searchStudent.value
-            .trim()
-            .toLowerCase();
+    const selectedAcademicYear =
+        academicYearFilter.value;
 
 
     const selectedStage =
@@ -274,19 +378,32 @@ function renderStudents() {
         classFilter.value;
 
 
+    const searchValue =
+        searchStudent.value
+            .trim()
+            .toLowerCase();
+
+
+    /*
+        Apply filters.
+    */
+
     const filteredStudents =
         institutionStudents.filter(
             student => {
 
+
                 const studentName =
                     String(
-                        student.name || ""
+                        student.name ||
+                        ""
                     ).toLowerCase();
 
 
                 const studentNumber =
                     String(
-                        student.studentNumber || ""
+                        student.studentNumber ||
+                        ""
                     ).toLowerCase();
 
 
@@ -299,35 +416,80 @@ function renderStudents() {
                     );
 
 
+                const matchesAcademicYear =
+                    selectedAcademicYear ===
+                        "all" ||
+
+                    student.academicYear ===
+                        selectedAcademicYear;
+
+
                 const matchesStage =
-                    selectedStage === "all" ||
-                    student.stage === selectedStage;
+                    selectedStage ===
+                        "all" ||
+
+                    student.stage ===
+                        selectedStage;
 
 
                 const matchesClass =
-                    selectedClass === "all" ||
-                    student.className === selectedClass;
+                    selectedClass ===
+                        "all" ||
+
+                    String(
+                        student.classNumber
+                    ) ===
+                        String(
+                            selectedClass
+                        );
 
 
                 return (
+
                     matchesSearch &&
+
+                    matchesAcademicYear &&
+
                     matchesStage &&
+
                     matchesClass
+
                 );
+
             }
         );
 
 
-    studentsTableBody.innerHTML = "";
+    /*
+        Update total.
+    */
+
+    totalStudentsElement.textContent =
+        filteredStudents.length;
 
 
-    // Empty state
-    if (filteredStudents.length === 0) {
+    /*
+        Clear table.
+    */
+
+    studentsTableBody.innerHTML =
+        "";
+
+
+    /*
+        Empty state.
+    */
+
+    if (
+        filteredStudents.length ===
+        0
+    ) {
 
         emptyState.style.display =
             "block";
 
         return;
+
     }
 
 
@@ -335,19 +497,55 @@ function renderStudents() {
         "none";
 
 
-    // Render rows
+    /*
+        Sort students by
+        registration order.
+    */
+
+    filteredStudents.sort(
+        function (
+            a,
+            b
+        ) {
+
+            return (
+                String(
+                    a.studentNumber ||
+                    ""
+                ).localeCompare(
+                    String(
+                        b.studentNumber ||
+                        ""
+                    ),
+                    undefined,
+                    {
+                        numeric: true
+                    }
+                )
+            );
+
+        }
+    );
+
+
+    /*
+        Render rows.
+    */
+
     filteredStudents.forEach(
         student => {
 
             const row =
-                document.createElement("tr");
+                document.createElement(
+                    "tr"
+                );
 
 
             const registrationDate =
                 student.registrationDate
-                    ? new Date(
+                    ? formatDate(
                         student.registrationDate
-                    ).toLocaleDateString()
+                    )
                     : "-";
 
 
@@ -357,58 +555,115 @@ function renderStudents() {
                 );
 
 
+            const className =
+                student.className ||
+                (
+                    student.classNumber
+                        ? `Class ${student.classNumber}`
+                        : "-"
+                );
+
+
             row.innerHTML = `
 
                 <td>
+
                     <span class="student-number">
+
                         ${escapeHtml(
-                            student.studentNumber || "-"
+                            student.studentNumber ||
+                            "-"
                         )}
+
                     </span>
+
                 </td>
 
+
                 <td>
+
                     <span class="student-name">
+
                         ${escapeHtml(
-                            student.name || "-"
+                            student.name ||
+                            "-"
                         )}
+
                     </span>
+
                 </td>
 
+
                 <td>
+
+                    <span class="class-badge">
+
+                        ${escapeHtml(
+                            student.academicYear ||
+                            "-"
+                        )}
+
+                    </span>
+
+                </td>
+
+
+                <td>
+
                     <span class="stage-badge">
+
                         ${escapeHtml(
                             stageName
                         )}
+
                     </span>
+
                 </td>
 
+
                 <td>
+
                     <span class="class-badge">
+
                         ${escapeHtml(
-                            student.className || "-"
+                            className
                         )}
+
                     </span>
+
                 </td>
 
+
                 <td>
+
                     ${escapeHtml(
                         registrationDate
                     )}
+
                 </td>
+
 
                 <td>
 
                     <button
                         class="table-action"
-                        onclick="viewStudent('${student.id}')">
+                        onclick="viewStudent('${escapeHtml(
+                            student.id
+                        )}')">
+
                         View
+
                     </button>
+
 
                     <button
                         class="table-action"
-                        onclick="editStudent('${student.id}')">
+                        onclick="editStudent('${escapeHtml(
+                            student.id
+                        )}')">
+
                         Edit
+
                     </button>
 
                 </td>
@@ -419,41 +674,92 @@ function renderStudents() {
             studentsTableBody.appendChild(
                 row
             );
+
         }
     );
+
 }
 
 
-// =====================================================
-// Format Stage
-// =====================================================
+/* Format stage */
 
-function formatStage(stage) {
+function formatStage(
+    stage
+) {
 
-    if (stage === "primary") {
+    if (
+        stage ===
+        "primary"
+    ) {
+
         return "Primary";
+
     }
 
 
-    if (stage === "preparatory") {
+    if (
+        stage ===
+        "preparatory"
+    ) {
+
         return "Preparatory";
+
     }
 
 
-    if (stage === "secondary") {
+    if (
+        stage ===
+        "secondary"
+    ) {
+
         return "Secondary";
+
     }
 
 
     return stage || "-";
+
 }
 
 
-// =====================================================
-// View Student
-// =====================================================
+/* Format date */
 
-function viewStudent(studentId) {
+function formatDate(
+    dateValue
+) {
+
+    if (!dateValue) {
+        return "-";
+    }
+
+
+    const date =
+        new Date(
+            dateValue
+        );
+
+
+    if (
+        isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "-";
+
+    }
+
+
+    return date.toLocaleDateString();
+
+}
+
+
+/* View student */
+
+function viewStudent(
+    studentId
+) {
 
     window.location.href =
         `student.html?id=${encodeURIComponent(
@@ -461,14 +767,15 @@ function viewStudent(studentId) {
         )}&institutionId=${encodeURIComponent(
             institution.id
         )}`;
+
 }
 
 
-// =====================================================
-// Edit Student
-// =====================================================
+/* Edit student */
 
-function editStudent(studentId) {
+function editStudent(
+    studentId
+) {
 
     window.location.href =
         `edit-student.html?id=${encodeURIComponent(
@@ -476,12 +783,11 @@ function editStudent(studentId) {
         )}&institutionId=${encodeURIComponent(
             institution.id
         )}`;
+
 }
 
 
-// =====================================================
-// Add Student
-// =====================================================
+/* Add student */
 
 function openAddStudent() {
 
@@ -489,8 +795,11 @@ function openAddStudent() {
         `add-student.html?id=${encodeURIComponent(
             institution.id
         )}`;
+
 }
 
+
+/* Events */
 
 addStudentButton.addEventListener(
     "click",
@@ -504,19 +813,17 @@ emptyAddStudentButton.addEventListener(
 );
 
 
-// =====================================================
-// Search
-// =====================================================
+academicYearFilter.addEventListener(
+    "change",
+    renderStudents
+);
+
 
 searchStudent.addEventListener(
     "input",
     renderStudents
 );
 
-
-// =====================================================
-// Stage Filter
-// =====================================================
 
 stageFilter.addEventListener(
     "change",
@@ -525,23 +832,16 @@ stageFilter.addEventListener(
         loadClassFilter();
 
         renderStudents();
+
     }
 );
 
-
-// =====================================================
-// Class Filter
-// =====================================================
 
 classFilter.addEventListener(
     "change",
     renderStudents
 );
 
-
-// =====================================================
-// Back
-// =====================================================
 
 backButton.addEventListener(
     "click",
@@ -551,20 +851,42 @@ backButton.addEventListener(
             `school.html?id=${encodeURIComponent(
                 institution.id
             )}`;
+
     }
 );
 
 
-// =====================================================
-// Escape HTML
-// =====================================================
+/* Escape HTML */
 
-function escapeHtml(value) {
+function escapeHtml(
+    value
+) {
 
     return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
 }
