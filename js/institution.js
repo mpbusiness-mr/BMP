@@ -36,6 +36,8 @@ const backButton =
 
 const editButton =
     document.getElementById("editButton");
+const usersButton =
+    document.getElementById("usersButton");
 
 
 // If institution does not exist
@@ -200,5 +202,15 @@ editButton.addEventListener(
 
         window.location.href =
             `edit-institution.html?id=${encodeURIComponent(institutionId)}`;
+    }
+);
+
+// Manage Users button
+usersButton.addEventListener(
+    "click",
+    function () {
+
+        window.location.href =
+            `users.html?id=${encodeURIComponent(institutionId)}`;
     }
 );
