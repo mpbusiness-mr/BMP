@@ -1,3 +1,4 @@
+```javascript
 // =====================================================
 // BMP Admin Dashboard
 // =====================================================
@@ -7,22 +8,11 @@
 // Check Admin Session
 // =====================================================
 
-const currentUser =
-    JSON.parse(
-        localStorage.getItem("bmpCurrentUser")
-    );
+const currentAdmin =
+    requireAdminLogin();
 
-
-// No valid Admin session
-if (
-    !currentUser ||
-    currentUser.role !== "Admin" ||
-    currentUser.status !== "active"
-) {
-
-    window.location.href =
-        "admin-login.html";
-
+if (!currentAdmin) {
+    throw new Error("Admin login required.");
 }
 
 
@@ -44,13 +34,10 @@ if (logoutButton) {
         "click",
         function () {
 
-            localStorage.removeItem(
-                "bmpCurrentUser"
-            );
+            logoutAdmin();
 
-            window.location.href =
-                "admin-login.html";
         }
     );
 
 }
+```
