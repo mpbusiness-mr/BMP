@@ -4,24 +4,17 @@
     padding: 0;
 }
 
-
 body {
     font-family: Arial, sans-serif;
-    background: #f4f6f9;
+    background: #f4f6f8;
     color: #1f2937;
-    min-height: 100vh;
 }
 
-
-/* =========================
-   Page Container
-========================= */
-
 .page-container {
-    width: 94%;
-    max-width: 1350px;
+    width: 100%;
+    max-width: 1100px;
     margin: 0 auto;
-    padding: 30px 0 50px;
+    padding: 30px 20px 50px;
 }
 
 
@@ -37,25 +30,156 @@ body {
     margin-bottom: 25px;
 }
 
-
 .page-header h1 {
     font-size: 30px;
-    font-weight: 700;
-    color: #111827;
-    margin-bottom: 7px;
+    margin-bottom: 6px;
 }
-
 
 .page-header p {
-    font-size: 15px;
     color: #6b7280;
+    font-size: 15px;
 }
-
 
 .header-actions {
     display: flex;
-    align-items: center;
     gap: 10px;
+    flex-shrink: 0;
+}
+
+
+/* =========================
+   Cards
+========================= */
+
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+.card h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+
+/* =========================
+   Information Grid
+========================= */
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.info-item {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.info-item span {
+    display: block;
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 7px;
+}
+
+.info-item strong {
+    display: block;
+    font-size: 15px;
+    color: #111827;
+    word-break: break-word;
+}
+
+
+/* =========================
+   Payment Summary
+========================= */
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.summary-item {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 18px;
+    text-align: center;
+}
+
+.summary-item span {
+    display: block;
+    color: #6b7280;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.summary-item strong {
+    display: block;
+    font-size: 24px;
+    color: #111827;
+}
+
+
+/* =========================
+   Table
+========================= */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+thead {
+    background: #f8fafc;
+}
+
+th,
+td {
+    padding: 13px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+th {
+    color: #374151;
+    font-weight: 600;
+}
+
+td {
+    color: #4b5563;
+}
+
+tbody tr:hover {
+    background: #f9fafb;
+}
+
+
+/* =========================
+   Empty State
+========================= */
+
+.empty-state {
+    text-align: center;
+    padding: 30px 15px;
+    color: #6b7280;
+    font-size: 14px;
 }
 
 
@@ -70,396 +194,29 @@ body {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition:
-        transform 0.2s ease,
-        background 0.2s ease,
-        box-shadow 0.2s ease;
+    transition: 0.2s ease;
 }
 
+.btn:hover {
+    transform: translateY(-1px);
+}
 
 .btn-primary {
-    background: #111827;
+    background: #2563eb;
     color: #ffffff;
 }
 
-
 .btn-primary:hover {
-    background: #000000;
-    box-shadow:
-        0 5px 15px rgba(17, 24, 39, 0.15);
+    background: #1d4ed8;
 }
-
 
 .btn-secondary {
-    background: #ffffff;
+    background: #e5e7eb;
     color: #374151;
-    border: 1px solid #d9dee7;
 }
-
 
 .btn-secondary:hover {
-    background: #f9fafb;
-    box-shadow:
-        0 4px 12px rgba(0, 0, 0, 0.06);
-}
-
-
-.btn:active {
-    transform: scale(0.98);
-}
-
-
-/* =========================
-   School Summary
-========================= */
-
-.school-summary {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-    margin-bottom: 25px;
-}
-
-
-.summary-item {
-    background: #ffffff;
-    border: 1px solid #e7eaf0;
-    border-radius: 12px;
-    padding: 19px 20px;
-    box-shadow:
-        0 3px 12px rgba(15, 23, 42, 0.04);
-}
-
-
-.summary-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: #8a93a3;
-    text-transform: uppercase;
-    letter-spacing: 0.4px;
-    margin-bottom: 8px;
-}
-
-
-.summary-item strong {
-    display: block;
-    font-size: 16px;
-    color: #111827;
-    word-break: break-word;
-}
-
-
-/* =========================
-   Filters Card
-========================= */
-
-.filters-card {
-    background: #ffffff;
-    border: 1px solid #e7eaf0;
-    border-radius: 14px;
-    padding: 22px;
-    margin-bottom: 20px;
-    box-shadow:
-        0 4px 15px rgba(15, 23, 42, 0.04);
-}
-
-
-.filter-header {
-    margin-bottom: 20px;
-}
-
-
-.filter-header h2 {
-    font-size: 20px;
-    color: #111827;
-    margin-bottom: 5px;
-}
-
-
-.filter-header p {
-    font-size: 14px;
-    color: #6b7280;
-}
-
-
-.filters-grid {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 15px;
-}
-
-
-.filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-}
-
-
-.filter-group label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #4b5563;
-}
-
-
-.filter-group input,
-.filter-group select {
-    width: 100%;
-    height: 43px;
-    padding: 0 12px;
-    border: 1px solid #d7dce4;
-    border-radius: 8px;
-    background: #ffffff;
-    color: #1f2937;
-    font-size: 14px;
-    transition:
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
-}
-
-
-.filter-group input:focus,
-.filter-group select:focus {
-    outline: none;
-    border-color: #9ca3af;
-    box-shadow:
-        0 0 0 3px rgba(156, 163, 175, 0.12);
-}
-
-
-/* =========================
-   Students Section
-========================= */
-
-.students-section {
-    background: #ffffff;
-    border: 1px solid #e7eaf0;
-    border-radius: 14px;
-    overflow: hidden;
-    box-shadow:
-        0 4px 15px rgba(15, 23, 42, 0.04);
-}
-
-
-/* =========================
-   Table
-========================= */
-
-.table-container {
-    width: 100%;
-    overflow-x: auto;
-}
-
-
-table {
-    width: 100%;
-    min-width: 900px;
-    border-collapse: collapse;
-}
-
-
-thead {
-    background: #f8f9fb;
-}
-
-
-th,
-td {
-    padding: 15px 17px;
-    text-align: left;
-    border-bottom: 1px solid #e9edf2;
-    font-size: 14px;
-}
-
-
-th {
-    color: #4b5563;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    white-space: nowrap;
-}
-
-
-td {
-    color: #374151;
-}
-
-
-tbody tr {
-    transition: background 0.15s ease;
-}
-
-
-tbody tr:hover {
-    background: #fafbfc;
-}
-
-
-tbody tr:last-child td {
-    border-bottom: none;
-}
-
-
-/* =========================
-   Student Number
-========================= */
-
-.student-number {
-    font-weight: 700;
-    color: #111827;
-}
-
-
-/* =========================
-   Student Name
-========================= */
-
-.student-name {
-    font-weight: 600;
-    color: #111827;
-}
-
-
-/* =========================
-   Stage / Class Badges
-========================= */
-
-.stage-badge,
-.class-badge {
-    display: inline-block;
-    padding: 5px 9px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-
-.stage-badge {
-    background: #f0f1f3;
-    color: #374151;
-}
-
-
-.class-badge {
-    background: #f7f7f8;
-    color: #4b5563;
-}
-
-
-/* =========================
-   Action Buttons
-========================= */
-
-.table-action {
-    border: 1px solid #d9dee7;
-    background: #ffffff;
-    color: #374151;
-    border-radius: 6px;
-    padding: 7px 11px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-right: 5px;
-    transition:
-        background 0.2s ease,
-        border-color 0.2s ease;
-}
-
-
-.table-action:hover {
-    background: #f5f6f8;
-    border-color: #c8ced8;
-}
-
-
-/* =========================
-   Empty State
-========================= */
-
-.empty-state {
-    display: none;
-    padding: 65px 20px;
-    text-align: center;
-}
-
-
-.empty-icon {
-    width: 52px;
-    height: 52px;
-    margin: 0 auto 15px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    border-radius: 50%;
-
-    background: #f1f2f4;
-    color: #6b7280;
-
-    font-size: 28px;
-    font-weight: 300;
-}
-
-
-.empty-state h3 {
-    font-size: 20px;
-    color: #111827;
-    margin-bottom: 8px;
-}
-
-
-.empty-state p {
-    max-width: 400px;
-    margin: 0 auto 20px;
-    color: #737b89;
-    font-size: 14px;
-    line-height: 1.6;
-}
-
-
-/* =========================
-   Focus Accessibility
-========================= */
-
-.btn:focus-visible,
-.table-action:focus-visible,
-.filter-group input:focus-visible,
-.filter-group select:focus-visible {
-    outline: 3px solid rgba(17, 24, 39, 0.15);
-    outline-offset: 2px;
-}
-
-
-/* =========================
-   Tablet
-========================= */
-
-@media (max-width: 900px) {
-
-    .page-container {
-        width: 94%;
-    }
-
-
-    .school-summary {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-
-    .filters-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
-
-    .search-group {
-        grid-column: 1 / -1;
-    }
-
+    background: #d1d5db;
 }
 
 
@@ -467,75 +224,39 @@ tbody tr:last-child td {
    Mobile
 ========================= */
 
-@media (max-width: 600px) {
+@media (max-width: 700px) {
 
     .page-container {
-        width: 94%;
-        padding: 20px 0 35px;
+        padding: 20px 15px 40px;
     }
-
 
     .page-header {
+        align-items: flex-start;
         flex-direction: column;
-        align-items: stretch;
     }
-
 
     .page-header h1 {
         font-size: 25px;
     }
 
-
     .header-actions {
-        flex-direction: column;
         width: 100%;
     }
-
 
     .header-actions .btn {
-        width: 100%;
+        flex: 1;
     }
 
-
-    .school-summary {
-        grid-template-columns: 1fr;
-        gap: 12px;
+    .card {
+        padding: 20px;
     }
 
-
-    .summary-item {
-        padding: 16px;
-    }
-
-
-    .filters-card {
-        padding: 18px;
-    }
-
-
-    .filters-grid {
+    .info-grid {
         grid-template-columns: 1fr;
     }
 
-
-    .search-group {
-        grid-column: auto;
-    }
-
-
-    .students-section {
-        border-radius: 12px;
-    }
-
-
-    th,
-    td {
-        padding: 13px 14px;
-    }
-
-
-    .empty-state {
-        padding: 50px 18px;
+    .summary-grid {
+        grid-template-columns: 1fr;
     }
 
 }
