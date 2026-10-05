@@ -4,9 +4,20 @@
 
 
 // =====================================================
-// Elements
+// Check Admin Session
 // =====================================================
 
+const currentAdmin =
+    requireAdminLogin();
+
+if (!currentAdmin) {
+    throw new Error("Admin login required.");
+}
+
+
+// =====================================================
+// Elements
+// =====================================================
 const institutionType =
     document.getElementById(
         "institutionType"
