@@ -1,11 +1,15 @@
 // Get institutions
 const institutions =
-    JSON.parse(localStorage.getItem("bmpInstitutions")) || [];
+    JSON.parse(
+        localStorage.getItem("bmpInstitutions")
+    ) || [];
 
 
 // Get institution ID from URL
 const urlParams =
-    new URLSearchParams(window.location.search);
+    new URLSearchParams(
+        window.location.search
+    );
 
 const institutionId =
     urlParams.get("id");
@@ -94,7 +98,9 @@ backButton.addEventListener(
     function () {
 
         window.location.href =
-            `users.html?id=${encodeURIComponent(institutionId)}`;
+            `users.html?id=${encodeURIComponent(
+                institutionId
+            )}`;
     }
 );
 
@@ -105,7 +111,9 @@ cancelButton.addEventListener(
     function () {
 
         window.location.href =
-            `users.html?id=${encodeURIComponent(institutionId)}`;
+            `users.html?id=${encodeURIComponent(
+                institutionId
+            )}`;
     }
 );
 
@@ -128,7 +136,9 @@ addUserForm.addEventListener(
         // Validate username
         if (!username) {
 
-            alert("Please enter a username.");
+            alert(
+                "Please enter a username."
+            );
 
             usernameInput.focus();
 
@@ -139,7 +149,9 @@ addUserForm.addEventListener(
         // Validate password
         if (!password) {
 
-            alert("Please enter a password.");
+            alert(
+                "Please enter a password."
+            );
 
             passwordInput.focus();
 
@@ -227,11 +239,44 @@ addUserForm.addEventListener(
 
 
         // Add user
-        users.push(newUser);
+        users.push(
+            newUser
+        );
 
 
         // Save users
-        saveUsers(users);
+        saveUsers(
+            users
+        );
+
+
+        // Activity Log
+        if (
+            typeof logActivity ===
+            "function"
+        ) {
+
+            logActivity({
+
+                institutionId:
+                    institutionId,
+
+                userId:
+                    "ADMIN",
+
+                username:
+                    "Admin",
+
+                role:
+                    "Admin",
+
+                action:
+                    "Created User",
+
+                details:
+                    `Created user "${newUser.username}" for institution "${institution.name}"`
+            });
+        }
 
 
         alert(
@@ -241,6 +286,8 @@ addUserForm.addEventListener(
 
         // Return to users page
         window.location.href =
-            `users.html?id=${encodeURIComponent(institutionId)}`;
+            `users.html?id=${encodeURIComponent(
+                institutionId
+            )}`;
     }
 );
