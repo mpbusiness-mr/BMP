@@ -1,34 +1,18 @@
+
 // =====================================================
-// Authentication & Permissions
+// BMP Institution Users
 // =====================================================
 
-const currentUser =
-    requireSchoolLogin();
 
-if (!currentUser) {
-    throw new Error(
-        "School login required."
-    );
-}
+// =====================================================
+// Check Admin Session
+// =====================================================
 
+const currentAdmin =
+    requireAdminLogin();
 
-// Only Director / Manager
-// can manage users.
-
-if (
-    currentUser.role !== "Director" &&
-    currentUser.role !== "Manager"
-) {
-
-    window.location.href =
-        "school.html?id=" +
-        encodeURIComponent(
-            currentUser.institutionId
-        );
-
-    throw new Error(
-        "User management permission denied."
-    );
+if (!currentAdmin) {
+    throw new Error("Admin login required.");
 }
 
 
@@ -36,19 +20,13 @@ if (
 // Institution
 // =====================================================
 
-const institutionId =
-    getActiveInstitutionId();
-
-if (!institutionId) {
-    throw new Error(
-        "Institution access denied."
+const urlParams =
+    new URLSearchParams(
+        window.location.search
     );
 
-
-
-const urlParams = new URLSearchParams(window.location.search);
-const institutionId = urlParams.get("id");
-
+const institutionId =
+    urlParams.get("id");
 
 // Get institutions
 const institutions =
