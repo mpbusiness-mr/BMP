@@ -1,7 +1,27 @@
 // =====================================================
 // BMP Classes & Stages
 // =====================================================
+// =====================================================
+// Authentication
+// =====================================================
 
+const currentUser =
+    requireSchoolLogin();
+
+if (!currentUser) {
+    throw new Error(
+        "School login required."
+    );
+}
+
+
+const institutionId =
+    getActiveInstitutionId();
+
+if (!institutionId) {
+    throw new Error(
+        "Institution access denied."
+    );
 
 // =====================================================
 // Get Institution ID
