@@ -194,10 +194,7 @@ const institutionIdElement =
         "institutionId"
     );
 
-///const statusElement =
-  ///  document.getElementById(
-      ///  "status"
-  ///  );
+
 const statusElement =
     document.getElementById(
         "institutionStatus"
@@ -242,6 +239,18 @@ if (statusElement) {
 
 }
 
+
+const institutionNameElement =
+    document.getElementById(
+        "institutionName"
+    );
+
+if (institutionNameElement) {
+
+    institutionNameElement.textContent =
+        institution.name || "School";
+
+}
 
 // =====================================================
 // Navigation Helper
