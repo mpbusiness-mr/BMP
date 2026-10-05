@@ -194,11 +194,14 @@ const institutionIdElement =
         "institutionId"
     );
 
+///const statusElement =
+  ///  document.getElementById(
+      ///  "status"
+  ///  );
 const statusElement =
     document.getElementById(
-        "status"
-    );
-
+        "institutionStatus"
+   );
 
 // =====================================================
 // Display Institution
