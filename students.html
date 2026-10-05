@@ -15,6 +15,7 @@
     <div class="page-container">
 
         <!-- Header -->
+
         <header class="page-header">
 
             <div>
@@ -46,7 +47,8 @@
         </header>
 
 
-        <!-- School Information -->
+        <!-- School Summary -->
+
         <section class="school-summary">
 
             <div class="summary-item">
@@ -55,8 +57,7 @@
                     Institution ID
                 </span>
 
-                <strong
-                    id="institutionId">
+                <strong id="institutionId">
                     -
                 </strong>
 
@@ -69,8 +70,7 @@
                     School
                 </span>
 
-                <strong
-                    id="institutionName">
+                <strong id="institutionName">
                     -
                 </strong>
 
@@ -80,11 +80,10 @@
             <div class="summary-item">
 
                 <span class="summary-label">
-                    Total Students
+                    Students in Selected Year
                 </span>
 
-                <strong
-                    id="totalStudents">
+                <strong id="totalStudents">
                     0
                 </strong>
 
@@ -94,11 +93,13 @@
 
 
         <!-- Filters -->
+
         <section class="filters-card">
 
             <div class="filter-header">
 
                 <div>
+
                     <h2>
                         Student List
                     </h2>
@@ -106,6 +107,7 @@
                     <p>
                         Search and filter students
                     </p>
+
                 </div>
 
             </div>
@@ -113,7 +115,29 @@
 
             <div class="filters-grid">
 
+
+                <!-- Academic Year -->
+
+                <div class="filter-group">
+
+                    <label for="academicYearFilter">
+                        Academic Year
+                    </label>
+
+                    <select
+                        id="academicYearFilter">
+
+                        <option value="all">
+                            All Academic Years
+                        </option>
+
+                    </select>
+
+                </div>
+
+
                 <!-- Search -->
+
                 <div class="filter-group search-group">
 
                     <label for="searchStudent">
@@ -130,13 +154,15 @@
 
 
                 <!-- Stage -->
+
                 <div class="filter-group">
 
                     <label for="stageFilter">
                         Stage
                     </label>
 
-                    <select id="stageFilter">
+                    <select
+                        id="stageFilter">
 
                         <option value="all">
                             All Stages
@@ -160,13 +186,15 @@
 
 
                 <!-- Class -->
+
                 <div class="filter-group">
 
                     <label for="classFilter">
                         Class
                     </label>
 
-                    <select id="classFilter">
+                    <select
+                        id="classFilter">
 
                         <option value="all">
                             All Classes
@@ -181,7 +209,8 @@
         </section>
 
 
-        <!-- Students Table -->
+        <!-- Students -->
+
         <section class="students-section">
 
             <div class="table-container">
@@ -198,6 +227,10 @@
 
                             <th>
                                 Student Name
+                            </th>
+
+                            <th>
+                                Academic Year
                             </th>
 
                             <th>
@@ -220,7 +253,6 @@
 
                     </thead>
 
-
                     <tbody id="studentsTableBody">
                     </tbody>
 
@@ -230,6 +262,7 @@
 
 
             <!-- Empty State -->
+
             <div
                 id="emptyState"
                 class="empty-state">
@@ -243,7 +276,8 @@
                 </h3>
 
                 <p>
-                    There are no students matching your search or filters.
+                    There are no students matching
+                    your search or filters.
                 </p>
 
                 <button
