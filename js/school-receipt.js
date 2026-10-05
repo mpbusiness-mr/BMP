@@ -4,6 +4,30 @@
 
 
 // =====================================================
+// Authentication
+// =====================================================
+
+const currentUser =
+    requireSchoolLogin();
+
+if (!currentUser) {
+    throw new Error(
+        "School login required."
+    );
+}
+
+
+const institutionId =
+    getActiveInstitutionId();
+
+if (!institutionId) {
+    throw new Error(
+        "Institution access denied."
+    );
+}
+
+
+// =====================================================
 // URL Parameters
 // =====================================================
 
@@ -11,10 +35,6 @@ const urlParams =
     new URLSearchParams(
         window.location.search
     );
-
-
-const institutionId =
-    urlParams.get("id");
 
 
 const paymentId =
