@@ -174,31 +174,8 @@ function renderInstitutions() {
 
 // View institution
 function viewInstitution(id) {
-
-    const institutions = getInstitutions();
-
-    const institution =
-        institutions.find(item => item.id === id);
-
-    if (!institution) {
-        alert("Institution not found.");
-        return;
-    }
-
-
-    alert(
-        "Institution Information\n\n" +
-        "ID: " + institution.id + "\n" +
-        "Name: " + institution.name + "\n" +
-        "Type: " + institution.type + "\n" +
-        "Phone: " + (institution.phone || "-") + "\n" +
-        "Email: " + (institution.email || "-") + "\n" +
-        "Username: " + institution.username + "\n" +
-        "License: " +
-        (institution.licenseStart || "-") +
-        " - " +
-        (institution.licenseEnd || "-")
-    );
+    window.location.href =
+        `institution.html?id=${encodeURIComponent(id)}`;
 }
 
 
