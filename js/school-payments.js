@@ -2,12 +2,32 @@
    School Payments - BMP
    ================================= */
 
-const params = new URLSearchParams(window.location.search);
+// =====================================================
+// Authentication
+// =====================================================
 
-const institutionId = params.get("id");
+const currentUser = requireSchoolLogin();
+
+if (!currentUser) {
+    throw new Error("School login required.");
+}
+
+const institutionId =
+    getActiveInstitutionId();
+
+if (!institutionId) {
+    throw new Error("Institution access denied.");
+}
+
+
+// =====================================================
+// Storage Keys
+// =====================================================
 
 const studentsKey = "bmpStudents";
+
 const paymentsKey = "bmpPayments";
+
 const institutionsKey = "bmpInstitutions";
 
 
