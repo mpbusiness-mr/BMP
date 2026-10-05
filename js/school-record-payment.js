@@ -2,12 +2,34 @@
    School Record Payment - BMP
    ================================= */
 
-const params = new URLSearchParams(
-    window.location.search
-);
+
+// =================================
+// Authentication
+// =================================
+
+const currentUser =
+    requireSchoolLogin();
+
+if (!currentUser) {
+    throw new Error(
+        "School login required."
+    );
+}
+
 
 const institutionId =
-    params.get("id");
+    getActiveInstitutionId();
+
+if (!institutionId) {
+    throw new Error(
+        "Institution access denied."
+    );
+}
+
+
+// =================================
+// Storage Keys
+// =================================
 
 const studentsKey =
     "bmpStudents";
@@ -17,7 +39,6 @@ const paymentsKey =
 
 const institutionsKey =
     "bmpInstitutions";
-
 
 /* =================================
    Helpers
