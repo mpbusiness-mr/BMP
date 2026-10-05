@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Record School Payment - BMP</title>
+
+    <link
+        rel="stylesheet"
+        href="school-record-payment.css">
+
+</head>
+
+<body>
+
+    <div class="page-container">
+
+        <!-- Header -->
+
+        <header class="page-header">
+
+            <div>
+                <h1>Record School Payment</h1>
+                <p>Register a monthly student payment</p>
+            </div>
+
+            <div class="header-actions">
+
+                <button
+                    type="button"
+                    id="backButton"
+                    class="btn btn-secondary">
+                    Back
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- School Information -->
+
+        <section class="card">
+
+            <h2>School Information</h2>
+
+            <div class="info-grid">
+
+                <div class="info-item">
+
+                    <span>Institution ID</span>
+
+                    <strong id="institutionId">
+                        -
+                    </strong>
+
+                </div>
+
+                <div class="info-item">
+
+                    <span>School Name</span>
+
+                    <strong id="institutionName">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Payment Form -->
+
+        <section class="card">
+
+            <h2>Payment Information</h2>
+
+            <form id="paymentForm">
+
+                <div class="form-grid">
+
+
+                    <!-- Academic Year -->
+
+                    <div class="form-group">
+
+                        <label for="academicYear">
+                            Academic Year
+                        </label>
+
+                        <select
+                            id="academicYear"
+                            required>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Student -->
+
+                    <div class="form-group">
+
+                        <label for="student">
+                            Student
+                        </label>
+
+                        <select
+                            id="student"
+                            required>
+
+                            <option value="">
+                                Select Student
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Student Number -->
+
+                    <div class="form-group">
+
+                        <label for="studentNumber">
+                            Student Number
+                        </label>
+
+                        <input
+                            type="text"
+                            id="studentNumber"
+                            readonly
+                            placeholder="Student number">
+
+                    </div>
+
+
+                    <!-- Stage -->
+
+                    <div class="form-group">
+
+                        <label for="stage">
+                            Stage
+                        </label>
+
+                        <input
+                            type="text"
+                            id="stage"
+                            readonly
+                            placeholder="Stage">
+
+                    </div>
+
+
+                    <!-- Class -->
+
+                    <div class="form-group">
+
+                        <label for="className">
+                            Class
+                        </label>
+
+                        <input
+                            type="text"
+                            id="className"
+                            readonly
+                            placeholder="Class">
+
+                    </div>
+
+
+                    <!-- Month -->
+
+                    <div class="form-group">
+
+                        <label for="month">
+                            Month
+                        </label>
+
+                        <select
+                            id="month"
+                            required>
+
+                            <option value="">
+                                Select Month
+                            </option>
+
+                            <option value="October">
+                                October
+                            </option>
+
+                            <option value="November">
+                                November
+                            </option>
+
+                            <option value="December">
+                                December
+                            </option>
+
+                            <option value="January">
+                                January
+                            </option>
+
+                            <option value="February">
+                                February
+                            </option>
+
+                            <option value="March">
+                                March
+                            </option>
+
+                            <option value="April">
+                                April
+                            </option>
+
+                            <option value="May">
+                                May
+                            </option>
+
+                            <option value="June">
+                                June
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Amount -->
+
+                    <div class="form-group">
+
+                        <label for="amount">
+                            Amount
+                        </label>
+
+                        <input
+                            type="number"
+                            id="amount"
+                            min="0"
+                            step="0.01"
+                            placeholder="Enter amount"
+                            required>
+
+                    </div>
+
+
+                    <!-- Payment Date -->
+
+                    <div class="form-group">
+
+                        <label for="paymentDate">
+                            Payment Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="paymentDate"
+                            required>
+
+                    </div>
+
+
+                    <!-- Receipt Number -->
+
+                    <div class="form-group">
+
+                        <label for="receiptNumber">
+                            Receipt Number
+                        </label>
+
+                        <input
+                            type="text"
+                            id="receiptNumber"
+                            readonly
+                            placeholder="Automatically generated">
+
+                    </div>
+
+
+                    <!-- Recorded By -->
+
+                    <div class="form-group">
+
+                        <label for="recordedBy">
+                            Recorded By
+                        </label>
+
+                        <input
+                            type="text"
+                            id="recordedBy"
+                            placeholder="Current user"
+                            required>
+
+                    </div>
+
+
+                    <!-- Notes -->
+
+                    <div class="form-group form-group-full">
+
+                        <label for="notes">
+                            Notes
+                        </label>
+
+                        <textarea
+                            id="notes"
+                            rows="4"
+                            placeholder="Optional notes">
+                        </textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Error -->
+
+                <div
+                    id="errorMessage"
+                    class="message error-message"
+                    style="display: none;">
+                </div>
+
+
+                <!-- Success -->
+
+                <div
+                    id="successMessage"
+                    class="message success-message"
+                    style="display: none;">
+                </div>
+
+
+                <!-- Actions -->
+
+                <div class="form-actions">
+
+                    <button
+                        type="button"
+                        id="cancelButton"
+                        class="btn btn-secondary">
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+                        Record Payment
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+
+    <script src="js/school-record-payment.js"></script>
+
+</body>
+
+</html>
