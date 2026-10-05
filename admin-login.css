@@ -1,0 +1,224 @@
+/* =====================================================
+   BMP Admin Login
+   ===================================================== */
+
+* {
+    box-sizing: border-box;
+}
+
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f7fb;
+    color: #1f2937;
+}
+
+
+/* =====================================================
+   Page
+   ===================================================== */
+
+.login-page {
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+}
+
+
+/* =====================================================
+   Login Card
+   ===================================================== */
+
+.login-card {
+    width: 100%;
+    max-width: 430px;
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+
+    padding: 36px;
+
+    box-shadow:
+        0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+
+/* =====================================================
+   Header
+   ===================================================== */
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+
+.login-header h1 {
+    margin: 0 0 8px;
+
+    font-size: 32px;
+    font-weight: 700;
+}
+
+
+.login-header h2 {
+    margin: 0 0 10px;
+
+    font-size: 22px;
+    font-weight: 600;
+}
+
+
+.login-header p {
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+
+/* =====================================================
+   Form
+   ===================================================== */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+.form-group input {
+    width: 100%;
+
+    padding: 12px 14px;
+
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    font-size: 15px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s,
+        box-shadow 0.2s;
+}
+
+
+.form-group input:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+
+.form-group input::placeholder {
+    color: #9ca3af;
+}
+
+
+/* =====================================================
+   Button
+   ===================================================== */
+
+.btn {
+    width: 100%;
+
+    border: none;
+    border-radius: 8px;
+
+    padding: 13px 16px;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s,
+        transform 0.1s;
+}
+
+
+.btn:active {
+    transform: scale(0.99);
+}
+
+
+.btn-primary {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+
+/* =====================================================
+   Error
+   ===================================================== */
+
+.error-message {
+    min-height: 20px;
+
+    margin-top: 14px;
+
+    text-align: center;
+
+    color: #dc2626;
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   Mobile
+   ===================================================== */
+
+@media (max-width: 500px) {
+
+    .login-page {
+        padding: 16px;
+    }
+
+
+    .login-card {
+        padding: 28px 22px;
+
+        border-radius: 12px;
+    }
+
+
+    .login-header h1 {
+        font-size: 28px;
+    }
+
+
+    .login-header h2 {
+        font-size: 20px;
+    }
+
+}
