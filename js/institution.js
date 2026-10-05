@@ -590,3 +590,98 @@ if (usersButton) {
         }
     );
 }
+
+
+
+
+// =====================================================
+// Toggle Institution Status
+// =====================================================
+
+const toggleStatusButton =
+    document.getElementById(
+        "toggleStatusButton"
+    );
+
+if (toggleStatusButton) {
+
+    toggleStatusButton.addEventListener(
+        "click",
+        function () {
+
+            const isDisabled =
+                institution.status === "disabled";
+
+            const action =
+                isDisabled
+                    ? "enable"
+                    : "disable";
+
+            const confirmed =
+                confirm(
+                    `Are you sure you want to ${action} this institution?`
+                );
+
+            if (!confirmed) {
+                return;
+            }
+
+            institution.status =
+                isDisabled
+                    ? "active"
+                    : "disabled";
+
+            localStorage.setItem(
+                "bmpInstitutions",
+                JSON.stringify(
+                    institutions
+                )
+            );
+
+            if (
+                typeof logActivity ===
+                "function"
+            ) {
+
+                logActivity({
+
+                    institutionId:
+                        institution.id,
+
+                    username:
+                        "Owner",
+
+                    role:
+                        "Admin",
+
+                    action:
+                        isDisabled
+                            ? "Enabled Institution"
+                            : "Disabled Institution",
+
+                    details:
+                        `${institution.type}: ${institution.name}`
+
+                });
+            }
+
+            loadInstitution();
+
+            toggleStatusButton.textContent =
+                institution.status === "disabled"
+                    ? "Enable Institution"
+                    : "Disable Institution";
+
+            toggleStatusButton.className =
+                institution.status === "disabled"
+                    ? "btn btn-success"
+                    : "btn btn-warning";
+
+            alert(
+                institution.status === "disabled"
+                    ? "Institution enabled successfully."
+                    : "Institution disabled successfully."
+            );
+        }
+    );
+}
