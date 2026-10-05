@@ -1,416 +1,554 @@
-/* =================================
-   School Receipt - BMP
-   ================================= */
+// =====================================================
+// BMP School Receipt
+// =====================================================
 
-const params = new URLSearchParams(
-    window.location.search
-);
+
+// =====================================================
+// URL Parameters
+// =====================================================
+
+const urlParams =
+    new URLSearchParams(
+        window.location.search
+    );
+
 
 const institutionId =
-    params.get("id");
+    urlParams.get("id");
+
 
 const paymentId =
-    params.get("paymentId");
-
-const studentsKey =
-    "bmpStudents";
-
-const paymentsKey =
-    "bmpPayments";
-
-const institutionsKey =
-    "bmpInstitutions";
+    urlParams.get("paymentId");
 
 
-/* =================================
-   Helpers
-   ================================= */
+// =====================================================
+// Storage
+// =====================================================
 
-function getData(key) {
-
-    return JSON.parse(
-        localStorage.getItem(key)
+const institutions =
+    JSON.parse(
+        localStorage.getItem(
+            "bmpInstitutions"
+        )
     ) || [];
 
-}
+
+const payments =
+    JSON.parse(
+        localStorage.getItem(
+            "bmpPayments"
+        )
+    ) || [];
 
 
-/* =================================
-   Find Payment
-   ================================= */
+const students =
+    JSON.parse(
+        localStorage.getItem(
+            "bmpStudents"
+        )
+    ) || [];
 
-function getPayment() {
 
-    const payments =
-        getData(paymentsKey);
+// =====================================================
+// Find Institution
+// =====================================================
 
-    return payments.find(
-        payment =>
-            payment.id === paymentId &&
-            payment.institutionId ===
-            institutionId
+const institution =
+    institutions.find(
+        item =>
+            item.id === institutionId
     );
 
-}
 
+// =====================================================
+// Find Payment
+// =====================================================
 
-/* =================================
-   Find Student
-   ================================= */
-
-function getStudent(studentId) {
-
-    const students =
-        getData(studentsKey);
-
-    return students.find(
-        student =>
-            student.id === studentId &&
-            student.institutionId ===
-            institutionId
+const payment =
+    payments.find(
+        item =>
+            item.id === paymentId &&
+            item.institutionId ===
+                institutionId
     );
 
-}
 
+// =====================================================
+// Elements
+// =====================================================
 
-/* =================================
-   Find Institution
-   ================================= */
-
-function getInstitution() {
-
-    const institutions =
-        getData(institutionsKey);
-
-    return institutions.find(
-        institution =>
-            institution.id ===
-            institutionId
-    );
-
-}
-
-
-/* =================================
-   Format Stage
-   ================================= */
-
-function formatStage(stage) {
-
-    const stages = {
-
-        primary: "Primary",
-
-        preparatory: "Preparatory",
-
-        secondary: "Secondary"
-
-    };
-
-    return stages[stage] ||
-        stage ||
-        "-";
-
-}
-
-
-/* =================================
-   Format Date
-   ================================= */
-
-function formatDate(date) {
-
-    if (!date) {
-        return "-";
-    }
-
-    const parsed =
-        new Date(date);
-
-    if (isNaN(parsed)) {
-        return date;
-    }
-
-    return parsed.toLocaleDateString();
-
-}
-
-
-/* =================================
-   Format Amount
-   ================================= */
-
-function formatAmount(amount) {
-
-    const number =
-        Number(amount || 0);
-
-    return number.toLocaleString();
-
-}
-
-
-/* =================================
-   Load Receipt
-   ================================= */
-
-function loadReceipt() {
-
-    const payment =
-        getPayment();
-
-    if (!payment) {
-
-        alert(
-            "Payment record not found."
-        );
-
-        return false;
-
-    }
-
-
-    const institution =
-        getInstitution();
-
-    const student =
-        getStudent(
-            payment.studentId
-        );
-
-
-    if (!institution) {
-
-        alert(
-            "Institution not found."
-        );
-
-        return false;
-
-    }
-
-
-    if (!student) {
-
-        alert(
-            "Student record not found."
-        );
-
-        return false;
-
-    }
-
-
-    /* =============================
-       School
-       ============================= */
-
+const schoolName =
     document.getElementById(
         "schoolName"
-    ).textContent =
-        institution.name || "-";
+    );
 
+
+const schoolLogoContainer =
     document.getElementById(
-        "institutionId"
-    ).textContent =
-        institution.id || "-";
+        "schoolLogoContainer"
+    );
 
 
-    /* =============================
-       Receipt
-       ============================= */
-
+const receiptNumber =
     document.getElementById(
         "receiptNumber"
-    ).textContent =
-        payment.receiptNumber || "-";
+    );
 
 
-    /* =============================
-       Academic Year
-       ============================= */
+const institutionIdElement =
+    document.getElementById(
+        "institutionId"
+    );
 
+
+const academicYear =
     document.getElementById(
         "academicYear"
-    ).textContent =
-        payment.academicYear || "-";
+    );
 
 
-    /* =============================
-       Student
-       ============================= */
-
+const studentName =
     document.getElementById(
         "studentName"
-    ).textContent =
-        student.name || "-";
+    );
 
+
+const studentNumber =
     document.getElementById(
         "studentNumber"
-    ).textContent =
-        student.studentNumber || "-";
+    );
 
+
+const stage =
     document.getElementById(
         "stage"
-    ).textContent =
-        formatStage(
-            student.stage
-        );
+    );
 
+
+const className =
     document.getElementById(
         "className"
-    ).textContent =
-        student.className ||
-        student.classNumber ||
-        "-";
+    );
 
 
-    /* =============================
-       Payment
-       ============================= */
-
+const month =
     document.getElementById(
         "month"
-    ).textContent =
-        payment.month || "-";
+    );
 
+
+const amount =
     document.getElementById(
         "amount"
-    ).textContent =
-        formatAmount(
-            payment.amount
-        );
+    );
 
+
+const paymentDate =
     document.getElementById(
         "paymentDate"
-    ).textContent =
-        formatDate(
-            payment.paymentDate
-        );
+    );
 
+
+const recordedBy =
     document.getElementById(
         "recordedBy"
-    ).textContent =
-        payment.recordedBy || "-";
+    );
 
 
-    /* =============================
-       Notes
-       ============================= */
-
-    if (payment.notes) {
-
-        document.getElementById(
-            "notes"
-        ).textContent =
-            payment.notes;
-
-        document.getElementById(
-            "notesSection"
-        ).style.display =
-            "block";
-
-    }
+const notesSection =
+    document.getElementById(
+        "notesSection"
+    );
 
 
-    return true;
+const notes =
+    document.getElementById(
+        "notes"
+    );
 
+
+const printButton =
+    document.getElementById(
+        "printButton"
+    );
+
+
+const pdfButton =
+    document.getElementById(
+        "pdfButton"
+    );
+
+
+const backButton =
+    document.getElementById(
+        "backButton"
+    );
+
+
+// =====================================================
+// Check Institution
+// =====================================================
+
+if (!institution) {
+
+    alert(
+        "School not found."
+    );
+
+    window.location.href =
+        "institutions.html";
 }
 
 
-/* =================================
-   Print Receipt
-   ================================= */
+// =====================================================
+// Check Payment
+// =====================================================
 
-function printReceipt() {
+else if (!payment) {
 
-    window.print();
-
-}
-
-
-/* =================================
-   Save as PDF
-   ================================= */
-
-function saveAsPDF() {
-
-    /*
-       Browsers use the system print
-       dialog to save a webpage as PDF.
-
-       The user can select:
-       "Save as PDF"
-    */
-
-    window.print();
-
-}
-
-
-/* =================================
-   Back to Payments
-   ================================= */
-
-function goBack() {
+    alert(
+        "Payment not found."
+    );
 
     window.location.href =
         `school-payments.html?id=${encodeURIComponent(
             institutionId
         )}`;
-
 }
 
 
-/* =================================
-   Events
-   ================================= */
+// =====================================================
+// Load Receipt
+// =====================================================
 
-document
-    .getElementById(
-        "printButton"
-    )
-    .addEventListener(
-        "click",
-        printReceipt
-    );
-
-
-document
-    .getElementById(
-        "pdfButton"
-    )
-    .addEventListener(
-        "click",
-        saveAsPDF
-    );
-
-
-document
-    .getElementById(
-        "backButton"
-    )
-    .addEventListener(
-        "click",
-        goBack
-    );
-
-
-/* =================================
-   Initialize
-   ================================= */
-
-if (
-    !institutionId ||
-    !paymentId
-) {
-
-    alert(
-        "Receipt information is missing."
-    );
-
-} else {
+else {
 
     loadReceipt();
 
 }
+
+
+// =====================================================
+// Load Receipt Function
+// =====================================================
+
+function loadReceipt() {
+
+    // -------------------------------------------------
+    // School Information
+    // -------------------------------------------------
+
+    schoolName.textContent =
+        institution.name ||
+        "School Name";
+
+
+    institutionIdElement.textContent =
+        institution.id ||
+        "-";
+
+
+    // -------------------------------------------------
+    // School Logo
+    // -------------------------------------------------
+
+    if (
+        institution.logo &&
+        schoolLogoContainer
+    ) {
+
+        const logo =
+            document.createElement(
+                "img"
+            );
+
+
+        logo.src =
+            institution.logo;
+
+
+        logo.alt =
+            "School Logo";
+
+
+        schoolLogoContainer.innerHTML =
+            "";
+
+
+        schoolLogoContainer.appendChild(
+            logo
+        );
+
+
+        schoolLogoContainer.style.display =
+            "block";
+
+    } else if (
+        schoolLogoContainer
+    ) {
+
+        schoolLogoContainer.style.display =
+            "none";
+    }
+
+
+    // -------------------------------------------------
+    // Receipt Information
+    // -------------------------------------------------
+
+    receiptNumber.textContent =
+        payment.receiptNumber ||
+        "-";
+
+
+    academicYear.textContent =
+        payment.academicYear ||
+        "-";
+
+
+    // -------------------------------------------------
+    // Student Information
+    // -------------------------------------------------
+
+    studentName.textContent =
+        payment.studentName ||
+        "-";
+
+
+    studentNumber.textContent =
+        payment.studentNumber ||
+        "-";
+
+
+    stage.textContent =
+        getStageName(
+            payment.studentId
+        );
+
+
+    className.textContent =
+        getClassName(
+            payment.studentId
+        );
+
+
+    // -------------------------------------------------
+    // Payment Information
+    // -------------------------------------------------
+
+    month.textContent =
+        payment.month ||
+        "-";
+
+
+    amount.textContent =
+        formatAmount(
+            payment.amount
+        );
+
+
+    paymentDate.textContent =
+        formatDate(
+            payment.paymentDate
+        );
+
+
+    recordedBy.textContent =
+        payment.recordedBy ||
+        "-";
+
+
+    // -------------------------------------------------
+    // Notes
+    // -------------------------------------------------
+
+    if (
+        payment.notes &&
+        payment.notes.trim() !== ""
+    ) {
+
+        notes.textContent =
+            payment.notes;
+
+
+        notesSection.style.display =
+            "block";
+
+    } else {
+
+        notesSection.style.display =
+            "none";
+    }
+
+
+    // -------------------------------------------------
+    // Browser Title
+    // -------------------------------------------------
+
+    document.title =
+        `${payment.receiptNumber || "Receipt"} - ${institution.name || "School"}`;
+}
+
+
+// =====================================================
+// Get Stage
+// =====================================================
+
+function getStageName(
+    studentId
+) {
+
+    const student =
+        students.find(
+            item =>
+                item.id === studentId &&
+                item.institutionId ===
+                    institutionId
+        );
+
+
+    if (!student) {
+
+        return "-";
+    }
+
+
+    return student.stage ||
+        "-";
+}
+
+
+// =====================================================
+// Get Class
+// =====================================================
+
+function getClassName(
+    studentId
+) {
+
+    const student =
+        students.find(
+            item =>
+                item.id === studentId &&
+                item.institutionId ===
+                    institutionId
+        );
+
+
+    if (!student) {
+
+        return "-";
+    }
+
+
+    return student.className ||
+        "-";
+}
+
+
+// =====================================================
+// Format Amount
+// =====================================================
+
+function formatAmount(
+    value
+) {
+
+    const number =
+        Number(value);
+
+
+    if (
+        Number.isNaN(number)
+    ) {
+
+        return value || "-";
+    }
+
+
+    const currency =
+        institution.currency ||
+        "MRU";
+
+
+    return `${number.toLocaleString()} ${currency}`;
+}
+
+
+// =====================================================
+// Format Date
+// =====================================================
+
+function formatDate(
+    value
+) {
+
+    if (!value) {
+
+        return "-";
+    }
+
+
+    const date =
+        new Date(value);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return value;
+    }
+
+
+    return date.toLocaleDateString(
+        "en-GB"
+    );
+}
+
+
+// =====================================================
+// Print Receipt
+// =====================================================
+
+printButton.addEventListener(
+    "click",
+    function () {
+
+        window.print();
+
+    }
+);
+
+
+// =====================================================
+// Save as PDF
+// =====================================================
+
+pdfButton.addEventListener(
+    "click",
+    function () {
+
+        window.print();
+
+    }
+);
+
+
+// =====================================================
+// Back to Payments
+// =====================================================
+
+backButton.addEventListener(
+    "click",
+    function () {
+
+        window.location.href =
+            `school-payments.html?id=${encodeURIComponent(
+                institutionId
+            )}`;
+
+    }
+);
