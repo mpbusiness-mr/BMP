@@ -41,3 +41,52 @@ if (logoutButton) {
 
 }
 
+
+
+// =====================================================
+// Navigation
+// =====================================================
+
+const institutionsButton =
+    document.getElementById("institutionsButton");
+
+const activityLogsButton =
+    document.getElementById("activityLogsButton");
+
+
+// =====================================================
+// Institutions
+// =====================================================
+
+if (institutionsButton) {
+
+    institutionsButton.addEventListener(
+        "click",
+        function () {
+
+            window.location.href =
+                "institutions.html";
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// Activity Logs
+// =====================================================
+
+if (activityLogsButton) {
+
+    activityLogsButton.addEventListener(
+        "click",
+        function () {
+
+            window.location.href =
+                "activity-logs.html";
+
+        }
+    );
+
+}
