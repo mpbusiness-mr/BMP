@@ -1,23 +1,67 @@
+```html
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة إدارة المؤسسات</title>
-    <link rel="stylesheet" href="style.css">
+
+    <title>BMP - Login</title>
+
+    <link rel="stylesheet" href="index.css">
 </head>
 
 <body>
 
-    <div class="container">
-        <h1>منصة إدارة المؤسسات</h1>
-        <p>نظام إدارة المدارس والمطاعم</p>
+    <main class="login-page">
 
-        <button onclick="testSystem()">
-            اختبار النظام
-        </button>
-    </div>
+        <section class="login-card">
 
-    <script src="app.js"></script>
+            <div class="logo">
+                BMP
+            </div>
+
+            <h1>Business Management Platform</h1>
+
+            <p class="subtitle">Admin Panel</p>
+
+            <form id="loginForm">
+
+                <div class="input-group">
+                    <label for="username">Username</label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        placeholder="Enter username"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter password"
+                        required
+                    >
+                </div>
+
+                <button type="submit">
+                    Login
+                </button>
+
+                <p id="loginMessage"></p>
+
+            </form>
+
+        </section>
+
+    </main>
+
+    <script src="js/login.js"></script>
+
 </body>
 </html>
+```
