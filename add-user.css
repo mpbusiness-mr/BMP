@@ -16,6 +16,7 @@ body {
     margin: 40px auto;
 }
 
+
 /* Header */
 
 .page-header {
@@ -87,8 +88,7 @@ body {
     font-weight: bold;
 }
 
-.form-group input,
-.form-group select {
+.form-group input {
     width: 100%;
     padding: 11px 12px;
     border: 1px solid #ccc;
@@ -97,14 +97,13 @@ body {
     background: #fff;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.form-group input:focus {
     outline: none;
     border-color: #333;
 }
 
 
-/* Permissions */
+/* Access */
 
 .permissions-section {
     margin-top: 25px;
@@ -116,18 +115,43 @@ body {
     margin-bottom: 15px;
 }
 
-.permission-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-    cursor: pointer;
+.access-box,
+.restricted-box {
+    padding: 16px;
+    border-radius: 7px;
+    margin-bottom: 15px;
 }
 
-.permission-item input {
-    width: 17px;
-    height: 17px;
-    cursor: pointer;
+.access-box {
+    background: #f1f8f3;
+    border: 1px solid #c8e6d0;
+}
+
+.restricted-box {
+    background: #faf4f4;
+    border: 1px solid #e3caca;
+}
+
+.access-box strong,
+.restricted-box strong {
+    display: block;
+    margin-bottom: 7px;
+}
+
+.access-box p,
+.restricted-box p {
+    color: #555;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.restricted-box ul {
+    margin-left: 20px;
+    color: #555;
+}
+
+.restricted-box li {
+    margin-bottom: 6px;
 }
 
 
