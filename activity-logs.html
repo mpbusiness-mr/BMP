@@ -1,1 +1,186 @@
 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Activity Logs - BMP Admin</title>
+
+    <link rel="stylesheet" href="activity-logs.css">
+</head>
+
+<body>
+
+    <div class="page-container">
+
+        <!-- Header -->
+        <header class="page-header">
+
+            <div>
+                <h1>Activity Logs</h1>
+                <p>
+                    View all system activity and operations
+                </p>
+            </div>
+
+            <button
+                id="backButton"
+                class="btn btn-secondary">
+                Back
+            </button>
+
+        </header>
+
+
+        <!-- Filters -->
+        <section class="filters-section">
+
+            <div class="filters-grid">
+
+                <!-- Search -->
+                <div class="filter-group">
+
+                    <label for="searchLog">
+                        Search
+                    </label>
+
+                    <input
+                        type="text"
+                        id="searchLog"
+                        placeholder="Search logs..."
+                    >
+
+                </div>
+
+
+                <!-- Institution -->
+                <div class="filter-group">
+
+                    <label for="institutionFilter">
+                        Institution
+                    </label>
+
+                    <select id="institutionFilter">
+
+                        <option value="all">
+                            All Institutions
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Role -->
+                <div class="filter-group">
+
+                    <label for="roleFilter">
+                        Role
+                    </label>
+
+                    <select id="roleFilter">
+
+                        <option value="all">
+                            All Roles
+                        </option>
+
+                        <option value="Admin">
+                            Admin
+                        </option>
+
+                        <option value="Director">
+                            Director
+                        </option>
+
+                        <option value="Manager">
+                            Manager
+                        </option>
+
+                        <option value="User">
+                            User
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Logs -->
+        <section class="logs-section">
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Institution
+                            </th>
+
+                            <th>
+                                User
+                            </th>
+
+                            <th>
+                                Role
+                            </th>
+
+                            <th>
+                                Action
+                            </th>
+
+                            <th>
+                                Date & Time
+                            </th>
+
+                            <th>
+                                Details
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="logsTableBody">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- Empty State -->
+            <div
+                id="emptyState"
+                class="empty-state">
+
+                <h3>
+                    No Activity Logs Found
+                </h3>
+
+                <p>
+                    There are no activity logs matching your filters.
+                </p>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <script src="js/activity-logs.js"></script>
+
+</body>
+
+</html>
