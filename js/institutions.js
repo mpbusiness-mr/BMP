@@ -1,80 +1,59 @@
-```javascript
-// ==========================================
-// BMP - Institutions
-// Temporary development data
-// ==========================================
+const tableBody = document.getElementById("institutionsTableBody");
+const emptyState = document.getElementById("emptyState");
 
+const searchInput = document.getElementById("searchInstitution");
+const typeFilter = document.getElementById("typeFilter");
+const statusFilter = document.getElementById("statusFilter");
 
-const institutions = [
-
-    {
-        id: "SCH-0001",
-        name: "Al Noor School",
-        type: "school",
-        status: "active",
-        license: "01/10/2026 - 31/08/2027"
-    },
-
-    {
-        id: "RES-0001",
-        name: "My Restaurant",
-        type: "restaurant",
-        status: "active",
-        license: "01/10/2026 - 31/08/2027"
-    },
-
-    {
-        id: "SCH-0002",
-        name: "Future School",
-        type: "school",
-        status: "disabled",
-        license: "01/09/2026 - 31/08/2027"
-    },
-
-    {
-        id: "RES-0002",
-        name: "Example Restaurant",
-        type: "restaurant",
-        status: "expired",
-        license: "01/01/2026 - 30/09/2026"
-    }
-
-];
-
-
-// ==========================================
-// Elements
-// ==========================================
-
-const tableBody =
-    document.getElementById("institutionsTableBody");
-
-const emptyState =
-    document.getElementById("emptyState");
-
-const searchInput =
-    document.getElementById("searchInstitution");
-
-const typeFilter =
-    document.getElementById("typeFilter");
-
-const statusFilter =
-    document.getElementById("statusFilter");
-
-const createButton =
+const createInstitutionButton =
     document.getElementById("createInstitutionButton");
 
 
-// ==========================================
-// Display Institutions
-// ==========================================
+// Get institutions from localStorage
+function getInstitutions() {
+    return JSON.parse(
+        localStorage.getItem("bmpInstitutions")
+    ) || [];
+}
 
-function displayInstitutions() {
 
-    const search =
-        searchInput.value
-            .trim()
-            .toLowerCase();
+// Save institutions
+function saveInstitutions(institutions) {
+    localStorage.setItem(
+        "bmpInstitutions",
+        JSON.stringify(institutions)
+    );
+}
+
+
+// Get current status
+function getStatus(institution) {
+
+    if (institution.status === "disabled") {
+        return "disabled";
+    }
+
+    if (institution.licenseEnd) {
+
+        const today = new Date();
+        const endDate = new Date(institution.licenseEnd);
+
+        if (endDate < today) {
+            return "expired";
+        }
+    }
+
+    return "active";
+}
+
+
+// Render institutions
+function renderInstitutions() {
+
+    const institutions = getInstitutions();
+
+    const searchValue =
+        searchInput.value.trim().toLowerCase();
 
     const selectedType =
         typeFilter.value;
@@ -83,44 +62,28 @@ function displayInstitutions() {
         statusFilter.value;
 
 
-    const filteredInstitutions =
-        institutions.filter(function (institution) {
+    const filteredInstitutions = institutions.filter(institution => {
 
-            const matchesSearch =
-                institution.name
-                    .toLowerCase()
-                    .includes(search)
+        const currentStatus = getStatus(institution);
 
-                ||
+        const matchesSearch =
+            institution.name.toLowerCase().includes(searchValue) ||
+            institution.id.toLowerCase().includes(searchValue);
 
-                institution.id
-                    .toLowerCase()
-                    .includes(search);
+        const matchesType =
+            selectedType === "all" ||
+            institution.type === selectedType;
 
+        const matchesStatus =
+            selectedStatus === "all" ||
+            currentStatus === selectedStatus;
 
-            const matchesType =
-                selectedType === "all"
-
-                ||
-
-                institution.type === selectedType;
-
-
-            const matchesStatus =
-                selectedStatus === "all"
-
-                ||
-
-                institution.status === selectedStatus;
-
-
-            return (
-                matchesSearch &&
-                matchesType &&
-                matchesStatus
-            );
-
-        });
+        return (
+            matchesSearch &&
+            matchesType &&
+            matchesStatus
+        );
+    });
 
 
     tableBody.innerHTML = "";
@@ -129,235 +92,196 @@ function displayInstitutions() {
     if (filteredInstitutions.length === 0) {
 
         emptyState.style.display = "block";
-
         return;
 
+    } else {
+
+        emptyState.style.display = "none";
     }
 
 
-    emptyState.style.display = "none";
+    filteredInstitutions.forEach(institution => {
+
+        const status = getStatus(institution);
+
+        const row = document.createElement("tr");
 
 
-    filteredInstitutions.forEach(function (institution) {
+        const typeName =
+            institution.type === "school"
+                ? "School"
+                : "Restaurant";
 
-        const row =
-            document.createElement("tr");
+
+        const statusName =
+            status.charAt(0).toUpperCase() +
+            status.slice(1);
 
 
         row.innerHTML = `
+            <td>${institution.id}</td>
+
+            <td>${institution.name}</td>
 
             <td>
-                ${institution.id}
-            </td>
-
-            <td>
-                ${institution.name}
-            </td>
-
-            <td>
-                <span class="type type-${institution.type}">
-                    ${formatType(institution.type)}
+                <span class="type-badge type-${institution.type}">
+                    ${typeName}
                 </span>
             </td>
 
             <td>
-                <span class="status status-${institution.status}">
-                    ${formatStatus(institution.status)}
+                <span class="status-badge status-${status}">
+                    ${statusName}
                 </span>
             </td>
 
             <td>
-                ${institution.license}
+                ${institution.licenseStart || "-"}
+                -
+                ${institution.licenseEnd || "-"}
             </td>
 
             <td>
+                <button
+                    class="action-btn view-btn"
+                    onclick="viewInstitution('${institution.id}')">
+                    View
+                </button>
 
-                <div class="actions">
-
-                    <button
-                        class="action-button"
-                        onclick="viewInstitution('${institution.id}')"
-                    >
-                        View
-                    </button>
-
-                    <button
-                        class="action-button"
-                        onclick="toggleInstitution('${institution.id}')"
-                    >
-                        ${institution.status === "disabled"
-                            ? "Enable"
-                            : "Disable"}
-                    </button>
-
-                </div>
-
+                ${
+                    status === "disabled"
+                    ?
+                    `<button
+                        class="action-btn enable-btn"
+                        onclick="enableInstitution('${institution.id}')">
+                        Enable
+                    </button>`
+                    :
+                    `<button
+                        class="action-btn disable-btn"
+                        onclick="disableInstitution('${institution.id}')">
+                        Disable
+                    </button>`
+                }
             </td>
-
         `;
 
 
         tableBody.appendChild(row);
-
     });
-
 }
 
 
-// ==========================================
-// Format Type
-// ==========================================
-
-function formatType(type) {
-
-    if (type === "school") {
-        return "School";
-    }
-
-    if (type === "restaurant") {
-        return "Restaurant";
-    }
-
-    return type;
-
-}
-
-
-// ==========================================
-// Format Status
-// ==========================================
-
-function formatStatus(status) {
-
-    if (status === "active") {
-        return "Active";
-    }
-
-    if (status === "disabled") {
-        return "Disabled";
-    }
-
-    if (status === "expired") {
-        return "Expired";
-    }
-
-    return status;
-
-}
-
-
-// ==========================================
-// View Institution
-// ==========================================
-
+// View institution
 function viewInstitution(id) {
 
+    const institutions = getInstitutions();
+
     const institution =
-        institutions.find(function (item) {
-
-            return item.id === id;
-
-        });
-
+        institutions.find(item => item.id === id);
 
     if (!institution) {
+        alert("Institution not found.");
         return;
     }
 
 
     alert(
-        "Institution:\n\n" +
-
-        "ID: " + institution.id +
-
-        "\nName: " + institution.name +
-
-        "\nType: " + formatType(institution.type) +
-
-        "\nStatus: " + formatStatus(institution.status) +
-
-        "\nLicense: " + institution.license
+        "Institution Information\n\n" +
+        "ID: " + institution.id + "\n" +
+        "Name: " + institution.name + "\n" +
+        "Type: " + institution.type + "\n" +
+        "Phone: " + (institution.phone || "-") + "\n" +
+        "Email: " + (institution.email || "-") + "\n" +
+        "Username: " + institution.username + "\n" +
+        "License: " +
+        (institution.licenseStart || "-") +
+        " - " +
+        (institution.licenseEnd || "-")
     );
-
 }
 
 
-// ==========================================
-// Enable / Disable Institution
-// ==========================================
+// Disable institution
+function disableInstitution(id) {
 
-function toggleInstitution(id) {
+    const institutions = getInstitutions();
 
     const institution =
-        institutions.find(function (item) {
-
-            return item.id === id;
-
-        });
-
+        institutions.find(item => item.id === id);
 
     if (!institution) {
         return;
     }
 
 
-    if (institution.status === "disabled") {
+    const confirmed = confirm(
+        "Are you sure you want to disable this institution?"
+    );
 
-        institution.status = "active";
-
-    } else {
-
-        institution.status = "disabled";
-
+    if (!confirmed) {
+        return;
     }
 
 
-    displayInstitutions();
+    institution.status = "disabled";
 
+    saveInstitutions(institutions);
+
+    renderInstitutions();
 }
 
 
-// ==========================================
-// Create Institution
-// ==========================================
+// Enable institution
+function enableInstitution(id) {
 
-createButton.addEventListener(
+    const institutions = getInstitutions();
+
+    const institution =
+        institutions.find(item => item.id === id);
+
+    if (!institution) {
+        return;
+    }
+
+
+    institution.status = "active";
+
+    saveInstitutions(institutions);
+
+    renderInstitutions();
+}
+
+
+// Search
+searchInput.addEventListener(
+    "input",
+    renderInstitutions
+);
+
+
+// Type filter
+typeFilter.addEventListener(
+    "change",
+    renderInstitutions
+);
+
+
+// Status filter
+statusFilter.addEventListener(
+    "change",
+    renderInstitutions
+);
+
+
+// Create Institution
+createInstitutionButton.addEventListener(
     "click",
     function () {
-
-        alert(
-            "Create Institution module will be added next."
-        );
-
+        window.location.href = "create-institution.html";
     }
 );
 
 
-// ==========================================
-// Filters
-// ==========================================
-
-searchInput.addEventListener(
-    "input",
-    displayInstitutions
-);
-
-
-typeFilter.addEventListener(
-    "change",
-    displayInstitutions
-);
-
-
-statusFilter.addEventListener(
-    "change",
-    displayInstitutions
-);
-
-
-// ==========================================
-// Initial Display
-// ==========================================
-
-displayInstitutions();
-```
+// Initial render
+renderInstitutions();
