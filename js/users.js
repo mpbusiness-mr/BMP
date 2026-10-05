@@ -1,4 +1,3 @@
-
 const urlParams = new URLSearchParams(window.location.search);
 const institutionId = urlParams.get("id");
 
@@ -184,7 +183,7 @@ function renderUsers() {
         institutionUsers.filter(user => {
 
             const matchesSearch =
-                user.username
+                String(user.username || "")
                     .toLowerCase()
                     .includes(searchValue);
 
@@ -209,7 +208,6 @@ function renderUsers() {
         emptyState.style.display = "block";
 
         return;
-
     }
 
 
@@ -236,23 +234,19 @@ function renderUsers() {
 
         const statusName =
             user.status
-                .charAt(0)
-                .toUpperCase() +
-            user.status.slice(1);
+                ? user.status
+                    .charAt(0)
+                    .toUpperCase() +
+                  user.status.slice(1)
+                : "Active";
 
 
         let actionButton = "";
 
 
-        if (user.isMainUser) {
-
-            actionButton = `
-                <span class="role-badge">
-                    Main Account
-                </span>
-            `;
-
-        } else if (user.status === "disabled") {
+        // Admin can manage every user,
+        // including Director / Manager.
+        if (user.status === "disabled") {
 
             actionButton = `
                 <button
@@ -277,24 +271,26 @@ function renderUsers() {
         row.innerHTML = `
 
             <td>
-                ${user.username}
+                ${escapeHtml(user.username || "-")}
             </td>
 
             <td>
                 <span class="role-badge">
-                    ${role}
+                    ${escapeHtml(role)}
                 </span>
             </td>
 
             <td>
                 <span
-                    class="status-badge status-${user.status}">
-                    ${statusName}
+                    class="status-badge status-${escapeHtml(
+                        user.status || "active"
+                    )}">
+                    ${escapeHtml(statusName)}
                 </span>
             </td>
 
             <td>
-                ${createdDate}
+                ${escapeHtml(createdDate)}
             </td>
 
             <td>
@@ -322,23 +318,21 @@ function disableUser(userId) {
 
 
     if (!user) {
+
+        alert("User not found.");
+
         return;
     }
 
 
-    if (user.isMainUser) {
-
-        alert(
-            "The main account cannot be disabled."
-        );
-
+    if (user.status === "disabled") {
         return;
     }
 
 
     const confirmed =
         confirm(
-            "Are you sure you want to disable this user?"
+            `Are you sure you want to disable user "${user.username}"?`
         );
 
 
@@ -352,6 +346,36 @@ function disableUser(userId) {
 
 
     saveUsers(users);
+
+
+    // Activity Log
+    if (
+        typeof logActivity ===
+        "function"
+    ) {
+
+        logActivity({
+
+            institutionId:
+                institution.id,
+
+            userId:
+                "ADMIN",
+
+            username:
+                "Admin",
+
+            role:
+                "Admin",
+
+            action:
+                "Disabled User",
+
+            details:
+                `Disabled user "${user.username}" (${user.role || "User"})`
+        });
+    }
+
 
     renderUsers();
 }
@@ -370,6 +394,14 @@ function enableUser(userId) {
 
 
     if (!user) {
+
+        alert("User not found.");
+
+        return;
+    }
+
+
+    if (user.status === "active") {
         return;
     }
 
@@ -380,7 +412,49 @@ function enableUser(userId) {
 
     saveUsers(users);
 
+
+    // Activity Log
+    if (
+        typeof logActivity ===
+        "function"
+    ) {
+
+        logActivity({
+
+            institutionId:
+                institution.id,
+
+            userId:
+                "ADMIN",
+
+            username:
+                "Admin",
+
+            role:
+                "Admin",
+
+            action:
+                "Enabled User",
+
+            details:
+                `Enabled user "${user.username}" (${user.role || "User"})`
+        });
+    }
+
+
     renderUsers();
+}
+
+
+// Escape HTML
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 
