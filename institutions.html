@@ -1,1 +1,207 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>BMP - Institutions</title>
+
+    <link rel="stylesheet" href="institutions.css">
+
+</head>
+
+<body>
+
+    <div class="institutions-page">
+
+        <!-- Header -->
+
+        <header class="page-header">
+
+            <div class="header-left">
+
+                <h1>Institutions</h1>
+
+                <p>
+                    Manage all registered institutions
+                </p>
+
+            </div>
+
+
+            <button
+                class="create-button"
+                id="createInstitutionButton"
+            >
+                + Create Institution
+            </button>
+
+        </header>
+
+
+        <!-- Filters -->
+
+        <section class="filters-section">
+
+            <div class="search-box">
+
+                <label for="searchInstitution">
+                    Search
+                </label>
+
+                <input
+                    type="search"
+                    id="searchInstitution"
+                    placeholder="Search by name or ID..."
+                >
+
+            </div>
+
+
+            <div class="filter-box">
+
+                <label for="typeFilter">
+                    Type
+                </label>
+
+                <select id="typeFilter">
+
+                    <option value="all">
+                        All Types
+                    </option>
+
+                    <option value="school">
+                        School
+                    </option>
+
+                    <option value="restaurant">
+                        Restaurant
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="filter-box">
+
+                <label for="statusFilter">
+                    Status
+                </label>
+
+                <select id="statusFilter">
+
+                    <option value="all">
+                        All Statuses
+                    </option>
+
+                    <option value="active">
+                        Active
+                    </option>
+
+                    <option value="disabled">
+                        Disabled
+                    </option>
+
+                    <option value="expired">
+                        Expired
+                    </option>
+
+                </select>
+
+            </div>
+
+        </section>
+
+
+        <!-- Institutions Table -->
+
+        <section class="institutions-section">
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Institution ID
+                            </th>
+
+                            <th>
+                                Institution Name
+                            </th>
+
+                            <th>
+                                Type
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                            <th>
+                                License
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="institutionsTableBody">
+
+                        <!--
+                            Institution data will be
+                            loaded by institutions.js
+                        -->
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- Empty State -->
+
+            <div
+                class="empty-state"
+                id="emptyState"
+            >
+
+                <h2>
+                    No Institutions Found
+                </h2>
+
+                <p>
+                    There are no institutions matching
+                    your current filters.
+                </p>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <script src="js/institutions.js"></script>
+
+</body>
+
+</html>
+```
