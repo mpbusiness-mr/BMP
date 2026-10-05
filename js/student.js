@@ -1,10 +1,5 @@
 const urlParams =
-    new URLSearchParams(
-        window.location.search
-    );
-
-
-/* IDs from URL */
+    new URLSearchParams(window.location.search);
 
 const studentId =
     urlParams.get("id");
@@ -13,161 +8,131 @@ const institutionId =
     urlParams.get("institutionId");
 
 
-/* Get institutions */
+/* ================================
+   Elements
+================================ */
 
-const institutions =
-    JSON.parse(
-        localStorage.getItem(
-            "bmpInstitutions"
-        )
+const institutionIdElement =
+    document.getElementById("institutionId");
+
+const institutionNameElement =
+    document.getElementById("institutionName");
+
+const academicYearElement =
+    document.getElementById("academicYear");
+
+const studentNumberElement =
+    document.getElementById("studentNumber");
+
+const studentNameElement =
+    document.getElementById("studentName");
+
+const stageElement =
+    document.getElementById("stage");
+
+const classNameElement =
+    document.getElementById("className");
+
+const registrationDateElement =
+    document.getElementById("registrationDate");
+
+const studentIdElement =
+    document.getElementById("studentId");
+
+const paidMonthsElement =
+    document.getElementById("paidMonths");
+
+const unpaidMonthsElement =
+    document.getElementById("unpaidMonths");
+
+const totalPaidElement =
+    document.getElementById("totalPaid");
+
+const paymentHistoryBody =
+    document.getElementById("paymentHistoryBody");
+
+const emptyPayments =
+    document.getElementById("emptyPayments");
+
+const backButton =
+    document.getElementById("backButton");
+
+const editButton =
+    document.getElementById("editButton");
+
+
+/* ================================
+   Load Data
+================================ */
+
+function getInstitutions() {
+
+    return JSON.parse(
+        localStorage.getItem("bmpInstitutions")
     ) || [];
 
+}
 
-/* Find institution */
+
+function getStudents() {
+
+    return JSON.parse(
+        localStorage.getItem("bmpStudents")
+    ) || [];
+
+}
+
+
+function getPayments() {
+
+    return JSON.parse(
+        localStorage.getItem("bmpPayments")
+    ) || [];
+
+}
+
+
+/* ================================
+   Find Institution
+================================ */
+
+const institutions =
+    getInstitutions();
 
 const institution =
     institutions.find(
-        item =>
-            item.id === institutionId
+        item => item.id === institutionId
     );
 
-
-/* Get students */
-
-const students =
-    JSON.parse(
-        localStorage.getItem(
-            "bmpStudents"
-        )
-    ) || [];
-
-
-/*
-    Find student.
-
-    The student must belong
-    to the selected institution.
-*/
-
-const student =
-    students.find(
-        item =>
-            item.id === studentId &&
-            item.institutionId ===
-                institutionId
-    );
-
-
-/* Elements */
-
-const studentPageTitle =
-    document.getElementById(
-        "studentPageTitle"
-    );
-
-const studentPageSubtitle =
-    document.getElementById(
-        "studentPageSubtitle"
-    );
-
-const institutionIdElement =
-    document.getElementById(
-        "institutionId"
-    );
-
-const institutionNameElement =
-    document.getElementById(
-        "institutionName"
-    );
-
-const studentNumberElement =
-    document.getElementById(
-        "studentNumber"
-    );
-
-const studentNameElement =
-    document.getElementById(
-        "studentName"
-    );
-
-const studentStageElement =
-    document.getElementById(
-        "studentStage"
-    );
-
-const studentClassElement =
-    document.getElementById(
-        "studentClass"
-    );
-
-const registrationDateElement =
-    document.getElementById(
-        "registrationDate"
-    );
-
-const studentIdElement =
-    document.getElementById(
-        "studentId"
-    );
-
-const paidMonthsElement =
-    document.getElementById(
-        "paidMonths"
-    );
-
-const unpaidMonthsElement =
-    document.getElementById(
-        "unpaidMonths"
-    );
-
-const totalPaidElement =
-    document.getElementById(
-        "totalPaid"
-    );
-
-const paymentTableBody =
-    document.getElementById(
-        "paymentTableBody"
-    );
-
-const paymentEmptyState =
-    document.getElementById(
-        "paymentEmptyState"
-    );
-
-const paymentTableContainer =
-    document.getElementById(
-        "paymentTableContainer"
-    );
-
-const backButton =
-    document.getElementById(
-        "backButton"
-    );
-
-const editButton =
-    document.getElementById(
-        "editButton"
-    );
-
-
-/* Validate */
 
 if (!institution) {
 
-    alert(
-        "School not found."
-    );
+    alert("Institution not found.");
 
     window.location.href =
         "institutions.html";
 
 }
-else if (!student) {
 
-    alert(
-        "Student not found."
+
+/* ================================
+   Find Student
+================================ */
+
+const students =
+    getStudents();
+
+const student =
+    students.find(
+        item =>
+            item.id === studentId &&
+            item.institutionId === institutionId
     );
+
+
+if (!student) {
+
+    alert("Student not found.");
 
     window.location.href =
         `students.html?id=${encodeURIComponent(
@@ -175,77 +140,49 @@ else if (!student) {
         )}`;
 
 }
-else {
-
-    initializeStudentPage();
-
-}
 
 
-/* Initialize */
+/* ================================
+   Display Institution
+================================ */
 
-function initializeStudentPage() {
+institutionIdElement.textContent =
+    institution.id;
 
-    document.title =
-        `${student.name} - BMP`;
-
-
-    studentPageTitle.textContent =
-        student.name ||
-        "Student Profile";
+institutionNameElement.textContent =
+    institution.name;
 
 
-    studentPageSubtitle.textContent =
-        `Student profile for ${institution.name}`;
+/* ================================
+   Display Student
+================================ */
+
+academicYearElement.textContent =
+    student.academicYear || "-";
+
+studentNumberElement.textContent =
+    student.studentNumber || "-";
+
+studentNameElement.textContent =
+    student.name || "-";
+
+stageElement.textContent =
+    formatStage(student.stage);
+
+classNameElement.textContent =
+    student.className ||
+    `Class ${student.classNumber}`;
+
+registrationDateElement.textContent =
+    student.registrationDate || "-";
+
+studentIdElement.textContent =
+    student.id || "-";
 
 
-    institutionIdElement.textContent =
-        institution.id || "-";
-
-
-    institutionNameElement.textContent =
-        institution.name || "-";
-
-
-    studentNumberElement.textContent =
-        student.studentNumber || "-";
-
-
-    studentNameElement.textContent =
-        student.name || "-";
-
-
-    studentStageElement.textContent =
-        formatStage(
-            student.stage
-        );
-
-
-    studentClassElement.textContent =
-        student.className ||
-        (
-            student.classNumber
-                ? `Class ${student.classNumber}`
-                : "-"
-        );
-
-
-    registrationDateElement.textContent =
-        formatDate(
-            student.registrationDate
-        );
-
-
-    studentIdElement.textContent =
-        student.id || "-";
-
-
-    loadPaymentData();
-
-}
-
-
-/* Format stage */
+/* ================================
+   Format Stage
+================================ */
 
 function formatStage(stage) {
 
@@ -266,212 +203,196 @@ function formatStage(stage) {
 }
 
 
-/* Format date */
+/* ================================
+   Student Payments
+================================ */
 
-function formatDate(dateValue) {
-
-    if (!dateValue) {
-        return "-";
-    }
-
-    const date =
-        new Date(dateValue);
-
-    if (isNaN(date.getTime())) {
-        return "-";
-    }
-
-    return date.toLocaleDateString();
-
-}
+const allPayments =
+    getPayments();
 
 
-/* Load payment data */
+const studentPayments =
+    allPayments.filter(payment =>
 
-function loadPaymentData() {
+        payment.institutionId ===
+            institutionId &&
 
-    /*
-        Payments will be implemented
-        later.
+        (
+            payment.studentId ===
+                student.id ||
 
-        For now, the page checks
-        bmpPayments if it exists.
-    */
+            payment.studentNumber ===
+                student.studentNumber
+        )
 
-    const payments =
-        JSON.parse(
-            localStorage.getItem(
-                "bmpPayments"
-            )
-        ) || [];
-
-
-    const studentPayments =
-        payments.filter(
-            payment =>
-
-                payment.institutionId ===
-                    institution.id &&
-
-                payment.studentId ===
-                    student.id
-        );
-
-
-    const paidMonths =
-        studentPayments.length;
-
-
-    const totalPaid =
-        studentPayments.reduce(
-            (
-                total,
-                payment
-            ) => {
-
-                return (
-                    total +
-                    Number(
-                        payment.amount
-                    || 0)
-                );
-
-            },
-            0
-        );
-
-
-    /*
-        The full list of school months
-        will be handled by the payment
-        system later.
-
-        For now, unpaid months
-        remain zero until the payment
-        module is implemented.
-    */
-
-    const unpaidMonths = 0;
-
-
-    paidMonthsElement.textContent =
-        paidMonths;
-
-
-    unpaidMonthsElement.textContent =
-        unpaidMonths;
-
-
-    totalPaidElement.textContent =
-        formatAmount(
-            totalPaid
-        );
-
-
-    renderPaymentHistory(
-        studentPayments
     );
 
-}
+
+/* ================================
+   Payment Summary
+================================ */
+
+const paidMonths =
+    studentPayments.length;
 
 
-/* Format amount */
+const totalPaid =
+    studentPayments.reduce(
+        (total, payment) => {
+
+            return total +
+                Number(
+                    payment.amount
+                );
+
+        },
+        0
+    );
+
+
+/*
+   There are currently 12 possible
+   payment months in one academic year.
+*/
+
+const unpaidMonths =
+    Math.max(
+        0,
+        12 - paidMonths
+    );
+
+
+paidMonthsElement.textContent =
+    paidMonths;
+
+unpaidMonthsElement.textContent =
+    unpaidMonths;
+
+totalPaidElement.textContent =
+    formatAmount(totalPaid);
+
+
+/* ================================
+   Format Amount
+================================ */
 
 function formatAmount(amount) {
 
-    const number =
-        Number(amount || 0);
-
-    return number.toLocaleString();
+    return Number(amount || 0)
+        .toLocaleString();
 
 }
 
 
-/* Render payment history */
+/* ================================
+   Payment History
+================================ */
 
-function renderPaymentHistory(
-    payments
-) {
+function renderPaymentHistory() {
 
-    paymentTableBody.innerHTML =
-        "";
+    paymentHistoryBody.innerHTML = "";
 
 
     if (
-        payments.length === 0
+        studentPayments.length === 0
     ) {
 
-        paymentEmptyState.style.display =
+        emptyPayments.style.display =
             "block";
-
-        paymentTableContainer.style.display =
-            "none";
 
         return;
 
     }
 
 
-    paymentEmptyState.style.display =
+    emptyPayments.style.display =
         "none";
 
-    paymentTableContainer.style.display =
-        "block";
+
+    const sortedPayments =
+        [...studentPayments].sort(
+            (a, b) => {
+
+                const dateA =
+                    new Date(
+                        a.paymentDate ||
+                        a.date ||
+                        0
+                    );
+
+                const dateB =
+                    new Date(
+                        b.paymentDate ||
+                        b.date ||
+                        0
+                    );
+
+                return dateB - dateA;
+
+            }
+        );
 
 
-    payments.forEach(
+    sortedPayments.forEach(
         payment => {
 
             const row =
-                document.createElement(
-                    "tr"
+                document.createElement("tr");
+
+
+            const month =
+                payment.month || "-";
+
+
+            const amount =
+                formatAmount(
+                    payment.amount
                 );
+
+
+            const paymentDate =
+                payment.paymentDate ||
+                payment.date ||
+                "-";
+
+
+            const receiptNumber =
+                payment.receiptNumber ||
+                "-";
+
+
+            const recordedBy =
+                payment.username ||
+                payment.recordedBy ||
+                "-";
 
 
             row.innerHTML = `
 
                 <td>
-                    ${escapeHtml(
-                        payment.month || "-"
-                    )}
+                    ${escapeHtml(month)}
                 </td>
 
                 <td>
-                    ${escapeHtml(
-                        formatAmount(
-                            payment.amount
-                        )
-                    )}
+                    ${escapeHtml(amount)}
                 </td>
 
                 <td>
-                    ${escapeHtml(
-                        formatDate(
-                            payment.paymentDate ||
-                            payment.date
-                        )
-                    )}
+                    ${escapeHtml(paymentDate)}
                 </td>
 
                 <td>
-                    ${escapeHtml(
-                        payment.receiptNumber ||
-                        "-"
-                    )}
+                    ${escapeHtml(receiptNumber)}
                 </td>
 
                 <td>
-                    ${escapeHtml(
-                        payment.recordedBy ||
-                        payment.username ||
-                        "-"
-                    )}
+                    ${escapeHtml(recordedBy)}
                 </td>
 
             `;
 
 
-            paymentTableBody.appendChild(
+            paymentHistoryBody.appendChild(
                 row
             );
 
@@ -481,7 +402,38 @@ function renderPaymentHistory(
 }
 
 
-/* Edit Student */
+/* ================================
+   Escape HTML
+================================ */
+
+function escapeHtml(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* ================================
+   Navigation
+================================ */
+
+backButton.addEventListener(
+    "click",
+    function () {
+
+        window.location.href =
+            `students.html?id=${encodeURIComponent(
+                institutionId
+            )}`;
+
+    }
+);
+
 
 editButton.addEventListener(
     "click",
@@ -491,57 +443,15 @@ editButton.addEventListener(
             `edit-student.html?id=${encodeURIComponent(
                 student.id
             )}&institutionId=${encodeURIComponent(
-                institution.id
+                institutionId
             )}`;
 
     }
 );
 
 
-/* Back */
+/* ================================
+   Initial Render
+================================ */
 
-backButton.addEventListener(
-    "click",
-    function () {
-
-        window.location.href =
-            `students.html?id=${encodeURIComponent(
-                institution.id
-            )}`;
-
-    }
-);
-
-
-/* Escape HTML */
-
-function escapeHtml(value) {
-
-    return String(value)
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
-}
+renderPaymentHistory();
