@@ -1,41 +1,69 @@
+// Get institutions
 const institutions =
-    JSON.parse(localStorage.getItem("bmpInstitutions")) || [];
+    JSON.parse(
+        localStorage.getItem("bmpInstitutions")
+    ) || [];
 
 
 // Get institution ID from URL
-const urlParams = new URLSearchParams(window.location.search);
-const institutionId = urlParams.get("id");
+const urlParams =
+    new URLSearchParams(
+        window.location.search
+    );
+
+const institutionId =
+    urlParams.get("id");
 
 
 // Find institution
-const institution = institutions.find(
-    item => item.id === institutionId
-);
+const institution =
+    institutions.find(
+        item => item.id === institutionId
+    );
 
 
 // Elements
-const idElement = document.getElementById("institutionId");
-const nameElement = document.getElementById("institutionName");
-const typeElement = document.getElementById("institutionType");
-const statusElement = document.getElementById("institutionStatus");
+const idElement =
+    document.getElementById("institutionId");
 
-const phoneElement = document.getElementById("institutionPhone");
-const emailElement = document.getElementById("institutionEmail");
+const nameElement =
+    document.getElementById("institutionName");
 
-const licenseStartElement = document.getElementById("licenseStart");
-const licenseEndElement = document.getElementById("licenseEnd");
-const licenseStatusElement = document.getElementById("licenseStatus");
+const typeElement =
+    document.getElementById("institutionType");
 
-const usernameElement = document.getElementById("mainUsername");
+const statusElement =
+    document.getElementById("institutionStatus");
+
+const phoneElement =
+    document.getElementById("institutionPhone");
+
+const emailElement =
+    document.getElementById("institutionEmail");
+
+const licenseStartElement =
+    document.getElementById("licenseStart");
+
+const licenseEndElement =
+    document.getElementById("licenseEnd");
+
+const licenseStatusElement =
+    document.getElementById("licenseStatus");
+
+const usernameElement =
+    document.getElementById("mainUsername");
 
 const toggleStatusButton =
-    document.getElementById("toggleStatusButton");
+    document.getElementById(
+        "toggleStatusButton"
+    );
 
 const backButton =
     document.getElementById("backButton");
 
 const editButton =
     document.getElementById("editButton");
+
 const usersButton =
     document.getElementById("usersButton");
 
@@ -45,7 +73,8 @@ if (!institution) {
 
     alert("Institution not found.");
 
-    window.location.href = "institutions.html";
+    window.location.href =
+        "institutions.html";
 
 } else {
 
@@ -56,19 +85,32 @@ if (!institution) {
 // Get institution status
 function getInstitutionStatus() {
 
-    if (institution.status === "disabled") {
+    if (
+        institution.status ===
+        "disabled"
+    ) {
+
         return "disabled";
     }
 
+
     if (institution.licenseEnd) {
 
-        const today = new Date();
-        const endDate = new Date(institution.licenseEnd);
+        const today =
+            new Date();
+
+        const endDate =
+            new Date(
+                institution.licenseEnd
+            );
+
 
         if (endDate < today) {
+
             return "expired";
         }
     }
+
 
     return "active";
 }
@@ -77,46 +119,59 @@ function getInstitutionStatus() {
 // Display institution
 function displayInstitution() {
 
-    const status = getInstitutionStatus();
+    const status =
+        getInstitutionStatus();
+
 
     idElement.textContent =
         institution.id || "-";
 
+
     nameElement.textContent =
         institution.name || "-";
+
 
     typeElement.textContent =
         institution.type === "school"
             ? "School"
             : "Restaurant";
 
+
     statusElement.textContent =
         status.charAt(0).toUpperCase() +
         status.slice(1);
 
+
     phoneElement.textContent =
         institution.phone || "-";
+
 
     emailElement.textContent =
         institution.email || "-";
 
+
     licenseStartElement.textContent =
         institution.licenseStart || "-";
 
+
     licenseEndElement.textContent =
         institution.licenseEnd || "-";
+
 
     licenseStatusElement.textContent =
         status === "expired"
             ? "Expired"
             : "Valid";
 
+
     usernameElement.textContent =
         institution.username || "-";
 
 
     // Update button
-    if (status === "disabled") {
+    if (
+        status === "disabled"
+    ) {
 
         toggleStatusButton.textContent =
             "Enable Institution";
@@ -147,45 +202,125 @@ toggleStatusButton.addEventListener(
 
         const currentInstitutions =
             JSON.parse(
-                localStorage.getItem("bmpInstitutions")
+                localStorage.getItem(
+                    "bmpInstitutions"
+                )
             ) || [];
 
 
         const selectedInstitution =
             currentInstitutions.find(
-                item => item.id === institutionId
+                item =>
+                    item.id ===
+                    institutionId
             );
 
 
         if (!selectedInstitution) {
 
-            alert("Institution not found.");
+            alert(
+                "Institution not found."
+            );
 
             return;
         }
 
 
-        if (selectedInstitution.status === "disabled") {
+        // Enable institution
+        if (
+            selectedInstitution.status ===
+            "disabled"
+        ) {
 
-            selectedInstitution.status = "active";
+            selectedInstitution.status =
+                "active";
 
-        } else {
 
-            const confirmed = confirm(
-                "Are you sure you want to disable this institution?"
-            );
+            // Activity Log
+            if (
+                typeof logActivity ===
+                "function"
+            ) {
+
+                logActivity({
+
+                    institutionId:
+                        selectedInstitution.id,
+
+                    userId:
+                        "ADMIN",
+
+                    username:
+                        "Admin",
+
+                    role:
+                        "Admin",
+
+                    action:
+                        "Enabled Institution",
+
+                    details:
+                        `Enabled institution "${selectedInstitution.name}"`
+                });
+            }
+
+
+        }
+
+        // Disable institution
+        else {
+
+            const confirmed =
+                confirm(
+                    "Are you sure you want to disable this institution?"
+                );
+
 
             if (!confirmed) {
                 return;
             }
 
-            selectedInstitution.status = "disabled";
+
+            selectedInstitution.status =
+                "disabled";
+
+
+            // Activity Log
+            if (
+                typeof logActivity ===
+                "function"
+            ) {
+
+                logActivity({
+
+                    institutionId:
+                        selectedInstitution.id,
+
+                    userId:
+                        "ADMIN",
+
+                    username:
+                        "Admin",
+
+                    role:
+                        "Admin",
+
+                    action:
+                        "Disabled Institution",
+
+                    details:
+                        `Disabled institution "${selectedInstitution.name}"`
+                });
+            }
         }
 
 
+        // Save
         localStorage.setItem(
             "bmpInstitutions",
-            JSON.stringify(currentInstitutions)
+            JSON.stringify(
+                currentInstitutions
+            )
         );
 
 
@@ -201,9 +336,12 @@ editButton.addEventListener(
     function () {
 
         window.location.href =
-            `edit-institution.html?id=${encodeURIComponent(institutionId)}`;
+            `edit-institution.html?id=${encodeURIComponent(
+                institutionId
+            )}`;
     }
 );
+
 
 // Manage Users button
 usersButton.addEventListener(
@@ -211,6 +349,8 @@ usersButton.addEventListener(
     function () {
 
         window.location.href =
-            `users.html?id=${encodeURIComponent(institutionId)}`;
+            `users.html?id=${encodeURIComponent(
+                institutionId
+            )}`;
     }
 );
