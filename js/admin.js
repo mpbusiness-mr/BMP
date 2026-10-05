@@ -1,33 +1,56 @@
-// Admin Panel Navigation
+// =====================================================
+// BMP Admin Dashboard
+// =====================================================
 
 
-// Institutions button
-const institutionsButton =
-    document.getElementById("institutionsButton");
+// =====================================================
+// Check Admin Session
+// =====================================================
+
+const currentUser =
+    JSON.parse(
+        localStorage.getItem("bmpCurrentUser")
+    );
 
 
-// Activity Logs button
-const activityLogsButton =
-    document.getElementById("activityLogsButton");
+// No valid Admin session
+if (
+    !currentUser ||
+    currentUser.role !== "Admin" ||
+    currentUser.status !== "active"
+) {
+
+    window.location.href =
+        "admin-login.html";
+
+}
 
 
-// Open Institutions
-institutionsButton.addEventListener(
-    "click",
-    function () {
+// =====================================================
+// Admin Dashboard
+// =====================================================
 
-        window.location.href =
-            "institutions.html";
-    }
-);
+const logoutButton =
+    document.getElementById("logoutButton");
 
 
-// Open Activity Logs
-activityLogsButton.addEventListener(
-    "click",
-    function () {
+// =====================================================
+// Logout
+// =====================================================
 
-        window.location.href =
-            "activity-logs.html";
-    }
-);
+if (logoutButton) {
+
+    logoutButton.addEventListener(
+        "click",
+        function () {
+
+            localStorage.removeItem(
+                "bmpCurrentUser"
+            );
+
+            window.location.href =
+                "admin-login.html";
+        }
+    );
+
+}
