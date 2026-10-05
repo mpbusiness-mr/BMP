@@ -3,7 +3,41 @@
 // =====================================================
 
 
-// Get institution ID from URL
+// =====================================================
+// Check Session
+// =====================================================
+
+const currentUser =
+    JSON.parse(
+        localStorage.getItem("bmpCurrentUser")
+    );
+
+
+// =====================================================
+// Validate User
+// =====================================================
+
+if (
+    !currentUser ||
+    !currentUser.institutionId ||
+    (
+        currentUser.role !== "Director" &&
+        currentUser.role !== "Manager" &&
+        currentUser.role !== "User"
+    ) ||
+    currentUser.status !== "active"
+) {
+
+    window.location.href =
+        "school-login.html";
+
+}
+
+
+// =====================================================
+// Get Institution ID
+// =====================================================
+
 const urlParams =
     new URLSearchParams(
         window.location.search
@@ -13,119 +47,80 @@ const institutionId =
     urlParams.get("id");
 
 
-// Get institutions
+// =====================================================
+// Prevent Access To Another Institution
+// =====================================================
+
+if (
+    institutionId &&
+    institutionId !==
+        currentUser.institutionId
+) {
+
+    window.location.href =
+        "school.html?id=" +
+        encodeURIComponent(
+            currentUser.institutionId
+        );
+
+}
+
+
+// Use session institution
+// if no ID exists in URL
+const activeInstitutionId =
+    currentUser.institutionId;
+
+
+// =====================================================
+// Get Institutions
+// =====================================================
+
 const institutions =
     JSON.parse(
-        localStorage.getItem("bmpInstitutions")
+        localStorage.getItem(
+            "bmpInstitutions"
+        )
     ) || [];
 
 
-// Find institution
+// =====================================================
+// Find Institution
+// =====================================================
+
 const institution =
     institutions.find(
-        item =>
-            item.id === institutionId
+        function (item) {
+
+            return (
+                item.id ===
+                activeInstitutionId
+            );
+
+        }
     );
 
 
-// =====================================================
-// Elements
-// =====================================================
-
-const schoolName =
-    document.getElementById("schoolName");
-
-const schoolInfo =
-    document.getElementById("schoolInfo");
-
-const institutionIdElement =
-    document.getElementById("institutionId");
-
-const institutionNameElement =
-    document.getElementById("institutionName");
-
-const institutionStatusElement =
-    document.getElementById("institutionStatus");
-
-const backButton =
-    document.getElementById("backButton");
-
-const studentsButton =
-    document.getElementById("studentsButton");
-
-const paymentsButton =
-    document.getElementById("paymentsButton");
-
-const receiptsButton =
-    document.getElementById("receiptsButton");
-
-const reportsButton =
-    document.getElementById("reportsButton");
-
-const classesButton =
-    document.getElementById("classesButton");
-
-const usersButton =
-    document.getElementById("usersButton");
-
-const settingsButton =
-    document.getElementById("settingsButton");
-
-
-// =====================================================
-// Check Institution
-// =====================================================
-
+// Institution not found
 if (!institution) {
 
-    alert("School not found.");
+    localStorage.removeItem(
+        "bmpCurrentUser"
+    );
 
     window.location.href =
-        "institutions.html";
+        "school-login.html";
 
-} else {
-
-    initializeSchool();
 }
 
 
 // =====================================================
-// Initialize School
+// Check Institution Status
 // =====================================================
 
-function initializeSchool() {
-
-    schoolName.textContent =
-        institution.name || "School Dashboard";
-
-
-    schoolInfo.textContent =
-        "Manage school operations";
-
-
-    institutionIdElement.textContent =
-        institution.id || "-";
-
-
-    institutionNameElement.textContent =
-        institution.name || "-";
-
-
-    institutionStatusElement.textContent =
-        getInstitutionStatus();
-
-
-    // Update browser title
-    document.title =
-        `${institution.name} - BMP`;
-}
-
-
-// =====================================================
-// Get Institution Status
-// =====================================================
-
-function getInstitutionStatus() {
+function getInstitutionStatus(
+    institution
+) {
 
     if (
         institution.status ===
@@ -133,24 +128,46 @@ function getInstitutionStatus() {
     ) {
 
         return "Disabled";
+
     }
 
 
-    if (institution.licenseEnd) {
+    if (
+        institution.licenseEnd
+    ) {
 
         const today =
             new Date();
 
-        const endDate =
+        today.setHours(
+            0,
+            0,
+            0,
+            0
+        );
+
+
+        const licenseEnd =
             new Date(
                 institution.licenseEnd
             );
 
+        licenseEnd.setHours(
+            0,
+            0,
+            0,
+            0
+        );
 
-        if (endDate < today) {
+
+        if (
+            licenseEnd < today
+        ) {
 
             return "Expired";
+
         }
+
     }
 
 
@@ -159,135 +176,111 @@ function getInstitutionStatus() {
 
 
 // =====================================================
-// Back
+// Dashboard Elements
 // =====================================================
 
-backButton.addEventListener(
-    "click",
-    function () {
+const schoolName =
+    document.getElementById(
+        "schoolName"
+    );
 
-        window.location.href =
-            `institution.html?id=${encodeURIComponent(
-                institution.id
-            )}`;
-    }
-);
+const schoolInfo =
+    document.getElementById(
+        "schoolInfo"
+    );
 
+const institutionIdElement =
+    document.getElementById(
+        "institutionId"
+    );
 
-// =====================================================
-// Students
-// =====================================================
-
-studentsButton.addEventListener(
-    "click",
-    function () {
-
-        window.location.href =
-            `students.html?id=${encodeURIComponent(
-                institution.id
-            )}`;
-    }
-);
+const statusElement =
+    document.getElementById(
+        "status"
+    );
 
 
 // =====================================================
-// Payments
+// Display Institution
 // =====================================================
 
-// =====================================================
-// Payments
-// =====================================================
+if (schoolName) {
 
-paymentsButton.addEventListener(
-    "click",
-    function () {
+    schoolName.textContent =
+        institution.name || "School";
 
-        window.location.href =
-            `school-payments.html?id=${encodeURIComponent(
-                institution.id
-            )}`;
-    }
-);
-
-// =====================================================
-// Receipts
-// =====================================================
-
-receiptsButton.addEventListener(
-    "click",
-    function () {
-
-        window.location.href =
-            `receipts.html?id=${encodeURIComponent(
-                institution.id
-            )}`;
-    }
-);
+}
 
 
-// =====================================================
-// Reports
-// =====================================================
+if (schoolInfo) {
 
-// =====================================================
-// Reports
-// =====================================================
+    schoolInfo.textContent =
+        institution.phone ||
+        institution.email ||
+        "";
 
-reportsButton.addEventListener(
-    "click",
-    function () {
+}
 
-        window.location.href =
-            `school-reports.html?id=${encodeURIComponent(
-                institution.id
-            )}`;
-    }
-);
+
+if (institutionIdElement) {
+
+    institutionIdElement.textContent =
+        institution.id;
+
+}
+
+
+if (statusElement) {
+
+    statusElement.textContent =
+        getInstitutionStatus(
+            institution
+        );
+
+}
 
 
 // =====================================================
-// Classes & Stages
+// Navigation Helper
 // =====================================================
 
-classesButton.addEventListener(
-    "click",
-    function () {
+function openSchoolPage(
+    page
+) {
 
-        window.location.href =
-            `classes.html?id=${encodeURIComponent(
-                institution.id
-            )}`;
-    }
-);
+    window.location.href =
+        page +
+        "?id=" +
+        encodeURIComponent(
+            activeInstitutionId
+        );
 
-
-// =====================================================
-// Users
-// =====================================================
-
-usersButton.addEventListener(
-    "click",
-    function () {
-
-        window.location.href =
-            `users.html?id=${encodeURIComponent(
-                institution.id
-            )}`;
-    }
-);
+}
 
 
 // =====================================================
-// Settings
+// Logout
 // =====================================================
 
-settingsButton.addEventListener(
-    "click",
-    function () {
+const logoutButton =
+    document.getElementById(
+        "logoutButton"
+    );
 
-        window.location.href =
-            `school-settings.html?id=${encodeURIComponent(
-                institution.id
-            )}`;
-    }
-);
+if (logoutButton) {
+
+    logoutButton.addEventListener(
+        "click",
+        function () {
+
+            localStorage.removeItem(
+                "bmpCurrentUser"
+            );
+
+            window.location.href =
+                "school-login.html";
+
+        }
+    );
+
+}
