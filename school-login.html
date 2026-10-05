@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>School Login - BMP</title>
+
+    <link
+        rel="stylesheet"
+        href="school-login.css">
+</head>
+
+<body>
+
+    <div class="login-page">
+
+        <div class="login-card">
+
+            <div class="login-header">
+
+                <h1>BMP</h1>
+
+                <h2>School Login</h2>
+
+                <p>
+                    Sign in to your school account.
+                </p>
+
+            </div>
+
+
+            <form id="loginForm">
+
+                <div class="form-group">
+
+                    <label for="username">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        placeholder="Enter username"
+                        autocomplete="username"
+                        required>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter password"
+                        autocomplete="current-password"
+                        required>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="btn btn-primary">
+
+                    Login
+
+                </button>
+
+
+                <div
+                    id="errorMessage"
+                    class="error-message">
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script src="js/school-login.js"></script>
+
+</body>
+
+</html>
