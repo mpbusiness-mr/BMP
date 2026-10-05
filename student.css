@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Student Profile - BMP</title>
+
+    <link rel="stylesheet" href="student.css">
+</head>
+
+<body>
+
+    <div class="page-container">
+
+        <!-- Header -->
+
+        <header class="page-header">
+
+            <div>
+                <h1 id="studentPageTitle">
+                    Student Profile
+                </h1>
+
+                <p id="studentPageSubtitle">
+                    View student information
+                </p>
+            </div>
+
+            <div class="header-actions">
+
+                <button
+                    id="backButton"
+                    class="btn btn-secondary">
+                    Back
+                </button>
+
+                <button
+                    id="editButton"
+                    class="btn btn-primary">
+                    Edit Student
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- School Information -->
+
+        <section class="card">
+
+            <h2>School Information</h2>
+
+            <div class="info-grid">
+
+                <div class="info-item">
+
+                    <span>
+                        Institution ID
+                    </span>
+
+                    <strong id="institutionId">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="info-item">
+
+                    <span>
+                        School Name
+                    </span>
+
+                    <strong id="institutionName">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Student Information -->
+
+        <section class="card">
+
+            <h2>Student Information</h2>
+
+            <div class="student-profile-grid">
+
+
+                <div class="profile-item student-number-item">
+
+                    <span>
+                        Student Number
+                    </span>
+
+                    <strong id="studentNumber">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="profile-item">
+
+                    <span>
+                        Student Name
+                    </span>
+
+                    <strong id="studentName">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="profile-item">
+
+                    <span>
+                        Stage
+                    </span>
+
+                    <strong id="studentStage">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="profile-item">
+
+                    <span>
+                        Class
+                    </span>
+
+                    <strong id="studentClass">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="profile-item">
+
+                    <span>
+                        Registration Date
+                    </span>
+
+                    <strong id="registrationDate">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="profile-item">
+
+                    <span>
+                        Student ID
+                    </span>
+
+                    <strong id="studentId">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Payment Summary -->
+
+        <section class="card">
+
+            <h2>Payment Summary</h2>
+
+            <div class="summary-grid">
+
+                <div class="summary-item">
+
+                    <span>
+                        Paid Months
+                    </span>
+
+                    <strong id="paidMonths">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Unpaid Months
+                    </span>
+
+                    <strong id="unpaidMonths">
+                        0
+                    </strong>
+
+                </div>
+
+
+                <div class="summary-item">
+
+                    <span>
+                        Total Paid
+                    </span>
+
+                    <strong id="totalPaid">
+                        0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Payment History -->
+
+        <section class="card">
+
+            <div class="section-header">
+
+                <div>
+
+                    <h2>
+                        Payment History
+                    </h2>
+
+                    <p>
+                        Student payment records
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="paymentEmptyState"
+                class="empty-state">
+
+                <h3>
+                    No Payment Records
+                </h3>
+
+                <p>
+                    Payment records will appear here
+                    after payments are registered.
+                </p>
+
+            </div>
+
+
+            <div
+                id="paymentTableContainer"
+                class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Month
+                            </th>
+
+                            <th>
+                                Amount
+                            </th>
+
+                            <th>
+                                Payment Date
+                            </th>
+
+                            <th>
+                                Receipt Number
+                            </th>
+
+                            <th>
+                                Recorded By
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="paymentTableBody">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <script src="js/student.js"></script>
+
+</body>
+
+</html>
