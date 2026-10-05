@@ -1,17 +1,23 @@
 // Get institution ID from URL
-const urlParams = new URLSearchParams(window.location.search);
-const institutionId = urlParams.get("id");
+const urlParams =
+    new URLSearchParams(window.location.search);
+
+const institutionId =
+    urlParams.get("id");
 
 
 // Get institutions
 let institutions =
-    JSON.parse(localStorage.getItem("bmpInstitutions")) || [];
+    JSON.parse(
+        localStorage.getItem("bmpInstitutions")
+    ) || [];
 
 
 // Find institution
-const institution = institutions.find(
-    item => item.id === institutionId
-);
+const institution =
+    institutions.find(
+        item => item.id === institutionId
+    );
 
 
 // Elements
@@ -54,7 +60,8 @@ if (!institution) {
 
     alert("Institution not found.");
 
-    window.location.href = "institutions.html";
+    window.location.href =
+        "institutions.html";
 
 } else {
 
@@ -195,6 +202,35 @@ saveButton.addEventListener(
         );
 
 
+        // Activity Log
+        if (
+            typeof logActivity ===
+            "function"
+        ) {
+
+            logActivity({
+
+                institutionId:
+                    institution.id,
+
+                userId:
+                    "ADMIN",
+
+                username:
+                    "Admin",
+
+                role:
+                    "Admin",
+
+                action:
+                    "Edited Institution",
+
+                details:
+                    `Updated institution "${institution.name}"`
+            });
+        }
+
+
         alert(
             "Institution updated successfully."
         );
@@ -202,7 +238,9 @@ saveButton.addEventListener(
 
         // Return to details
         window.location.href =
-            `institution.html?id=${encodeURIComponent(institution.id)}`;
+            `institution.html?id=${encodeURIComponent(
+                institution.id
+            )}`;
     }
 );
 
@@ -213,7 +251,9 @@ cancelButton.addEventListener(
     function () {
 
         window.location.href =
-            `institution.html?id=${encodeURIComponent(institutionId)}`;
+            `institution.html?id=${encodeURIComponent(
+                institutionId
+            )}`;
     }
 );
 
@@ -224,6 +264,8 @@ backButton.addEventListener(
     function () {
 
         window.location.href =
-            `institution.html?id=${encodeURIComponent(institutionId)}`;
+            `institution.html?id=${encodeURIComponent(
+                institutionId
+            )}`;
     }
 );
