@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>School Dashboard - BMP</title>
+
+    <link rel="stylesheet" href="school.css">
+</head>
+
+<body>
+
+    <div class="page-container">
+
+        <!-- Header -->
+        <header class="page-header">
+
+            <div>
+                <h1 id="schoolName">
+                    School Dashboard
+                </h1>
+
+                <p id="schoolInfo">
+                    Manage school operations
+                </p>
+            </div>
+
+            <button
+                id="backButton"
+                class="btn btn-secondary">
+                Back
+            </button>
+
+        </header>
+
+
+        <!-- School Information -->
+        <section class="school-summary">
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    Institution ID
+                </span>
+
+                <strong
+                    id="institutionId">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    School Name
+                </span>
+
+                <strong
+                    id="institutionName">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    Status
+                </span>
+
+                <strong
+                    id="institutionStatus">
+                    -
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- Dashboard -->
+        <main class="dashboard">
+
+            <!-- Students -->
+            <button
+                id="studentsButton"
+                class="dashboard-card">
+
+                <h2>
+                    Students
+                </h2>
+
+                <p>
+                    Register, search and manage students.
+                </p>
+
+            </button>
+
+
+            <!-- Payments -->
+            <button
+                id="paymentsButton"
+                class="dashboard-card">
+
+                <h2>
+                    Payments
+                </h2>
+
+                <p>
+                    Manage monthly student payments.
+                </p>
+
+            </button>
+
+
+            <!-- Receipts -->
+            <button
+                id="receiptsButton"
+                class="dashboard-card">
+
+                <h2>
+                    Receipts
+                </h2>
+
+                <p>
+                    View and manage payment receipts.
+                </p>
+
+            </button>
+
+
+            <!-- Reports -->
+            <button
+                id="reportsButton"
+                class="dashboard-card">
+
+                <h2>
+                    Reports
+                </h2>
+
+                <p>
+                    View school statistics and reports.
+                </p>
+
+            </button>
+
+
+            <!-- Classes & Stages -->
+            <button
+                id="classesButton"
+                class="dashboard-card">
+
+                <h2>
+                    Classes &amp; Stages
+                </h2>
+
+                <p>
+                    Manage academic stages and classes.
+                </p>
+
+            </button>
+
+
+            <!-- Users -->
+            <button
+                id="usersButton"
+                class="dashboard-card">
+
+                <h2>
+                    Users
+                </h2>
+
+                <p>
+                    Manage school users and access.
+                </p>
+
+            </button>
+
+
+            <!-- Settings -->
+            <button
+                id="settingsButton"
+                class="dashboard-card">
+
+                <h2>
+                    Settings
+                </h2>
+
+                <p>
+                    Manage school settings.
+                </p>
+
+            </button>
+
+        </main>
+
+    </div>
+
+
+    <script src="js/school.js"></script>
+
+</body>
+
+</html>
