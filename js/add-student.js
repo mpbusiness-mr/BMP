@@ -11,7 +11,9 @@ const institutionId =
 
 const institutions =
     JSON.parse(
-        localStorage.getItem("bmpInstitutions")
+        localStorage.getItem(
+            "bmpInstitutions"
+        )
     ) || [];
 
 
@@ -32,6 +34,11 @@ const institutionIdElement =
 const institutionNameElement =
     document.getElementById(
         "institutionName"
+    );
+
+const academicYearInput =
+    document.getElementById(
+        "academicYear"
     );
 
 const addStudentForm =
@@ -93,7 +100,7 @@ if (!institution) {
 }
 
 
-/* Initialize */
+/* Initialize page */
 
 function initializePage() {
 
@@ -104,7 +111,75 @@ function initializePage() {
         institution.name || "-";
 
 
-    /* Set today's date */
+    loadAcademicYears();
+
+
+    setTodayDate();
+
+}
+
+
+/* Load academic years */
+
+function loadAcademicYears() {
+
+    const currentYear =
+        new Date().getFullYear();
+
+
+    /*
+        Show several academic years
+        around the current year.
+    */
+
+    for (
+        let i = -1;
+        i <= 3;
+        i++
+    ) {
+
+        const startYear =
+            currentYear + i;
+
+        const endYear =
+            startYear + 1;
+
+        const value =
+            `${startYear}-${endYear}`;
+
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value =
+            value;
+
+        option.textContent =
+            value;
+
+        academicYearInput.appendChild(
+            option
+        );
+
+    }
+
+
+    /*
+        Automatically select the
+        current academic year.
+    */
+
+    academicYearInput.value =
+        `${currentYear}-${currentYear + 1}`;
+
+}
+
+
+/* Set today's date */
+
+function setTodayDate() {
 
     const today =
         new Date();
@@ -115,12 +190,18 @@ function initializePage() {
     const month =
         String(
             today.getMonth() + 1
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
 
     const day =
         String(
             today.getDate()
-        ).padStart(2, "0");
+        ).padStart(
+            2,
+            "0"
+        );
 
     registrationDateInput.value =
         `${year}-${month}-${day}`;
@@ -143,29 +224,44 @@ function getStudents() {
 
 /* Save students */
 
-function saveStudents(students) {
+function saveStudents(
+    students
+) {
 
     localStorage.setItem(
         "bmpStudents",
-        JSON.stringify(students)
+        JSON.stringify(
+            students
+        )
     );
 
 }
 
 
-/* Stage letter */
+/* Get stage letter */
 
-function getStageLetter(stage) {
+function getStageLetter(
+    stage
+) {
 
-    if (stage === "primary") {
+    if (
+        stage ===
+        "primary"
+    ) {
         return "A";
     }
 
-    if (stage === "preparatory") {
+    if (
+        stage ===
+        "preparatory"
+    ) {
         return "B";
     }
 
-    if (stage === "secondary") {
+    if (
+        stage ===
+        "secondary"
+    ) {
         return "C";
     }
 
@@ -253,6 +349,9 @@ function loadClasses() {
 
 function generateStudentNumber() {
 
+    const academicYear =
+        academicYearInput.value;
+
     const stage =
         stageInput.value;
 
@@ -261,6 +360,7 @@ function generateStudentNumber() {
 
 
     if (
+        academicYear === "" ||
         stage === "" ||
         classNumber === ""
     ) {
@@ -274,10 +374,15 @@ function generateStudentNumber() {
 
 
     const stageLetter =
-        getStageLetter(stage);
+        getStageLetter(
+            stage
+        );
 
 
     if (!stageLetter) {
+
+        studentNumberInput.value =
+            "";
 
         return "";
 
@@ -289,10 +394,13 @@ function generateStudentNumber() {
 
 
     /*
-        Only count students
-        from this school,
-        this stage,
-        and this class.
+        Count only students
+        from the same:
+
+        1. Institution
+        2. Academic year
+        3. Stage
+        4. Class
     */
 
     const classStudents =
@@ -301,6 +409,9 @@ function generateStudentNumber() {
 
                 student.institutionId ===
                     institution.id &&
+
+                student.academicYear ===
+                    academicYear &&
 
                 student.stage ===
                     stage &&
@@ -315,13 +426,11 @@ function generateStudentNumber() {
 
 
     /*
-        Next sequence number.
+        Registration order.
 
-        Example:
-
-        0 students → 001
-        1 student  → 002
-        2 students → 003
+        First student = 001
+        Second student = 002
+        Third student = 003
     */
 
     const nextNumber =
@@ -337,6 +446,13 @@ function generateStudentNumber() {
         );
 
 
+    /*
+        Example:
+
+        A + 1 + 001
+        = A1001
+    */
+
     const studentNumber =
         `${stageLetter}${classNumber}${formattedNumber}`;
 
@@ -348,6 +464,18 @@ function generateStudentNumber() {
     return studentNumber;
 
 }
+
+
+/* Academic year changed */
+
+academicYearInput.addEventListener(
+    "change",
+    function () {
+
+        generateStudentNumber();
+
+    }
+);
 
 
 /* Stage changed */
@@ -413,6 +541,9 @@ addStudentForm.addEventListener(
         event.preventDefault();
 
 
+        const academicYear =
+            academicYearInput.value;
+
         const studentName =
             studentNameInput.value.trim();
 
@@ -427,6 +558,19 @@ addStudentForm.addEventListener(
 
 
         /* Validation */
+
+        if (!academicYear) {
+
+            alert(
+                "Please select the academic year."
+            );
+
+            academicYearInput.focus();
+
+            return;
+
+        }
+
 
         if (!studentName) {
 
@@ -481,11 +625,8 @@ addStudentForm.addEventListener(
 
 
         /*
-            Generate again immediately
-            before saving.
-
-            This prevents using
-            an old displayed number.
+            Generate the number again
+            immediately before saving.
         */
 
         const studentNumber =
@@ -508,7 +649,9 @@ addStudentForm.addEventListener(
 
 
         /*
-            Final duplicate check
+            Check duplicate number
+            inside this school and
+            academic year.
         */
 
         const duplicate =
@@ -518,6 +661,9 @@ addStudentForm.addEventListener(
                     student.institutionId ===
                         institution.id &&
 
+                    student.academicYear ===
+                        academicYear &&
+
                     student.studentNumber ===
                         studentNumber
             );
@@ -526,7 +672,7 @@ addStudentForm.addEventListener(
         if (duplicate) {
 
             alert(
-                "A student with this number already exists. Please try again."
+                "This student number already exists. Please try again."
             );
 
             generateStudentNumber();
@@ -550,6 +696,9 @@ addStudentForm.addEventListener(
 
             institutionId:
                 institution.id,
+
+            academicYear:
+                academicYear,
 
             studentNumber:
                 studentNumber,
@@ -611,7 +760,7 @@ addStudentForm.addEventListener(
                     "Registered Student",
 
                 details:
-                    `Registered student "${newStudent.name}" - Student Number: ${newStudent.studentNumber}`
+                    `Registered student "${newStudent.name}" - ${newStudent.studentNumber} - Academic Year: ${newStudent.academicYear}`
 
             });
 
@@ -619,7 +768,7 @@ addStudentForm.addEventListener(
 
 
         alert(
-            `Student registered successfully.\n\nStudent Number: ${studentNumber}`
+            `Student registered successfully.\n\nStudent Number: ${studentNumber}\nAcademic Year: ${academicYear}`
         );
 
 
