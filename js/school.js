@@ -194,17 +194,20 @@ studentsButton.addEventListener(
 // Payments
 // =====================================================
 
+// =====================================================
+// Payments
+// =====================================================
+
 paymentsButton.addEventListener(
     "click",
     function () {
 
         window.location.href =
-            `payments.html?id=${encodeURIComponent(
+            `school-payments.html?id=${encodeURIComponent(
                 institution.id
             )}`;
     }
 );
-
 
 // =====================================================
 // Receipts
