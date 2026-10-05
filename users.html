@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Institution Users - BMP Admin</title>
+
+    <link rel="stylesheet" href="users.css">
+</head>
+
+<body>
+
+    <div class="page-container">
+
+        <!-- Header -->
+        <header class="page-header">
+
+            <div>
+                <h1>Institution Users</h1>
+                <p id="institutionTitle">
+                    Manage users for this institution
+                </p>
+            </div>
+
+            <button
+                id="backButton"
+                class="btn btn-secondary">
+                Back
+            </button>
+
+        </header>
+
+
+        <main class="content-container">
+
+            <!-- Institution Summary -->
+            <section class="institution-summary">
+
+                <div class="summary-item">
+                    <span class="summary-label">
+                        Institution ID
+                    </span>
+
+                    <span
+                        id="institutionId"
+                        class="summary-value">
+                        -
+                    </span>
+                </div>
+
+
+                <div class="summary-item">
+                    <span class="summary-label">
+                        Institution Name
+                    </span>
+
+                    <span
+                        id="institutionName"
+                        class="summary-value">
+                        -
+                    </span>
+                </div>
+
+
+                <div class="summary-item">
+                    <span class="summary-label">
+                        Type
+                    </span>
+
+                    <span
+                        id="institutionType"
+                        class="summary-value">
+                        -
+                    </span>
+                </div>
+
+            </section>
+
+
+            <!-- Users Section -->
+            <section class="users-section">
+
+                <div class="section-header">
+
+                    <div>
+                        <h2>Users</h2>
+                        <p>
+                            Manage accounts and user access
+                        </p>
+                    </div>
+
+                    <button
+                        id="addUserButton"
+                        class="btn btn-primary">
+                        + Add User
+                    </button>
+
+                </div>
+
+
+                <!-- Search -->
+                <div class="search-container">
+
+                    <input
+                        type="text"
+                        id="searchUser"
+                        placeholder="Search by username..."
+                    >
+
+                    <select id="userStatusFilter">
+
+                        <option value="all">
+                            All Statuses
+                        </option>
+
+                        <option value="active">
+                            Active
+                        </option>
+
+                        <option value="disabled">
+                            Disabled
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Users Table -->
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+
+                                <th>Username</th>
+
+                                <th>Role</th>
+
+                                <th>Status</th>
+
+                                <th>Created</th>
+
+                                <th>Actions</th>
+
+                            </tr>
+                        </thead>
+
+
+                        <tbody id="usersTableBody">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- Empty State -->
+                <div
+                    id="emptyState"
+                    class="empty-state">
+
+                    <h3>No Users Found</h3>
+
+                    <p>
+                        There are no users matching your search.
+                    </p>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="js/users.js"></script>
+
+</body>
+</html>
