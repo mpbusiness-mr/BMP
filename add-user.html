@@ -97,21 +97,15 @@
 
                 <div class="form-group">
 
-                    <label for="role">
+                    <label>
                         Role
                     </label>
 
-                    <select id="role" required>
-
-                        <option value="">
-                            Select Role
-                        </option>
-
-                        <option value="user">
-                            User
-                        </option>
-
-                    </select>
+                    <input
+                        type="text"
+                        value="User"
+                        readonly
+                    >
 
                 </div>
 
@@ -119,76 +113,58 @@
                 <!-- Permissions -->
                 <div class="permissions-section">
 
-                    <h3>Permissions</h3>
+                    <h3>Access</h3>
 
-                    <label class="permission-item">
+                    <div class="access-box">
 
-                        <input
-                            type="checkbox"
-                            id="permissionStudents"
-                        >
+                        <strong>
+                            Full Operational Access
+                        </strong>
 
-                        <span>
-                            Manage Students
-                        </span>
+                        <p>
+                            This user can perform all normal
+                            operations of the institution.
+                        </p>
 
-                    </label>
-
-
-                    <label class="permission-item">
-
-                        <input
-                            type="checkbox"
-                            id="permissionPayments"
-                        >
-
-                        <span>
-                            Manage Payments
-                        </span>
-
-                    </label>
+                    </div>
 
 
-                    <label class="permission-item">
+                    <div class="restricted-box">
 
-                        <input
-                            type="checkbox"
-                            id="permissionReports"
-                        >
+                        <strong>
+                            Restricted
+                        </strong>
 
-                        <span>
-                            View Reports
-                        </span>
+                        <p>
+                            User management is available only
+                            to the Director / Manager.
+                        </p>
 
-                    </label>
+                        <ul>
 
+                            <li>
+                                Cannot add users
+                            </li>
 
-                    <label class="permission-item">
+                            <li>
+                                Cannot disable users
+                            </li>
 
-                        <input
-                            type="checkbox"
-                            id="permissionReceipts"
-                        >
+                            <li>
+                                Cannot enable users
+                            </li>
 
-                        <span>
-                            Manage Receipts
-                        </span>
+                            <li>
+                                Cannot disable the Director / Manager
+                            </li>
 
-                    </label>
+                            <li>
+                                Cannot delete users
+                            </li>
 
+                        </ul>
 
-                    <label class="permission-item">
-
-                        <input
-                            type="checkbox"
-                            id="permissionTransactions"
-                        >
-
-                        <span>
-                            Manage Transactions
-                        </span>
-
-                    </label>
+                    </div>
 
                 </div>
 
