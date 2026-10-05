@@ -314,3 +314,46 @@ body {
     }
 
 }
+
+
+
+
+
+/* =====================================================
+   School Logo
+   ===================================================== */
+
+.school-brand {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+
+.school-logo-container {
+    display: none;
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+}
+
+
+.school-logo-container img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+    display: block;
+}
+
+
+/* =====================================================
+   Print
+   ===================================================== */
+
+@media print {
+
+    .school-logo-container {
+        display: block;
+    }
+
+}
