@@ -1,3 +1,20 @@
+
+// =====================================================
+// Check Admin Session
+// =====================================================
+
+// =====================================================
+// Check Admin Session
+// =====================================================
+
+const currentAdmin =
+    requireAdminLogin();
+
+if (!currentAdmin) {
+    throw new Error("Admin login required.");
+
+
+
 const tableBody = document.getElementById("institutionsTableBody");
 const emptyState = document.getElementById("emptyState");
 
