@@ -1,17 +1,77 @@
+// =====================================================
+// BMP Create Institution
+// =====================================================
+
+
+// =====================================================
+// Elements
+// =====================================================
+
 const institutionType =
-    document.getElementById("institutionType");
+    document.getElementById(
+        "institutionType"
+    );
 
 const institutionId =
-    document.getElementById("institutionId");
+    document.getElementById(
+        "institutionId"
+    );
+
+const institutionName =
+    document.getElementById(
+        "institutionName"
+    );
+
+const institutionPhone =
+    document.getElementById(
+        "institutionPhone"
+    );
+
+const institutionEmail =
+    document.getElementById(
+        "institutionEmail"
+    );
+
+const licenseStart =
+    document.getElementById(
+        "licenseStart"
+    );
+
+const licenseEnd =
+    document.getElementById(
+        "licenseEnd"
+    );
+
+const mainUsername =
+    document.getElementById(
+        "mainUsername"
+    );
+
+const mainPassword =
+    document.getElementById(
+        "mainPassword"
+    );
+
+const institutionLogo =
+    document.getElementById(
+        "institutionLogo"
+    );
 
 const createButton =
-    document.getElementById("createButton");
+    document.getElementById(
+        "createButton"
+    );
 
 const cancelButton =
-    document.getElementById("cancelButton");
+    document.getElementById(
+        "cancelButton"
+    );
 
 
+// =====================================================
 // Generate Institution ID
+// =====================================================
+
 function generateInstitutionId() {
 
     const currentYear =
@@ -20,11 +80,11 @@ function generateInstitutionId() {
             .toString()
             .slice(-2);
 
-
-    // Temporary demo counter
-    let institutions =
+    const institutions =
         JSON.parse(
-            localStorage.getItem("bmpInstitutions")
+            localStorage.getItem(
+                "bmpInstitutions"
+            )
         ) || [];
 
 
@@ -33,86 +93,158 @@ function generateInstitutionId() {
 
 
     const formattedNumber =
-        String(institutionNumber)
-            .padStart(4, "0");
+        String(
+            institutionNumber
+        ).padStart(
+            4,
+            "0"
+        );
 
 
     return `MP${formattedNumber}${currentYear}`;
 }
 
 
-// Generate ID when institution type is selected
-institutionType.addEventListener(
-    "change",
-    function () {
+// =====================================================
+// Set Institution ID
+// =====================================================
 
-        if (institutionType.value !== "") {
+institutionId.value =
+    generateInstitutionId();
 
-            institutionId.value =
-                generateInstitutionId();
 
-        } else {
+// =====================================================
+// Read Logo
+// =====================================================
 
-            institutionId.value = "";
+function readLogoFile() {
+
+    return new Promise(
+        function (resolve, reject) {
+
+            // No logo selected
+            if (
+                !institutionLogo.files ||
+                institutionLogo.files.length === 0
+            ) {
+
+                resolve(null);
+
+                return;
+            }
+
+
+            const file =
+                institutionLogo.files[0];
+
+
+            // Check file type
+
+            const allowedTypes = [
+                "image/png",
+                "image/jpeg",
+                "image/webp"
+            ];
+
+
+            if (
+                !allowedTypes.includes(
+                    file.type
+                )
+            ) {
+
+                reject(
+                    "Invalid logo format. Please use PNG, JPG or WEBP."
+                );
+
+                return;
+            }
+
+
+            // Optional size limit
+            // 2 MB
+
+            if (
+                file.size >
+                2 * 1024 * 1024
+            ) {
+
+                reject(
+                    "Logo file must be smaller than 2 MB."
+                );
+
+                return;
+            }
+
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload =
+                function () {
+
+                    resolve(
+                        reader.result
+                    );
+                };
+
+
+            reader.onerror =
+                function () {
+
+                    reject(
+                        "Unable to read the logo file."
+                    );
+                };
+
+
+            reader.readAsDataURL(
+                file
+            );
         }
-    }
-);
+    );
+}
 
 
+// =====================================================
 // Create Institution
+// =====================================================
+
 createButton.addEventListener(
     "click",
-    function () {
+    async function () {
+
+        const type =
+            institutionType.value;
 
         const name =
-            document
-                .getElementById("institutionName")
-                .value
-                .trim();
-
+            institutionName.value.trim();
 
         const phone =
-            document
-                .getElementById("phone")
-                .value
-                .trim();
-
+            institutionPhone.value.trim();
 
         const email =
-            document
-                .getElementById("email")
-                .value
-                .trim();
+            institutionEmail.value.trim();
 
+        const startDate =
+            licenseStart.value;
 
-        const licenseStart =
-            document
-                .getElementById("licenseStart")
-                .value;
-
-
-        const licenseEnd =
-            document
-                .getElementById("licenseEnd")
-                .value;
-
+        const endDate =
+            licenseEnd.value;
 
         const username =
-            document
-                .getElementById("mainUsername")
-                .value
-                .trim();
-
+            mainUsername.value.trim();
 
         const password =
-            document
-                .getElementById("mainPassword")
-                .value;
+            mainPassword.value;
 
 
+        // =================================================
         // Validation
+        // =================================================
 
-        if (institutionType.value === "") {
+        if (!type) {
 
             alert(
                 "Please select the institution type."
@@ -122,7 +254,7 @@ createButton.addEventListener(
         }
 
 
-        if (name === "") {
+        if (!name) {
 
             alert(
                 "Please enter the institution name."
@@ -132,7 +264,7 @@ createButton.addEventListener(
         }
 
 
-        if (licenseStart === "") {
+        if (!startDate) {
 
             alert(
                 "Please select the license start date."
@@ -142,7 +274,7 @@ createButton.addEventListener(
         }
 
 
-        if (licenseEnd === "") {
+        if (!endDate) {
 
             alert(
                 "Please select the license end date."
@@ -152,7 +284,10 @@ createButton.addEventListener(
         }
 
 
-        if (licenseEnd < licenseStart) {
+        if (
+            new Date(endDate) <
+            new Date(startDate)
+        ) {
 
             alert(
                 "License end date cannot be before the start date."
@@ -162,7 +297,7 @@ createButton.addEventListener(
         }
 
 
-        if (username === "") {
+        if (!username) {
 
             alert(
                 "Please enter the main username."
@@ -172,7 +307,7 @@ createButton.addEventListener(
         }
 
 
-        if (password === "") {
+        if (!password) {
 
             alert(
                 "Please enter the main password."
@@ -182,18 +317,80 @@ createButton.addEventListener(
         }
 
 
-        // Create institution
+        // =================================================
+        // Read Logo
+        // =================================================
+
+        let logo = null;
+
+
+        try {
+
+            logo =
+                await readLogoFile();
+
+        } catch (error) {
+
+            alert(error);
+
+            return;
+        }
+
+
+        // =================================================
+        // Get Existing Institutions
+        // =================================================
+
+        const institutions =
+            JSON.parse(
+                localStorage.getItem(
+                    "bmpInstitutions"
+                )
+            ) || [];
+
+
+        // =================================================
+        // Check Username
+        // =================================================
+
+        const usernameExists =
+            institutions.some(
+                function (item) {
+
+                    return (
+                        item.username &&
+                        item.username.toLowerCase() ===
+                        username.toLowerCase()
+                    );
+
+                }
+            );
+
+
+        if (usernameExists) {
+
+            alert(
+                "This username is already in use."
+            );
+
+            return;
+        }
+
+
+        // =================================================
+        // Create Institution Object
+        // =================================================
 
         const newInstitution = {
 
             id:
                 institutionId.value,
 
+            type:
+                type,
+
             name:
                 name,
-
-            type:
-                institutionType.value,
 
             phone:
                 phone,
@@ -201,11 +398,17 @@ createButton.addEventListener(
             email:
                 email,
 
+            logo:
+                logo,
+
             licenseStart:
-                licenseStart,
+                startDate,
 
             licenseEnd:
-                licenseEnd,
+                endDate,
+
+            status:
+                "active",
 
             username:
                 username,
@@ -213,38 +416,32 @@ createButton.addEventListener(
             password:
                 password,
 
-            status:
-                "active",
-
             createdAt:
                 new Date().toISOString()
+
         };
 
 
-        // Get institutions
-
-        let institutions =
-            JSON.parse(
-                localStorage.getItem("bmpInstitutions")
-            ) || [];
-
-
-        // Add institution
+        // =================================================
+        // Save Institution
+        // =================================================
 
         institutions.push(
             newInstitution
         );
 
 
-        // Save institutions
-
         localStorage.setItem(
             "bmpInstitutions",
-            JSON.stringify(institutions)
+            JSON.stringify(
+                institutions
+            )
         );
 
 
+        // =================================================
         // Activity Log
+        // =================================================
 
         if (
             typeof logActivity ===
@@ -256,11 +453,8 @@ createButton.addEventListener(
                 institutionId:
                     newInstitution.id,
 
-                userId:
-                    "ADMIN",
-
                 username:
-                    "Admin",
+                    "Owner",
 
                 role:
                     "Admin",
@@ -269,29 +463,36 @@ createButton.addEventListener(
                     "Created Institution",
 
                 details:
-                    `Created ${
-                        newInstitution.type === "school"
-                            ? "School"
-                            : "Restaurant"
-                    } "${newInstitution.name}"`
+                    `${newInstitution.type}: ${newInstitution.name}`
+
             });
         }
 
+
+        // =================================================
+        // Success
+        // =================================================
 
         alert(
             "Institution created successfully."
         );
 
 
-        // Return to institutions
+        // =================================================
+        // Redirect
+        // =================================================
 
         window.location.href =
-            "institutions.html";
+            `institution.html?id=${encodeURIComponent(
+                newInstitution.id
+            )}`;
     }
 );
 
 
+// =====================================================
 // Cancel
+// =====================================================
 
 cancelButton.addEventListener(
     "click",
