@@ -15,6 +15,7 @@
     <div class="page-container">
 
         <!-- Header -->
+
         <header class="page-header">
 
             <div>
@@ -35,6 +36,7 @@
 
 
         <!-- School Information -->
+
         <section class="card">
 
             <h2>School Information</h2>
@@ -72,6 +74,7 @@
 
 
         <!-- Student Information -->
+
         <section class="card">
 
             <h2>Student Information</h2>
@@ -80,7 +83,34 @@
             <form id="addStudentForm">
 
 
+                <!-- Academic Year -->
+
+                <div class="form-group">
+
+                    <label for="academicYear">
+                        Academic Year
+                    </label>
+
+                    <select
+                        id="academicYear"
+                        required>
+
+                        <option value="">
+                            Select academic year
+                        </option>
+
+                    </select>
+
+                    <small>
+                        The student number is generated
+                        separately for each academic year.
+                    </small>
+
+                </div>
+
+
                 <!-- Student Number -->
+
                 <div class="form-group">
 
                     <label for="studentNumber">
@@ -90,19 +120,21 @@
                     <input
                         type="text"
                         id="studentNumber"
-                        placeholder="Select stage and class"
+                        placeholder="Select academic year, stage and class"
                         readonly
                     >
 
                     <small>
-                        Automatically generated based on stage,
-                        class and registration order.
+                        Automatically generated according
+                        to the academic year, stage, class
+                        and registration order.
                     </small>
 
                 </div>
 
 
                 <!-- Student Name -->
+
                 <div class="form-group">
 
                     <label for="studentName">
@@ -120,6 +152,7 @@
 
 
                 <!-- Stage -->
+
                 <div class="form-group">
 
                     <label for="stage">
@@ -152,6 +185,7 @@
 
 
                 <!-- Class -->
+
                 <div class="form-group">
 
                     <label for="className">
@@ -172,6 +206,7 @@
 
 
                 <!-- Registration Date -->
+
                 <div class="form-group">
 
                     <label for="registrationDate">
@@ -188,6 +223,7 @@
 
 
                 <!-- Actions -->
+
                 <div class="form-actions">
 
                     <button
