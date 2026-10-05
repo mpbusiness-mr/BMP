@@ -37,24 +37,6 @@ const usernameInput =
 const passwordInput =
     document.getElementById("password");
 
-const roleInput =
-    document.getElementById("role");
-
-const permissionStudents =
-    document.getElementById("permissionStudents");
-
-const permissionPayments =
-    document.getElementById("permissionPayments");
-
-const permissionReports =
-    document.getElementById("permissionReports");
-
-const permissionReceipts =
-    document.getElementById("permissionReceipts");
-
-const permissionTransactions =
-    document.getElementById("permissionTransactions");
-
 const backButton =
     document.getElementById("backButton");
 
@@ -142,9 +124,6 @@ addUserForm.addEventListener(
         const password =
             passwordInput.value;
 
-        const role =
-            roleInput.value;
-
 
         // Validate username
         if (!username) {
@@ -163,17 +142,6 @@ addUserForm.addEventListener(
             alert("Please enter a password.");
 
             passwordInput.focus();
-
-            return;
-        }
-
-
-        // Validate role
-        if (!role) {
-
-            alert("Please select a role.");
-
-            roleInput.focus();
 
             return;
         }
@@ -222,7 +190,7 @@ addUserForm.addEventListener(
                 password,
 
             role:
-                role,
+                "user",
 
             status:
                 "active",
@@ -235,20 +203,25 @@ addUserForm.addEventListener(
 
             permissions: {
 
+                // Full operational access
                 students:
-                    permissionStudents.checked,
+                    true,
 
                 payments:
-                    permissionPayments.checked,
+                    true,
 
                 reports:
-                    permissionReports.checked,
+                    true,
 
                 receipts:
-                    permissionReceipts.checked,
+                    true,
 
                 transactions:
-                    permissionTransactions.checked
+                    true,
+
+                // User management is Director/Manager only
+                manageUsers:
+                    false
             }
         };
 
@@ -257,7 +230,7 @@ addUserForm.addEventListener(
         users.push(newUser);
 
 
-        // Save
+        // Save users
         saveUsers(users);
 
 
