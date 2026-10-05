@@ -295,3 +295,78 @@ if (logoutButton) {
     );
 
 }
+
+
+
+// =====================================================
+// Dashboard Buttons
+// =====================================================
+
+document.getElementById("studentsButton")
+    ?.addEventListener("click", function () {
+
+        window.location.href =
+            "students.html?id=" +
+            encodeURIComponent(activeInstitutionId);
+
+    });
+
+
+document.getElementById("paymentsButton")
+    ?.addEventListener("click", function () {
+
+        window.location.href =
+            "school-payments.html?id=" +
+            encodeURIComponent(activeInstitutionId);
+
+    });
+
+
+document.getElementById("receiptsButton")
+    ?.addEventListener("click", function () {
+
+        window.location.href =
+            "school-receipt.html?id=" +
+            encodeURIComponent(activeInstitutionId);
+
+    });
+
+
+document.getElementById("reportsButton")
+    ?.addEventListener("click", function () {
+
+        window.location.href =
+            "school-reports.html?id=" +
+            encodeURIComponent(activeInstitutionId);
+
+    });
+
+
+document.getElementById("classesButton")
+    ?.addEventListener("click", function () {
+
+        window.location.href =
+            "classes.html?id=" +
+            encodeURIComponent(activeInstitutionId);
+
+    });
+
+
+document.getElementById("usersButton")
+    ?.addEventListener("click", function () {
+
+        window.location.href =
+            "users.html?id=" +
+            encodeURIComponent(activeInstitutionId);
+
+    });
+
+
+document.getElementById("settingsButton")
+    ?.addEventListener("click", function () {
+
+        window.location.href =
+            "school-settings.html?id=" +
+            encodeURIComponent(activeInstitutionId);
+
+    });
