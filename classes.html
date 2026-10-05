@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Classes & Stages - BMP</title>
+
+    <link rel="stylesheet" href="classes.css">
+</head>
+
+<body>
+
+    <div class="page-container">
+
+        <!-- Header -->
+        <header class="page-header">
+
+            <div>
+                <h1>
+                    Classes &amp; Stages
+                </h1>
+
+                <p>
+                    Manage academic stages and classes.
+                </p>
+            </div>
+
+            <button
+                id="backButton"
+                class="btn btn-secondary">
+                Back
+            </button>
+
+        </header>
+
+
+        <!-- School Information -->
+        <section class="school-summary">
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    Institution ID
+                </span>
+
+                <strong id="institutionId">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    School Name
+                </span>
+
+                <strong id="institutionName">
+                    -
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- Academic Stages -->
+        <main class="stages-container">
+
+            <!-- Primary -->
+            <section class="stage-card">
+
+                <div class="stage-header">
+
+                    <div>
+                        <span class="stage-code">
+                            A
+                        </span>
+
+                        <div>
+                            <h2>
+                                Primary Education
+                            </h2>
+
+                            <p>
+                                6 Classes
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="primaryClasses"
+                    class="classes-list">
+                </div>
+
+            </section>
+
+
+            <!-- Preparatory -->
+            <section class="stage-card">
+
+                <div class="stage-header">
+
+                    <div>
+                        <span class="stage-code">
+                            B
+                        </span>
+
+                        <div>
+                            <h2>
+                                Preparatory Education
+                            </h2>
+
+                            <p>
+                                4 Classes
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="preparatoryClasses"
+                    class="classes-list">
+                </div>
+
+            </section>
+
+
+            <!-- Secondary -->
+            <section class="stage-card">
+
+                <div class="stage-header">
+
+                    <div>
+                        <span class="stage-code">
+                            C
+                        </span>
+
+                        <div>
+                            <h2>
+                                Secondary Education
+                            </h2>
+
+                            <p>
+                                3 Classes
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="secondaryClasses"
+                    class="classes-list">
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="js/classes.js"></script>
+
+</body>
+
+</html>
