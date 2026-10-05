@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Institution Details - BMP Admin</title>
+
+    <link rel="stylesheet" href="institution.css">
+</head>
+
+<body>
+
+    <div class="page-container">
+
+        <header class="page-header">
+
+            <div>
+                <h1>Institution Details</h1>
+                <p>View and manage institution information</p>
+            </div>
+
+            <button id="backButton" class="btn btn-secondary">
+                Back to Institutions
+            </button>
+
+        </header>
+
+
+        <main class="content-container">
+
+            <!-- Institution Information -->
+            <section class="info-section">
+
+                <h2>Institution Information</h2>
+
+                <div class="info-grid">
+
+                    <div class="info-item">
+                        <span class="info-label">Institution ID</span>
+                        <span id="institutionId" class="info-value">-</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Institution Name</span>
+                        <span id="institutionName" class="info-value">-</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Institution Type</span>
+                        <span id="institutionType" class="info-value">-</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Status</span>
+                        <span id="institutionStatus" class="info-value">-</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Phone</span>
+                        <span id="institutionPhone" class="info-value">-</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span id="institutionEmail" class="info-value">-</span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- License Information -->
+            <section class="info-section">
+
+                <h2>License Information</h2>
+
+                <div class="info-grid">
+
+                    <div class="info-item">
+                        <span class="info-label">Start Date</span>
+                        <span id="licenseStart" class="info-value">-</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">End Date</span>
+                        <span id="licenseEnd" class="info-value">-</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">License Status</span>
+                        <span id="licenseStatus" class="info-value">-</span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- Main Account -->
+            <section class="info-section">
+
+                <h2>Main Account</h2>
+
+                <div class="info-grid">
+
+                    <div class="info-item">
+                        <span class="info-label">Username</span>
+                        <span id="mainUsername" class="info-value">-</span>
+                    </div>
+
+                    <div class="info-item">
+                        <span class="info-label">Account Status</span>
+                        <span id="accountStatus" class="info-value">
+                            Active
+                        </span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- Actions -->
+            <section class="actions-section">
+
+                <h2>Actions</h2>
+
+                <div class="actions">
+
+                    <button id="editButton" class="btn btn-primary">
+                        Edit Institution
+                    </button>
+
+                    <button id="toggleStatusButton" class="btn btn-warning">
+                        Disable Institution
+                    </button>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script src="js/institution.js"></script>
+
+</body>
+</html>
