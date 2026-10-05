@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Students - BMP</title>
+
+    <link rel="stylesheet" href="students.css">
+</head>
+
+<body>
+
+    <div class="page-container">
+
+        <!-- Header -->
+        <header class="page-header">
+
+            <div>
+                <h1 id="pageTitle">
+                    Students
+                </h1>
+
+                <p id="pageSubtitle">
+                    Manage school students
+                </p>
+            </div>
+
+            <div class="header-actions">
+
+                <button
+                    id="backButton"
+                    class="btn btn-secondary">
+                    Back
+                </button>
+
+                <button
+                    id="addStudentButton"
+                    class="btn btn-primary">
+                    + Add Student
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- School Information -->
+        <section class="school-summary">
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    Institution ID
+                </span>
+
+                <strong
+                    id="institutionId">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    School
+                </span>
+
+                <strong
+                    id="institutionName">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    Total Students
+                </span>
+
+                <strong
+                    id="totalStudents">
+                    0
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- Filters -->
+        <section class="filters-card">
+
+            <div class="filter-header">
+
+                <div>
+                    <h2>
+                        Student List
+                    </h2>
+
+                    <p>
+                        Search and filter students
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="filters-grid">
+
+                <!-- Search -->
+                <div class="filter-group search-group">
+
+                    <label for="searchStudent">
+                        Search
+                    </label>
+
+                    <input
+                        type="text"
+                        id="searchStudent"
+                        placeholder="Search by name or student number..."
+                    >
+
+                </div>
+
+
+                <!-- Stage -->
+                <div class="filter-group">
+
+                    <label for="stageFilter">
+                        Stage
+                    </label>
+
+                    <select id="stageFilter">
+
+                        <option value="all">
+                            All Stages
+                        </option>
+
+                        <option value="primary">
+                            Primary
+                        </option>
+
+                        <option value="preparatory">
+                            Preparatory
+                        </option>
+
+                        <option value="secondary">
+                            Secondary
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Class -->
+                <div class="filter-group">
+
+                    <label for="classFilter">
+                        Class
+                    </label>
+
+                    <select id="classFilter">
+
+                        <option value="all">
+                            All Classes
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Students Table -->
+        <section class="students-section">
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Student Number
+                            </th>
+
+                            <th>
+                                Student Name
+                            </th>
+
+                            <th>
+                                Stage
+                            </th>
+
+                            <th>
+                                Class
+                            </th>
+
+                            <th>
+                                Registration Date
+                            </th>
+
+                            <th>
+                                Actions
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="studentsTableBody">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- Empty State -->
+            <div
+                id="emptyState"
+                class="empty-state">
+
+                <div class="empty-icon">
+                    +
+                </div>
+
+                <h3>
+                    No Students Found
+                </h3>
+
+                <p>
+                    There are no students matching your search or filters.
+                </p>
+
+                <button
+                    id="emptyAddStudentButton"
+                    class="btn btn-primary">
+                    + Add Student
+                </button>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <script src="js/students.js"></script>
+
+</body>
+
+</html>
