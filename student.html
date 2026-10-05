@@ -2,12 +2,19 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
     <title>Student Profile - BMP</title>
 
-    <link rel="stylesheet" href="student.css">
+    <link
+        rel="stylesheet"
+        href="student.css">
+
 </head>
 
 <body>
@@ -19,13 +26,13 @@
         <header class="page-header">
 
             <div>
-                <h1 id="studentPageTitle">
-                    Student Profile
-                </h1>
 
-                <p id="studentPageSubtitle">
-                    View student information
+                <h1>Student Profile</h1>
+
+                <p>
+                    View student information and payment history
                 </p>
+
             </div>
 
             <div class="header-actions">
@@ -33,13 +40,17 @@
                 <button
                     id="backButton"
                     class="btn btn-secondary">
+
                     Back
+
                 </button>
 
                 <button
                     id="editButton"
                     class="btn btn-primary">
+
                     Edit Student
+
                 </button>
 
             </div>
@@ -51,7 +62,9 @@
 
         <section class="card">
 
-            <h2>School Information</h2>
+            <h2>
+                School Information
+            </h2>
 
             <div class="info-grid">
 
@@ -89,12 +102,27 @@
 
         <section class="card">
 
-            <h2>Student Information</h2>
+            <h2>
+                Student Information
+            </h2>
 
-            <div class="student-profile-grid">
+            <div class="info-grid">
 
 
-                <div class="profile-item student-number-item">
+                <div class="info-item">
+
+                    <span>
+                        Academic Year
+                    </span>
+
+                    <strong id="academicYear">
+                        -
+                    </strong>
+
+                </div>
+
+
+                <div class="info-item">
 
                     <span>
                         Student Number
@@ -107,7 +135,7 @@
                 </div>
 
 
-                <div class="profile-item">
+                <div class="info-item">
 
                     <span>
                         Student Name
@@ -120,33 +148,33 @@
                 </div>
 
 
-                <div class="profile-item">
+                <div class="info-item">
 
                     <span>
                         Stage
                     </span>
 
-                    <strong id="studentStage">
+                    <strong id="stage">
                         -
                     </strong>
 
                 </div>
 
 
-                <div class="profile-item">
+                <div class="info-item">
 
                     <span>
                         Class
                     </span>
 
-                    <strong id="studentClass">
+                    <strong id="className">
                         -
                     </strong>
 
                 </div>
 
 
-                <div class="profile-item">
+                <div class="info-item">
 
                     <span>
                         Registration Date
@@ -159,7 +187,7 @@
                 </div>
 
 
-                <div class="profile-item">
+                <div class="info-item">
 
                     <span>
                         Student ID
@@ -180,7 +208,9 @@
 
         <section class="card">
 
-            <h2>Payment Summary</h2>
+            <h2>
+                Payment Summary
+            </h2>
 
             <div class="summary-grid">
 
@@ -231,42 +261,11 @@
 
         <section class="card">
 
-            <div class="section-header">
+            <h2>
+                Payment History
+            </h2>
 
-                <div>
-
-                    <h2>
-                        Payment History
-                    </h2>
-
-                    <p>
-                        Student payment records
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div
-                id="paymentEmptyState"
-                class="empty-state">
-
-                <h3>
-                    No Payment Records
-                </h3>
-
-                <p>
-                    Payment records will appear here
-                    after payments are registered.
-                </p>
-
-            </div>
-
-
-            <div
-                id="paymentTableContainer"
-                class="table-container">
+            <div class="table-container">
 
                 <table>
 
@@ -298,10 +297,21 @@
 
                     </thead>
 
-                    <tbody id="paymentTableBody">
+                    <tbody id="paymentHistoryBody">
+
                     </tbody>
 
                 </table>
+
+            </div>
+
+
+            <div
+                id="emptyPayments"
+                class="empty-state"
+                style="display: none;">
+
+                No payment records found.
 
             </div>
 
