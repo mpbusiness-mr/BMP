@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add User - BMP</title>
+
+    <link rel="stylesheet" href="add-user.css">
+</head>
+
+<body>
+
+    <div class="page-container">
+
+        <!-- Header -->
+        <header class="page-header">
+
+            <div>
+                <h1>Add User</h1>
+                <p>Create a new user for this institution</p>
+            </div>
+
+            <button id="backButton" class="btn btn-secondary">
+                Back
+            </button>
+
+        </header>
+
+
+        <!-- Institution Information -->
+        <section class="card">
+
+            <h2>Institution Information</h2>
+
+            <div class="info-grid">
+
+                <div class="info-item">
+                    <span>Institution ID</span>
+                    <strong id="institutionId">-</strong>
+                </div>
+
+                <div class="info-item">
+                    <span>Institution Name</span>
+                    <strong id="institutionName">-</strong>
+                </div>
+
+                <div class="info-item">
+                    <span>Institution Type</span>
+                    <strong id="institutionType">-</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- User Information -->
+        <section class="card">
+
+            <h2>User Information</h2>
+
+            <form id="addUserForm">
+
+                <div class="form-group">
+
+                    <label for="username">
+                        Username
+                    </label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        placeholder="Enter username"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter password"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="role">
+                        Role
+                    </label>
+
+                    <select id="role" required>
+
+                        <option value="">
+                            Select Role
+                        </option>
+
+                        <option value="user">
+                            User
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Permissions -->
+                <div class="permissions-section">
+
+                    <h3>Permissions</h3>
+
+                    <label class="permission-item">
+
+                        <input
+                            type="checkbox"
+                            id="permissionStudents"
+                        >
+
+                        <span>
+                            Manage Students
+                        </span>
+
+                    </label>
+
+
+                    <label class="permission-item">
+
+                        <input
+                            type="checkbox"
+                            id="permissionPayments"
+                        >
+
+                        <span>
+                            Manage Payments
+                        </span>
+
+                    </label>
+
+
+                    <label class="permission-item">
+
+                        <input
+                            type="checkbox"
+                            id="permissionReports"
+                        >
+
+                        <span>
+                            View Reports
+                        </span>
+
+                    </label>
+
+
+                    <label class="permission-item">
+
+                        <input
+                            type="checkbox"
+                            id="permissionReceipts"
+                        >
+
+                        <span>
+                            Manage Receipts
+                        </span>
+
+                    </label>
+
+
+                    <label class="permission-item">
+
+                        <input
+                            type="checkbox"
+                            id="permissionTransactions"
+                        >
+
+                        <span>
+                            Manage Transactions
+                        </span>
+
+                    </label>
+
+                </div>
+
+
+                <!-- Actions -->
+                <div class="form-actions">
+
+                    <button
+                        type="button"
+                        id="cancelButton"
+                        class="btn btn-secondary"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Create User
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+
+    <script src="js/add-user.js"></script>
+
+</body>
+
+</html>
