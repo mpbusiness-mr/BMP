@@ -4,16 +4,27 @@
 
 
 // =====================================================
-// Get Institution ID
+// Authentication
 // =====================================================
 
-const urlParams =
-    new URLSearchParams(
-        window.location.search
+const currentUser =
+    requireSchoolLogin();
+
+if (!currentUser) {
+    throw new Error(
+        "School login required."
     );
+}
+
 
 const institutionId =
-    urlParams.get("id");
+    getActiveInstitutionId();
+
+if (!institutionId) {
+    throw new Error(
+        "Institution access denied."
+    );
+}
 
 
 // =====================================================
