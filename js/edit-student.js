@@ -1,11 +1,32 @@
+// =====================================================
+// Authentication
+// =====================================================
+
+const currentUser = requireSchoolLogin();
+
+if (!currentUser) {
+    throw new Error("School login required.");
+}
+
+const institutionId =
+    getActiveInstitutionId();
+
+if (!institutionId) {
+    throw new Error("Institution access denied.");
+}
+
+
+// =====================================================
+// Student ID
+// =====================================================
+
 const urlParams =
-    new URLSearchParams(window.location.search);
+    new URLSearchParams(
+        window.location.search
+    );
 
 const studentId =
     urlParams.get("id");
-
-const institutionId =
-    urlParams.get("institutionId");
 
 
 /* ================================
