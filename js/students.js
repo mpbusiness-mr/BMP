@@ -1,12 +1,22 @@
 // =====================================================
+// Students
+// =====================================================
+
+const STUDENTS_API_URL =
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+
+
+// =====================================================
 // Authentication
 // =====================================================
 
-const currentUser = requireSchoolLogin();
+const currentUser =
+    requireSchoolLogin();
 
 if (!currentUser) {
     throw new Error("School login required.");
 }
+
 
 const institutionId =
     getActiveInstitutionId();
@@ -15,24 +25,44 @@ if (!institutionId) {
     throw new Error("Institution access denied.");
 }
 
-/* Get institutions */
 
-const institutions =
-    JSON.parse(
-        localStorage.getItem(
-            "bmpInstitutions"
-        )
-    ) || [];
+// =====================================================
+// Institution
+// =====================================================
+
+const institution = {
+
+    id:
+        currentUser.institutionId || "",
+
+    name:
+        currentUser.institutionName || "",
+
+    phone:
+        currentUser.institutionPhone || "",
+
+    email:
+        currentUser.institutionEmail || ""
+
+};
 
 
-const institution =
-    institutions.find(
-        item =>
-            item.id === institutionId
-    );
+if (
+    institution.id !==
+    institutionId
+) {
+
+    alert("Institution access denied.");
+
+    window.location.href =
+        "school-login.html";
+
+}
 
 
-/* Elements */
+// =====================================================
+// Elements
+// =====================================================
 
 const pageTitle =
     document.getElementById(
@@ -105,28 +135,21 @@ const backButton =
     );
 
 
-/* Check institution */
+// =====================================================
+// Students data
+// =====================================================
 
-if (!institution) {
-
-    alert(
-        "School not found."
-    );
-
-    window.location.href =
-        "institutions.html";
-
-}
-else {
-
-    initializeStudents();
-
-}
+let students = [];
 
 
-/* Initialize */
+// =====================================================
+// Initialize
+// =====================================================
 
-function initializeStudents() {
+initializeStudents();
+
+
+async function initializeStudents() {
 
     pageTitle.textContent =
         "Students";
@@ -144,48 +167,164 @@ function initializeStudents() {
         institution.name;
 
 
-    loadAcademicYearFilter();
-
     loadClassFilter();
 
-    renderStudents();
+
+    await loadStudents();
 
 }
 
 
-/* Get students */
+// =====================================================
+// Load students from Backend
+// =====================================================
 
-function getStudents() {
+async function loadStudents() {
 
-    return JSON.parse(
-        localStorage.getItem(
-            "bmpStudents"
-        )
-    ) || [];
+    studentsTableBody.innerHTML = "";
 
-}
+    totalStudentsElement.textContent = "0";
 
 
-/* Load academic years */
+    try {
 
-function loadAcademicYearFilter() {
+        const response =
+            await fetch(
+                STUDENTS_API_URL,
+                {
 
-    const students =
-        getStudents();
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body: JSON.stringify({
+
+                        action:
+                            "getStudents",
+
+                        institutionId:
+                            institution.id,
+
+                        username:
+                            currentUser.username
+
+                    })
+
+                }
+            );
 
 
-    const institutionStudents =
-        students.filter(
-            student =>
-                student.institutionId ===
-                institution.id
+        if (!response.ok) {
+
+            throw new Error(
+                "Server connection failed."
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Unable to load students."
+            );
+
+        }
+
+
+        students =
+            (result.students || [])
+                .map(normalizeStudent);
+
+
+        loadAcademicYearFilter();
+
+        renderStudents();
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "Students loading error:",
+            error
         );
 
+
+        students = [];
+
+        renderStudents();
+
+
+        alert(
+            error.message ||
+            "Unable to load students."
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// Normalize student data
+// =====================================================
+
+function normalizeStudent(student) {
+
+    return {
+
+        id:
+            student.studentId || "",
+
+        studentNumber:
+            student.studentNumber || "",
+
+        academicYear:
+            student.academicYear || "",
+
+        name:
+            student.name || "",
+
+        stage:
+            student.stage || "",
+
+        classNumber:
+            student.class ||
+            student.classNumber ||
+            "",
+
+        className:
+            student.class
+                ? `Class ${student.class}`
+                : "",
+
+        registrationDate:
+            student.createdAt || ""
+
+    };
+
+}
+
+
+// =====================================================
+// Load academic years
+// =====================================================
+
+function loadAcademicYearFilter() {
 
     const academicYears =
         [
             ...new Set(
-                institutionStudents
+                students
                     .map(
                         student =>
                             student.academicYear
@@ -197,11 +336,6 @@ function loadAcademicYearFilter() {
             )
         ];
 
-
-    /*
-        Sort newest academic year
-        first.
-    */
 
     academicYears.sort(
         function (
@@ -223,9 +357,11 @@ function loadAcademicYearFilter() {
 
 
     academicYearFilter.innerHTML = `
+
         <option value="all">
             All Academic Years
         </option>
+
     `;
 
 
@@ -237,11 +373,14 @@ function loadAcademicYearFilter() {
                     "option"
                 );
 
+
             option.value =
                 year;
 
+
             option.textContent =
                 year;
+
 
             academicYearFilter.appendChild(
                 option
@@ -251,13 +390,9 @@ function loadAcademicYearFilter() {
     );
 
 
-    /*
-        Select current academic year
-        if it exists.
-    */
-
     const currentYear =
         new Date().getFullYear();
+
 
     const currentAcademicYear =
         `${currentYear}-${currentYear + 1}`;
@@ -277,7 +412,9 @@ function loadAcademicYearFilter() {
 }
 
 
-/* Load classes */
+// =====================================================
+// Load classes
+// =====================================================
 
 function loadClassFilter() {
 
@@ -286,43 +423,36 @@ function loadClassFilter() {
 
 
     classFilter.innerHTML = `
+
         <option value="all">
             All Classes
         </option>
+
     `;
 
 
-    let numberOfClasses =
-        0;
+    let numberOfClasses = 6;
 
 
     if (
-        stage ===
-        "primary"
+        stage === "primary"
     ) {
 
         numberOfClasses = 6;
 
     }
     else if (
-        stage ===
-        "preparatory"
+        stage === "preparatory"
     ) {
 
         numberOfClasses = 4;
 
     }
     else if (
-        stage ===
-        "secondary"
+        stage === "secondary"
     ) {
 
         numberOfClasses = 3;
-
-    }
-    else {
-
-        numberOfClasses = 6;
 
     }
 
@@ -338,11 +468,14 @@ function loadClassFilter() {
                 "option"
             );
 
+
         option.value =
             String(i);
 
+
         option.textContent =
             `Class ${i}`;
+
 
         classFilter.appendChild(
             option
@@ -353,26 +486,11 @@ function loadClassFilter() {
 }
 
 
-/* Render students */
+// =====================================================
+// Render students
+// =====================================================
 
 function renderStudents() {
-
-    const allStudents =
-        getStudents();
-
-
-    /*
-        Only students belonging
-        to this institution.
-    */
-
-    const institutionStudents =
-        allStudents.filter(
-            student =>
-                student.institutionId ===
-                institution.id
-        );
-
 
     const selectedAcademicYear =
         academicYearFilter.value;
@@ -392,12 +510,8 @@ function renderStudents() {
             .toLowerCase();
 
 
-    /*
-        Apply filters.
-    */
-
     const filteredStudents =
-        institutionStudents.filter(
+        students.filter(
             student => {
 
 
@@ -427,7 +541,6 @@ function renderStudents() {
                 const matchesAcademicYear =
                     selectedAcademicYear ===
                         "all" ||
-
                     student.academicYear ===
                         selectedAcademicYear;
 
@@ -435,7 +548,6 @@ function renderStudents() {
                 const matchesStage =
                     selectedStage ===
                         "all" ||
-
                     student.stage ===
                         selectedStage;
 
@@ -443,7 +555,6 @@ function renderStudents() {
                 const matchesClass =
                     selectedClass ===
                         "all" ||
-
                     String(
                         student.classNumber
                     ) ===
@@ -468,29 +579,16 @@ function renderStudents() {
         );
 
 
-    /*
-        Update total.
-    */
-
     totalStudentsElement.textContent =
         filteredStudents.length;
 
-
-    /*
-        Clear table.
-    */
 
     studentsTableBody.innerHTML =
         "";
 
 
-    /*
-        Empty state.
-    */
-
     if (
-        filteredStudents.length ===
-        0
+        filteredStudents.length === 0
     ) {
 
         emptyState.style.display =
@@ -504,11 +602,6 @@ function renderStudents() {
     emptyState.style.display =
         "none";
 
-
-    /*
-        Sort students by
-        registration order.
-    */
 
     filteredStudents.sort(
         function (
@@ -535,10 +628,6 @@ function renderStudents() {
         }
     );
 
-
-    /*
-        Render rows.
-    */
 
     filteredStudents.forEach(
         student => {
@@ -689,39 +778,30 @@ function renderStudents() {
 }
 
 
-/* Format stage */
+// =====================================================
+// Format stage
+// =====================================================
 
-function formatStage(
-    stage
-) {
+function formatStage(stage) {
 
     if (
-        stage ===
-        "primary"
+        stage === "primary"
     ) {
-
         return "Primary";
-
     }
 
 
     if (
-        stage ===
-        "preparatory"
+        stage === "preparatory"
     ) {
-
         return "Preparatory";
-
     }
 
 
     if (
-        stage ===
-        "secondary"
+        stage === "secondary"
     ) {
-
         return "Secondary";
-
     }
 
 
@@ -730,11 +810,11 @@ function formatStage(
 }
 
 
-/* Format date */
+// =====================================================
+// Format date
+// =====================================================
 
-function formatDate(
-    dateValue
-) {
+function formatDate(dateValue) {
 
     if (!dateValue) {
         return "-";
@@ -742,9 +822,7 @@ function formatDate(
 
 
     const date =
-        new Date(
-            dateValue
-        );
+        new Date(dateValue);
 
 
     if (
@@ -763,11 +841,11 @@ function formatDate(
 }
 
 
-/* View student */
+// =====================================================
+// View student
+// =====================================================
 
-function viewStudent(
-    studentId
-) {
+function viewStudent(studentId) {
 
     window.location.href =
         `student.html?id=${encodeURIComponent(
@@ -779,11 +857,11 @@ function viewStudent(
 }
 
 
-/* Edit student */
+// =====================================================
+// Edit student
+// =====================================================
 
-function editStudent(
-    studentId
-) {
+function editStudent(studentId) {
 
     window.location.href =
         `edit-student.html?id=${encodeURIComponent(
@@ -795,7 +873,9 @@ function editStudent(
 }
 
 
-/* Add student */
+// =====================================================
+// Add student
+// =====================================================
 
 function openAddStudent() {
 
@@ -807,7 +887,9 @@ function openAddStudent() {
 }
 
 
-/* Events */
+// =====================================================
+// Events
+// =====================================================
 
 addStudentButton.addEventListener(
     "click",
@@ -864,11 +946,11 @@ backButton.addEventListener(
 );
 
 
-/* Escape HTML */
+// =====================================================
+// Escape HTML
+// =====================================================
 
-function escapeHtml(
-    value
-) {
+function escapeHtml(value) {
 
     return String(value)
 
