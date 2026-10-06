@@ -14,12 +14,14 @@
 
     <div class="page-container">
 
-        <!-- Header -->
         <header class="page-header">
 
             <div>
-                <h1>Add User</h1>
-                <p>Create a new user for this institution</p>
+                <h1 id="pageTitle">Add User</h1>
+
+                <p id="pageDescription">
+                    Create a new user for this institution
+                </p>
             </div>
 
             <button id="backButton" class="btn btn-secondary">
@@ -29,25 +31,35 @@
         </header>
 
 
-        <!-- Institution Information -->
         <section class="card">
 
-            <h2>Institution Information</h2>
+            <h2 id="institutionInformation">
+                Institution Information
+            </h2>
 
             <div class="info-grid">
 
                 <div class="info-item">
-                    <span>Institution ID</span>
+                    <span id="institutionIdLabel">
+                        Institution ID
+                    </span>
+
                     <strong id="institutionId">-</strong>
                 </div>
 
                 <div class="info-item">
-                    <span>Institution Name</span>
+                    <span id="institutionNameLabel">
+                        Institution Name
+                    </span>
+
                     <strong id="institutionName">-</strong>
                 </div>
 
                 <div class="info-item">
-                    <span>Institution Type</span>
+                    <span id="institutionTypeLabel">
+                        Institution Type
+                    </span>
+
                     <strong id="institutionType">-</strong>
                 </div>
 
@@ -56,16 +68,17 @@
         </section>
 
 
-        <!-- User Information -->
         <section class="card">
 
-            <h2>User Information</h2>
+            <h2 id="userInformation">
+                User Information
+            </h2>
 
             <form id="addUserForm">
 
                 <div class="form-group">
 
-                    <label for="username">
+                    <label for="username" id="usernameLabel">
                         Username
                     </label>
 
@@ -81,7 +94,7 @@
 
                 <div class="form-group">
 
-                    <label for="password">
+                    <label for="password" id="passwordLabel">
                         Password
                     </label>
 
@@ -97,12 +110,13 @@
 
                 <div class="form-group">
 
-                    <label>
+                    <label id="roleLabel">
                         Role
                     </label>
 
                     <input
                         type="text"
+                        id="role"
                         value="User"
                         readonly
                     >
@@ -110,18 +124,19 @@
                 </div>
 
 
-                <!-- Permissions -->
                 <div class="permissions-section">
 
-                    <h3>Access</h3>
+                    <h3 id="accessTitle">
+                        Access
+                    </h3>
 
                     <div class="access-box">
 
-                        <strong>
+                        <strong id="fullAccessTitle">
                             Full Operational Access
                         </strong>
 
-                        <p>
+                        <p id="fullAccessDescription">
                             This user can perform all normal
                             operations of the institution.
                         </p>
@@ -131,34 +146,34 @@
 
                     <div class="restricted-box">
 
-                        <strong>
+                        <strong id="restrictedTitle">
                             Restricted
                         </strong>
 
-                        <p>
+                        <p id="restrictedDescription">
                             User management is available only
-                            to the Director / Manager.
+                            to the Director.
                         </p>
 
                         <ul>
 
-                            <li>
+                            <li id="cannotAddUsers">
                                 Cannot add users
                             </li>
 
-                            <li>
+                            <li id="cannotDisableUsers">
                                 Cannot disable users
                             </li>
 
-                            <li>
+                            <li id="cannotEnableUsers">
                                 Cannot enable users
                             </li>
 
-                            <li>
-                                Cannot disable the Director / Manager
+                            <li id="cannotDisableDirector">
+                                Cannot disable the Director
                             </li>
 
-                            <li>
+                            <li id="cannotDeleteUsers">
                                 Cannot delete users
                             </li>
 
@@ -169,21 +184,19 @@
                 </div>
 
 
-                <!-- Actions -->
                 <div class="form-actions">
 
                     <button
                         type="button"
                         id="cancelButton"
-                        class="btn btn-secondary"
-                    >
+                        class="btn btn-secondary">
                         Cancel
                     </button>
 
                     <button
                         type="submit"
-                        class="btn btn-primary"
-                    >
+                        id="createUserButton"
+                        class="btn btn-primary">
                         Create User
                     </button>
 
@@ -199,6 +212,7 @@
     <script src="js/auth.js"></script>
     <script src="js/activity-log.js"></script>
     <script src="js/add-user.js"></script>
+
 </body>
 
 </html>
