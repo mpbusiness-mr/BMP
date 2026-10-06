@@ -1,8 +1,10 @@
+```css
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
+
 
 body {
     font-family: Arial, sans-serif;
@@ -10,6 +12,7 @@ body {
     color: #1f2937;
     min-height: 100vh;
 }
+
 
 .page-container {
     width: 94%;
@@ -19,7 +22,9 @@ body {
 }
 
 
-/* Header */
+/* =====================================================
+   Header
+===================================================== */
 
 .page-header {
     display: flex;
@@ -29,6 +34,19 @@ body {
     margin-bottom: 25px;
 }
 
+
+.header-left {
+    flex: 1;
+}
+
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+
 .page-header h1 {
     font-size: 30px;
     font-weight: 700;
@@ -36,20 +54,59 @@ body {
     margin-bottom: 7px;
 }
 
+
 .page-header p {
     font-size: 15px;
     color: #6b7280;
 }
 
 
-/* Buttons */
+/* =====================================================
+   Language Selector
+===================================================== */
+
+#languageSelect {
+    padding: 8px 12px;
+
+    border: 1px solid #d7dce4;
+    border-radius: 6px;
+
+    background: #ffffff;
+    color: #1f2937;
+
+    font-size: 14px;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+#languageSelect:focus {
+    outline: none;
+
+    border-color: #9ca3af;
+
+    box-shadow:
+        0 0 0 3px rgba(156, 163, 175, 0.12);
+}
+
+
+/* =====================================================
+   Buttons
+===================================================== */
 
 .btn {
     border: none;
     border-radius: 8px;
+
     padding: 11px 18px;
+
     font-size: 14px;
     font-weight: 600;
+
     cursor: pointer;
 
     transition:
@@ -58,10 +115,12 @@ body {
         box-shadow 0.2s ease;
 }
 
+
 .btn-primary {
     background: #111827;
     color: #ffffff;
 }
+
 
 .btn-primary:hover {
     background: #000000;
@@ -70,11 +129,14 @@ body {
         0 5px 15px rgba(17, 24, 39, 0.15);
 }
 
+
 .btn-secondary {
     background: #ffffff;
     color: #374151;
+
     border: 1px solid #d9dee7;
 }
+
 
 .btn-secondary:hover {
     background: #f9fafb;
@@ -83,15 +145,19 @@ body {
         0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
+
 .btn:active {
     transform: scale(0.98);
 }
 
 
-/* Cards */
+/* =====================================================
+   Cards
+===================================================== */
 
 .card {
     background: #ffffff;
+
     border: 1px solid #e7eaf0;
     border-radius: 14px;
 
@@ -102,28 +168,38 @@ body {
         0 4px 15px rgba(15, 23, 42, 0.04);
 }
 
+
 .card h2 {
     font-size: 20px;
     color: #111827;
+
     margin-bottom: 22px;
 }
 
 
-/* School Information */
+/* =====================================================
+   School Information
+===================================================== */
 
 .info-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
     gap: 18px;
 }
 
+
 .info-item {
     background: #f8f9fb;
+
     border: 1px solid #e7eaf0;
     border-radius: 9px;
 
     padding: 15px;
 }
+
 
 .info-item span {
     display: block;
@@ -139,6 +215,7 @@ body {
     margin-bottom: 7px;
 }
 
+
 .info-item strong {
     display: block;
 
@@ -149,29 +226,50 @@ body {
 }
 
 
-/* Form */
+/* =====================================================
+   Form
+===================================================== */
 
-#addStudentForm {
+#studentForm {
     display: flex;
+
     flex-direction: column;
+
     gap: 18px;
 }
 
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, 1fr);
+
+    gap: 18px;
+}
+
+
 .form-group {
     display: flex;
+
     flex-direction: column;
+
     gap: 7px;
 }
+
 
 .form-group label {
     font-size: 13px;
     font-weight: 600;
+
     color: #4b5563;
 }
+
 
 .form-group input,
 .form-group select {
     width: 100%;
+
     height: 44px;
 
     padding: 0 12px;
@@ -189,6 +287,7 @@ body {
         box-shadow 0.2s ease;
 }
 
+
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
@@ -200,145 +299,74 @@ body {
 }
 
 
-/* Student Number */
+/* =====================================================
+   Student Number
+===================================================== */
 
 #studentNumber {
     background: #f8f9fb;
+
     color: #111827;
+
     font-weight: 700;
+
     letter-spacing: 0.5px;
 }
 
+
 .form-group small {
     font-size: 12px;
+
     color: #8a93a3;
+
     line-height: 1.5;
 }
 
 
-/* Form Actions */
+/* =====================================================
+   Form Actions
+===================================================== */
 
 .form-actions {
     display: flex;
+
     justify-content: flex-end;
+
     gap: 10px;
 
     margin-top: 8px;
+
     padding-top: 20px;
 
     border-top: 1px solid #e9edf2;
 }
 
 
-/* Focus */
+/* =====================================================
+   Focus
+===================================================== */
 
 .btn:focus-visible,
 .form-group input:focus-visible,
-.form-group select:focus-visible {
+.form-group select:focus-visible,
+#languageSelect:focus-visible {
     outline: 3px solid rgba(17, 24, 39, 0.15);
+
     outline-offset: 2px;
 }
 
 
-/* Tablet */
-
-@media (max-width: 700px) {
-
-    .page-container {
-        width: 94%;
-        padding-top: 25px;
-    }
-
-    .info-grid {
-        grid-template-columns: 1fr;
-    }
-
-}
-
-
-/* Mobile */
-
-@media (max-width: 600px) {
-
-    .page-container {
-        width: 94%;
-        padding: 20px 0 35px;
-    }
-
-    .page-header {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .page-header h1 {
-        font-size: 25px;
-    }
-
-    .page-header p {
-        font-size: 14px;
-    }
-
-    .page-header .btn {
-        width: 100%;
-    }
-
-    .card {
-        padding: 19px;
-        border-radius: 12px;
-    }
-
-    .card h2 {
-        font-size: 19px;
-        margin-bottom: 19px;
-    }
-
-    .form-actions {
-        flex-direction: column-reverse;
-    }
-
-    .form-actions .btn {
-        width: 100%;
-    }
-
-}
-
-
-
-
-```css
-/* Language Selector */
-
-#languageSelect {
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    background: #fff;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-
-/* Header layout */
-
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-}
-
-
-.header-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-
-/* Arabic RTL */
+/* =====================================================
+   Arabic RTL
+===================================================== */
 
 html[dir="rtl"] {
     direction: rtl;
+}
+
+
+html[dir="rtl"] body {
+    text-align: right;
 }
 
 
@@ -355,5 +383,119 @@ html[dir="rtl"] .header-right {
 html[dir="rtl"] .form-group,
 html[dir="rtl"] .info-item {
     text-align: right;
+}
+
+
+html[dir="rtl"] .form-actions {
+    justify-content: flex-start;
+}
+
+
+html[dir="rtl"] .form-group input,
+html[dir="rtl"] .form-group select {
+    text-align: right;
+}
+
+
+/* =====================================================
+   Tablet
+===================================================== */
+
+@media (max-width: 700px) {
+
+    .page-container {
+        width: 94%;
+
+        padding-top: 25px;
+    }
+
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* =====================================================
+   Mobile
+===================================================== */
+
+@media (max-width: 600px) {
+
+    .page-container {
+        width: 94%;
+
+        padding: 20px 0 35px;
+    }
+
+
+    .page-header {
+        flex-direction: column;
+
+        align-items: stretch;
+    }
+
+
+    .header-left {
+        width: 100%;
+    }
+
+
+    .header-right {
+        width: 100%;
+
+        justify-content: space-between;
+    }
+
+
+    .page-header h1 {
+        font-size: 25px;
+    }
+
+
+    .page-header p {
+        font-size: 14px;
+    }
+
+
+    #languageSelect {
+        flex: 1;
+    }
+
+
+    .page-header .btn {
+        width: 100%;
+    }
+
+
+    .card {
+        padding: 19px;
+
+        border-radius: 12px;
+    }
+
+
+    .card h2 {
+        font-size: 19px;
+
+        margin-bottom: 19px;
+    }
+
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+
+    .form-actions .btn {
+        width: 100%;
+    }
+
 }
 ```
