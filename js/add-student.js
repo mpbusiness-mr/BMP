@@ -1,7 +1,8 @@
-const translations = {
+const API_URL =
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
 
+const translations = {
     en: {
-        language: "Language",
         back: "Back",
         pageTitle: "Add Student",
         pageSubtitle: "Register a new student",
@@ -24,16 +25,16 @@ const translations = {
         registrationDate: "Registration Date",
         cancel: "Cancel",
         registerStudent: "Register Student",
+        registering: "Registering...",
         studentRegistered: "Student registered successfully.",
         studentNameRequired: "Please enter the student name.",
         stageRequired: "Please select a stage.",
         classRequired: "Please select a class.",
         registrationDateRequired: "Please select the registration date.",
-        studentExists: "A student with this number already exists."
+        serverError: "Unable to register the student."
     },
 
     ar: {
-        language: "اللغة",
         back: "رجوع",
         pageTitle: "إضافة طالب",
         pageSubtitle: "تسجيل طالب جديد",
@@ -56,16 +57,16 @@ const translations = {
         registrationDate: "تاريخ التسجيل",
         cancel: "إلغاء",
         registerStudent: "تسجيل الطالب",
+        registering: "جاري التسجيل...",
         studentRegistered: "تم تسجيل الطالب بنجاح.",
         studentNameRequired: "يرجى إدخال اسم الطالب.",
         stageRequired: "يرجى اختيار المرحلة الدراسية.",
         classRequired: "يرجى اختيار القسم.",
         registrationDateRequired: "يرجى اختيار تاريخ التسجيل.",
-        studentExists: "يوجد طالب بهذا الرقم بالفعل."
+        serverError: "تعذر تسجيل الطالب."
     },
 
     fr: {
-        language: "Langue",
         back: "Retour",
         pageTitle: "Ajouter un élève",
         pageSubtitle: "Inscrire un nouvel élève",
@@ -88,180 +89,101 @@ const translations = {
         registrationDate: "Date d'inscription",
         cancel: "Annuler",
         registerStudent: "Inscrire l'élève",
+        registering: "Inscription...",
         studentRegistered: "Élève inscrit avec succès.",
         studentNameRequired: "Veuillez saisir le nom de l'élève.",
         stageRequired: "Veuillez sélectionner le niveau.",
         classRequired: "Veuillez sélectionner la classe.",
         registrationDateRequired: "Veuillez sélectionner la date d'inscription.",
-        studentExists: "Un élève avec ce numéro existe déjà."
+        serverError: "Impossible d'inscrire l'élève."
     }
-
 };
-
 
 let currentLanguage =
     localStorage.getItem("bmpLanguage") || "en";
 
-
 let currentUser = null;
 
 try {
-
     currentUser = JSON.parse(
         localStorage.getItem("bmpCurrentUser")
     );
-
 } catch (error) {
-
-    localStorage.removeItem("bmpCurrentUser");
     currentUser = null;
-
 }
-
 
 if (
     !currentUser ||
     !currentUser.institutionId ||
-    (
-        currentUser.role !== "Director" &&
-        currentUser.role !== "Manager" &&
-        currentUser.role !== "User"
-    ) ||
     currentUser.status !== "active"
 ) {
-
     window.location.href = "school-login.html";
-
 }
-
 
 const urlParams =
     new URLSearchParams(window.location.search);
 
-const institutionId =
+const urlInstitutionId =
     urlParams.get("id");
 
-
 if (
-    institutionId &&
-    institutionId !== currentUser.institutionId
+    urlInstitutionId &&
+    urlInstitutionId !== currentUser.institutionId
 ) {
-
     window.location.href =
         "school.html?id=" +
-        encodeURIComponent(
-            currentUser.institutionId
-        );
-
+        encodeURIComponent(currentUser.institutionId);
 }
-
 
 const activeInstitutionId =
     currentUser.institutionId;
 
-
-const institution = {
-
-    id: currentUser.institutionId,
-
-    type: currentUser.institutionType || "",
-
-    name: currentUser.institutionName || "",
-
-    phone: currentUser.institutionPhone || "",
-
-    email: currentUser.institutionEmail || "",
-
-    licenseStart: currentUser.licenseStart || "",
-
-    licenseEnd: currentUser.licenseEnd || "",
-
-    status: "active",
-
-    sheetId: currentUser.sheetId || ""
-
-};
-
-
-if (
-    !institution.id ||
-    !institution.name
-) {
-
-    localStorage.removeItem("bmpCurrentUser");
-
-    window.location.href =
-        "school-login.html";
-
-}
-
-
 const institutionIdElement =
     document.getElementById("institutionId");
-
 
 const institutionNameElement =
     document.getElementById("institutionName");
 
-
 const academicYearSelect =
     document.getElementById("academicYear");
-
 
 const studentNumberInput =
     document.getElementById("studentNumber");
 
-
 const studentNameInput =
     document.getElementById("studentName");
-
 
 const stageSelect =
     document.getElementById("stage");
 
-
 const classSelect =
     document.getElementById("className");
-
 
 const registrationDateInput =
     document.getElementById("registrationDate");
 
-
 const studentForm =
     document.getElementById("studentForm");
-
 
 const backButton =
     document.getElementById("backButton");
 
-
 const cancelButton =
     document.getElementById("cancelButton");
-
 
 const registerButton =
     document.getElementById("registerButton");
 
-
 const languageSelect =
     document.getElementById("languageSelect");
 
+institutionIdElement.textContent =
+    currentUser.institutionId;
 
-if (institutionIdElement) {
-    institutionIdElement.textContent =
-        institution.id;
-}
-
-
-if (institutionNameElement) {
-    institutionNameElement.textContent =
-        institution.name;
-}
-
+institutionNameElement.textContent =
+    currentUser.institutionName || "";
 
 function applyLanguage(language) {
-
     if (!translations[language]) {
         language = "en";
     }
@@ -279,90 +201,40 @@ function applyLanguage(language) {
     document.documentElement.dir =
         language === "ar" ? "rtl" : "ltr";
 
-
     document
         .querySelectorAll("[data-i18n]")
         .forEach(function(element) {
-
             const key =
                 element.getAttribute("data-i18n");
 
-            if (
-                translations[language][key]
-            ) {
-
+            if (translations[language][key]) {
                 element.textContent =
                     translations[language][key];
-
             }
-
         });
-
 
     document
         .querySelectorAll("[data-i18n-placeholder]")
         .forEach(function(element) {
-
             const key =
                 element.getAttribute(
                     "data-i18n-placeholder"
                 );
 
-            if (
-                translations[language][key]
-            ) {
-
+            if (translations[language][key]) {
                 element.placeholder =
                     translations[language][key];
-
             }
-
         });
-
 
     if (languageSelect) {
         languageSelect.value = language;
     }
 
+    loadClasses();
 }
-
-
-function getStudents() {
-
-    try {
-
-        const students =
-            JSON.parse(
-                localStorage.getItem(
-                    "bmpStudents"
-                )
-            );
-
-        return Array.isArray(students)
-            ? students
-            : [];
-
-    } catch (error) {
-
-        return [];
-
-    }
-
-}
-
-
-function saveStudents(students) {
-
-    localStorage.setItem(
-        "bmpStudents",
-        JSON.stringify(students)
-    );
-
-}
-
 
 function loadAcademicYears() {
-
     const currentYear =
         new Date().getFullYear();
 
@@ -373,27 +245,20 @@ function loadAcademicYears() {
         year <= currentYear + 1;
         year++
     ) {
+        const value =
+            `${year}-${String(year + 1).slice(-2)}`;
 
         const option =
             document.createElement("option");
 
-        option.value =
-            `${year}-${String(year + 1).slice(-2)}`;
+        option.value = value;
+        option.textContent = value;
 
-        option.textContent =
-            option.value;
-
-        academicYearSelect.appendChild(
-            option
-        );
-
+        academicYearSelect.appendChild(option);
     }
-
 }
 
-
 function loadClasses() {
-
     const stage =
         stageSelect.value;
 
@@ -403,55 +268,70 @@ function loadClasses() {
         document.createElement("option");
 
     placeholder.value = "";
-
     placeholder.textContent =
         translations[currentLanguage].selectClass;
 
-    classSelect.appendChild(
-        placeholder
-    );
-
+    classSelect.appendChild(placeholder);
 
     let count = 0;
 
     if (stage === "primary") {
         count = 6;
-    }
-
-    if (stage === "preparatory") {
+    } else if (stage === "preparatory") {
         count = 4;
-    }
-
-    if (stage === "secondary") {
+    } else if (stage === "secondary") {
         count = 3;
     }
 
-
-    for (
-        let i = 1;
-        i <= count;
-        i++
-    ) {
-
+    for (let i = 1; i <= count; i++) {
         const option =
             document.createElement("option");
 
-        option.value =
-            String(i);
+        option.value = String(i);
 
         option.textContent =
             `${translations[currentLanguage].class} ${i}`;
 
-        classSelect.appendChild(
-            option
-        );
-
+        classSelect.appendChild(option);
     }
-
 }
 
+function setRegistrationDate() {
+    const today =
+        new Date();
 
-function generateStudentNumber() {
+    registrationDateInput.value =
+        today.toISOString().split("T")[0];
+}
+
+function updateStudentNumberPreview() {
+    const stage =
+        stageSelect.value;
+
+    const classNumber =
+        classSelect.value;
+
+    if (!stage || !classNumber) {
+        studentNumberInput.value = "";
+        return;
+    }
+
+    const letters = {
+        primary: "A",
+        preparatory: "B",
+        secondary: "C"
+    };
+
+    studentNumberInput.value =
+        `${letters[stage]}${classNumber}XXX`;
+}
+
+async function registerStudent() {
+    const t =
+        translations[currentLanguage];
+
+    const name =
+        studentNameInput.value.trim();
 
     const academicYear =
         academicYearSelect.value;
@@ -462,309 +342,68 @@ function generateStudentNumber() {
     const classNumber =
         classSelect.value;
 
-    if (
-        !academicYear ||
-        !stage ||
-        !classNumber
-    ) {
+    const registrationDate =
+        registrationDateInput.value;
 
-        studentNumberInput.value = "";
-
+    if (!name) {
+        alert(t.studentNameRequired);
+        studentNameInput.focus();
         return;
-
     }
 
-
-    const stageLetters = {
-        primary: "A",
-        preparatory: "B",
-        secondary: "C"
-    };
-
-
-    const letter =
-        stageLetters[stage];
-
-    const students =
-        getStudents();
-
-
-    const count =
-        students.filter(function(student) {
-
-            return (
-                student.institutionId ===
-                    activeInstitutionId &&
-
-                student.academicYear ===
-                    academicYear &&
-
-                student.stage ===
-                    stage &&
-
-                String(
-                    student.classNumber
-                ) ===
-                    String(classNumber)
-            );
-
-        }).length;
-
-
-    const nextNumber =
-        count + 1;
-
-
-    studentNumberInput.value =
-        `${letter}${classNumber}${String(
-            nextNumber
-        ).padStart(3, "0")}`;
-
-}
-
-
-function setRegistrationDate() {
-
-    const today =
-        new Date();
-
-    const year =
-        today.getFullYear();
-
-    const month =
-        String(
-            today.getMonth() + 1
-        ).padStart(2, "0");
-
-    const day =
-        String(
-            today.getDate()
-        ).padStart(2, "0");
-
-
-    registrationDateInput.value =
-        `${year}-${month}-${day}`;
-
-}
-
-
-stageSelect.addEventListener(
-    "change",
-    function() {
-
-        loadClasses();
-        generateStudentNumber();
-
+    if (!stage) {
+        alert(t.stageRequired);
+        stageSelect.focus();
+        return;
     }
-);
 
-
-classSelect.addEventListener(
-    "change",
-    function() {
-
-        generateStudentNumber();
-
+    if (!classNumber) {
+        alert(t.classRequired);
+        classSelect.focus();
+        return;
     }
-);
 
-
-academicYearSelect.addEventListener(
-    "change",
-    function() {
-
-        generateStudentNumber();
-
+    if (!registrationDate) {
+        alert(t.registrationDateRequired);
+        registrationDateInput.focus();
+        return;
     }
-);
 
+    registerButton.disabled = true;
+    registerButton.textContent = t.registering;
 
-studentForm.addEventListener(
-    "submit",
-    function(event) {
-
-        event.preventDefault();
-
-        const t =
-            translations[currentLanguage];
-
-
-        const name =
-            studentNameInput.value.trim();
-
-        const academicYear =
-            academicYearSelect.value;
-
-        const stage =
-            stageSelect.value;
-
-        const classNumber =
-            classSelect.value;
-
-        const registrationDate =
-            registrationDateInput.value;
-
-
-        if (!name) {
-
-            alert(t.studentNameRequired);
-
-            studentNameInput.focus();
-
-            return;
-
-        }
-
-
-        if (!stage) {
-
-            alert(t.stageRequired);
-
-            stageSelect.focus();
-
-            return;
-
-        }
-
-
-        if (!classNumber) {
-
-            alert(t.classRequired);
-
-            classSelect.focus();
-
-            return;
-
-        }
-
-
-        if (!registrationDate) {
-
-            alert(
-                t.registrationDateRequired
-            );
-
-            registrationDateInput.focus();
-
-            return;
-
-        }
-
-
-        generateStudentNumber();
-
-
-        const studentNumber =
-            studentNumberInput.value;
-
-
-        const students =
-            getStudents();
-
-
-        const duplicate =
-            students.some(function(student) {
-
-                return (
-                    student.institutionId ===
-                        activeInstitutionId &&
-
-                    student.academicYear ===
-                        academicYear &&
-
-                    student.studentNumber ===
-                        studentNumber
-                );
-
+    try {
+        const response =
+            await fetch(API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type":
+                        "text/plain;charset=utf-8"
+                },
+                body: JSON.stringify({
+                    action: "addStudent",
+                    institutionId:
+                        activeInstitutionId,
+                    username:
+                        currentUser.username,
+                    academicYear,
+                    name,
+                    stage,
+                    classNumber,
+                    registrationDate
+                })
             });
 
+        const result =
+            await response.json();
 
-        if (duplicate) {
-
-            alert(t.studentExists);
-
-            return;
-
+        if (!result.success) {
+            throw new Error(
+                result.message || t.serverError
+            );
         }
-
-
-        const student = {
-
-            id:
-                "STU-" +
-                Date.now() +
-                "-" +
-                Math.random()
-                    .toString(36)
-                    .substring(2, 8),
-
-            institutionId:
-                activeInstitutionId,
-
-            academicYear:
-                academicYear,
-
-            studentNumber:
-                studentNumber,
-
-            name:
-                name,
-
-            stage:
-                stage,
-
-            classNumber:
-                classNumber,
-
-            className:
-                `${t.class} ${classNumber}`,
-
-            registrationDate:
-                registrationDate,
-
-            createdAt:
-                new Date().toISOString()
-
-        };
-
-
-        students.push(student);
-
-        saveStudents(students);
-
-
-        if (
-            typeof logActivity ===
-            "function"
-        ) {
-
-            logActivity({
-
-                institutionId:
-                    activeInstitutionId,
-
-                userId:
-                    currentUser.id || "",
-
-                username:
-                    currentUser.username || "",
-
-                role:
-                    currentUser.role || "",
-
-                action:
-                    "Registered Student",
-
-                details:
-                    `${name} - ${studentNumber}`
-
-            });
-
-        }
-
 
         alert(t.studentRegistered);
-
 
         window.location.href =
             "students.html?id=" +
@@ -772,68 +411,76 @@ studentForm.addEventListener(
                 activeInstitutionId
             );
 
+    } catch (error) {
+        alert(
+            error.message ||
+            t.serverError
+        );
+
+        registerButton.disabled = false;
+        registerButton.textContent =
+            t.registerStudent;
+    }
+}
+
+stageSelect.addEventListener(
+    "change",
+    function() {
+        loadClasses();
+        updateStudentNumberPreview();
     }
 );
 
-
-function goBack() {
-
-    window.location.href =
-        "students.html?id=" +
-        encodeURIComponent(
-            activeInstitutionId
-        );
-
-}
-
-
-if (backButton) {
-
-    backButton.addEventListener(
-        "click",
-        goBack
-    );
-
-}
-
-
-if (cancelButton) {
-
-    cancelButton.addEventListener(
-        "click",
-        goBack
-    );
-
-}
-
-
-if (languageSelect) {
-
-    languageSelect.addEventListener(
-        "change",
-        function() {
-
-            applyLanguage(
-                languageSelect.value
-            );
-
-            loadClasses();
-            generateStudentNumber();
-
-        }
-    );
-
-}
-
-
-loadAcademicYears();
-
-setRegistrationDate();
-
-applyLanguage(
-    currentLanguage
+classSelect.addEventListener(
+    "change",
+    updateStudentNumberPreview
 );
 
-loadClasses();
+academicYearSelect.addEventListener(
+    "change",
+    updateStudentNumberPreview
+);
 
-generateStudentNumber();
+studentForm.addEventListener(
+    "submit",
+    function(event) {
+        event.preventDefault();
+        registerStudent();
+    }
+);
+
+backButton.addEventListener(
+    "click",
+    function() {
+        window.location.href =
+            "students.html?id=" +
+            encodeURIComponent(
+                activeInstitutionId
+            );
+    }
+);
+
+cancelButton.addEventListener(
+    "click",
+    function() {
+        window.location.href =
+            "students.html?id=" +
+            encodeURIComponent(
+                activeInstitutionId
+            );
+    }
+);
+
+languageSelect.addEventListener(
+    "change",
+    function() {
+        applyLanguage(
+            languageSelect.value
+        );
+    }
+);
+
+loadAcademicYears();
+setRegistrationDate();
+applyLanguage(currentLanguage);
+updateStudentNumberPreview();
