@@ -1,14 +1,9 @@
-
 // =====================================================
-// Check Admin Session
-// =====================================================
-
-// =====================================================
-// Check Admin Session
+// BMP Institutions
 // =====================================================
 
 // =====================================================
-// Check Admin Session
+// Admin Session
 // =====================================================
 
 const currentAdmin =
@@ -19,48 +14,150 @@ if (!currentAdmin) {
 }
 
 
+// =====================================================
+// Google Apps Script Backend
+// =====================================================
 
-const tableBody = document.getElementById("institutionsTableBody");
-const emptyState = document.getElementById("emptyState");
+const ADMIN_API_URL =
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
 
-const searchInput = document.getElementById("searchInstitution");
-const typeFilter = document.getElementById("typeFilter");
-const statusFilter = document.getElementById("statusFilter");
+
+// =====================================================
+// Elements
+// =====================================================
+
+const tableBody =
+    document.getElementById(
+        "institutionsTableBody"
+    );
+
+const emptyState =
+    document.getElementById(
+        "emptyState"
+    );
+
+const searchInput =
+    document.getElementById(
+        "searchInstitution"
+    );
+
+const typeFilter =
+    document.getElementById(
+        "typeFilter"
+    );
+
+const statusFilter =
+    document.getElementById(
+        "statusFilter"
+    );
 
 const createInstitutionButton =
-    document.getElementById("createInstitutionButton");
-
-
-// Get institutions from localStorage
-function getInstitutions() {
-    return JSON.parse(
-        localStorage.getItem("bmpInstitutions")
-    ) || [];
-}
-
-
-// Save institutions
-function saveInstitutions(institutions) {
-    localStorage.setItem(
-        "bmpInstitutions",
-        JSON.stringify(institutions)
+    document.getElementById(
+        "createInstitutionButton"
     );
+
+
+// =====================================================
+// Institutions Data
+// =====================================================
+
+let institutions = [];
+
+
+// =====================================================
+// Load Institutions
+// =====================================================
+
+async function loadInstitutions() {
+
+    try {
+
+        const response =
+            await fetch(
+                ADMIN_API_URL,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body: JSON.stringify({
+                        action:
+                            "getInstitutions"
+                    })
+                }
+            );
+
+        const result =
+            await response.json();
+
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Unable to load institutions."
+            );
+        }
+
+        institutions =
+            result.institutions || [];
+
+        renderInstitutions();
+
+    } catch (error) {
+
+        console.error(
+            "Load institutions error:",
+            error
+        );
+
+        tableBody.innerHTML = "";
+
+        emptyState.style.display =
+            "block";
+
+        emptyState.querySelector("h2").textContent =
+            "Unable to Load Institutions";
+
+        emptyState.querySelector("p").textContent =
+            error.message ||
+            "Unable to connect to server.";
+    }
 }
 
 
-// Get current status
+// =====================================================
+// Get Current Status
+// =====================================================
+
 function getStatus(institution) {
 
-    if (institution.status === "disabled") {
+    if (
+        institution.status ===
+        "disabled"
+    ) {
+
         return "disabled";
     }
 
-    if (institution.licenseEnd) {
+    if (
+        institution.licenseEnd
+    ) {
 
-        const today = new Date();
-        const endDate = new Date(institution.licenseEnd);
+        const today =
+            new Date();
 
-        if (endDate < today) {
+        const endDate =
+            new Date(
+                institution.licenseEnd
+            );
+
+        if (
+            endDate < today
+        ) {
+
             return "expired";
         }
     }
@@ -69,13 +166,16 @@ function getStatus(institution) {
 }
 
 
-// Render institutions
+// =====================================================
+// Render Institutions
+// =====================================================
+
 function renderInstitutions() {
 
-    const institutions = getInstitutions();
-
     const searchValue =
-        searchInput.value.trim().toLowerCase();
+        searchInput.value
+            .trim()
+            .toLowerCase();
 
     const selectedType =
         typeFilter.value;
@@ -84,203 +184,401 @@ function renderInstitutions() {
         statusFilter.value;
 
 
-    const filteredInstitutions = institutions.filter(institution => {
+    const filteredInstitutions =
+        institutions.filter(
+            institution => {
 
-        const currentStatus = getStatus(institution);
+                const currentStatus =
+                    getStatus(
+                        institution
+                    );
 
-        const matchesSearch =
-            institution.name.toLowerCase().includes(searchValue) ||
-            institution.id.toLowerCase().includes(searchValue);
 
-        const matchesType =
-            selectedType === "all" ||
-            institution.type === selectedType;
+                const institutionName =
+                    String(
+                        institution.name || ""
+                    ).toLowerCase();
 
-        const matchesStatus =
-            selectedStatus === "all" ||
-            currentStatus === selectedStatus;
 
-        return (
-            matchesSearch &&
-            matchesType &&
-            matchesStatus
+                const institutionId =
+                    String(
+                        institution.id || ""
+                    ).toLowerCase();
+
+
+                const matchesSearch =
+                    institutionName.includes(
+                        searchValue
+                    ) ||
+                    institutionId.includes(
+                        searchValue
+                    );
+
+
+                const matchesType =
+                    selectedType === "all" ||
+                    institution.type ===
+                        selectedType;
+
+
+                const matchesStatus =
+                    selectedStatus === "all" ||
+                    currentStatus ===
+                        selectedStatus;
+
+
+                return (
+                    matchesSearch &&
+                    matchesType &&
+                    matchesStatus
+                );
+            }
         );
-    });
 
 
     tableBody.innerHTML = "";
 
 
-    if (filteredInstitutions.length === 0) {
+    if (
+        filteredInstitutions.length === 0
+    ) {
 
-        emptyState.style.display = "block";
+        emptyState.style.display =
+            "block";
+
         return;
 
     } else {
 
-        emptyState.style.display = "none";
+        emptyState.style.display =
+            "none";
     }
 
 
-    filteredInstitutions.forEach(institution => {
+    filteredInstitutions.forEach(
+        institution => {
 
-        const status = getStatus(institution);
-
-        const row = document.createElement("tr");
-
-
-        const typeName =
-            institution.type === "school"
-                ? "School"
-                : "Restaurant";
+            const status =
+                getStatus(
+                    institution
+                );
 
 
-        const statusName =
-            status.charAt(0).toUpperCase() +
-            status.slice(1);
+            const row =
+                document.createElement(
+                    "tr"
+                );
 
 
-        row.innerHTML = `
-            <td>${institution.id}</td>
-
-            <td>${institution.name}</td>
-
-            <td>
-                <span class="type-badge type-${institution.type}">
-                    ${typeName}
-                </span>
-            </td>
-
-            <td>
-                <span class="status-badge status-${status}">
-                    ${statusName}
-                </span>
-            </td>
-
-            <td>
-                ${institution.licenseStart || "-"}
-                -
-                ${institution.licenseEnd || "-"}
-            </td>
-
-            <td>
-                <button
-                    class="action-btn view-btn"
-                    onclick="viewInstitution('${institution.id}')">
-                    View
-                </button>
-
-                ${
-                    status === "disabled"
-                    ?
-                    `<button
-                        class="action-btn enable-btn"
-                        onclick="enableInstitution('${institution.id}')">
-                        Enable
-                    </button>`
-                    :
-                    `<button
-                        class="action-btn disable-btn"
-                        onclick="disableInstitution('${institution.id}')">
-                        Disable
-                    </button>`
-                }
-            </td>
-        `;
+            const typeName =
+                institution.type ===
+                    "school"
+                    ? "School"
+                    : "Restaurant";
 
 
-        tableBody.appendChild(row);
-    });
+            const statusName =
+                status
+                    .charAt(0)
+                    .toUpperCase() +
+                status.slice(1);
+
+
+            row.innerHTML = `
+                <td>
+                    ${institution.id || "-"}
+                </td>
+
+                <td>
+                    ${institution.name || "-"}
+                </td>
+
+                <td>
+                    <span
+                        class="type-badge type-${institution.type}">
+                        ${typeName}
+                    </span>
+                </td>
+
+                <td>
+                    <span
+                        class="status-badge status-${status}">
+                        ${statusName}
+                    </span>
+                </td>
+
+                <td>
+                    ${institution.licenseStart || "-"}
+                    -
+                    ${institution.licenseEnd || "-"}
+                </td>
+
+                <td>
+
+                    <button
+                        class="action-btn view-btn"
+                        onclick="viewInstitution('${institution.id}')">
+                        View
+                    </button>
+
+                    ${
+                        status === "disabled"
+
+                        ?
+
+                        `<button
+                            class="action-btn enable-btn"
+                            onclick="enableInstitution('${institution.id}')">
+                            Enable
+                        </button>`
+
+                        :
+
+                        `<button
+                            class="action-btn disable-btn"
+                            onclick="disableInstitution('${institution.id}')">
+                            Disable
+                        </button>`
+                    }
+
+                </td>
+            `;
+
+
+            tableBody.appendChild(
+                row
+            );
+        }
+    );
 }
 
 
-// View institution
+// =====================================================
+// View Institution
+// =====================================================
+
 function viewInstitution(id) {
+
     window.location.href =
         `institution.html?id=${encodeURIComponent(id)}`;
 }
 
 
-// Disable institution
-function disableInstitution(id) {
+// =====================================================
+// Disable Institution
+// =====================================================
 
-    const institutions = getInstitutions();
+async function disableInstitution(id) {
 
     const institution =
-        institutions.find(item => item.id === id);
+        institutions.find(
+            item =>
+                item.id === id
+        );
+
 
     if (!institution) {
         return;
     }
 
 
-    const confirmed = confirm(
-        "Are you sure you want to disable this institution?"
-    );
+    const confirmed =
+        confirm(
+            "Are you sure you want to disable this institution?"
+        );
+
 
     if (!confirmed) {
         return;
     }
 
 
-    institution.status = "disabled";
+    try {
 
-    saveInstitutions(institutions);
+        const response =
+            await fetch(
+                ADMIN_API_URL,
+                {
+                    method: "POST",
 
-    renderInstitutions();
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                "updateInstitutionStatus",
+
+                            institutionId:
+                                id,
+
+                            status:
+                                "disabled"
+
+                        })
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Unable to disable institution."
+            );
+        }
+
+
+        await loadInstitutions();
+
+
+    } catch (error) {
+
+        console.error(
+            "Disable institution error:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Unable to disable institution."
+        );
+    }
 }
 
 
-// Enable institution
-function enableInstitution(id) {
+// =====================================================
+// Enable Institution
+// =====================================================
 
-    const institutions = getInstitutions();
+async function enableInstitution(id) {
 
     const institution =
-        institutions.find(item => item.id === id);
+        institutions.find(
+            item =>
+                item.id === id
+        );
+
 
     if (!institution) {
         return;
     }
 
 
-    institution.status = "active";
+    try {
 
-    saveInstitutions(institutions);
+        const response =
+            await fetch(
+                ADMIN_API_URL,
+                {
+                    method: "POST",
 
-    renderInstitutions();
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                "updateInstitutionStatus",
+
+                            institutionId:
+                                id,
+
+                            status:
+                                "active"
+
+                        })
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Unable to enable institution."
+            );
+        }
+
+
+        await loadInstitutions();
+
+
+    } catch (error) {
+
+        console.error(
+            "Enable institution error:",
+            error
+        );
+
+        alert(
+            error.message ||
+            "Unable to enable institution."
+        );
+    }
 }
 
 
+// =====================================================
 // Search
+// =====================================================
+
 searchInput.addEventListener(
     "input",
     renderInstitutions
 );
 
 
-// Type filter
+// =====================================================
+// Type Filter
+// =====================================================
+
 typeFilter.addEventListener(
     "change",
     renderInstitutions
 );
 
 
-// Status filter
+// =====================================================
+// Status Filter
+// =====================================================
+
 statusFilter.addEventListener(
     "change",
     renderInstitutions
 );
 
 
+// =====================================================
 // Create Institution
+// =====================================================
+
 createInstitutionButton.addEventListener(
     "click",
     function () {
-        window.location.href = "create-institution.html";
+
+        window.location.href =
+            "create-institution.html";
     }
 );
 
 
-// Initial render
-renderInstitutions();
+// =====================================================
+// Initial Load
+// =====================================================
+
+loadInstitutions();
