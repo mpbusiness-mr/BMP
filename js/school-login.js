@@ -12,6 +12,163 @@ const SCHOOL_API_URL =
 
 
 // =====================================================
+// Translations
+// =====================================================
+
+const translations = {
+
+    en: {
+
+        language: "Language",
+
+        schoolLogin: "School Login",
+
+        loginDescription:
+            "Sign in to your school account.",
+
+        username:
+            "Username",
+
+        usernamePlaceholder:
+            "Enter username",
+
+        password:
+            "Password",
+
+        passwordPlaceholder:
+            "Enter password",
+
+        login:
+            "Login",
+
+        signingIn:
+            "Signing in...",
+
+        pleaseEnterCredentials:
+            "Please enter username and password.",
+
+        serverError:
+            "Server returned an error.",
+
+        loginFailed:
+            "Login failed.",
+
+        invalidResponse:
+            "Invalid login response.",
+
+        unableToConnect:
+            "Unable to connect to server."
+
+    },
+
+
+    ar: {
+
+        language:
+            "اللغة",
+
+        schoolLogin:
+            "تسجيل دخول المدرسة",
+
+        loginDescription:
+            "قم بتسجيل الدخول إلى حساب مدرستك.",
+
+        username:
+            "اسم المستخدم",
+
+        usernamePlaceholder:
+            "أدخل اسم المستخدم",
+
+        password:
+            "كلمة المرور",
+
+        passwordPlaceholder:
+            "أدخل كلمة المرور",
+
+        login:
+            "تسجيل الدخول",
+
+        signingIn:
+            "جاري تسجيل الدخول...",
+
+        pleaseEnterCredentials:
+            "يرجى إدخال اسم المستخدم وكلمة المرور.",
+
+        serverError:
+            "حدث خطأ في الخادم.",
+
+        loginFailed:
+            "فشل تسجيل الدخول.",
+
+        invalidResponse:
+            "استجابة تسجيل الدخول غير صالحة.",
+
+        unableToConnect:
+            "تعذر الاتصال بالخادم."
+
+    },
+
+
+    fr: {
+
+        language:
+            "Langue",
+
+        schoolLogin:
+            "Connexion de l'école",
+
+        loginDescription:
+            "Connectez-vous à votre compte scolaire.",
+
+        username:
+            "Nom d'utilisateur",
+
+        usernamePlaceholder:
+            "Entrez le nom d'utilisateur",
+
+        password:
+            "Mot de passe",
+
+        passwordPlaceholder:
+            "Entrez le mot de passe",
+
+        login:
+            "Connexion",
+
+        signingIn:
+            "Connexion en cours...",
+
+        pleaseEnterCredentials:
+            "Veuillez saisir le nom d'utilisateur et le mot de passe.",
+
+        serverError:
+            "Le serveur a renvoyé une erreur.",
+
+        loginFailed:
+            "Échec de la connexion.",
+
+        invalidResponse:
+            "Réponse de connexion invalide.",
+
+        unableToConnect:
+            "Impossible de se connecter au serveur."
+
+    }
+
+};
+
+
+// =====================================================
+// Current Language
+// =====================================================
+
+let currentLanguage =
+    localStorage.getItem(
+        "bmpLanguage"
+    ) || "en";
+
+
+// =====================================================
 // Elements
 // =====================================================
 
@@ -39,6 +196,142 @@ const errorMessage =
     document.getElementById(
         "errorMessage"
     );
+
+const languageSelect =
+    document.getElementById(
+        "languageSelect"
+    );
+
+
+// =====================================================
+// Apply Language
+// =====================================================
+
+function applyLanguage(language) {
+
+    if (!translations[language]) {
+        language = "en";
+    }
+
+    currentLanguage = language;
+
+    localStorage.setItem(
+        "bmpLanguage",
+        language
+    );
+
+
+    // =============================================
+    // HTML Direction
+    // =============================================
+
+    document.documentElement.lang =
+        language;
+
+    document.documentElement.dir =
+        language === "ar"
+            ? "rtl"
+            : "ltr";
+
+
+    // =============================================
+    // Text
+    // =============================================
+
+    document
+        .querySelectorAll("[data-i18n]")
+        .forEach(function (element) {
+
+            const key =
+                element.getAttribute(
+                    "data-i18n"
+                );
+
+            if (
+                translations[language][key]
+            ) {
+
+                element.textContent =
+                    translations[language][key];
+
+            }
+
+        });
+
+
+    // =============================================
+    // Placeholders
+    // =============================================
+
+    document
+        .querySelectorAll(
+            "[data-i18n-placeholder]"
+        )
+        .forEach(function (element) {
+
+            const key =
+                element.getAttribute(
+                    "data-i18n-placeholder"
+                );
+
+            if (
+                translations[language][key]
+            ) {
+
+                element.placeholder =
+                    translations[language][key];
+
+            }
+
+        });
+
+
+    // =============================================
+    // Language Selector
+    // =============================================
+
+    if (languageSelect) {
+
+        languageSelect.value =
+            language;
+
+    }
+
+
+    // =============================================
+    // Login Button
+    // =============================================
+
+    if (
+        !loginButton.disabled
+    ) {
+
+        loginButton.textContent =
+            translations[language].login;
+
+    }
+
+}
+
+
+// =====================================================
+// Change Language
+// =====================================================
+
+if (languageSelect) {
+
+    languageSelect.addEventListener(
+        "change",
+        function () {
+
+            applyLanguage(
+                languageSelect.value
+            );
+
+        }
+    );
+
+}
 
 
 // =====================================================
@@ -119,7 +412,9 @@ loginForm.addEventListener(
         ) {
 
             errorMessage.textContent =
-                "Please enter username and password.";
+                translations[
+                    currentLanguage
+                ].pleaseEnterCredentials;
 
             return;
 
@@ -134,7 +429,9 @@ loginForm.addEventListener(
             true;
 
         loginButton.textContent =
-            "Signing in...";
+            translations[
+                currentLanguage
+            ].signingIn;
 
 
         try {
@@ -183,7 +480,9 @@ loginForm.addEventListener(
             if (!response.ok) {
 
                 throw new Error(
-                    "Server returned an error."
+                    translations[
+                        currentLanguage
+                    ].serverError
                 );
 
             }
@@ -206,14 +505,18 @@ loginForm.addEventListener(
                     result &&
                     result.message
                         ? result.message
-                        : "Login failed.";
+                        : translations[
+                            currentLanguage
+                        ].loginFailed;
 
 
                 loginButton.disabled =
                     false;
 
                 loginButton.textContent =
-                    "Login";
+                    translations[
+                        currentLanguage
+                    ].login;
 
                 return;
 
@@ -230,7 +533,9 @@ loginForm.addEventListener(
             ) {
 
                 throw new Error(
-                    "Invalid login response."
+                    translations[
+                        currentLanguage
+                    ].invalidResponse
                 );
 
             }
@@ -270,16 +575,29 @@ loginForm.addEventListener(
 
 
             errorMessage.textContent =
-                "Unable to connect to server.";
+                translations[
+                    currentLanguage
+                ].unableToConnect;
 
 
             loginButton.disabled =
                 false;
 
             loginButton.textContent =
-                "Login";
+                translations[
+                    currentLanguage
+                ].login;
 
         }
 
     }
+);
+
+
+// =====================================================
+// Initialize Language
+// =====================================================
+
+applyLanguage(
+    currentLanguage
 );
