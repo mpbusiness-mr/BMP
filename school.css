@@ -320,6 +320,56 @@ body {
     }
 
 
+    /* =====================================================
+   Language Selector
+   ===================================================== */
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.language-selector {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.language-selector label {
+    font-size: 14px;
+}
+
+.language-selector select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+}
+
+
+/* =====================================================
+   RTL Support
+   ===================================================== */
+
+html[dir="rtl"] .page-header {
+    text-align: right;
+}
+
+html[dir="rtl"] .header-actions {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .language-selector {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .school-summary,
+html[dir="rtl"] .dashboard {
+    direction: rtl;
+}
+
     .dashboard-card p {
         font-size: 13px;
     }
