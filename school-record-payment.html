@@ -15,6 +15,24 @@
         rel="stylesheet"
         href="school-record-payment.css">
 
+    <!-- Safety layer -->
+    <style>
+        button,
+        select,
+        input,
+        textarea {
+            pointer-events: auto !important;
+        }
+
+        .page-header,
+        .card,
+        .form-actions,
+        .message {
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+
 </head>
 
 <body>
@@ -371,6 +389,100 @@
 
     <script src="js/auth.js"></script>
     <script src="js/school-record-payment.js"></script>
+
+
+    <!-- Emergency navigation fallback -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            function getInstitutionForNavigation() {
+
+                try {
+
+                    const user =
+                        JSON.parse(
+                            localStorage.getItem(
+                                "bmpCurrentUser"
+                            ) || "null"
+                        );
+
+                    if (
+                        user &&
+                        user.institutionId
+                    ) {
+                        return user.institutionId;
+                    }
+
+                } catch (error) {
+                    console.error(error);
+                }
+
+
+                const params =
+                    new URLSearchParams(
+                        window.location.search
+                    );
+
+                return (
+                    params.get("institutionId") ||
+                    params.get("id") ||
+                    ""
+                );
+            }
+
+
+            const id =
+                getInstitutionForNavigation();
+
+
+            const backButton =
+                document.getElementById(
+                    "backButton"
+                );
+
+
+            const cancelButton =
+                document.getElementById(
+                    "cancelButton"
+                );
+
+
+            function goToPaymentsPage() {
+
+                if (!id) {
+
+                    window.location.href =
+                        "school-payments.html";
+
+                    return;
+
+                }
+
+
+                window.location.href =
+                    "school-payments.html?id=" +
+                    encodeURIComponent(id);
+
+            }
+
+
+            if (backButton) {
+
+                backButton.onclick =
+                    goToPaymentsPage;
+
+            }
+
+
+            if (cancelButton) {
+
+                cancelButton.onclick =
+                    goToPaymentsPage;
+
+            }
+
+        });
+    </script>
 
 </body>
 
