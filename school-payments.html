@@ -8,13 +8,16 @@
     <title>Payments</title>
 
     <link rel="stylesheet" href="school-payments.css">
-</head> 
+</head>
 
 <body>
 
     <div class="page-container">
 
-        <!-- Header -->
+        <!-- ================================
+             Header
+             ================================= -->
+
         <header class="page-header">
 
             <div class="header-left">
@@ -22,13 +25,15 @@
                 <button
                     type="button"
                     class="back-button"
-                    onclick="goBack()">
+                    id="backButton">
                     Back
                 </button>
 
                 <div class="page-title">
 
-                    <h1>Payments</h1>
+                    <h1>
+                        Payments
+                    </h1>
 
                     <p>
                         View and manage student payments
@@ -44,8 +49,7 @@
                 <button
                     type="button"
                     class="primary-button"
-                    id="recordPaymentPageBtn"
-                    onclick="goToRecordPayment()">
+                    id="recordPaymentPageBtn">
                     Record Payment
                 </button>
 
@@ -54,7 +58,10 @@
         </header>
 
 
-        <!-- Filters -->
+        <!-- ================================
+             Filters
+             ================================= -->
+
         <section class="filters-section">
 
             <div class="filter-group">
@@ -192,7 +199,10 @@
         </section>
 
 
-        <!-- Summary -->
+        <!-- ================================
+             Summary
+             ================================= -->
+
         <section class="summary-section">
 
             <div class="summary-card">
@@ -242,7 +252,10 @@
         </section>
 
 
-        <!-- Loading -->
+        <!-- ================================
+             Loading
+             ================================= -->
+
         <div
             id="loadingState"
             class="loading-state"
@@ -257,7 +270,10 @@
         </div>
 
 
-        <!-- Error -->
+        <!-- ================================
+             Error
+             ================================= -->
+
         <div
             id="errorState"
             class="error-state"
@@ -281,7 +297,10 @@
         </div>
 
 
-        <!-- Empty -->
+        <!-- ================================
+             Empty
+             ================================= -->
+
         <div
             id="emptyState"
             class="empty-state"
@@ -302,7 +321,10 @@
         </div>
 
 
-        <!-- Payments Table -->
+        <!-- ================================
+             Payments Table
+             ================================= -->
+
         <section
             id="paymentsTableSection"
             class="table-section">
@@ -363,15 +385,18 @@
     </div>
 
 
-    <!-- Payment Details Modal -->
+    <!-- ================================
+         Payment Details Modal
+         ================================= -->
+
     <div
         id="paymentDetailsModal"
         class="modal"
         style="display: none;">
 
         <div
-            class="modal-overlay"
-            onclick="closePaymentDetails()">
+            id="paymentDetailsOverlay"
+            class="modal-overlay">
         </div>
 
 
@@ -386,7 +411,7 @@
                 <button
                     type="button"
                     class="modal-close"
-                    onclick="closePaymentDetails()">
+                    id="paymentDetailsCloseBtn">
                     ×
                 </button>
 
@@ -403,7 +428,10 @@
     </div>
 
 
-    <!-- Scripts -->
+    <!-- ================================
+         Scripts
+         ================================= -->
+
     <script src="js/auth.js"></script>
     <script src="school-payments.js"></script>
 
