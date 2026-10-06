@@ -115,6 +115,7 @@ try {
 if (
     !currentUser ||
     !currentUser.institutionId ||
+    !currentUser.username ||
     currentUser.status !== "active"
 ) {
     window.location.href = "school-login.html";
@@ -132,11 +133,10 @@ if (
 ) {
     window.location.href =
         "school.html?id=" +
-        encodeURIComponent(currentUser.institutionId);
+        encodeURIComponent(
+            currentUser.institutionId
+        );
 }
-
-const activeInstitutionId =
-    currentUser.institutionId;
 
 const institutionIdElement =
     document.getElementById("institutionId");
@@ -199,31 +199,41 @@ function applyLanguage(language) {
         language;
 
     document.documentElement.dir =
-        language === "ar" ? "rtl" : "ltr";
+        language === "ar"
+            ? "rtl"
+            : "ltr";
 
     document
         .querySelectorAll("[data-i18n]")
         .forEach(function(element) {
             const key =
-                element.getAttribute("data-i18n");
+                element.getAttribute(
+                    "data-i18n"
+                );
 
-            if (translations[language][key]) {
-                element.textContent =
-                    translations[language][key];
+            const value =
+                translations[language][key];
+
+            if (value !== undefined) {
+                element.textContent = value;
             }
         });
 
     document
-        .querySelectorAll("[data-i18n-placeholder]")
+        .querySelectorAll(
+            "[data-i18n-placeholder]"
+        )
         .forEach(function(element) {
             const key =
                 element.getAttribute(
                     "data-i18n-placeholder"
                 );
 
-            if (translations[language][key]) {
-                element.placeholder =
-                    translations[language][key];
+            const value =
+                translations[language][key];
+
+            if (value !== undefined) {
+                element.placeholder = value;
             }
         });
 
@@ -254,8 +264,18 @@ function loadAcademicYears() {
         option.value = value;
         option.textContent = value;
 
-        academicYearSelect.appendChild(option);
+        academicYearSelect.appendChild(
+            option
+        );
     }
+
+    const currentAcademicYear =
+        `${currentYear}-${String(
+            currentYear + 1
+        ).slice(-2)}`;
+
+    academicYearSelect.value =
+        currentAcademicYear;
 }
 
 function loadClasses() {
@@ -268,40 +288,48 @@ function loadClasses() {
         document.createElement("option");
 
     placeholder.value = "";
-    placeholder.textContent =
-        translations[currentLanguage].selectClass;
 
-    classSelect.appendChild(placeholder);
+    placeholder.textContent =
+        translations[
+            currentLanguage
+        ].selectClass;
+
+    classSelect.appendChild(
+        placeholder
+    );
 
     let count = 0;
 
     if (stage === "primary") {
         count = 6;
-    } else if (stage === "preparatory") {
+    }
+
+    if (stage === "preparatory") {
         count = 4;
-    } else if (stage === "secondary") {
+    }
+
+    if (stage === "secondary") {
         count = 3;
     }
 
-    for (let i = 1; i <= count; i++) {
+    for (
+        let i = 1;
+        i <= count;
+        i++
+    ) {
         const option =
             document.createElement("option");
 
-        option.value = String(i);
+        option.value =
+            String(i);
 
         option.textContent =
             `${translations[currentLanguage].class} ${i}`;
 
-        classSelect.appendChild(option);
+        classSelect.appendChild(
+            option
+        );
     }
-}
-
-function setRegistrationDate() {
-    const today =
-        new Date();
-
-    registrationDateInput.value =
-        today.toISOString().split("T")[0];
 }
 
 function updateStudentNumberPreview() {
@@ -324,6 +352,27 @@ function updateStudentNumberPreview() {
 
     studentNumberInput.value =
         `${letters[stage]}${classNumber}XXX`;
+}
+
+function setRegistrationDate() {
+    const today =
+        new Date();
+
+    const year =
+        today.getFullYear();
+
+    const month =
+        String(
+            today.getMonth() + 1
+        ).padStart(2, "0");
+
+    const day =
+        String(
+            today.getDate()
+        ).padStart(2, "0");
+
+    registrationDateInput.value =
+        `${year}-${month}-${day}`;
 }
 
 async function registerStudent() {
@@ -370,45 +419,71 @@ async function registerStudent() {
     }
 
     registerButton.disabled = true;
-    registerButton.textContent = t.registering;
+
+    registerButton.textContent =
+        t.registering;
 
     try {
         const response =
-            await fetch(API_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type":
-                        "text/plain;charset=utf-8"
-                },
-                body: JSON.stringify({
-                    action: "addStudent",
-                    institutionId:
-                        activeInstitutionId,
-                    username:
-                        currentUser.username,
-                    academicYear,
-                    name,
-                    stage,
-                    classNumber,
-                    registrationDate
-                })
-            });
+            await fetch(
+                API_URL,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+                    body: JSON.stringify({
+                        action: "addStudent",
+                        institutionId:
+                            currentUser.institutionId,
+                        username:
+                            currentUser.username,
+                        academicYear:
+                            academicYear,
+                        name:
+                            name,
+                        stage:
+                            stage,
+                        classNumber:
+                            classNumber,
+                        registrationDate:
+                            registrationDate
+                    })
+                }
+            );
+
+        if (!response.ok) {
+            throw new Error(
+                "Server connection failed."
+            );
+        }
 
         const result =
             await response.json();
 
         if (!result.success) {
             throw new Error(
-                result.message || t.serverError
+                result.message ||
+                t.serverError
             );
         }
 
-        alert(t.studentRegistered);
+        studentNumberInput.value =
+            result.student.studentNumber;
+
+        alert(
+            t.studentRegistered +
+            "\n\n" +
+            t.studentNumber +
+            ": " +
+            result.student.studentNumber
+        );
 
         window.location.href =
             "students.html?id=" +
             encodeURIComponent(
-                activeInstitutionId
+                currentUser.institutionId
             );
 
     } catch (error) {
@@ -418,6 +493,7 @@ async function registerStudent() {
         );
 
         registerButton.disabled = false;
+
         registerButton.textContent =
             t.registerStudent;
     }
@@ -433,12 +509,16 @@ stageSelect.addEventListener(
 
 classSelect.addEventListener(
     "change",
-    updateStudentNumberPreview
+    function() {
+        updateStudentNumberPreview();
+    }
 );
 
 academicYearSelect.addEventListener(
     "change",
-    updateStudentNumberPreview
+    function() {
+        updateStudentNumberPreview();
+    }
 );
 
 studentForm.addEventListener(
@@ -455,7 +535,7 @@ backButton.addEventListener(
         window.location.href =
             "students.html?id=" +
             encodeURIComponent(
-                activeInstitutionId
+                currentUser.institutionId
             );
     }
 );
@@ -466,7 +546,7 @@ cancelButton.addEventListener(
         window.location.href =
             "students.html?id=" +
             encodeURIComponent(
-                activeInstitutionId
+                currentUser.institutionId
             );
     }
 );
@@ -482,5 +562,6 @@ languageSelect.addEventListener(
 
 loadAcademicYears();
 setRegistrationDate();
+loadClasses();
 applyLanguage(currentLanguage);
 updateStudentNumberPreview();
