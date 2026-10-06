@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>School Dashboard - BMP</title>
+    <title>BMP - School Dashboard</title>
 
     <link rel="stylesheet" href="school.css">
 </head>
@@ -27,11 +27,46 @@
                 </p>
             </div>
 
-            <button
-                id="backButton"
-                class="btn btn-secondary">
-                Back
-            </button>
+
+            <div class="header-actions">
+
+                <div class="language-selector">
+
+                    <label
+                        for="languageSelect"
+                        data-i18n="language">
+                        Language
+                    </label>
+
+                    <select id="languageSelect">
+
+                        <option value="en">
+                            English
+                        </option>
+
+                        <option value="ar">
+                            العربية
+                        </option>
+
+                        <option value="fr">
+                            Français
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    id="backButton"
+                    class="btn btn-secondary"
+                    data-i18n="back">
+
+                    Back
+
+                </button>
+
+            </div>
 
         </header>
 
@@ -41,12 +76,15 @@
 
             <div class="summary-item">
 
-                <span class="summary-label">
+                <span
+                    class="summary-label"
+                    data-i18n="institutionId">
+
                     Institution ID
+
                 </span>
 
-                <strong
-                    id="institutionId">
+                <strong id="institutionId">
                     -
                 </strong>
 
@@ -55,12 +93,15 @@
 
             <div class="summary-item">
 
-                <span class="summary-label">
+                <span
+                    class="summary-label"
+                    data-i18n="schoolNameLabel">
+
                     School Name
+
                 </span>
 
-                <strong
-                    id="institutionName">
+                <strong id="institutionName">
                     -
                 </strong>
 
@@ -69,12 +110,15 @@
 
             <div class="summary-item">
 
-                <span class="summary-label">
+                <span
+                    class="summary-label"
+                    data-i18n="status">
+
                     Status
+
                 </span>
 
-                <strong
-                    id="institutionStatus">
+                <strong id="institutionStatus">
                     -
                 </strong>
 
@@ -91,11 +135,11 @@
                 id="studentsButton"
                 class="dashboard-card">
 
-                <h2>
+                <h2 data-i18n="students">
                     Students
                 </h2>
 
-                <p>
+                <p data-i18n="studentsDescription">
                     Register, search and manage students.
                 </p>
 
@@ -107,11 +151,11 @@
                 id="paymentsButton"
                 class="dashboard-card">
 
-                <h2>
+                <h2 data-i18n="payments">
                     Payments
                 </h2>
 
-                <p>
+                <p data-i18n="paymentsDescription">
                     Manage monthly student payments.
                 </p>
 
@@ -123,11 +167,11 @@
                 id="receiptsButton"
                 class="dashboard-card">
 
-                <h2>
+                <h2 data-i18n="receipts">
                     Receipts
                 </h2>
 
-                <p>
+                <p data-i18n="receiptsDescription">
                     View and manage payment receipts.
                 </p>
 
@@ -139,11 +183,11 @@
                 id="reportsButton"
                 class="dashboard-card">
 
-                <h2>
+                <h2 data-i18n="reports">
                     Reports
                 </h2>
 
-                <p>
+                <p data-i18n="reportsDescription">
                     View school statistics and reports.
                 </p>
 
@@ -155,11 +199,11 @@
                 id="classesButton"
                 class="dashboard-card">
 
-                <h2>
+                <h2 data-i18n="classesStages">
                     Classes &amp; Stages
                 </h2>
 
-                <p>
+                <p data-i18n="classesStagesDescription">
                     Manage academic stages and classes.
                 </p>
 
@@ -171,11 +215,11 @@
                 id="usersButton"
                 class="dashboard-card">
 
-                <h2>
+                <h2 data-i18n="users">
                     Users
                 </h2>
 
-                <p>
+                <p data-i18n="usersDescription">
                     Manage school users and access.
                 </p>
 
@@ -187,21 +231,24 @@
                 id="settingsButton"
                 class="dashboard-card">
 
-                <h2>
+                <h2 data-i18n="settings">
                     Settings
                 </h2>
 
-                <p>
+                <p data-i18n="settingsDescription">
                     Manage school settings.
                 </p>
 
             </button>
 
-            <button
-               id="logoutButton"
-               class="btn btn-danger">
 
-                    Logout
+            <!-- Logout -->
+            <button
+                id="logoutButton"
+                class="btn btn-danger"
+                data-i18n="logout">
+
+                Logout
 
             </button>
 
