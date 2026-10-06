@@ -1,18 +1,323 @@
 // =====================================================
+// Configuration
+// =====================================================
+
+const API_URL =
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+
+
+// =====================================================
+// Translations
+// =====================================================
+
+const translations = {
+
+    en: {
+
+        pageTitle: "Edit Student",
+        pageSubtitle: "Update student information",
+
+        back: "Back",
+
+        schoolInformation: "School Information",
+        institutionId: "Institution ID",
+        institutionName: "School Name",
+
+        studentInformation: "Student Information",
+
+        academicYear: "Academic Year",
+        academicYearReadonly:
+            "The academic year cannot be changed after registration.",
+
+        studentNumber: "Student Number",
+        studentNumberReadonly:
+            "The student number cannot be changed.",
+
+        studentName: "Student Name",
+        enterStudentName: "Enter student name",
+
+        stage: "Stage",
+        selectStage: "Select stage",
+
+        primary: "Primary",
+        preparatory: "Preparatory",
+        secondary: "Secondary",
+
+        class: "Class",
+        selectClass: "Select class",
+
+        registrationDate: "Registration Date",
+
+        cancel: "Cancel",
+        saveChanges: "Save Changes",
+
+        loading: "Loading...",
+        saving: "Saving...",
+
+        studentNotFound: "Student not found.",
+        institutionNotFound: "Institution not found.",
+
+        completeFields:
+            "Please complete all required fields.",
+
+        networkError:
+            "Unable to connect to the server. Please check your internet connection.",
+
+        saveError:
+            "Unable to update student information.",
+
+        success:
+            "Student information updated successfully.",
+
+        serverError:
+            "The server returned an invalid response.",
+
+        loginRequired:
+            "School login required."
+
+    },
+
+
+    ar: {
+
+        pageTitle: "تعديل الطالب",
+        pageSubtitle: "تحديث معلومات الطالب",
+
+        back: "رجوع",
+
+        schoolInformation: "معلومات المؤسسة",
+        institutionId: "معرّف المؤسسة",
+        institutionName: "اسم المؤسسة",
+
+        studentInformation: "معلومات الطالب",
+
+        academicYear: "السنة الدراسية",
+        academicYearReadonly:
+            "لا يمكن تغيير السنة الدراسية بعد تسجيل الطالب.",
+
+        studentNumber: "رقم الطالب",
+        studentNumberReadonly:
+            "لا يمكن تغيير رقم الطالب.",
+
+        studentName: "اسم الطالب",
+        enterStudentName: "أدخل اسم الطالب",
+
+        stage: "المرحلة",
+        selectStage: "اختر المرحلة",
+
+        primary: "الابتدائية",
+        preparatory: "الإعدادية",
+        secondary: "الثانوية",
+
+        class: "القسم",
+        selectClass: "اختر القسم",
+
+        registrationDate: "تاريخ التسجيل",
+
+        cancel: "إلغاء",
+        saveChanges: "حفظ التغييرات",
+
+        loading: "جارٍ التحميل...",
+        saving: "جارٍ الحفظ...",
+
+        studentNotFound:
+            "لم يتم العثور على الطالب.",
+
+        institutionNotFound:
+            "لم يتم العثور على المؤسسة.",
+
+        completeFields:
+            "يرجى إكمال جميع الحقول المطلوبة.",
+
+        networkError:
+            "تعذر الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.",
+
+        saveError:
+            "تعذر تحديث معلومات الطالب.",
+
+        success:
+            "تم تحديث معلومات الطالب بنجاح.",
+
+        serverError:
+            "أعاد الخادم استجابة غير صالحة.",
+
+        loginRequired:
+            "يجب تسجيل الدخول إلى المؤسسة."
+
+    },
+
+
+    fr: {
+
+        pageTitle: "Modifier l'élève",
+        pageSubtitle: "Mettre à jour les informations de l'élève",
+
+        back: "Retour",
+
+        schoolInformation: "Informations de l'établissement",
+        institutionId: "ID de l'établissement",
+        institutionName: "Nom de l'établissement",
+
+        studentInformation: "Informations de l'élève",
+
+        academicYear: "Année scolaire",
+        academicYearReadonly:
+            "L'année scolaire ne peut pas être modifiée après l'inscription.",
+
+        studentNumber: "Numéro de l'élève",
+        studentNumberReadonly:
+            "Le numéro de l'élève ne peut pas être modifié.",
+
+        studentName: "Nom de l'élève",
+        enterStudentName: "Entrez le nom de l'élève",
+
+        stage: "Niveau",
+        selectStage: "Sélectionnez le niveau",
+
+        primary: "Primaire",
+        preparatory: "Collège",
+        secondary: "Secondaire",
+
+        class: "Classe",
+        selectClass: "Sélectionnez la classe",
+
+        registrationDate: "Date d'inscription",
+
+        cancel: "Annuler",
+        saveChanges: "Enregistrer",
+
+        loading: "Chargement...",
+        saving: "Enregistrement...",
+
+        studentNotFound:
+            "Élève introuvable.",
+
+        institutionNotFound:
+            "Établissement introuvable.",
+
+        completeFields:
+            "Veuillez remplir tous les champs obligatoires.",
+
+        networkError:
+            "Impossible de contacter le serveur. Vérifiez votre connexion Internet.",
+
+        saveError:
+            "Impossible de mettre à jour les informations de l'élève.",
+
+        success:
+            "Les informations de l'élève ont été mises à jour avec succès.",
+
+        serverError:
+            "Le serveur a renvoyé une réponse invalide.",
+
+        loginRequired:
+            "Connexion à l'établissement requise."
+
+    }
+
+};
+
+
+// =====================================================
+// Language
+// =====================================================
+
+let currentLanguage =
+    localStorage.getItem("bmpLanguage") || "en";
+
+
+function t(key) {
+
+    return (
+        translations[currentLanguage] &&
+        translations[currentLanguage][key]
+    ) ||
+    translations.en[key] ||
+    key;
+
+}
+
+
+function applyLanguage() {
+
+    const html =
+        document.documentElement;
+
+    html.lang =
+        currentLanguage;
+
+    html.dir =
+        currentLanguage === "ar"
+            ? "rtl"
+            : "ltr";
+
+
+    document
+        .querySelectorAll("[data-i18n]")
+        .forEach(element => {
+
+            const key =
+                element.dataset.i18n;
+
+            element.textContent =
+                t(key);
+
+        });
+
+
+    document
+        .querySelectorAll("[data-i18n-placeholder]")
+        .forEach(element => {
+
+            const key =
+                element.dataset.i18nPlaceholder;
+
+            element.placeholder =
+                t(key);
+
+        });
+
+
+    languageSelect.value =
+        currentLanguage;
+
+
+    loadClasses(
+        classSelect.value
+    );
+
+}
+
+
+// =====================================================
 // Authentication
 // =====================================================
 
-const currentUser = requireSchoolLogin();
+const currentUser =
+    requireSchoolLogin();
+
 
 if (!currentUser) {
-    throw new Error("School login required.");
+
+    alert(t("loginRequired"));
+
+    throw new Error(
+        "School login required."
+    );
+
 }
+
 
 const institutionId =
     getActiveInstitutionId();
 
+
 if (!institutionId) {
-    throw new Error("Institution access denied.");
+
+    throw new Error(
+        "Institution access denied."
+    );
+
 }
 
 
@@ -25,148 +330,100 @@ const urlParams =
         window.location.search
     );
 
+
 const studentId =
     urlParams.get("id");
 
 
-/* ================================
-   Elements
-================================ */
+if (!studentId) {
 
-const institutionIdElement =
-    document.getElementById("institutionId");
-
-const institutionNameElement =
-    document.getElementById("institutionName");
-
-const academicYearInput =
-    document.getElementById("academicYear");
-
-const studentNumberInput =
-    document.getElementById("studentNumber");
-
-const studentNameInput =
-    document.getElementById("studentName");
-
-const stageSelect =
-    document.getElementById("stage");
-
-const classSelect =
-    document.getElementById("className");
-
-const registrationDateInput =
-    document.getElementById("registrationDate");
-
-const editStudentForm =
-    document.getElementById("editStudentForm");
-
-const backButton =
-    document.getElementById("backButton");
-
-const cancelButton =
-    document.getElementById("cancelButton");
-
-
-/* ================================
-   Get Data
-================================ */
-
-function getInstitutions() {
-
-    return JSON.parse(
-        localStorage.getItem("bmpInstitutions")
-    ) || [];
-
-}
-
-
-function getStudents() {
-
-    return JSON.parse(
-        localStorage.getItem("bmpStudents")
-    ) || [];
-
-}
-
-
-function saveStudents(students) {
-
-    localStorage.setItem(
-        "bmpStudents",
-        JSON.stringify(students)
-    );
-
-}
-
-
-/* ================================
-   Find Institution
-================================ */
-
-const institutions =
-    getInstitutions();
-
-const institution =
-    institutions.find(
-        item => item.id === institutionId
-    );
-
-
-if (!institution) {
-
-    alert("Institution not found.");
-
-    window.location.href =
-        "institutions.html";
-
-}
-
-
-/* ================================
-   Find Student
-================================ */
-
-let students =
-    getStudents();
-
-const studentIndex =
-    students.findIndex(
-        student =>
-            student.id === studentId &&
-            student.institutionId === institutionId
-    );
-
-
-if (studentIndex === -1) {
-
-    alert("Student not found.");
+    alert(t("studentNotFound"));
 
     window.location.href =
         `students.html?id=${encodeURIComponent(
             institutionId
         )}`;
 
+    throw new Error(
+        "Student ID missing."
+    );
+
 }
 
 
-const student =
-    students[studentIndex];
+// =====================================================
+// Elements
+// =====================================================
+
+const institutionIdElement =
+    document.getElementById(
+        "institutionId"
+    );
+
+const institutionNameElement =
+    document.getElementById(
+        "institutionName"
+    );
+
+const academicYearInput =
+    document.getElementById(
+        "academicYear"
+    );
+
+const studentNumberInput =
+    document.getElementById(
+        "studentNumber"
+    );
+
+const studentNameInput =
+    document.getElementById(
+        "studentName"
+    );
+
+const stageSelect =
+    document.getElementById(
+        "stage"
+    );
+
+const classSelect =
+    document.getElementById(
+        "className"
+    );
+
+const registrationDateInput =
+    document.getElementById(
+        "registrationDate"
+    );
+
+const editStudentForm =
+    document.getElementById(
+        "editStudentForm"
+    );
+
+const backButton =
+    document.getElementById(
+        "backButton"
+    );
+
+const cancelButton =
+    document.getElementById(
+        "cancelButton"
+    );
+
+const saveButton =
+    document.getElementById(
+        "saveButton"
+    );
+
+const languageSelect =
+    document.getElementById(
+        "languageSelect"
+    );
 
 
-/* ================================
-   Display Institution
-================================ */
-
-institutionIdElement.textContent =
-    institution.id;
-
-institutionNameElement.textContent =
-    institution.name;
-
-
-/* ================================
-   Load Classes
-================================ */
+// =====================================================
+// Load Classes
+// =====================================================
 
 function loadClasses(
     selectedClass = ""
@@ -175,11 +432,21 @@ function loadClasses(
     const stage =
         stageSelect.value;
 
-    classSelect.innerHTML = `
-        <option value="">
-            Select class
-        </option>
-    `;
+
+    classSelect.innerHTML = "";
+
+
+    const defaultOption =
+        document.createElement("option");
+
+    defaultOption.value = "";
+
+    defaultOption.textContent =
+        t("selectClass");
+
+    classSelect.appendChild(
+        defaultOption
+    );
 
 
     let numberOfClasses = 0;
@@ -189,11 +456,15 @@ function loadClasses(
 
         numberOfClasses = 6;
 
-    } else if (stage === "preparatory") {
+    }
+
+    else if (stage === "preparatory") {
 
         numberOfClasses = 4;
 
-    } else if (stage === "secondary") {
+    }
+
+    else if (stage === "secondary") {
 
         numberOfClasses = 3;
 
@@ -207,21 +478,26 @@ function loadClasses(
     ) {
 
         const option =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
         option.value = i;
 
         option.textContent =
-            `Class ${i}`;
+            `${t("class")} ${i}`;
+
 
         if (
             String(i) ===
             String(selectedClass)
         ) {
 
-            option.selected = true;
+            option.selected =
+                true;
 
         }
+
 
         classSelect.appendChild(
             option
@@ -232,174 +508,448 @@ function loadClasses(
 }
 
 
-/* ================================
-   Fill Student Data
-================================ */
+// =====================================================
+// API Request
+// =====================================================
 
-academicYearInput.value =
-    student.academicYear || "";
+async function apiRequest(payload) {
 
-studentNumberInput.value =
-    student.studentNumber || "";
+    const response =
+        await fetch(
+            API_URL,
+            {
+                method: "POST",
 
-studentNameInput.value =
-    student.name || "";
+                headers: {
+                    "Content-Type":
+                        "text/plain;charset=utf-8"
+                },
 
-stageSelect.value =
-    student.stage || "";
-
-registrationDateInput.value =
-    student.registrationDate || "";
-
-loadClasses(
-    student.classNumber
-);
+                body:
+                    JSON.stringify(payload)
+            }
+        );
 
 
-/* ================================
-   Stage Change
-================================ */
+    if (!response.ok) {
 
-stageSelect.addEventListener(
-    "change",
-    function () {
-
-        loadClasses();
+        throw new Error(
+            `HTTP ${response.status}`
+        );
 
     }
-);
 
 
-/* ================================
-   Save Changes
-================================ */
-
-editStudentForm.addEventListener(
-    "submit",
-    function (event) {
-
-        event.preventDefault();
+    const text =
+        await response.text();
 
 
-        const updatedName =
-            studentNameInput.value.trim();
+    if (!text) {
 
-        const updatedStage =
-            stageSelect.value;
+        throw new Error(
+            "Empty server response."
+        );
 
-        const updatedClassNumber =
-            classSelect.value;
+    }
 
-        const updatedRegistrationDate =
-            registrationDateInput.value;
+
+    let result;
+
+
+    try {
+
+        result =
+            JSON.parse(text);
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Invalid server response:",
+            text
+        );
+
+        throw new Error(
+            "Invalid JSON response."
+        );
+
+    }
+
+
+    return result;
+
+}
+
+
+// =====================================================
+// Load Student
+// =====================================================
+
+async function loadStudent() {
+
+    try {
+
+        const result =
+            await apiRequest({
+
+                action:
+                    "getStudents",
+
+                institutionId:
+                    institutionId,
+
+                username:
+                    currentUser.username
+
+            });
 
 
         if (
-            !updatedName ||
-            !updatedStage ||
-            !updatedClassNumber ||
-            !updatedRegistrationDate
+            !result ||
+            !result.success
         ) {
 
-            alert(
-                "Please complete all required fields."
+            throw new Error(
+                result &&
+                result.message
+                    ? result.message
+                    : t("studentNotFound")
             );
+
+        }
+
+
+        const students =
+            Array.isArray(result.students)
+                ? result.students
+                : [];
+
+
+        const student =
+            students.find(
+                item =>
+                    String(
+                        item.studentId
+                    ) ===
+                    String(studentId)
+            );
+
+
+        if (!student) {
+
+            alert(
+                t("studentNotFound")
+            );
+
+            goBackToStudents();
 
             return;
 
         }
 
 
-        /*
-           Academic year and student number
-           remain unchanged.
-        */
+        displayStudent(
+            student
+        );
 
-        const oldStudent =
-            students[studentIndex];
+    }
 
+    catch (error) {
 
-        students[studentIndex] = {
+        console.error(
+            "Load student error:",
+            error
+        );
 
-            ...oldStudent,
-
-            name:
-                updatedName,
-
-            stage:
-                updatedStage,
-
-            classNumber:
-                Number(updatedClassNumber),
-
-            className:
-                `Class ${updatedClassNumber}`,
-
-            registrationDate:
-                updatedRegistrationDate,
-
-            updatedAt:
-                new Date().toISOString()
-
-        };
-
-
-        saveStudents(students);
-
-
-        /* ============================
-           Activity Log
-        ============================ */
 
         if (
-            typeof logActivity ===
-            "function"
+            error instanceof TypeError &&
+            error.message
+                .toLowerCase()
+                .includes("fetch")
         ) {
 
-            logActivity({
+            alert(
+                t("networkError")
+            );
+
+        }
+
+        else {
+
+            alert(
+                error.message ||
+                t("studentNotFound")
+            );
+
+        }
+
+    }
+
+}
+
+
+// =====================================================
+// Display Student
+// =====================================================
+
+function displayStudent(student) {
+
+    institutionIdElement.textContent =
+        currentUser.institutionId ||
+        institutionId ||
+        "—";
+
+
+    institutionNameElement.textContent =
+        currentUser.institutionName ||
+        currentUser.name ||
+        "—";
+
+
+    academicYearInput.value =
+        student.academicYear || "";
+
+
+    studentNumberInput.value =
+        student.studentNumber || "";
+
+
+    studentNameInput.value =
+        student.name || "";
+
+
+    stageSelect.value =
+        student.stage || "";
+
+
+    registrationDateInput.value =
+        normalizeDate(
+            student.registrationDate
+        );
+
+
+    loadClasses(
+        student.classNumber ||
+        student.class ||
+        ""
+    );
+
+}
+
+
+// =====================================================
+// Date Normalization
+// =====================================================
+
+function normalizeDate(value) {
+
+    if (!value) {
+
+        return "";
+
+    }
+
+
+    const stringValue =
+        String(value);
+
+
+    if (
+        /^\d{4}-\d{2}-\d{2}$/.test(
+            stringValue
+        )
+    ) {
+
+        return stringValue;
+
+    }
+
+
+    const date =
+        new Date(stringValue);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return "";
+
+    }
+
+
+    const year =
+        date.getFullYear();
+
+    const month =
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0");
+
+    const day =
+        String(
+            date.getDate()
+        ).padStart(2, "0");
+
+
+    return `${year}-${month}-${day}`;
+
+}
+
+
+// =====================================================
+// Save Changes
+// =====================================================
+
+async function saveChanges() {
+
+    const updatedName =
+        studentNameInput.value.trim();
+
+
+    const updatedStage =
+        stageSelect.value;
+
+
+    const updatedClassNumber =
+        classSelect.value;
+
+
+    const updatedRegistrationDate =
+        registrationDateInput.value;
+
+
+    if (
+        !updatedName ||
+        !updatedStage ||
+        !updatedClassNumber ||
+        !updatedRegistrationDate
+    ) {
+
+        alert(
+            t("completeFields")
+        );
+
+        return;
+
+    }
+
+
+    saveButton.disabled =
+        true;
+
+    saveButton.textContent =
+        t("saving");
+
+
+    try {
+
+        const result =
+            await apiRequest({
+
+                action:
+                    "updateStudent",
 
                 institutionId:
                     institutionId,
 
-                userId:
-                    "ADMIN",
-
                 username:
-                    "Admin",
+                    currentUser.username,
 
-                role:
-                    "Admin",
+                studentId:
+                    studentId,
 
-                action:
-                    "Edited Student",
+                name:
+                    updatedName,
 
-                details:
-                    `Student ${updatedName} edited. Student Number: ${oldStudent.studentNumber}. Academic Year: ${oldStudent.academicYear}.`
+                stage:
+                    updatedStage,
+
+                classNumber:
+                    Number(
+                        updatedClassNumber
+                    ),
+
+                registrationDate:
+                    updatedRegistrationDate
 
             });
+
+
+        if (
+            !result ||
+            !result.success
+        ) {
+
+            throw new Error(
+                result &&
+                result.message
+                    ? result.message
+                    : t("saveError")
+            );
 
         }
 
 
         alert(
-            "Student information updated successfully."
+            t("success")
         );
 
 
-        window.location.href =
-            `student.html?id=${encodeURIComponent(
-                studentId
-            )}&institutionId=${encodeURIComponent(
-                institutionId
-            )}`;
+        goBackToStudent();
+
 
     }
-);
+
+    catch (error) {
+
+        console.error(
+            "Update student error:",
+            error
+        );
 
 
-/* ================================
-   Navigation
-================================ */
+        if (
+            error instanceof TypeError &&
+            error.message
+                .toLowerCase()
+                .includes("fetch")
+        ) {
+
+            alert(
+                t("networkError")
+            );
+
+        }
+
+        else {
+
+            alert(
+                error.message ||
+                t("saveError")
+            );
+
+        }
+
+
+        saveButton.disabled =
+            false;
+
+        saveButton.textContent =
+            t("saveChanges");
+
+    }
+
+}
+
+
+// =====================================================
+// Navigation
+// =====================================================
 
 function goBackToStudent() {
 
@@ -413,6 +963,42 @@ function goBackToStudent() {
 }
 
 
+function goBackToStudents() {
+
+    window.location.href =
+        `students.html?id=${encodeURIComponent(
+            institutionId
+        )}`;
+
+}
+
+
+// =====================================================
+// Events
+// =====================================================
+
+stageSelect.addEventListener(
+    "change",
+    function () {
+
+        loadClasses();
+
+    }
+);
+
+
+editStudentForm.addEventListener(
+    "submit",
+    function(event) {
+
+        event.preventDefault();
+
+        saveChanges();
+
+    }
+);
+
+
 backButton.addEventListener(
     "click",
     goBackToStudent
@@ -423,3 +1009,30 @@ cancelButton.addEventListener(
     "click",
     goBackToStudent
 );
+
+
+languageSelect.addEventListener(
+    "change",
+    function() {
+
+        currentLanguage =
+            languageSelect.value;
+
+        localStorage.setItem(
+            "bmpLanguage",
+            currentLanguage
+        );
+
+        applyLanguage();
+
+    }
+);
+
+
+// =====================================================
+// Initialize
+// =====================================================
+
+applyLanguage();
+
+loadStudent();
