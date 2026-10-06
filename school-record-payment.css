@@ -21,6 +21,7 @@ body {
     padding: 30px;
 }
 
+
 /* =================================
    Header
    ================================= */
@@ -49,6 +50,7 @@ body {
     gap: 10px;
 }
 
+
 /* =================================
    Cards
    ================================= */
@@ -67,6 +69,7 @@ body {
     color: #111827;
     margin-bottom: 20px;
 }
+
 
 /* =================================
    School Information
@@ -96,6 +99,7 @@ body {
     font-size: 15px;
     color: #111827;
 }
+
 
 /* =================================
    Form
@@ -133,7 +137,10 @@ body {
     color: #111827;
     font-size: 14px;
     outline: none;
-    transition: 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
 }
 
 .form-group input,
@@ -152,7 +159,8 @@ body {
 .form-group select:focus,
 .form-group textarea:focus {
     border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    box-shadow:
+        0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 
 .form-group input[readonly] {
@@ -160,6 +168,15 @@ body {
     color: #4b5563;
     cursor: not-allowed;
 }
+
+.form-group select:disabled,
+.form-group input:disabled,
+.form-group textarea:disabled {
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: not-allowed;
+}
+
 
 /* =================================
    Buttons
@@ -169,14 +186,28 @@ body {
     border: none;
     border-radius: 8px;
     padding: 11px 19px;
+    min-height: 43px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: 0.2s ease;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        opacity 0.2s ease;
 }
 
 .btn:hover {
     transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .btn-primary {
@@ -184,7 +215,7 @@ body {
     color: #ffffff;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
     background: #1d4ed8;
 }
 
@@ -193,9 +224,10 @@ body {
     color: #374151;
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover:not(:disabled) {
     background: #d1d5db;
 }
+
 
 /* =================================
    Messages
@@ -206,6 +238,7 @@ body {
     padding: 12px 14px;
     margin-top: 20px;
     font-size: 14px;
+    line-height: 1.5;
 }
 
 .error-message {
@@ -220,6 +253,7 @@ body {
     color: #15803d;
 }
 
+
 /* =================================
    Form Actions
    ================================= */
@@ -232,6 +266,36 @@ body {
     padding-top: 20px;
     border-top: 1px solid #e5e7eb;
 }
+
+
+/* =================================
+   Loading State
+   ================================= */
+
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.btn-loading::after {
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-left: 8px;
+    vertical-align: -2px;
+    border: 2px solid rgba(255, 255, 255, 0.45);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: button-spin 0.7s linear infinite;
+}
+
+@keyframes button-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 
 /* =================================
    Responsive
@@ -282,6 +346,7 @@ body {
     }
 }
 
+
 @media (max-width: 450px) {
 
     .page-container {
@@ -292,7 +357,24 @@ body {
         font-size: 22px;
     }
 
+    .page-header p {
+        font-size: 14px;
+    }
+
     .card {
         padding: 15px;
+    }
+
+    .card h2 {
+        font-size: 17px;
+    }
+
+    .form-group input,
+    .form-group select {
+        height: 45px;
+    }
+
+    .btn {
+        width: 100%;
     }
 }
