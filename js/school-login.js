@@ -1,5 +1,6 @@
 // =====================================================
 // BMP School Login
+// Director + User
 // =====================================================
 
 
@@ -207,13 +208,22 @@ const languageSelect =
 // Apply Language
 // =====================================================
 
-function applyLanguage(language) {
+function applyLanguage(
+    language
+) {
 
-    if (!translations[language]) {
-        language = "en";
+    if (
+        !translations[language]
+    ) {
+
+        language =
+            "en";
     }
 
-    currentLanguage = language;
+
+    currentLanguage =
+        language;
+
 
     localStorage.setItem(
         "bmpLanguage",
@@ -221,9 +231,9 @@ function applyLanguage(language) {
     );
 
 
-    // =============================================
+    // =================================================
     // HTML Direction
-    // =============================================
+    // =================================================
 
     document.documentElement.lang =
         language;
@@ -234,61 +244,73 @@ function applyLanguage(language) {
             : "ltr";
 
 
-    // =============================================
+    // =================================================
     // Text
-    // =============================================
+    // =================================================
 
     document
-        .querySelectorAll("[data-i18n]")
-        .forEach(function (element) {
+        .querySelectorAll(
+            "[data-i18n]"
+        )
+        .forEach(
+            function (element) {
 
-            const key =
-                element.getAttribute(
-                    "data-i18n"
-                );
+                const key =
+                    element.getAttribute(
+                        "data-i18n"
+                    );
 
-            if (
-                translations[language][key]
-            ) {
 
-                element.textContent =
-                    translations[language][key];
+                if (
+                    translations[language][key]
+                ) {
+
+                    element.textContent =
+                        translations[
+                            language
+                        ][key];
+
+                }
 
             }
+        );
 
-        });
 
-
-    // =============================================
+    // =================================================
     // Placeholders
-    // =============================================
+    // =================================================
 
     document
         .querySelectorAll(
             "[data-i18n-placeholder]"
         )
-        .forEach(function (element) {
+        .forEach(
+            function (element) {
 
-            const key =
-                element.getAttribute(
-                    "data-i18n-placeholder"
-                );
+                const key =
+                    element.getAttribute(
+                        "data-i18n-placeholder"
+                    );
 
-            if (
-                translations[language][key]
-            ) {
 
-                element.placeholder =
-                    translations[language][key];
+                if (
+                    translations[language][key]
+                ) {
+
+                    element.placeholder =
+                        translations[
+                            language
+                        ][key];
+
+                }
 
             }
+        );
 
-        });
 
-
-    // =============================================
+    // =================================================
     // Language Selector
-    // =============================================
+    // =================================================
 
     if (languageSelect) {
 
@@ -298,16 +320,19 @@ function applyLanguage(language) {
     }
 
 
-    // =============================================
+    // =================================================
     // Login Button
-    // =============================================
+    // =================================================
 
     if (
+        loginButton &&
         !loginButton.disabled
     ) {
 
         loginButton.textContent =
-            translations[language].login;
+            translations[
+                language
+            ].login;
 
     }
 
@@ -340,43 +365,86 @@ if (languageSelect) {
 
 let currentUser = null;
 
+
 try {
 
-    currentUser =
-        JSON.parse(
-            localStorage.getItem(
-                "bmpCurrentUser"
-            )
+    const savedUser =
+        localStorage.getItem(
+            "bmpCurrentUser"
         );
 
+
+    if (savedUser) {
+
+        currentUser =
+            JSON.parse(
+                savedUser
+            );
+
+    }
+
 } catch (error) {
+
+    console.error(
+        "Invalid saved session:",
+        error
+    );
+
 
     localStorage.removeItem(
         "bmpCurrentUser"
     );
 
-    currentUser = null;
 
+    currentUser =
+        null;
 }
 
 
-if (
-    currentUser &&
-    currentUser.institutionId &&
-    currentUser.status === "active" &&
-    (
-        currentUser.role === "Director" ||
-        currentUser.role === "Manager" ||
-        currentUser.role === "User"
-    )
-) {
+// =====================================================
+// Validate Existing Session
+// =====================================================
 
-    window.location.href =
-        "school.html?id=" +
-        encodeURIComponent(
-            currentUser.institutionId
+if (currentUser) {
+
+    const role =
+        String(
+            currentUser.role || ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    const validRole =
+        role === "director" ||
+        role === "user" ||
+        role === "manager";
+
+
+    const validSession =
+        currentUser.institutionId &&
+        currentUser.username &&
+        currentUser.status === "active" &&
+        validRole;
+
+
+    if (validSession) {
+
+        window.location.href =
+            "school.html?id=" +
+            encodeURIComponent(
+                currentUser.institutionId
+            );
+
+    } else {
+
+        localStorage.removeItem(
+            "bmpCurrentUser"
         );
 
+        currentUser =
+            null;
+    }
 }
 
 
@@ -394,6 +462,7 @@ loginForm.addEventListener(
         const username =
             usernameInput.value.trim();
 
+
         const password =
             passwordInput.value;
 
@@ -402,9 +471,9 @@ loginForm.addEventListener(
             "";
 
 
-        // =============================================
+        // =================================================
         // Validate Fields
-        // =============================================
+        // =================================================
 
         if (
             !username ||
@@ -417,16 +486,16 @@ loginForm.addEventListener(
                 ].pleaseEnterCredentials;
 
             return;
-
         }
 
 
-        // =============================================
+        // =================================================
         // Disable Button
-        // =============================================
+        // =================================================
 
         loginButton.disabled =
             true;
+
 
         loginButton.textContent =
             translations[
@@ -436,9 +505,9 @@ loginForm.addEventListener(
 
         try {
 
-            // =========================================
+            // =============================================
             // Send Login Request
-            // =========================================
+            // =============================================
 
             const response =
                 await fetch(
@@ -473,9 +542,9 @@ loginForm.addEventListener(
                 );
 
 
-            // =========================================
-            // Check HTTP Response
-            // =========================================
+            // =============================================
+            // HTTP Error
+            // =============================================
 
             if (!response.ok) {
 
@@ -488,13 +557,17 @@ loginForm.addEventListener(
             }
 
 
+            // =============================================
+            // Read JSON
+            // =============================================
+
             const result =
                 await response.json();
 
 
-            // =========================================
+            // =============================================
             // Login Failed
-            // =========================================
+            // =============================================
 
             if (
                 !result ||
@@ -513,23 +586,25 @@ loginForm.addEventListener(
                 loginButton.disabled =
                     false;
 
+
                 loginButton.textContent =
                     translations[
                         currentLanguage
                     ].login;
 
-                return;
 
+                return;
             }
 
 
-            // =========================================
-            // Validate Returned User
-            // =========================================
+            // =============================================
+            // Validate User
+            // =============================================
 
             if (
                 !result.user ||
-                !result.user.institutionId
+                !result.user.institutionId ||
+                !result.user.username
             ) {
 
                 throw new Error(
@@ -541,47 +616,127 @@ loginForm.addEventListener(
             }
 
 
-            // =========================================
-            // Save Session
-            // =========================================
+            // =============================================
+            // Normalize Role
+            // =============================================
+
+            const role =
+                String(
+                    result.user.role || ""
+                )
+                .trim();
+
+
+            if (
+                !role
+            ) {
+
+                throw new Error(
+                    translations[
+                        currentLanguage
+                    ].invalidResponse
+                );
+
+            }
+
+
+            // =============================================
+            // Normalize Status
+            // =============================================
+
+            const status =
+                String(
+                    result.user.status ||
+                    "active"
+                )
+                .trim()
+                .toLowerCase();
+
+
+            if (
+                status !== "active"
+            ) {
+
+                errorMessage.textContent =
+                    "This account is not active.";
+
+
+                loginButton.disabled =
+                    false;
+
+
+                loginButton.textContent =
+                    translations[
+                        currentLanguage
+                    ].login;
+
+
+                return;
+            }
+
+
+            // =============================================
+            // Save Authenticated Session
+            // =============================================
+
+            const authenticatedUser = {
+
+                ...result.user,
+
+                role:
+                    role,
+
+                status:
+                    status
+
+            };
+
 
             localStorage.setItem(
 
                 "bmpCurrentUser",
 
                 JSON.stringify(
-                    result.user
+                    authenticatedUser
                 )
 
             );
 
 
-            // =========================================
+            // =============================================
             // Go To School Dashboard
-            // =========================================
+            // =============================================
 
             window.location.href =
                 "school.html?id=" +
                 encodeURIComponent(
-                    result.user.institutionId
+                    authenticatedUser.institutionId
                 );
 
         }
+
+
         catch (error) {
 
             console.error(
+                "School Login Error:",
                 error
             );
 
 
             errorMessage.textContent =
-                translations[
-                    currentLanguage
-                ].unableToConnect;
+                error.message &&
+                error.message !==
+                    "Failed to fetch"
+                    ? error.message
+                    : translations[
+                        currentLanguage
+                    ].unableToConnect;
 
 
             loginButton.disabled =
                 false;
+
 
             loginButton.textContent =
                 translations[
