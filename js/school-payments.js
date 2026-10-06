@@ -5,27 +5,7 @@
 
 
 /* =================================
-   Authentication
-   ================================= */ 
-
-const currentUser =
-    requireSchoolLogin();
-
-if (!currentUser) {
-    throw new Error("School login required.");
-}
-
-
-const institutionId =
-    getActiveInstitutionId();
-
-if (!institutionId) {
-    throw new Error("Institution access denied.");
-}
-
-
-/* =================================
-   Apps Script Backend
+   Configuration
    ================================= */
 
 const API_URL =
@@ -36,7 +16,13 @@ const API_URL =
    State
    ================================= */
 
+let currentUser = null;
+
+let institutionId = null;
+
 let allPayments = [];
+
+let pageInitialized = false;
 
 
 /* =================================
@@ -50,7 +36,99 @@ function getElement(id) {
 }
 
 
+/* =================================
+   Authentication
+   ================================= */
+
+function initializeAuthentication() {
+
+    try {
+
+        if (
+            typeof requireSchoolLogin ===
+            "function"
+        ) {
+
+            currentUser =
+                requireSchoolLogin();
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "School authentication error:",
+            error
+        );
+
+    }
+
+
+    try {
+
+        if (
+            typeof getActiveInstitutionId ===
+            "function"
+        ) {
+
+            institutionId =
+                getActiveInstitutionId();
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Institution ID error:",
+            error
+        );
+
+    }
+
+
+    /*
+       Fallback:
+       If the institution ID is present
+       in the page URL, use it.
+    */
+
+    if (!institutionId) {
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        const urlInstitutionId =
+            params.get("id");
+
+        if (urlInstitutionId) {
+
+            institutionId =
+                urlInstitutionId;
+
+        }
+
+    }
+
+
+    return true;
+
+}
+
+
+/* =================================
+   Username
+   ================================= */
+
 function getCurrentUsername() {
+
+    if (!currentUser) {
+
+        return "";
+
+    }
+
 
     return (
         currentUser.username ||
@@ -66,13 +144,33 @@ function getCurrentUsername() {
    Backend Request
    ================================= */
 
-async function apiRequest(action, data = {}) {
+async function apiRequest(
+    action,
+    data = {}
+) {
+
+    if (!institutionId) {
+
+        throw new Error(
+            "Institution ID is missing."
+        );
+
+    }
+
 
     const payload = {
-        action: action,
-        institutionId: institutionId,
-        username: getCurrentUsername(),
+
+        action:
+            action,
+
+        institutionId:
+            institutionId,
+
+        username:
+            getCurrentUsername(),
+
         ...data
+
     };
 
 
@@ -80,15 +178,22 @@ async function apiRequest(action, data = {}) {
         await fetch(
             API_URL,
             {
-                method: "POST",
+
+                method:
+                    "POST",
 
                 headers: {
+
                     "Content-Type":
                         "text/plain;charset=utf-8"
+
                 },
 
                 body:
-                    JSON.stringify(payload)
+                    JSON.stringify(
+                        payload
+                    )
+
             }
         );
 
@@ -128,11 +233,15 @@ async function apiRequest(action, data = {}) {
 function loadInstitution() {
 
     const institutionNameElement =
-        getElement("institutionName");
+        getElement(
+            "institutionName"
+        );
 
 
     const institutionIdElement =
-        getElement("institutionId");
+        getElement(
+            "institutionId"
+        );
 
 
     if (institutionIdElement) {
@@ -146,8 +255,13 @@ function loadInstitution() {
     if (institutionNameElement) {
 
         institutionNameElement.textContent =
-            currentUser.institutionName ||
-            currentUser.schoolName ||
+            (
+                currentUser &&
+                (
+                    currentUser.institutionName ||
+                    currentUser.schoolName
+                )
+            ) ||
             institutionId ||
             "-";
 
@@ -189,21 +303,24 @@ function getCurrentAcademicYear() {
 }
 
 
+/* =================================
+   Academic Year Filter
+   ================================= */
+
 function loadAcademicYearFilter() {
 
     const select =
-        getElement("academicYear");
+        getElement(
+            "academicYear"
+        );
 
 
     if (!select) {
+
         return;
+
     }
 
-
-    /*
-       Keep the first option:
-       All
-    */
 
     while (
         select.options.length > 1
@@ -268,17 +385,14 @@ function loadAcademicYearFilter() {
     );
 
 
-    /*
-       Select current academic year
-       if it exists.
-    */
-
     const currentYear =
         getCurrentAcademicYear();
 
 
     if (
-        years.has(currentYear)
+        years.has(
+            currentYear
+        )
     ) {
 
         select.value =
@@ -322,7 +436,6 @@ async function loadPayments() {
 
         renderPayments();
 
-
     } catch (error) {
 
         console.error(
@@ -335,7 +448,6 @@ async function loadPayments() {
             error.message ||
             "Failed to load payments."
         );
-
 
     } finally {
 
@@ -355,10 +467,6 @@ function renderPayments() {
     let payments =
         [...allPayments];
 
-
-    /* =================================
-       Filters
-       ================================= */
 
     const academicYear =
         getElement(
@@ -392,13 +500,11 @@ function renderPayments() {
         payments.filter(
             payment => {
 
-
-                /* Academic Year */
-
                 if (
                     academicYear &&
                     String(
-                        payment.academicYear || ""
+                        payment.academicYear ||
+                        ""
                     ) !==
                     String(
                         academicYear
@@ -410,12 +516,11 @@ function renderPayments() {
                 }
 
 
-                /* Month */
-
                 if (
                     month &&
                     String(
-                        payment.month || ""
+                        payment.month ||
+                        ""
                     ).toLowerCase() !==
                     String(
                         month
@@ -427,12 +532,11 @@ function renderPayments() {
                 }
 
 
-                /* Stage */
-
                 if (
                     stage &&
+                    payment.stage &&
                     String(
-                        payment.stage || ""
+                        payment.stage
                     ).toLowerCase() !==
                     String(
                         stage
@@ -443,8 +547,6 @@ function renderPayments() {
 
                 }
 
-
-                /* Search */
 
                 if (search) {
 
@@ -538,7 +640,8 @@ function renderPayments() {
                 return (
                     total +
                     Number(
-                        payment.amount || 0
+                        payment.amount ||
+                        0
                     )
                 );
 
@@ -600,7 +703,9 @@ function renderPayments() {
 
 
     if (!tbody) {
+
         return;
+
     }
 
 
@@ -662,7 +767,8 @@ function renderPayments() {
 
             const amount =
                 Number(
-                    payment.amount || 0
+                    payment.amount ||
+                    0
                 ).toLocaleString();
 
 
@@ -710,7 +816,9 @@ function renderPayments() {
                 </td>
 
                 <td>
-                    ${paymentDate}
+                    ${escapeHtml(
+                        paymentDate
+                    )}
                 </td>
 
                 <td>
@@ -730,7 +838,7 @@ function renderPayments() {
 
             row.addEventListener(
                 "click",
-                () => {
+                function() {
 
                     showPaymentDetails(
                         payment
@@ -757,29 +865,40 @@ function renderPayments() {
 function getMonthDisplayName(month) {
 
     if (!month) {
+
         return "-";
+
     }
 
 
     const months = {
 
-        October: "October",
+        October:
+            "October",
 
-        November: "November",
+        November:
+            "November",
 
-        December: "December",
+        December:
+            "December",
 
-        January: "January",
+        January:
+            "January",
 
-        February: "February",
+        February:
+            "February",
 
-        March: "March",
+        March:
+            "March",
 
-        April: "April",
+        April:
+            "April",
 
-        May: "May",
+        May:
+            "May",
 
-        June: "June"
+        June:
+            "June"
 
     };
 
@@ -799,7 +918,9 @@ function getMonthDisplayName(month) {
 function formatDate(date) {
 
     if (!date) {
+
         return "-";
+
     }
 
 
@@ -901,7 +1022,8 @@ function showPaymentDetails(
 
             <span>
                 ${escapeHtml(
-                    payment.studentNumber || "-"
+                    payment.studentNumber ||
+                    "-"
                 )}
             </span>
 
@@ -916,7 +1038,8 @@ function showPaymentDetails(
 
             <span>
                 ${escapeHtml(
-                    payment.studentName || "-"
+                    payment.studentName ||
+                    "-"
                 )}
             </span>
 
@@ -931,7 +1054,8 @@ function showPaymentDetails(
 
             <span>
                 ${escapeHtml(
-                    payment.academicYear || "-"
+                    payment.academicYear ||
+                    "-"
                 )}
             </span>
 
@@ -963,7 +1087,8 @@ function showPaymentDetails(
 
             <span>
                 ${Number(
-                    payment.amount || 0
+                    payment.amount ||
+                    0
                 ).toLocaleString()}
             </span>
 
@@ -1028,6 +1153,10 @@ function showPaymentDetails(
 }
 
 
+/* =================================
+   Close Payment Details
+   ================================= */
+
 function closePaymentDetails() {
 
     const modal =
@@ -1047,7 +1176,7 @@ function closePaymentDetails() {
 
 
 /* =================================
-   Loading / Error / Empty
+   Loading
    ================================= */
 
 function showLoading(show) {
@@ -1085,6 +1214,10 @@ function showLoading(show) {
 
 }
 
+
+/* =================================
+   Error
+   ================================= */
 
 function showError(message) {
 
@@ -1136,6 +1269,10 @@ function hideError() {
 
 }
 
+
+/* =================================
+   Empty
+   ================================= */
 
 function showEmpty() {
 
@@ -1202,7 +1339,7 @@ function hideEmpty() {
 
 
 /* =================================
-   Apply Filters
+   Filters
    ================================= */
 
 function applyFilters() {
@@ -1211,10 +1348,6 @@ function applyFilters() {
 
 }
 
-
-/* =================================
-   Reset Filters
-   ================================= */
 
 function resetFilters() {
 
@@ -1285,24 +1418,6 @@ function resetFilters() {
 
 function goBack() {
 
-    window.location.href =
-        `school.html?id=${encodeURIComponent(
-            institutionId
-        )}`;
-
-}
-
-
-/*
-   Record Payment Page
-
-   This function is intentionally kept
-   as a global function because the HTML
-   button calls it directly.
-*/
-
-function goToRecordPayment() {
-
     if (!institutionId) {
 
         console.error(
@@ -1314,10 +1429,45 @@ function goToRecordPayment() {
     }
 
 
-    const targetUrl =
-        `school-record-payment.html?id=${encodeURIComponent(
+    window.location.href =
+        "school.html?id=" +
+        encodeURIComponent(
             institutionId
-        )}`;
+        );
+
+}
+
+
+/*
+   Record Payment Page
+
+   Kept as a global function so it
+   can also be called from HTML
+   if necessary.
+*/
+
+function goToRecordPayment() {
+
+    if (!institutionId) {
+
+        console.error(
+            "Institution ID is missing."
+        );
+
+        showError(
+            "Institution ID is missing."
+        );
+
+        return;
+
+    }
+
+
+    const targetUrl =
+        "school-record-payment.html?id=" +
+        encodeURIComponent(
+            institutionId
+        );
 
 
     window.location.href =
@@ -1327,10 +1477,22 @@ function goToRecordPayment() {
 
 
 /* =================================
-   Initialize Events
+   Event Listeners
    ================================= */
 
 function setupEventListeners() {
+
+    const backButton =
+        getElement(
+            "backButton"
+        );
+
+
+    const recordPaymentPageBtn =
+        getElement(
+            "recordPaymentPageBtn"
+        );
+
 
     const academicYear =
         getElement(
@@ -1374,13 +1536,55 @@ function setupEventListeners() {
         );
 
 
-    const recordPaymentPageBtn =
+    const closeButton =
         getElement(
-            "recordPaymentPageBtn"
+            "paymentDetailsCloseBtn"
         );
 
 
-    /* Academic Year */
+    const overlay =
+        getElement(
+            "paymentDetailsOverlay"
+        );
+
+
+    /* =================================
+       Back
+       ================================= */
+
+    if (backButton) {
+
+        backButton.addEventListener(
+            "click",
+            goBack
+        );
+
+    }
+
+
+    /* =================================
+       Record Payment
+       ================================= */
+
+    if (recordPaymentPageBtn) {
+
+        recordPaymentPageBtn.addEventListener(
+            "click",
+            function(event) {
+
+                event.preventDefault();
+
+                goToRecordPayment();
+
+            }
+        );
+
+    }
+
+
+    /* =================================
+       Academic Year
+       ================================= */
 
     if (academicYear) {
 
@@ -1392,7 +1596,9 @@ function setupEventListeners() {
     }
 
 
-    /* Month */
+    /* =================================
+       Month
+       ================================= */
 
     if (paymentMonth) {
 
@@ -1404,7 +1610,9 @@ function setupEventListeners() {
     }
 
 
-    /* Stage */
+    /* =================================
+       Stage
+       ================================= */
 
     if (stageFilter) {
 
@@ -1416,7 +1624,9 @@ function setupEventListeners() {
     }
 
 
-    /* Search */
+    /* =================================
+       Search
+       ================================= */
 
     if (studentSearch) {
 
@@ -1428,7 +1638,9 @@ function setupEventListeners() {
     }
 
 
-    /* Apply */
+    /* =================================
+       Apply
+       ================================= */
 
     if (applyFiltersBtn) {
 
@@ -1440,7 +1652,9 @@ function setupEventListeners() {
     }
 
 
-    /* Reset */
+    /* =================================
+       Reset
+       ================================= */
 
     if (resetFiltersBtn) {
 
@@ -1452,7 +1666,9 @@ function setupEventListeners() {
     }
 
 
-    /* Retry */
+    /* =================================
+       Retry
+       ================================= */
 
     if (retryBtn) {
 
@@ -1464,33 +1680,37 @@ function setupEventListeners() {
     }
 
 
-    /*
-       Record Payment
+    /* =================================
+       Payment Details Close
+       ================================= */
 
-       HTML already has onclick as the
-       primary navigation method.
+    if (closeButton) {
 
-       This event listener is kept as
-       an additional backup.
-    */
-
-    if (recordPaymentPageBtn) {
-
-        recordPaymentPageBtn.addEventListener(
+        closeButton.addEventListener(
             "click",
-            goToRecordPayment
+            closePaymentDetails
         );
 
     }
 
 
-    /*
-       Escape closes payment details.
-    */
+    if (overlay) {
+
+        overlay.addEventListener(
+            "click",
+            closePaymentDetails
+        );
+
+    }
+
+
+    /* =================================
+       Escape
+       ================================= */
 
     document.addEventListener(
         "keydown",
-        event => {
+        function(event) {
 
             if (
                 event.key === "Escape"
@@ -1507,19 +1727,52 @@ function setupEventListeners() {
 
 
 /* =================================
-   Start
+   Initialize
    ================================= */
 
 function initializePage() {
+
+    if (pageInitialized) {
+
+        return;
+
+    }
+
+
+    pageInitialized =
+        true;
+
+
+    initializeAuthentication();
 
     loadInstitution();
 
     setupEventListeners();
 
-    loadPayments();
+
+    /*
+       Only attempt to load payments
+       when an institution is available.
+    */
+
+    if (institutionId) {
+
+        loadPayments();
+
+    } else {
+
+        showError(
+            "Institution ID is missing."
+        );
+
+    }
 
 }
 
+
+/* =================================
+   Start
+   ================================= */
 
 if (
     document.readyState ===
@@ -1528,7 +1781,10 @@ if (
 
     document.addEventListener(
         "DOMContentLoaded",
-        initializePage
+        initializePage,
+        {
+            once: true
+        }
     );
 
 } else {
