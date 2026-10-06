@@ -8,7 +8,12 @@
     padding: 0;
 }
 
+html {
+    min-height: 100%;
+}
+
 body {
+    min-height: 100vh;
     font-family: Arial, Helvetica, sans-serif;
     background: #f4f6f9;
     color: #1f2937;
@@ -20,6 +25,7 @@ body {
     margin: 0 auto;
     padding: 30px;
 }
+
 
 /* ================================
    Header
@@ -33,13 +39,19 @@ body {
     margin-bottom: 25px;
 }
 
-.page-header h1 {
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.page-title h1 {
     font-size: 30px;
     color: #111827;
     margin-bottom: 6px;
 }
 
-.page-header p {
+.page-title p {
     color: #6b7280;
     font-size: 15px;
 }
@@ -50,11 +62,18 @@ body {
     flex-wrap: wrap;
 }
 
+
 /* ================================
    Buttons
    ================================ */
 
-.btn {
+button {
+    font-family: inherit;
+}
+
+.back-button,
+.primary-button,
+.secondary-button {
     border: none;
     border-radius: 8px;
     padding: 11px 18px;
@@ -64,124 +83,70 @@ body {
     transition: 0.2s ease;
 }
 
-.btn:hover {
+.back-button:hover,
+.primary-button:hover,
+.secondary-button:hover {
     transform: translateY(-1px);
 }
 
-.btn-primary {
-    background: #2563eb;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #1d4ed8;
-}
-
-.btn-secondary {
+.back-button {
     background: #e5e7eb;
     color: #374151;
 }
 
-.btn-secondary:hover {
+.back-button:hover {
     background: #d1d5db;
 }
 
-/* ================================
-   Cards
-   ================================ */
-
-.card {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+.primary-button {
+    background: #2563eb;
+    color: white;
 }
 
-.card h2 {
-    font-size: 19px;
-    color: #111827;
-    margin-bottom: 20px;
+.primary-button:hover {
+    background: #1d4ed8;
 }
 
-/* ================================
-   School Information
-   ================================ */
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+.secondary-button {
+    background: #e5e7eb;
+    color: #374151;
 }
 
-.info-item {
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 15px;
+.secondary-button:hover {
+    background: #d1d5db;
 }
 
-.info-item span,
-.summary-item span {
-    display: block;
-    font-size: 13px;
-    color: #6b7280;
-    margin-bottom: 7px;
-}
-
-.info-item strong {
-    font-size: 15px;
-    color: #111827;
-}
-
-/* ================================
-   Payment Summary
-   ================================ */
-
-.summary-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-}
-
-.summary-item {
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 18px;
-}
-
-.summary-item strong {
-    display: block;
-    font-size: 23px;
-    color: #2563eb;
-}
 
 /* ================================
    Filters
    ================================ */
 
-.filters-grid {
+.filters-section {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 20px;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.form-group {
+.filter-group {
     display: flex;
     flex-direction: column;
 }
 
-.form-group label {
+.filter-group label {
     font-size: 13px;
     font-weight: 600;
     color: #374151;
     margin-bottom: 7px;
 }
 
-.form-group input,
-.form-group select {
+.filter-group input,
+.filter-group select {
     width: 100%;
     height: 42px;
     padding: 0 12px;
@@ -193,15 +158,70 @@ body {
     outline: none;
 }
 
-.form-group input:focus,
-.form-group select:focus {
+.filter-group input:focus,
+.filter-group select:focus {
     border-color: #2563eb;
     box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 
+.search-group {
+    min-width: 0;
+}
+
+.filter-actions {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.filter-actions button {
+    height: 42px;
+}
+
+
 /* ================================
-   Table
+   Summary
    ================================ */
+
+.summary-section {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.summary-label {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+
+.summary-value {
+    font-size: 25px;
+    font-weight: 700;
+    color: #2563eb;
+}
+
+
+/* ================================
+   Table Section
+   ================================ */
+
+.table-section {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
 
 .table-container {
     width: 100%;
@@ -219,8 +239,8 @@ thead {
 }
 
 th {
-    text-align: left;
-    padding: 13px 12px;
+    text-align: right;
+    padding: 14px 12px;
     border-bottom: 1px solid #e5e7eb;
     color: #4b5563;
     font-size: 13px;
@@ -229,6 +249,7 @@ th {
 }
 
 td {
+    text-align: right;
     padding: 14px 12px;
     border-bottom: 1px solid #f1f5f9;
     font-size: 14px;
@@ -236,36 +257,213 @@ td {
     white-space: nowrap;
 }
 
+tbody tr {
+    transition: background 0.15s ease;
+}
+
 tbody tr:hover {
     background: #f9fafb;
 }
+
+
+/* ================================
+   Loading
+   ================================ */
+
+.loading-state {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 50px 20px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.loading-spinner {
+    width: 38px;
+    height: 38px;
+    margin: 0 auto 15px;
+    border: 4px solid #e5e7eb;
+    border-top-color: #2563eb;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* ================================
+   Error
+   ================================ */
+
+.error-state {
+    background: #fff;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    padding: 35px 20px;
+    text-align: center;
+    color: #991b1b;
+    margin-bottom: 20px;
+}
+
+.error-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    border-radius: 50%;
+    background: #fee2e2;
+    color: #dc2626;
+    font-weight: 700;
+    font-size: 22px;
+}
+
+.error-state p {
+    margin-bottom: 18px;
+}
+
 
 /* ================================
    Empty State
    ================================ */
 
 .empty-state {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 50px 20px;
     text-align: center;
-    padding: 45px 20px;
     color: #6b7280;
-    font-size: 15px;
 }
+
+.empty-icon {
+    font-size: 42px;
+    margin-bottom: 15px;
+}
+
+.empty-state h3 {
+    color: #374151;
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    font-size: 14px;
+}
+
+
+/* ================================
+   Payment Details Modal
+   ================================ */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.modal-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 22px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal-header h2 {
+    font-size: 20px;
+    color: #111827;
+}
+
+.modal-close {
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.modal-close:hover {
+    color: #111827;
+}
+
+.modal-body {
+    padding: 22px;
+}
+
+.payment-detail-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 13px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.payment-detail-row:last-child {
+    border-bottom: none;
+}
+
+.payment-detail-row strong {
+    color: #374151;
+    font-size: 14px;
+}
+
+.payment-detail-row span {
+    color: #111827;
+    font-size: 14px;
+    text-align: left;
+}
+
 
 /* ================================
    Responsive
    ================================ */
 
-@media (max-width: 1000px) {
+@media (max-width: 1100px) {
 
-    .filters-grid {
+    .filters-section {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .summary-grid {
+    .summary-section {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .filter-actions {
+        align-items: center;
     }
 
 }
+
 
 @media (max-width: 700px) {
 
@@ -278,7 +476,11 @@ tbody tr:hover {
         align-items: flex-start;
     }
 
-    .page-header h1 {
+    .header-left {
+        width: 100%;
+    }
+
+    .page-title h1 {
         font-size: 25px;
     }
 
@@ -286,27 +488,37 @@ tbody tr:hover {
         width: 100%;
     }
 
-    .header-actions .btn {
+    .header-actions button {
         flex: 1;
     }
 
-    .info-grid {
+    .filters-section {
         grid-template-columns: 1fr;
-    }
-
-    .summary-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .filters-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .card {
         padding: 18px;
     }
 
+    .summary-section {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-actions {
+        width: 100%;
+    }
+
+    .filter-actions button {
+        flex: 1;
+    }
+
+    .table-section {
+        padding: 12px;
+    }
+
+    .modal-content {
+        max-height: 95vh;
+    }
+
 }
+
 
 @media (max-width: 450px) {
 
@@ -314,7 +526,12 @@ tbody tr:hover {
         padding: 12px;
     }
 
-    .page-header h1 {
+    .header-left {
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .page-title h1 {
         font-size: 22px;
     }
 
@@ -322,8 +539,33 @@ tbody tr:hover {
         flex-direction: column;
     }
 
-    .header-actions .btn {
+    .header-actions button {
         width: 100%;
+    }
+
+    .filter-actions {
+        flex-direction: column;
+    }
+
+    .filter-actions button {
+        width: 100%;
+    }
+
+    .summary-card {
+        padding: 17px;
+    }
+
+    .summary-value {
+        font-size: 22px;
+    }
+
+    .modal {
+        padding: 10px;
+    }
+
+    .payment-detail-row {
+        flex-direction: column;
+        gap: 5px;
     }
 
 }
