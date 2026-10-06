@@ -1,1472 +1,580 @@
-/* =================================
-   School Record Payment - BMP
-   Google Apps Script Backend
-   ================================= */
+<!DOCTYPE html>
+<html lang="en">
 
+<head>
 
-/* =================================
-   API
-   ================================= */
+    <meta charset="UTF-8">
 
-const API_URL =
-    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
+    <title>Record School Payment - BMP</title>
 
-/* =================================
-   State
-   ================================= */
+    <link
+        rel="stylesheet"
+        href="school-record-payment.css">
 
-let currentUser = null;
-let institutionId = null;
-let institution = null;
-let students = [];
-let pageInitialized = false;
-
-
-/* =================================
-   Authentication
-   ================================= */
-
-function initializeAuthentication() {
-
-    try {
-
-        if (
-            typeof requireSchoolLogin ===
-            "function"
-        ) {
-
-            currentUser =
-                requireSchoolLogin();
-
+    <style>
+        button,
+        select,
+        input,
+        textarea {
+            pointer-events: auto !important;
         }
 
-    } catch (error) {
-
-        console.error(
-            "Authentication error:",
-            error
-        );
-
-    }
-
-
-    /*
-       If authentication helper did not
-       return the user, try localStorage.
-    */
-
-    if (!currentUser) {
-
-        try {
-
-            currentUser =
-                JSON.parse(
-                    localStorage.getItem(
-                        "bmpCurrentUser"
-                    ) || "null"
-                );
-
-        } catch (error) {
-
-            console.error(
-                "Invalid stored user:",
-                error
-            );
-
-            currentUser = null;
-
+        .page-header,
+        .card,
+        .form-actions,
+        .message {
+            position: relative;
+            z-index: 10;
         }
 
-    }
-
-
-    if (!currentUser) {
-
-        return false;
-
-    }
-
-
-    /* =================================
-       Institution ID
-       ================================= */
-
-    try {
-
-        if (
-            typeof getActiveInstitutionId ===
-            "function"
-        ) {
-
-            institutionId =
-                getActiveInstitutionId();
-
+        /* Student search area */
+        .student-search-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
         }
 
-    } catch (error) {
-
-        console.error(
-            "Institution helper error:",
-            error
-        );
-
-    }
-
-
-    /*
-       Fallback to URL.
-    */
-
-    if (!institutionId) {
-
-        const params =
-            new URLSearchParams(
-                window.location.search
-            );
-
-
-        institutionId =
-            params.get(
-                "institutionId"
-            ) ||
-            params.get(
-                "id"
-            );
-
-    }
-
-
-    /*
-       Final fallback to logged-in user.
-    */
-
-    if (!institutionId) {
-
-        institutionId =
-            currentUser.institutionId ||
-            null;
-
-    }
-
-
-    return Boolean(
-        institutionId
-    );
-
-}
-
-
-/* =================================
-   Backend Request
-   ================================= */
-
-async function apiRequest(
-    action,
-    data = {}
-) {
-
-    if (!institutionId) {
-
-        throw new Error(
-            "Institution ID is missing."
-        );
-
-    }
-
-
-    const username =
-        currentUser &&
-        (
-            currentUser.username ||
-            currentUser.userName ||
-            currentUser.name
-        )
-        || "";
-
-
-    const payload = {
-
-        action:
-            action,
-
-        institutionId:
-            institutionId,
-
-        username:
-            username
-
-    };
-
-
-    Object.assign(
-        payload,
-        data
-    );
-
-
-    const response =
-        await fetch(
-            API_URL,
-            {
-                method: "POST",
-
-                headers: {
-                    "Content-Type":
-                        "text/plain;charset=utf-8"
-                },
-
-                body:
-                    JSON.stringify(
-                        payload
-                    )
-            }
-        );
-
-
-    if (!response.ok) {
-
-        throw new Error(
-            `Server error: ${response.status}`
-        );
-
-    }
-
-
-    const result =
-        await response.json();
-
-
-    if (!result.success) {
-
-        throw new Error(
-            result.message ||
-            "Request failed."
-        );
-
-    }
-
-
-    return result;
-
-}
-
-
-/* =================================
-   Institution
-   ================================= */
-
-function loadInstitution() {
-
-    institution = {
-
-        id:
-            institutionId,
-
-        name:
-            currentUser.institutionName ||
-            currentUser.schoolName ||
-            currentUser.institution ||
-            institutionId
-
-    };
-
-
-    const institutionIdElement =
-        document.getElementById(
-            "institutionId"
-        );
-
-
-    const institutionNameElement =
-        document.getElementById(
-            "institutionName"
-        );
-
-
-    if (institutionIdElement) {
-
-        institutionIdElement.textContent =
-            institution.id || "-";
-
-    }
-
-
-    if (institutionNameElement) {
-
-        institutionNameElement.textContent =
-            institution.name || "-";
-
-    }
-
-
-    return true;
-
-}
-
-
-/* =================================
-   Academic Year
-   ================================= */
-
-function getCurrentAcademicYear() {
-
-    const now =
-        new Date();
-
-
-    let year =
-        now.getFullYear();
-
-
-    /*
-       October → June
-    */
-
-    if (
-        now.getMonth() < 9
-    ) {
-
-        year--;
-
-    }
-
-
-    return `${year}-${year + 1}`;
-
-}
-
-
-function getAvailableAcademicYears() {
-
-    const years =
-        new Set();
-
-
-    students.forEach(
-        student => {
-
-            if (
-                student.academicYear
-            ) {
-
-                years.add(
-                    String(
-                        student.academicYear
-                    )
-                );
-
+        .student-search-input {
+            flex: 1;
+        }
+
+        .student-search-button {
+            min-width: 100px;
+        }
+
+        .student-result {
+            margin-top: 12px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            font-size: 14px;
+            display: none;
+        }
+
+        .student-result.error {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #b91c1c;
+        }
+
+        @media (max-width: 700px) {
+            .student-search-row {
+                flex-direction: column;
+                align-items: stretch;
             }
 
+            .student-search-button {
+                width: 100%;
+            }
         }
-    );
+    </style>
 
+</head>
 
-    years.add(
-        getCurrentAcademicYear()
-    );
+<body>
 
+    <div class="page-container">
 
-    return Array.from(years)
-        .sort()
-        .reverse();
+        <!-- Header -->
 
-}
+        <header class="page-header">
 
+            <div>
+                <h1>Record School Payment</h1>
+                <p>Register a monthly student payment</p>
+            </div>
 
-function loadAcademicYears() {
+            <div class="header-actions">
 
-    const select =
-        document.getElementById(
-            "academicYear"
-        );
+                <button
+                    type="button"
+                    id="backButton"
+                    class="btn btn-secondary">
+                    Back
+                </button>
 
+            </div>
 
-    if (!select) {
-        return;
-    }
+        </header>
 
 
-    const years =
-        getAvailableAcademicYears();
+        <!-- School Information -->
 
+        <section class="card">
 
-    select.innerHTML = `
-        <option value="">
-            Select Academic Year
-        </option>
-    `;
+            <h2>School Information</h2>
 
+            <div class="info-grid">
 
-    years.forEach(
-        year => {
+                <div class="info-item">
 
-            const option =
-                document.createElement(
-                    "option"
-                );
+                    <span>Institution ID</span>
 
+                    <strong id="institutionId">
+                        -
+                    </strong>
 
-            option.value =
-                year;
+                </div>
 
+                <div class="info-item">
 
-            option.textContent =
-                year;
+                    <span>School Name</span>
 
+                    <strong id="institutionName">
+                        -
+                    </strong>
 
-            select.appendChild(
-                option
-            );
+                </div>
 
-        }
-    );
+            </div>
 
+        </section>
 
-    const currentYear =
-        getCurrentAcademicYear();
 
+        <!-- Payment Form -->
 
-    if (
-        years.includes(
-            currentYear
-        )
-    ) {
+        <section class="card">
 
-        select.value =
-            currentYear;
+            <h2>Payment Information</h2>
 
-    }
+            <form id="paymentForm">
 
-}
+                <div class="form-grid">
 
+                    <!-- Academic Year -->
 
-/* =================================
-   Students
-   ================================= */
+                    <div class="form-group">
 
-async function loadStudentsFromBackend() {
+                        <label for="academicYear">
+                            Academic Year
+                        </label>
 
-    try {
+                        <select
+                            id="academicYear"
+                            required>
 
-        const result =
-            await apiRequest(
-                "getStudents"
-            );
+                            <option value="">
+                                Select Academic Year
+                            </option>
 
+                        </select>
 
-        students =
-            Array.isArray(
-                result.students
-            )
-                ? result.students
-                : [];
+                    </div>
 
 
-        students =
-            students.filter(
-                student =>
-                    !student.institutionId ||
-                    String(
-                        student.institutionId
-                    ) ===
-                    String(
-                        institutionId
-                    )
-            );
+                    <!-- Student Number Search -->
 
+                    <div class="form-group">
 
-        return true;
+                        <label for="studentNumberSearch">
+                            Student Number
+                        </label>
 
-    } catch (error) {
+                        <div class="student-search-row">
 
-        console.error(
-            "Failed to load students:",
-            error
-        );
+                            <input
+                                type="text"
+                                id="studentNumberSearch"
+                                class="student-search-input"
+                                placeholder="Enter student number"
+                                autocomplete="off">
 
+                            <button
+                                type="button"
+                                id="searchStudentButton"
+                                class="btn btn-primary student-search-button">
+                                Search
+                            </button>
 
-        showError(
-            error.message ||
-            "Failed to load students."
-        );
+                        </div>
 
+                        <div
+                            id="studentSearchResult"
+                            class="student-result">
+                        </div>
 
-        return false;
+                    </div>
 
-    }
 
-}
+                    <!-- Student Name -->
 
+                    <div class="form-group">
 
-function getStudentId(student) {
+                        <label for="studentName">
+                            Student Name
+                        </label>
 
-    return String(
-        student.studentId ||
-        student.id ||
-        ""
-    );
+                        <input
+                            type="text"
+                            id="studentName"
+                            readonly
+                            placeholder="Search for a student">
 
-}
+                    </div>
 
 
-function getInstitutionStudents() {
+                    <!-- Hidden Student ID -->
 
-    return students.filter(
-        student =>
-            !student.institutionId ||
-            String(
-                student.institutionId
-            ) ===
-            String(
-                institutionId
-            )
-    );
+                    <input
+                        type="hidden"
+                        id="studentId">
 
-}
 
+                    <!-- Student Number -->
 
-function loadStudents() {
+                    <div class="form-group">
 
-    const select =
-        document.getElementById(
-            "student"
-        );
+                        <label for="studentNumber">
+                            Student Number
+                        </label>
 
+                        <input
+                            type="text"
+                            id="studentNumber"
+                            readonly
+                            placeholder="Student number">
 
-    if (!select) {
-        return;
-    }
+                    </div>
 
 
-    const academicYearElement =
-        document.getElementById(
-            "academicYear"
-        );
+                    <!-- Stage -->
 
+                    <div class="form-group">
 
-    const academicYear =
-        academicYearElement
-            ? academicYearElement.value
-            : "";
+                        <label for="stage">
+                            Stage
+                        </label>
 
+                        <input
+                            type="text"
+                            id="stage"
+                            readonly
+                            placeholder="Stage">
 
-    const filteredStudents =
-        getInstitutionStudents()
-            .filter(
-                student =>
-                    String(
-                        student.academicYear ||
-                        ""
-                    ) ===
-                    String(
-                        academicYear
-                    )
-            )
-            .sort(
-                (a, b) =>
-                    String(
-                        a.studentNumber ||
-                        ""
-                    ).localeCompare(
-                        String(
-                            b.studentNumber ||
-                            ""
-                        ),
-                        undefined,
-                        {
-                            numeric: true
+                    </div>
+
+
+                    <!-- Class -->
+
+                    <div class="form-group">
+
+                        <label for="className">
+                            Class
+                        </label>
+
+                        <input
+                            type="text"
+                            id="className"
+                            readonly
+                            placeholder="Class">
+
+                    </div>
+
+
+                    <!-- Month -->
+
+                    <div class="form-group">
+
+                        <label for="month">
+                            Month
+                        </label>
+
+                        <select
+                            id="month"
+                            required>
+
+                            <option value="">
+                                Select Month
+                            </option>
+
+                            <option value="October">
+                                October
+                            </option>
+
+                            <option value="November">
+                                November
+                            </option>
+
+                            <option value="December">
+                                December
+                            </option>
+
+                            <option value="January">
+                                January
+                            </option>
+
+                            <option value="February">
+                                February
+                            </option>
+
+                            <option value="March">
+                                March
+                            </option>
+
+                            <option value="April">
+                                April
+                            </option>
+
+                            <option value="May">
+                                May
+                            </option>
+
+                            <option value="June">
+                                June
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Amount -->
+
+                    <div class="form-group">
+
+                        <label for="amount">
+                            Amount
+                        </label>
+
+                        <input
+                            type="number"
+                            id="amount"
+                            min="0.01"
+                            step="0.01"
+                            placeholder="Enter amount"
+                            required>
+
+                    </div>
+
+
+                    <!-- Payment Date -->
+
+                    <div class="form-group">
+
+                        <label for="paymentDate">
+                            Payment Date
+                        </label>
+
+                        <input
+                            type="date"
+                            id="paymentDate"
+                            required>
+
+                    </div>
+
+
+                    <!-- Receipt Number -->
+
+                    <div class="form-group">
+
+                        <label for="receiptNumber">
+                            Receipt Number
+                        </label>
+
+                        <input
+                            type="text"
+                            id="receiptNumber"
+                            readonly
+                            placeholder="Generated after payment">
+
+                    </div>
+
+
+                    <!-- Recorded By -->
+
+                    <div class="form-group">
+
+                        <label for="recordedBy">
+                            Recorded By
+                        </label>
+
+                        <input
+                            type="text"
+                            id="recordedBy"
+                            readonly
+                            placeholder="Current user">
+
+                    </div>
+
+
+                    <!-- Notes -->
+
+                    <div class="form-group form-group-full">
+
+                        <label for="notes">
+                            Notes
+                        </label>
+
+                        <textarea
+                            id="notes"
+                            rows="4"
+                            placeholder="Optional notes"></textarea>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Error -->
+
+                <div
+                    id="errorMessage"
+                    class="message error-message"
+                    style="display: none;">
+                </div>
+
+
+                <!-- Success -->
+
+                <div
+                    id="successMessage"
+                    class="message success-message"
+                    style="display: none;">
+                </div>
+
+
+                <!-- Actions -->
+
+                <div class="form-actions">
+
+                    <button
+                        type="button"
+                        id="cancelButton"
+                        class="btn btn-secondary">
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        id="recordPaymentButton"
+                        class="btn btn-primary">
+                        Record Payment
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+
+    <script src="js/auth.js"></script>
+    <script src="js/school-record-payment.js"></script>
+
+
+    <!-- Emergency navigation fallback -->
+
+    <script>
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
+
+                function getInstitutionForNavigation() {
+
+                    try {
+
+                        const user =
+                            JSON.parse(
+                                localStorage.getItem(
+                                    "bmpCurrentUser"
+                                ) || "null"
+                            );
+
+                        if (
+                            user &&
+                            user.institutionId
+                        ) {
+
+                            return user.institutionId;
+
                         }
-                    )
-            );
 
+                    } catch (error) {
 
-    select.innerHTML = `
-        <option value="">
-            Select Student
-        </option>
-    `;
+                        console.error(error);
 
+                    }
 
-    filteredStudents.forEach(
-        student => {
 
-            const option =
-                document.createElement(
-                    "option"
-                );
+                    const params =
+                        new URLSearchParams(
+                            window.location.search
+                        );
 
 
-            option.value =
-                getStudentId(
-                    student
-                );
-
-
-            option.textContent =
-                `${student.studentNumber || "-"} - ${student.name || "-"}`;
-
-
-            select.appendChild(
-                option
-            );
-
-        }
-    );
-
-
-    clearStudentInformation();
-
-}
-
-
-/* =================================
-   Student Information
-   ================================= */
-
-function clearStudentInformation() {
-
-    const studentNumber =
-        document.getElementById(
-            "studentNumber"
-        );
-
-
-    const stage =
-        document.getElementById(
-            "stage"
-        );
-
-
-    const className =
-        document.getElementById(
-            "className"
-        );
-
-
-    if (studentNumber) {
-
-        studentNumber.value =
-            "";
-
-    }
-
-
-    if (stage) {
-
-        stage.value =
-            "";
-
-    }
-
-
-    if (className) {
-
-        className.value =
-            "";
-
-    }
-
-}
-
-
-function loadStudentInformation() {
-
-    const studentElement =
-        document.getElementById(
-            "student"
-        );
-
-
-    if (!studentElement) {
-        return;
-    }
-
-
-    const studentId =
-        String(
-            studentElement.value ||
-            ""
-        );
-
-
-    if (!studentId) {
-
-        clearStudentInformation();
-
-        return;
-
-    }
-
-
-    const academicYearElement =
-        document.getElementById(
-            "academicYear"
-        );
-
-
-    const academicYear =
-        academicYearElement
-            ? academicYearElement.value
-            : "";
-
-
-    const student =
-        students.find(
-            item =>
-
-                getStudentId(item) ===
-                    studentId &&
-
-                String(
-                    item.academicYear ||
-                    ""
-                ) ===
-                    String(
-                        academicYear
-                    )
-        );
-
-
-    if (!student) {
-
-        clearStudentInformation();
-
-        return;
-
-    }
-
-
-    const studentNumber =
-        document.getElementById(
-            "studentNumber"
-        );
-
-
-    const stage =
-        document.getElementById(
-            "stage"
-        );
-
-
-    const className =
-        document.getElementById(
-            "className"
-        );
-
-
-    if (studentNumber) {
-
-        studentNumber.value =
-            student.studentNumber ||
-            "";
-
-    }
-
-
-    if (stage) {
-
-        stage.value =
-            formatStage(
-                student.stage
-            );
-
-    }
-
-
-    if (className) {
-
-        className.value =
-            student.className ||
-            student.class ||
-            student.classNumber ||
-            "";
-
-    }
-
-}
-
-
-/* =================================
-   Stage
-   ================================= */
-
-function formatStage(stage) {
-
-    if (!stage) {
-
-        return "-";
-
-    }
-
-
-    const stages = {
-
-        primary:
-            "Primary",
-
-        preparatory:
-            "Preparatory",
-
-        secondary:
-            "Secondary"
-
-    };
-
-
-    return stages[
-        String(stage)
-            .trim()
-            .toLowerCase()
-    ] ||
-        stage;
-
-}
-
-
-/* =================================
-   Current User
-   ================================= */
-
-function getCurrentUsername() {
-
-    if (
-        currentUser &&
-        currentUser.username
-    ) {
-
-        return currentUser.username;
-
-    }
-
-
-    if (
-        currentUser &&
-        currentUser.userName
-    ) {
-
-        return currentUser.userName;
-
-    }
-
-
-    if (
-        currentUser &&
-        currentUser.name
-    ) {
-
-        return currentUser.name;
-
-    }
-
-
-    return "Unknown User";
-
-}
-
-
-function loadCurrentUser() {
-
-    const recordedBy =
-        document.getElementById(
-            "recordedBy"
-        );
-
-
-    if (recordedBy) {
-
-        recordedBy.value =
-            getCurrentUsername();
-
-    }
-
-}
-
-
-/* =================================
-   Receipt Number
-   ================================= */
-
-function setReceiptNumber(
-    receiptNumber = ""
-) {
-
-    const element =
-        document.getElementById(
-            "receiptNumber"
-        );
-
-
-    if (!element) {
-        return;
-    }
-
-
-    element.value =
-        receiptNumber ||
-        "Generated after saving";
-
-}
-
-
-/* =================================
-   Messages
-   ================================= */
-
-function showError(message) {
-
-    const error =
-        document.getElementById(
-            "errorMessage"
-        );
-
-
-    const success =
-        document.getElementById(
-            "successMessage"
-        );
-
-
-    if (success) {
-
-        success.style.display =
-            "none";
-
-    }
-
-
-    if (error) {
-
-        error.textContent =
-            message;
-
-        error.style.display =
-            "block";
-
-    }
-
-}
-
-
-function showSuccess(message) {
-
-    const error =
-        document.getElementById(
-            "errorMessage"
-        );
-
-
-    const success =
-        document.getElementById(
-            "successMessage"
-        );
-
-
-    if (error) {
-
-        error.style.display =
-            "none";
-
-    }
-
-
-    if (success) {
-
-        success.textContent =
-            message;
-
-        success.style.display =
-            "block";
-
-    }
-
-}
-
-
-/* =================================
-   Save Payment
-   ================================= */
-
-async function savePayment(event) {
-
-    event.preventDefault();
-
-
-    const academicYear =
-        document.getElementById(
-            "academicYear"
-        ).value;
-
-
-    const studentId =
-        document.getElementById(
-            "student"
-        ).value;
-
-
-    const month =
-        document.getElementById(
-            "month"
-        ).value;
-
-
-    const amount =
-        Number(
-            document.getElementById(
-                "amount"
-            ).value
-        );
-
-
-    const paymentDate =
-        document.getElementById(
-            "paymentDate"
-        ).value;
-
-
-    const notesElement =
-        document.getElementById(
-            "notes"
-        );
-
-
-    const notes =
-        notesElement
-            ? notesElement.value.trim()
-            : "";
-
-
-    /* =================================
-       Validation
-       ================================= */
-
-    if (!academicYear) {
-
-        showError(
-            "Please select an academic year."
-        );
-
-        return;
-
-    }
-
-
-    if (!studentId) {
-
-        showError(
-            "Please select a student."
-        );
-
-        return;
-
-    }
-
-
-    if (!month) {
-
-        showError(
-            "Please select a month."
-        );
-
-        return;
-
-    }
-
-
-    if (
-        !amount ||
-        amount <= 0
-    ) {
-
-        showError(
-            "Please enter a valid payment amount."
-        );
-
-        return;
-
-    }
-
-
-    if (!paymentDate) {
-
-        showError(
-            "Please select the payment date."
-        );
-
-        return;
-
-    }
-
-
-    const student =
-        students.find(
-            item =>
-
-                getStudentId(item) ===
-                    String(
-                        studentId
-                    ) &&
-
-                String(
-                    item.academicYear ||
-                    ""
-                ) ===
-                    String(
-                        academicYear
-                    )
-        );
-
-
-    if (!student) {
-
-        showError(
-            "Student not found for the selected academic year."
-        );
-
-        return;
-
-    }
-
-
-    /* =================================
-       Disable Button
-       ================================= */
-
-    const button =
-        document.getElementById(
-            "recordPaymentButton"
-        );
-
-
-    if (button) {
-
-        button.disabled =
-            true;
-
-        button.textContent =
-            "Recording...";
-
-    }
-
-
-    try {
-
-        /* =================================
-           Send To Backend
-           ================================= */
-
-        const result =
-            await apiRequest(
-                "addPayment",
-                {
-
-                    studentId:
-                        studentId,
-
-                    academicYear:
-                        academicYear,
-
-                    month:
-                        month,
-
-                    amount:
-                        amount,
-
-                    paymentDate:
-                        paymentDate,
-
-                    notes:
-                        notes
+                    return (
+                        params.get("institutionId") ||
+                        params.get("id") ||
+                        ""
+                    );
 
                 }
-            );
 
 
-        /* =================================
-           Backend Response
-           ================================= */
-
-        const payment =
-            result.payment ||
-            {};
+                const id =
+                    getInstitutionForNavigation();
 
 
-        const receiptNumber =
-            payment.receiptNumber ||
-            result.receiptNumber ||
-            "";
+                const backButton =
+                    document.getElementById(
+                        "backButton"
+                    );
 
 
-        if (receiptNumber) {
-
-            setReceiptNumber(
-                receiptNumber
-            );
-
-        }
+                const cancelButton =
+                    document.getElementById(
+                        "cancelButton"
+                    );
 
 
-        showSuccess(
-            `Payment recorded successfully.${receiptNumber ? ` Receipt: ${receiptNumber}` : ""}`
+                function goToPaymentsPage() {
+
+                    if (!id) {
+
+                        window.location.href =
+                            "school-payments.html";
+
+                        return;
+
+                    }
+
+
+                    window.location.href =
+                        "school-payments.html?id=" +
+                        encodeURIComponent(id);
+
+                }
+
+
+                if (backButton) {
+
+                    backButton.onclick =
+                        goToPaymentsPage;
+
+                }
+
+
+                if (cancelButton) {
+
+                    cancelButton.onclick =
+                        goToPaymentsPage;
+
+                }
+
+            }
         );
 
+    </script>
 
-        /*
-           Return to the payments page
-           after successful recording.
-        */
+</body>
 
-        setTimeout(
-            () => {
-
-                window.location.href =
-                    `school-payments.html?id=${encodeURIComponent(
-                        institutionId
-                    )}`;
-
-            },
-            1000
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Payment error:",
-            error
-        );
-
-
-        showError(
-            error.message ||
-            "Failed to record payment."
-        );
-
-
-        if (button) {
-
-            button.disabled =
-                false;
-
-            button.textContent =
-                "Record Payment";
-
-        }
-
-    }
-
-}
-
-
-/* =================================
-   Navigation
-   ================================= */
-
-function goBack() {
-
-    if (!institutionId) {
-
-        window.location.href =
-            "school-payments.html";
-
-        return;
-
-    }
-
-
-    window.location.href =
-        `school-payments.html?id=${encodeURIComponent(
-            institutionId
-        )}`;
-
-}
-
-
-function goToPayments() {
-
-    goBack();
-
-}
-
-
-/* =================================
-   Event Listeners
-   ================================= */
-
-function setupEventListeners() {
-
-    const academicYearElement =
-        document.getElementById(
-            "academicYear"
-        );
-
-
-    if (academicYearElement) {
-
-        academicYearElement.addEventListener(
-            "change",
-            loadStudents
-        );
-
-    }
-
-
-    const studentElement =
-        document.getElementById(
-            "student"
-        );
-
-
-    if (studentElement) {
-
-        studentElement.addEventListener(
-            "change",
-            loadStudentInformation
-        );
-
-    }
-
-
-    const paymentForm =
-        document.getElementById(
-            "paymentForm"
-        );
-
-
-    if (paymentForm) {
-
-        paymentForm.addEventListener(
-            "submit",
-            savePayment
-        );
-
-    }
-
-
-    const backButton =
-        document.getElementById(
-            "backButton"
-        );
-
-
-    if (backButton) {
-
-        backButton.onclick =
-            goBack;
-
-    }
-
-
-    const cancelButton =
-        document.getElementById(
-            "cancelButton"
-        );
-
-
-    if (cancelButton) {
-
-        cancelButton.onclick =
-            goBack;
-
-    }
-
-}
-
-
-/* =================================
-   Initialize
-   ================================= */
-
-async function initializePage() {
-
-    if (pageInitialized) {
-        return;
-    }
-
-
-    pageInitialized =
-        true;
-
-
-    const authenticated =
-        initializeAuthentication();
-
-
-    if (!authenticated) {
-
-        console.error(
-            "School authentication failed."
-        );
-
-        return;
-
-    }
-
-
-    if (!institutionId) {
-
-        showError(
-            "Institution ID is missing."
-        );
-
-        return;
-
-    }
-
-
-    loadInstitution();
-
-    loadCurrentUser();
-
-
-    const paymentDate =
-        document.getElementById(
-            "paymentDate"
-        );
-
-
-    if (paymentDate) {
-
-        paymentDate.value =
-            new Date()
-                .toISOString()
-                .split("T")[0];
-
-    }
-
-
-    setReceiptNumber();
-
-
-    const loaded =
-        await loadStudentsFromBackend();
-
-
-    if (!loaded) {
-
-        return;
-
-    }
-
-
-    loadAcademicYears();
-
-    loadStudents();
-
-}
-
-
-/* =================================
-   Start
-   ================================= */
-
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        setupEventListeners();
-
-        initializePage();
-
-    }
-);
+</html>
