@@ -1,18 +1,26 @@
-
 // =====================================================
 // BMP Institution Users
+// Google Sheets / Apps Script Version
 // =====================================================
 
 
 // =====================================================
-// Check Admin Session
+// API
 // =====================================================
 
-const currentAdmin =
-    requireAdminLogin();
+const API_URL =
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
 
-if (!currentAdmin) {
-    throw new Error("Admin login required.");
+
+// =====================================================
+// Check School Session
+// =====================================================
+
+const currentUser =
+    requireSchoolLogin();
+
+if (!currentUser) {
+    throw new Error("School login required.");
 }
 
 
@@ -20,180 +28,269 @@ if (!currentAdmin) {
 // Institution
 // =====================================================
 
-const urlParams =
-    new URLSearchParams(
-        window.location.search
-    );
-
 const institutionId =
-    urlParams.get("id");
+    getActiveInstitutionId();
 
-// Get institutions
-const institutions =
-    JSON.parse(localStorage.getItem("bmpInstitutions")) || [];
-
-
-// Find institution
-const institution = institutions.find(
-    item => item.id === institutionId
-);
+if (!institutionId) {
+    throw new Error("Institution access denied.");
+}
 
 
+// Only Director can manage users
+if (
+    String(currentUser.role || "")
+        .trim()
+        .toLowerCase() !== "director"
+) {
+
+    alert("Only the Director can manage users.");
+
+    window.location.href =
+        `school.html?id=${encodeURIComponent(
+            currentUser.institutionId
+        )}`;
+
+    throw new Error(
+        "Director access required."
+    );
+}
+
+
+// =====================================================
 // Elements
+// =====================================================
+
 const institutionTitle =
-    document.getElementById("institutionTitle");
+    document.getElementById(
+        "institutionTitle"
+    );
 
 const institutionIdElement =
-    document.getElementById("institutionId");
+    document.getElementById(
+        "institutionId"
+    );
 
 const institutionNameElement =
-    document.getElementById("institutionName");
+    document.getElementById(
+        "institutionName"
+    );
 
 const institutionTypeElement =
-    document.getElementById("institutionType");
+    document.getElementById(
+        "institutionType"
+    );
 
 const usersTableBody =
-    document.getElementById("usersTableBody");
+    document.getElementById(
+        "usersTableBody"
+    );
 
 const emptyState =
-    document.getElementById("emptyState");
+    document.getElementById(
+        "emptyState"
+    );
 
 const searchUser =
-    document.getElementById("searchUser");
+    document.getElementById(
+        "searchUser"
+    );
 
 const userStatusFilter =
-    document.getElementById("userStatusFilter");
+    document.getElementById(
+        "userStatusFilter"
+    );
 
 const addUserButton =
-    document.getElementById("addUserButton");
+    document.getElementById(
+        "addUserButton"
+    );
 
 const backButton =
-    document.getElementById("backButton");
+    document.getElementById(
+        "backButton"
+    );
 
 
-// Check institution
-if (!institution) {
+// =====================================================
+// Local Page State
+// =====================================================
 
-    alert("Institution not found.");
-
-    window.location.href = "institutions.html";
-
-} else {
-
-    initializeUsers();
-}
+let users = [];
 
 
+// =====================================================
 // Initialize
-function initializeUsers() {
+// =====================================================
+
+initializeUsers();
+
+
+// =====================================================
+// Initialize Users Page
+// =====================================================
+
+async function initializeUsers() {
 
     institutionTitle.textContent =
-        `Manage users for ${institution.name}`;
+        `Manage users`;
 
     institutionIdElement.textContent =
-        institution.id;
+        institutionId;
 
     institutionNameElement.textContent =
-        institution.name;
+        currentUser.institutionName ||
+        "-";
 
     institutionTypeElement.textContent =
-        institution.type === "school"
-            ? "School"
-            : "Restaurant";
+        "School";
 
 
-    createMainUserIfNeeded();
-
-    renderUsers();
+    await loadUsers();
 }
 
 
-// Get all users
-function getUsers() {
+// =====================================================
+// API Request Helper
+// =====================================================
 
-    return JSON.parse(
-        localStorage.getItem("bmpUsers")
-    ) || [];
-}
+async function apiRequest(payload) {
 
+    try {
 
-// Save users
-function saveUsers(users) {
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method: "POST",
 
-    localStorage.setItem(
-        "bmpUsers",
-        JSON.stringify(users)
-    );
-}
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
 
-
-// Create main account
-function createMainUserIfNeeded() {
-
-    let users = getUsers();
-
-
-    const mainUserExists = users.some(
-        user =>
-            user.institutionId === institution.id &&
-            user.isMainUser === true
-    );
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
+                }
+            );
 
 
-    if (mainUserExists) {
-        return;
-    }
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+        }
 
 
-    const mainUser = {
-
-        id:
-            "USR-" +
-            Date.now(),
-
-        institutionId:
-            institution.id,
-
-        username:
-            institution.username,
-
-        password:
-            institution.password,
-
-        role:
-            institution.type === "school"
-                ? "Director"
-                : "Manager",
-
-        status:
-            "active",
-
-        isMainUser:
-            true,
-
-        createdAt:
-            new Date().toISOString()
-    };
+        const result =
+            await response.json();
 
 
-    users.push(mainUser);
+        return result;
 
-    saveUsers(users);
-}
+    } catch (error) {
 
-
-// Render users
-function renderUsers() {
-
-    const users = getUsers();
-
-
-    const institutionUsers =
-        users.filter(
-            user =>
-                user.institutionId === institution.id
+        console.error(
+            "API Error:",
+            error
         );
 
+        throw error;
+    }
+}
+
+
+// =====================================================
+// Load Users
+// =====================================================
+
+async function loadUsers() {
+
+    usersTableBody.innerHTML = `
+        <tr>
+            <td
+                colspan="5"
+                style="text-align:center;padding:25px;"
+            >
+                Loading users...
+            </td>
+        </tr>
+    `;
+
+    emptyState.style.display = "none";
+
+
+    try {
+
+        const result =
+            await apiRequest({
+
+                action:
+                    "getUsers",
+
+                institutionId:
+                    institutionId,
+
+                username:
+                    currentUser.username
+            });
+
+
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Failed to load users."
+            );
+        }
+
+
+        users =
+            Array.isArray(
+                result.users
+            )
+                ? result.users
+                : [];
+
+
+        renderUsers();
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        usersTableBody.innerHTML = `
+            <tr>
+                <td
+                    colspan="5"
+                    style="
+                        text-align:center;
+                        padding:25px;
+                        color:#b00020;
+                    "
+                >
+                    Failed to load users.
+                </td>
+            </tr>
+        `;
+
+
+        alert(
+            error.message ||
+            "Failed to load users."
+        );
+    }
+}
+
+
+// =====================================================
+// Render Users
+// =====================================================
+
+function renderUsers() {
 
     const searchValue =
         searchUser.value
@@ -206,152 +303,249 @@ function renderUsers() {
 
 
     const filteredUsers =
-        institutionUsers.filter(user => {
+        users.filter(
+            user => {
 
-            const matchesSearch =
-                String(user.username || "")
+                const matchesSearch =
+                    String(
+                        user.username || ""
+                    )
                     .toLowerCase()
-                    .includes(searchValue);
+                    .includes(
+                        searchValue
+                    );
 
 
-            const matchesStatus =
-                selectedStatus === "all" ||
-                user.status === selectedStatus;
+                const matchesStatus =
+                    selectedStatus === "all" ||
+                    user.status ===
+                        selectedStatus;
 
 
-            return (
-                matchesSearch &&
-                matchesStatus
-            );
-        });
+                return (
+                    matchesSearch &&
+                    matchesStatus
+                );
+            }
+        );
 
 
     usersTableBody.innerHTML = "";
 
 
-    if (filteredUsers.length === 0) {
+    if (
+        filteredUsers.length === 0
+    ) {
 
-        emptyState.style.display = "block";
+        emptyState.style.display =
+            "block";
 
         return;
     }
 
 
-    emptyState.style.display = "none";
+    emptyState.style.display =
+        "none";
 
 
-    filteredUsers.forEach(user => {
+    filteredUsers.forEach(
+        user => {
 
-        const row =
-            document.createElement("tr");
-
-
-        const role =
-            user.role || "User";
-
-
-        const createdDate =
-            user.createdAt
-                ? new Date(
-                    user.createdAt
-                ).toLocaleDateString()
-                : "-";
+            const row =
+                document.createElement(
+                    "tr"
+                );
 
 
-        const statusName =
-            user.status
-                ? user.status
+            const role =
+                user.role ||
+                "User";
+
+
+            const createdDate =
+                user.createdAt
+                    ? formatDate(
+                        user.createdAt
+                    )
+                    : "-";
+
+
+            const status =
+                user.status ||
+                "active";
+
+
+            const statusName =
+                status
                     .charAt(0)
                     .toUpperCase() +
-                  user.status.slice(1)
-                : "Active";
+                status.slice(1);
 
 
-        let actionButton = "";
+            let actionButton =
+                "";
 
 
-        // Admin can manage every user,
-        // including Director / Manager.
-        if (user.status === "disabled") {
+            // =================================================
+            // Director cannot be disabled
+            // =================================================
 
-            actionButton = `
-                <button
-                    class="action-btn enable-btn"
-                    onclick="enableUser('${user.id}')">
-                    Enable
-                </button>
+            const isDirector =
+                String(
+                    user.role || ""
+                )
+                .trim()
+                .toLowerCase() ===
+                "director";
+
+
+            if (isDirector) {
+
+                actionButton = `
+                    <span
+                        style="
+                            color:#777;
+                            font-size:13px;
+                        "
+                    >
+                        Protected
+                    </span>
+                `;
+
+            } else if (
+                status === "disabled"
+            ) {
+
+                actionButton = `
+                    <button
+                        class="action-btn enable-btn"
+                        onclick="enableUser('${escapeJs(
+                            user.userId ||
+                            user.id
+                        )}')"
+                    >
+                        Enable
+                    </button>
+                `;
+
+            } else {
+
+                actionButton = `
+                    <button
+                        class="action-btn disable-btn"
+                        onclick="disableUser('${escapeJs(
+                            user.userId ||
+                            user.id
+                        )}')"
+                    >
+                        Disable
+                    </button>
+                `;
+            }
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${escapeHtml(
+                        user.username ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    <span class="role-badge">
+                        ${escapeHtml(
+                            role
+                        )}
+                    </span>
+                </td>
+
+                <td>
+                    <span
+                        class="status-badge status-${escapeHtml(
+                            status
+                        )}"
+                    >
+                        ${escapeHtml(
+                            statusName
+                        )}
+                    </span>
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        createdDate
+                    )}
+                </td>
+
+                <td>
+                    ${actionButton}
+                </td>
+
             `;
 
-        } else {
 
-            actionButton = `
-                <button
-                    class="action-btn disable-btn"
-                    onclick="disableUser('${user.id}')">
-                    Disable
-                </button>
-            `;
+            usersTableBody.appendChild(
+                row
+            );
         }
-
-
-        row.innerHTML = `
-
-            <td>
-                ${escapeHtml(user.username || "-")}
-            </td>
-
-            <td>
-                <span class="role-badge">
-                    ${escapeHtml(role)}
-                </span>
-            </td>
-
-            <td>
-                <span
-                    class="status-badge status-${escapeHtml(
-                        user.status || "active"
-                    )}">
-                    ${escapeHtml(statusName)}
-                </span>
-            </td>
-
-            <td>
-                ${escapeHtml(createdDate)}
-            </td>
-
-            <td>
-                ${actionButton}
-            </td>
-
-        `;
-
-
-        usersTableBody.appendChild(row);
-    });
+    );
 }
 
 
-// Disable user
-function disableUser(userId) {
+// =====================================================
+// Disable User
+// =====================================================
 
-    let users = getUsers();
-
+async function disableUser(
+    userId
+) {
 
     const user =
         users.find(
-            item => item.id === userId
+            item =>
+                String(
+                    item.userId ||
+                    item.id
+                ) ===
+                String(userId)
         );
 
 
     if (!user) {
 
-        alert("User not found.");
+        alert(
+            "User not found."
+        );
 
         return;
     }
 
 
-    if (user.status === "disabled") {
+    // Never allow Director to be disabled
+    if (
+        String(
+            user.role || ""
+        )
+        .trim()
+        .toLowerCase() ===
+        "director"
+    ) {
+
+        alert(
+            "The Director cannot be disabled."
+        );
+
+        return;
+    }
+
+
+    if (
+        user.status ===
+        "disabled"
+    ) {
+
         return;
     }
 
@@ -367,154 +561,366 @@ function disableUser(userId) {
     }
 
 
-    user.status =
-        "disabled";
+    try {
+
+        setUsersLoading(true);
 
 
-    saveUsers(users);
+        const result =
+            await apiRequest({
+
+                action:
+                    "updateUserStatus",
+
+                institutionId:
+                    institutionId,
+
+                username:
+                    currentUser.username,
+
+                userId:
+                    user.userId ||
+                    user.id,
+
+                status:
+                    "disabled"
+            });
 
 
-    // Activity Log
-    if (
-        typeof logActivity ===
-        "function"
-    ) {
+        if (!result.success) {
 
-        logActivity({
+            throw new Error(
+                result.message ||
+                "Failed to disable user."
+            );
+        }
 
-            institutionId:
-                institution.id,
 
-            userId:
-                "ADMIN",
+        alert(
+            "User disabled successfully."
+        );
 
-            username:
-                "Admin",
 
-            role:
-                "Admin",
+        await loadUsers();
 
-            action:
-                "Disabled User",
+    } catch (error) {
 
-            details:
-                `Disabled user "${user.username}" (${user.role || "User"})`
-        });
+        console.error(error);
+
+
+        alert(
+            error.message ||
+            "Failed to disable user."
+        );
+
+    } finally {
+
+        setUsersLoading(false);
     }
-
-
-    renderUsers();
 }
 
 
-// Enable user
-function enableUser(userId) {
+// =====================================================
+// Enable User
+// =====================================================
 
-    let users = getUsers();
-
+async function enableUser(
+    userId
+) {
 
     const user =
         users.find(
-            item => item.id === userId
+            item =>
+                String(
+                    item.userId ||
+                    item.id
+                ) ===
+                String(userId)
         );
 
 
     if (!user) {
 
-        alert("User not found.");
+        alert(
+            "User not found."
+        );
 
         return;
     }
 
 
-    if (user.status === "active") {
-        return;
-    }
-
-
-    user.status =
-        "active";
-
-
-    saveUsers(users);
-
-
-    // Activity Log
+    // Director should normally never be disabled,
+    // but keep this protection here too.
     if (
-        typeof logActivity ===
-        "function"
+        String(
+            user.role || ""
+        )
+        .trim()
+        .toLowerCase() ===
+        "director"
     ) {
 
-        logActivity({
+        alert(
+            "The Director account is protected."
+        );
 
-            institutionId:
-                institution.id,
-
-            userId:
-                "ADMIN",
-
-            username:
-                "Admin",
-
-            role:
-                "Admin",
-
-            action:
-                "Enabled User",
-
-            details:
-                `Enabled user "${user.username}" (${user.role || "User"})`
-        });
+        return;
     }
 
 
-    renderUsers();
+    if (
+        user.status ===
+        "active"
+    ) {
+
+        return;
+    }
+
+
+    const confirmed =
+        confirm(
+            `Are you sure you want to enable user "${user.username}"?`
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        setUsersLoading(true);
+
+
+        const result =
+            await apiRequest({
+
+                action:
+                    "updateUserStatus",
+
+                institutionId:
+                    institutionId,
+
+                username:
+                    currentUser.username,
+
+                userId:
+                    user.userId ||
+                    user.id,
+
+                status:
+                    "active"
+            });
+
+
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Failed to enable user."
+            );
+        }
+
+
+        alert(
+            "User enabled successfully."
+        );
+
+
+        await loadUsers();
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        alert(
+            error.message ||
+            "Failed to enable user."
+        );
+
+    } finally {
+
+        setUsersLoading(false);
+    }
 }
 
 
+// =====================================================
+// Loading State
+// =====================================================
+
+function setUsersLoading(
+    loading
+) {
+
+    if (!addUserButton) {
+        return;
+    }
+
+
+    addUserButton.disabled =
+        loading;
+
+
+    if (loading) {
+
+        addUserButton.style.opacity =
+            "0.6";
+
+    } else {
+
+        addUserButton.style.opacity =
+            "";
+    }
+}
+
+
+// =====================================================
+// Format Date
+// =====================================================
+
+function formatDate(
+    value
+) {
+
+    try {
+
+        const date =
+            new Date(value);
+
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+
+            return String(
+                value
+            );
+        }
+
+
+        return date.toLocaleDateString();
+
+    } catch (error) {
+
+        return String(
+            value
+        );
+    }
+}
+
+
+// =====================================================
 // Escape HTML
-function escapeHtml(value) {
+// =====================================================
 
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+function escapeHtml(
+    value
+) {
+
+    return String(
+        value
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
 }
 
 
+// =====================================================
+// Escape JavaScript String
+// =====================================================
+
+function escapeJs(
+    value
+) {
+
+    return String(
+        value
+    )
+    .replace(
+        /\\/g,
+        "\\\\"
+    )
+    .replace(
+        /'/g,
+        "\\'"
+    )
+    .replace(
+        /"/g,
+        '\\"'
+    );
+}
+
+
+// =====================================================
 // Search
+// =====================================================
+
 searchUser.addEventListener(
     "input",
     renderUsers
 );
 
 
-// Status filter
+// =====================================================
+// Status Filter
+// =====================================================
+
 userStatusFilter.addEventListener(
     "change",
     renderUsers
 );
 
 
+// =====================================================
 // Add User
+// =====================================================
+
 addUserButton.addEventListener(
     "click",
     function () {
 
         window.location.href =
-            `add-user.html?id=${encodeURIComponent(institution.id)}`;
+            `add-user.html?id=${encodeURIComponent(
+                institutionId
+            )}`;
     }
 );
 
 
+// =====================================================
 // Back
+// =====================================================
+
 backButton.addEventListener(
     "click",
     function () {
 
         window.location.href =
-            `institution.html?id=${encodeURIComponent(institution.id)}`;
+            `school.html?id=${encodeURIComponent(
+                institutionId
+            )}`;
     }
 );
