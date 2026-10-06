@@ -9,11 +9,27 @@
 
 function getCurrentUser() {
 
-    return JSON.parse(
-        localStorage.getItem(
+    try {
+
+        return JSON.parse(
+            localStorage.getItem(
+                "bmpCurrentUser"
+            )
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Invalid user session:",
+            error
+        );
+
+        localStorage.removeItem(
             "bmpCurrentUser"
-        )
-    );
+        );
+
+        return null;
+    }
 
 }
 
@@ -28,19 +44,38 @@ function requireSchoolLogin() {
         getCurrentUser();
 
 
+    const role =
+        currentUser &&
+        String(
+            currentUser.role || ""
+        )
+        .trim()
+        .toLowerCase();
+
+
     if (
         !currentUser ||
         !currentUser.institutionId ||
         (
-            currentUser.role !== "Director" &&
-            currentUser.role !== "Manager" &&
-            currentUser.role !== "User"
+            role !== "director" &&
+            role !== "manager" &&
+            role !== "user"
         ) ||
-        currentUser.status !== "active"
+        String(
+            currentUser.status || ""
+        )
+        .trim()
+        .toLowerCase() !== "active"
     ) {
+
+        localStorage.removeItem(
+            "bmpCurrentUser"
+        );
+
 
         window.location.href =
             "school-login.html";
+
 
         return null;
     }
