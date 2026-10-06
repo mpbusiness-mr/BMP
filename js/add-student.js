@@ -1,4 +1,3 @@
-```javascript
 const addStudentTranslations = {
 
     en: {
