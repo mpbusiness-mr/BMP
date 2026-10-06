@@ -15,7 +15,6 @@
         rel="stylesheet"
         href="school-record-payment.css">
 
-    <!-- Safety layer -->
     <style>
         button,
         select,
@@ -30,6 +29,49 @@
         .message {
             position: relative;
             z-index: 10;
+        }
+
+        /* Student search area */
+        .student-search-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .student-search-input {
+            flex: 1;
+        }
+
+        .student-search-button {
+            min-width: 100px;
+        }
+
+        .student-result {
+            margin-top: 12px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+            font-size: 14px;
+            display: none;
+        }
+
+        .student-result.error {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #b91c1c;
+        }
+
+        @media (max-width: 700px) {
+            .student-search-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .student-search-button {
+                width: 100%;
+            }
         }
     </style>
 
@@ -126,25 +168,62 @@
                     </div>
 
 
-                    <!-- Student -->
+                    <!-- Student Number Search -->
 
                     <div class="form-group">
 
-                        <label for="student">
-                            Student
+                        <label for="studentNumberSearch">
+                            Student Number
                         </label>
 
-                        <select
-                            id="student"
-                            required>
+                        <div class="student-search-row">
 
-                            <option value="">
-                                Select Student
-                            </option>
+                            <input
+                                type="text"
+                                id="studentNumberSearch"
+                                class="student-search-input"
+                                placeholder="Enter student number"
+                                autocomplete="off">
 
-                        </select>
+                            <button
+                                type="button"
+                                id="searchStudentButton"
+                                class="btn btn-primary student-search-button">
+                                Search
+                            </button>
+
+                        </div>
+
+                        <div
+                            id="studentSearchResult"
+                            class="student-result">
+                        </div>
 
                     </div>
+
+
+                    <!-- Student Name -->
+
+                    <div class="form-group">
+
+                        <label for="studentName">
+                            Student Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="studentName"
+                            readonly
+                            placeholder="Search for a student">
+
+                    </div>
+
+
+                    <!-- Hidden Student ID -->
+
+                    <input
+                        type="hidden"
+                        id="studentId">
 
 
                     <!-- Student Number -->
@@ -392,96 +471,108 @@
 
 
     <!-- Emergency navigation fallback -->
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
 
-            function getInstitutionForNavigation() {
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
 
-                try {
+                function getInstitutionForNavigation() {
 
-                    const user =
-                        JSON.parse(
-                            localStorage.getItem(
-                                "bmpCurrentUser"
-                            ) || "null"
-                        );
+                    try {
 
-                    if (
-                        user &&
-                        user.institutionId
-                    ) {
-                        return user.institutionId;
+                        const user =
+                            JSON.parse(
+                                localStorage.getItem(
+                                    "bmpCurrentUser"
+                                ) || "null"
+                            );
+
+                        if (
+                            user &&
+                            user.institutionId
+                        ) {
+
+                            return user.institutionId;
+
+                        }
+
+                    } catch (error) {
+
+                        console.error(error);
+
                     }
 
-                } catch (error) {
-                    console.error(error);
-                }
+
+                    const params =
+                        new URLSearchParams(
+                            window.location.search
+                        );
 
 
-                const params =
-                    new URLSearchParams(
-                        window.location.search
+                    return (
+                        params.get("institutionId") ||
+                        params.get("id") ||
+                        ""
                     );
 
-                return (
-                    params.get("institutionId") ||
-                    params.get("id") ||
-                    ""
-                );
-            }
+                }
 
 
-            const id =
-                getInstitutionForNavigation();
+                const id =
+                    getInstitutionForNavigation();
 
 
-            const backButton =
-                document.getElementById(
-                    "backButton"
-                );
+                const backButton =
+                    document.getElementById(
+                        "backButton"
+                    );
 
 
-            const cancelButton =
-                document.getElementById(
-                    "cancelButton"
-                );
+                const cancelButton =
+                    document.getElementById(
+                        "cancelButton"
+                    );
 
 
-            function goToPaymentsPage() {
+                function goToPaymentsPage() {
 
-                if (!id) {
+                    if (!id) {
+
+                        window.location.href =
+                            "school-payments.html";
+
+                        return;
+
+                    }
+
 
                     window.location.href =
-                        "school-payments.html";
-
-                    return;
+                        "school-payments.html?id=" +
+                        encodeURIComponent(id);
 
                 }
 
 
-                window.location.href =
-                    "school-payments.html?id=" +
-                    encodeURIComponent(id);
+                if (backButton) {
+
+                    backButton.onclick =
+                        goToPaymentsPage;
+
+                }
+
+
+                if (cancelButton) {
+
+                    cancelButton.onclick =
+                        goToPaymentsPage;
+
+                }
 
             }
+        );
 
-
-            if (backButton) {
-
-                backButton.onclick =
-                    goToPaymentsPage;
-
-            }
-
-
-            if (cancelButton) {
-
-                cancelButton.onclick =
-                    goToPaymentsPage;
-
-            }
-
-        });
     </script>
 
 </body>
