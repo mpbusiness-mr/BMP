@@ -62,27 +62,30 @@ async function authenticateAdmin(
     try {
 
         const response =
-            await fetch(
-                ADMIN_API_URL,
-                {
-                    method: "POST",
+    await fetch(
+        ADMIN_API_URL,
+        {
+            method: "POST",
 
-                    headers: {
-                        "Content-Type":
-                            "text/plain;charset=utf-8"
-                    },
+            headers: {
+                "Content-Type":
+                    "text/plain;charset=utf-8"
+            },
 
-                    body: JSON.stringify({
+            body: JSON.stringify({
 
-                        username:
-                            username,
+                action:
+                    "adminLogin",
 
-                        password:
-                            password
+                username:
+                    username,
 
-                    })
-                }
-            );
+                password:
+                    password
+
+            })
+        }
+    );
 
 
         const result =
