@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title data-i18n="payments.title">المدفوعات</title>
+    <title>Payments</title>
 
     <link rel="stylesheet" href="school-payments.css">
 </head>
@@ -15,31 +16,41 @@
 
         <!-- Header -->
         <header class="page-header">
+
             <div class="header-left">
+
                 <button
                     type="button"
                     class="back-button"
-                    onclick="goBack()"
-                    data-i18n="common.back">
-                    رجوع
+                    onclick="goBack()">
+                    Back
                 </button>
 
                 <div class="page-title">
-                    <h1 data-i18n="payments.title">المدفوعات</h1>
-                    <p data-i18n="payments.subtitle">
-                        عرض ومتابعة مدفوعات الطلاب
+
+                    <h1>Payments</h1>
+
+                    <p>
+                        View and manage student payments
                     </p>
+
                 </div>
+
             </div>
 
+
             <div class="header-actions">
+
                 <button
                     type="button"
                     class="primary-button"
-                    id="recordPaymentPageBtn">
+                    id="recordPaymentPageBtn"
+                    onclick="goToRecordPayment()">
                     Record Payment
                 </button>
+
             </div>
+
         </header>
 
 
@@ -47,103 +58,116 @@
         <section class="filters-section">
 
             <div class="filter-group">
-                <label for="academicYear" data-i18n="payments.academicYear">
-                    السنة الدراسية
+
+                <label for="academicYear">
+                    Academic Year
                 </label>
 
                 <select id="academicYear">
-                    <option value="" data-i18n="common.all">
-                        الكل
+
+                    <option value="">
+                        All
                     </option>
+
                 </select>
+
             </div>
 
 
             <div class="filter-group">
-                <label for="paymentMonth" data-i18n="payments.month">
-                    الشهر
+
+                <label for="paymentMonth">
+                    Month
                 </label>
 
                 <select id="paymentMonth">
-                    <option value="" data-i18n="common.all">
-                        الكل
+
+                    <option value="">
+                        All
                     </option>
 
-                    <option value="October" data-i18n="months.october">
-                        أكتوبر
+                    <option value="October">
+                        October
                     </option>
 
-                    <option value="November" data-i18n="months.november">
-                        نوفمبر
+                    <option value="November">
+                        November
                     </option>
 
-                    <option value="December" data-i18n="months.december">
-                        ديسمبر
+                    <option value="December">
+                        December
                     </option>
 
-                    <option value="January" data-i18n="months.january">
-                        يناير
+                    <option value="January">
+                        January
                     </option>
 
-                    <option value="February" data-i18n="months.february">
-                        فبراير
+                    <option value="February">
+                        February
                     </option>
 
-                    <option value="March" data-i18n="months.march">
-                        مارس
+                    <option value="March">
+                        March
                     </option>
 
-                    <option value="April" data-i18n="months.april">
-                        أبريل
+                    <option value="April">
+                        April
                     </option>
 
-                    <option value="May" data-i18n="months.may">
-                        مايو
+                    <option value="May">
+                        May
                     </option>
 
-                    <option value="June" data-i18n="months.june">
-                        يونيو
+                    <option value="June">
+                        June
                     </option>
+
                 </select>
+
             </div>
 
 
             <div class="filter-group">
-                <label for="stageFilter" data-i18n="students.stage">
-                    المرحلة
+
+                <label for="stageFilter">
+                    Stage
                 </label>
 
                 <select id="stageFilter">
-                    <option value="" data-i18n="common.all">
-                        الكل
+
+                    <option value="">
+                        All
                     </option>
 
-                    <option value="primary" data-i18n="stages.primary">
-                        التعليم الأساسي
+                    <option value="primary">
+                        Primary
                     </option>
 
-                    <option value="preparatory" data-i18n="stages.preparatory">
-                        الإعدادي
+                    <option value="preparatory">
+                        Preparatory
                     </option>
 
-                    <option value="secondary" data-i18n="stages.secondary">
-                        الثانوي
+                    <option value="secondary">
+                        Secondary
                     </option>
+
                 </select>
+
             </div>
 
 
             <div class="filter-group search-group">
-                <label for="studentSearch" data-i18n="payments.search">
-                    البحث
+
+                <label for="studentSearch">
+                    Search
                 </label>
 
                 <input
                     type="text"
                     id="studentSearch"
                     autocomplete="off"
-                    placeholder="اسم الطالب أو الرقم"
-                    data-i18n-placeholder="payments.searchPlaceholder">
+                    placeholder="Student name or number">
+
             </div>
 
 
@@ -152,17 +176,15 @@
                 <button
                     type="button"
                     class="secondary-button"
-                    id="applyFiltersBtn"
-                    data-i18n="common.search">
-                    بحث
+                    id="applyFiltersBtn">
+                    Search
                 </button>
 
                 <button
                     type="button"
                     class="secondary-button"
-                    id="resetFiltersBtn"
-                    data-i18n="common.reset">
-                    إعادة تعيين
+                    id="resetFiltersBtn">
+                    Reset
                 </button>
 
             </div>
@@ -174,35 +196,47 @@
         <section class="summary-section">
 
             <div class="summary-card">
-                <div class="summary-label" data-i18n="payments.totalPayments">
-                    إجمالي المدفوعات
+
+                <div class="summary-label">
+                    Total Payments
                 </div>
 
-                <div class="summary-value" id="totalPayments">
+                <div
+                    class="summary-value"
+                    id="totalPayments">
                     0
                 </div>
+
             </div>
 
 
             <div class="summary-card">
-                <div class="summary-label" data-i18n="payments.totalAmount">
-                    إجمالي المبلغ
+
+                <div class="summary-label">
+                    Total Amount
                 </div>
 
-                <div class="summary-value" id="totalAmount">
+                <div
+                    class="summary-value"
+                    id="totalAmount">
                     0
                 </div>
+
             </div>
 
 
             <div class="summary-card">
-                <div class="summary-label" data-i18n="payments.displayedPayments">
-                    المدفوعات المعروضة
+
+                <div class="summary-label">
+                    Displayed Payments
                 </div>
 
-                <div class="summary-value" id="displayedPayments">
+                <div
+                    class="summary-value"
+                    id="displayedPayments">
                     0
                 </div>
+
             </div>
 
         </section>
@@ -216,8 +250,8 @@
 
             <div class="loading-spinner"></div>
 
-            <p data-i18n="common.loading">
-                جارٍ التحميل...
+            <p>
+                Loading...
             </p>
 
         </div>
@@ -229,18 +263,19 @@
             class="error-state"
             style="display: none;">
 
-            <div class="error-icon">!</div>
+            <div class="error-icon">
+                !
+            </div>
 
             <p id="errorMessage">
-                حدث خطأ أثناء تحميل المدفوعات.
+                An error occurred while loading payments.
             </p>
 
             <button
                 type="button"
                 class="secondary-button"
-                id="retryBtn"
-                data-i18n="common.retry">
-                إعادة المحاولة
+                id="retryBtn">
+                Retry
             </button>
 
         </div>
@@ -252,14 +287,16 @@
             class="empty-state"
             style="display: none;">
 
-            <div class="empty-icon">📄</div>
+            <div class="empty-icon">
+                📄
+            </div>
 
-            <h3 data-i18n="payments.noPayments">
-                لا توجد مدفوعات
+            <h3>
+                No Payments
             </h3>
 
-            <p data-i18n="payments.noPaymentsDescription">
-                لم يتم العثور على أي مدفوعات مطابقة للبحث.
+            <p>
+                No payments matching your search were found.
             </p>
 
         </div>
@@ -275,41 +312,43 @@
                 <table id="paymentsTable">
 
                     <thead>
+
                         <tr>
 
-                            <th data-i18n="payments.studentNumber">
-                                رقم الطالب
+                            <th>
+                                Student Number
                             </th>
 
-                            <th data-i18n="payments.studentName">
-                                اسم الطالب
+                            <th>
+                                Student Name
                             </th>
 
-                            <th data-i18n="payments.academicYear">
-                                السنة الدراسية
+                            <th>
+                                Academic Year
                             </th>
 
-                            <th data-i18n="payments.month">
-                                الشهر
+                            <th>
+                                Month
                             </th>
 
-                            <th data-i18n="payments.amount">
-                                المبلغ
+                            <th>
+                                Amount
                             </th>
 
-                            <th data-i18n="payments.paymentDate">
-                                تاريخ الدفع
+                            <th>
+                                Payment Date
                             </th>
 
-                            <th data-i18n="payments.receiptNumber">
-                                رقم الإيصال
+                            <th>
+                                Receipt Number
                             </th>
 
-                            <th data-i18n="payments.recordedBy">
-                                سجل بواسطة
+                            <th>
+                                Recorded By
                             </th>
 
                         </tr>
+
                     </thead>
 
                     <tbody id="paymentsTableBody">
@@ -330,14 +369,18 @@
         class="modal"
         style="display: none;">
 
-        <div class="modal-overlay" onclick="closePaymentDetails()"></div>
+        <div
+            class="modal-overlay"
+            onclick="closePaymentDetails()">
+        </div>
+
 
         <div class="modal-content">
 
             <div class="modal-header">
 
-                <h2 data-i18n="payments.paymentDetails">
-                    تفاصيل الدفعة
+                <h2>
+                    Payment Details
                 </h2>
 
                 <button
@@ -348,6 +391,7 @@
                 </button>
 
             </div>
+
 
             <div
                 id="paymentDetailsContent"
@@ -364,4 +408,5 @@
     <script src="school-payments.js"></script>
 
 </body>
+
 </html>
