@@ -45,23 +45,37 @@ const errorMessage =
 // Check Existing Session
 // =====================================================
 
-const currentUser =
-    JSON.parse(
-        localStorage.getItem(
-            "bmpCurrentUser"
-        )
+let currentUser = null;
+
+try {
+
+    currentUser =
+        JSON.parse(
+            localStorage.getItem(
+                "bmpCurrentUser"
+            )
+        );
+
+} catch (error) {
+
+    localStorage.removeItem(
+        "bmpCurrentUser"
     );
+
+    currentUser = null;
+
+}
 
 
 if (
     currentUser &&
     currentUser.institutionId &&
+    currentUser.status === "active" &&
     (
         currentUser.role === "Director" ||
         currentUser.role === "Manager" ||
         currentUser.role === "User"
-    ) &&
-    currentUser.status === "active"
+    )
 ) {
 
     window.location.href =
@@ -95,7 +109,14 @@ loginForm.addEventListener(
             "";
 
 
-        if (!username || !password) {
+        // =============================================
+        // Validate Fields
+        // =============================================
+
+        if (
+            !username ||
+            !password
+        ) {
 
             errorMessage.textContent =
                 "Please enter username and password.";
@@ -105,6 +126,10 @@ loginForm.addEventListener(
         }
 
 
+        // =============================================
+        // Disable Button
+        // =============================================
+
         loginButton.disabled =
             true;
 
@@ -113,6 +138,10 @@ loginForm.addEventListener(
 
 
         try {
+
+            // =========================================
+            // Send Login Request
+            // =========================================
 
             const response =
                 await fetch(
@@ -147,6 +176,19 @@ loginForm.addEventListener(
                 );
 
 
+            // =========================================
+            // Check HTTP Response
+            // =========================================
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Server returned an error."
+                );
+
+            }
+
+
             const result =
                 await response.json();
 
@@ -155,11 +197,17 @@ loginForm.addEventListener(
             // Login Failed
             // =========================================
 
-            if (!result.success) {
+            if (
+                !result ||
+                !result.success
+            ) {
 
                 errorMessage.textContent =
-                    result.message ||
-                    "Login failed.";
+                    result &&
+                    result.message
+                        ? result.message
+                        : "Login failed.";
+
 
                 loginButton.disabled =
                     false;
@@ -168,6 +216,22 @@ loginForm.addEventListener(
                     "Login";
 
                 return;
+
+            }
+
+
+            // =========================================
+            // Validate Returned User
+            // =========================================
+
+            if (
+                !result.user ||
+                !result.user.institutionId
+            ) {
+
+                throw new Error(
+                    "Invalid login response."
+                );
 
             }
 
@@ -188,7 +252,7 @@ loginForm.addEventListener(
 
 
             // =========================================
-            // Go To Dashboard
+            // Go To School Dashboard
             // =========================================
 
             window.location.href =
@@ -197,8 +261,8 @@ loginForm.addEventListener(
                     result.user.institutionId
                 );
 
-
-        } catch (error) {
+        }
+        catch (error) {
 
             console.error(
                 error
