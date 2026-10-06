@@ -301,3 +301,59 @@ body {
     }
 
 }
+
+
+
+
+```css
+/* Language Selector */
+
+#languageSelect {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+
+/* Header layout */
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+
+/* Arabic RTL */
+
+html[dir="rtl"] {
+    direction: rtl;
+}
+
+
+html[dir="rtl"] .page-header {
+    direction: rtl;
+}
+
+
+html[dir="rtl"] .header-right {
+    direction: rtl;
+}
+
+
+html[dir="rtl"] .form-group,
+html[dir="rtl"] .info-item {
+    text-align: right;
+}
+```
