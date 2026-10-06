@@ -87,7 +87,6 @@
 
                 <div class="form-grid">
 
-
                     <!-- Academic Year -->
 
                     <div class="form-group">
@@ -99,6 +98,10 @@
                         <select
                             id="academicYear"
                             required>
+
+                            <option value="">
+                                Select Academic Year
+                            </option>
 
                         </select>
 
@@ -245,7 +248,7 @@
                         <input
                             type="number"
                             id="amount"
-                            min="0"
+                            min="0.01"
                             step="0.01"
                             placeholder="Enter amount"
                             required>
@@ -281,7 +284,7 @@
                             type="text"
                             id="receiptNumber"
                             readonly
-                            placeholder="Automatically generated">
+                            placeholder="Generated after payment">
 
                     </div>
 
@@ -297,8 +300,8 @@
                         <input
                             type="text"
                             id="recordedBy"
-                            placeholder="Current user"
-                            required>
+                            readonly
+                            placeholder="Current user">
 
                     </div>
 
@@ -314,8 +317,7 @@
                         <textarea
                             id="notes"
                             rows="4"
-                            placeholder="Optional notes">
-                        </textarea>
+                            placeholder="Optional notes"></textarea>
 
                     </div>
 
@@ -353,6 +355,7 @@
 
                     <button
                         type="submit"
+                        id="recordPaymentButton"
                         class="btn btn-primary">
                         Record Payment
                     </button>
@@ -364,6 +367,7 @@
         </section>
 
     </div>
+
 
     <script src="js/auth.js"></script>
     <script src="js/school-record-payment.js"></script>
