@@ -13,26 +13,147 @@ const API_URL =
 
 
 /* =================================
+   State
+   ================================= */
+
+let currentUser = null;
+let institutionId = null;
+let institution = null;
+let students = [];
+let pageInitialized = false;
+
+
+/* =================================
    Authentication
    ================================= */
 
-const currentUser =
-    requireSchoolLogin();
+function initializeAuthentication() {
 
-if (!currentUser) {
-    throw new Error(
-        "School login required."
+    try {
+
+        if (
+            typeof requireSchoolLogin ===
+            "function"
+        ) {
+
+            currentUser =
+                requireSchoolLogin();
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Authentication error:",
+            error
+        );
+
+    }
+
+
+    /*
+       If authentication helper did not
+       return the user, try localStorage.
+    */
+
+    if (!currentUser) {
+
+        try {
+
+            currentUser =
+                JSON.parse(
+                    localStorage.getItem(
+                        "bmpCurrentUser"
+                    ) || "null"
+                );
+
+        } catch (error) {
+
+            console.error(
+                "Invalid stored user:",
+                error
+            );
+
+            currentUser = null;
+
+        }
+
+    }
+
+
+    if (!currentUser) {
+
+        return false;
+
+    }
+
+
+    /* =================================
+       Institution ID
+       ================================= */
+
+    try {
+
+        if (
+            typeof getActiveInstitutionId ===
+            "function"
+        ) {
+
+            institutionId =
+                getActiveInstitutionId();
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Institution helper error:",
+            error
+        );
+
+    }
+
+
+    /*
+       Fallback to URL.
+    */
+
+    if (!institutionId) {
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        institutionId =
+            params.get(
+                "institutionId"
+            ) ||
+            params.get(
+                "id"
+            );
+
+    }
+
+
+    /*
+       Final fallback to logged-in user.
+    */
+
+    if (!institutionId) {
+
+        institutionId =
+            currentUser.institutionId ||
+            null;
+
+    }
+
+
+    return Boolean(
+        institutionId
     );
-}
 
-
-const institutionId =
-    getActiveInstitutionId();
-
-if (!institutionId) {
-    throw new Error(
-        "Institution access denied."
-    );
 }
 
 
@@ -45,20 +166,44 @@ async function apiRequest(
     data = {}
 ) {
 
-    const payload = {
-        action: action,
-        institutionId: institutionId,
-        username:
+    if (!institutionId) {
+
+        throw new Error(
+            "Institution ID is missing."
+        );
+
+    }
+
+
+    const username =
+        currentUser &&
+        (
             currentUser.username ||
             currentUser.userName ||
-            currentUser.name ||
-            ""
+            currentUser.name
+        )
+        || "";
+
+
+    const payload = {
+
+        action:
+            action,
+
+        institutionId:
+            institutionId,
+
+        username:
+            username
+
     };
+
 
     Object.assign(
         payload,
         data
     );
+
 
     const response =
         await fetch(
@@ -78,6 +223,7 @@ async function apiRequest(
             }
         );
 
+
     if (!response.ok) {
 
         throw new Error(
@@ -86,8 +232,10 @@ async function apiRequest(
 
     }
 
+
     const result =
         await response.json();
+
 
     if (!result.success) {
 
@@ -98,17 +246,10 @@ async function apiRequest(
 
     }
 
+
     return result;
 
 }
-
-
-/* =================================
-   State
-   ================================= */
-
-let institution = null;
-let students = [];
 
 
 /* =================================
@@ -116,12 +257,6 @@ let students = [];
    ================================= */
 
 function loadInstitution() {
-
-    /*
-       The school login/session already
-       contains the institution information
-       in the current authentication system.
-    */
 
     institution = {
 
@@ -131,7 +266,7 @@ function loadInstitution() {
         name:
             currentUser.institutionName ||
             currentUser.schoolName ||
-            currentUser.name ||
+            currentUser.institution ||
             institutionId
 
     };
@@ -141,6 +276,7 @@ function loadInstitution() {
         document.getElementById(
             "institutionId"
         );
+
 
     const institutionNameElement =
         document.getElementById(
@@ -178,19 +314,23 @@ function getCurrentAcademicYear() {
     const now =
         new Date();
 
+
     let year =
         now.getFullYear();
 
+
     /*
-       School year:
        October → June
     */
 
-    if (now.getMonth() < 9) {
+    if (
+        now.getMonth() < 9
+    ) {
 
         year--;
 
     }
+
 
     return `${year}-${year + 1}`;
 
@@ -211,7 +351,9 @@ function getAvailableAcademicYears() {
             ) {
 
                 years.add(
-                    student.academicYear
+                    String(
+                        student.academicYear
+                    )
                 );
 
             }
@@ -219,11 +361,6 @@ function getAvailableAcademicYears() {
         }
     );
 
-
-    /*
-       Always include the current
-       academic year.
-    */
 
     years.add(
         getCurrentAcademicYear()
@@ -243,6 +380,7 @@ function loadAcademicYears() {
         document.getElementById(
             "academicYear"
         );
+
 
     if (!select) {
         return;
@@ -268,11 +406,14 @@ function loadAcademicYears() {
                     "option"
                 );
 
+
             option.value =
                 year;
 
+
             option.textContent =
                 year;
+
 
             select.appendChild(
                 option
@@ -322,17 +463,16 @@ async function loadStudentsFromBackend() {
                 : [];
 
 
-        /*
-           Keep only students belonging
-           to the current institution.
-        */
-
         students =
             students.filter(
                 student =>
                     !student.institutionId ||
-                    student.institutionId ===
-                    institutionId
+                    String(
+                        student.institutionId
+                    ) ===
+                    String(
+                        institutionId
+                    )
             );
 
 
@@ -345,14 +485,27 @@ async function loadStudentsFromBackend() {
             error
         );
 
+
         showError(
             error.message ||
             "Failed to load students."
         );
 
+
         return false;
 
     }
+
+}
+
+
+function getStudentId(student) {
+
+    return String(
+        student.studentId ||
+        student.id ||
+        ""
+    );
 
 }
 
@@ -362,8 +515,12 @@ function getInstitutionStudents() {
     return students.filter(
         student =>
             !student.institutionId ||
-            student.institutionId ===
-            institutionId
+            String(
+                student.institutionId
+            ) ===
+            String(
+                institutionId
+            )
     );
 
 }
@@ -376,32 +533,46 @@ function loadStudents() {
             "student"
         );
 
+
     if (!select) {
         return;
     }
 
 
-    const academicYear =
+    const academicYearElement =
         document.getElementById(
             "academicYear"
-        ).value;
+        );
+
+
+    const academicYear =
+        academicYearElement
+            ? academicYearElement.value
+            : "";
 
 
     const filteredStudents =
         getInstitutionStudents()
             .filter(
                 student =>
-                    student.academicYear ===
-                    academicYear
+                    String(
+                        student.academicYear ||
+                        ""
+                    ) ===
+                    String(
+                        academicYear
+                    )
             )
             .sort(
                 (a, b) =>
-                    (
+                    String(
                         a.studentNumber ||
                         ""
                     ).localeCompare(
-                        b.studentNumber ||
-                        "",
+                        String(
+                            b.studentNumber ||
+                            ""
+                        ),
                         undefined,
                         {
                             numeric: true
@@ -427,7 +598,9 @@ function loadStudents() {
 
 
             option.value =
-                student.id;
+                getStudentId(
+                    student
+                );
 
 
             option.textContent =
@@ -458,10 +631,12 @@ function clearStudentInformation() {
             "studentNumber"
         );
 
+
     const stage =
         document.getElementById(
             "stage"
         );
+
 
     const className =
         document.getElementById(
@@ -497,10 +672,22 @@ function clearStudentInformation() {
 
 function loadStudentInformation() {
 
-    const studentId =
+    const studentElement =
         document.getElementById(
             "student"
-        ).value;
+        );
+
+
+    if (!studentElement) {
+        return;
+    }
+
+
+    const studentId =
+        String(
+            studentElement.value ||
+            ""
+        );
 
 
     if (!studentId) {
@@ -512,20 +699,32 @@ function loadStudentInformation() {
     }
 
 
-    const academicYear =
+    const academicYearElement =
         document.getElementById(
             "academicYear"
-        ).value;
+        );
+
+
+    const academicYear =
+        academicYearElement
+            ? academicYearElement.value
+            : "";
 
 
     const student =
         students.find(
             item =>
-                item.id ===
+
+                getStudentId(item) ===
                     studentId &&
 
-                item.academicYear ===
-                    academicYear
+                String(
+                    item.academicYear ||
+                    ""
+                ) ===
+                    String(
+                        academicYear
+                    )
         );
 
 
@@ -538,26 +737,52 @@ function loadStudentInformation() {
     }
 
 
-    document.getElementById(
-        "studentNumber"
-    ).value =
-        student.studentNumber || "";
-
-
-    document.getElementById(
-        "stage"
-    ).value =
-        formatStage(
-            student.stage
+    const studentNumber =
+        document.getElementById(
+            "studentNumber"
         );
 
 
-    document.getElementById(
-        "className"
-    ).value =
-        student.className ||
-        student.classNumber ||
-        "";
+    const stage =
+        document.getElementById(
+            "stage"
+        );
+
+
+    const className =
+        document.getElementById(
+            "className"
+        );
+
+
+    if (studentNumber) {
+
+        studentNumber.value =
+            student.studentNumber ||
+            "";
+
+    }
+
+
+    if (stage) {
+
+        stage.value =
+            formatStage(
+                student.stage
+            );
+
+    }
+
+
+    if (className) {
+
+        className.value =
+            student.className ||
+            student.class ||
+            student.classNumber ||
+            "";
+
+    }
 
 }
 
@@ -589,7 +814,11 @@ function formatStage(stage) {
     };
 
 
-    return stages[stage] ||
+    return stages[
+        String(stage)
+            .trim()
+            .toLowerCase()
+    ] ||
         stage;
 
 }
@@ -599,7 +828,7 @@ function formatStage(stage) {
    Current User
    ================================= */
 
-function getCurrentUser() {
+function getCurrentUsername() {
 
     if (
         currentUser &&
@@ -647,7 +876,7 @@ function loadCurrentUser() {
     if (recordedBy) {
 
         recordedBy.value =
-            getCurrentUser();
+            getCurrentUsername();
 
     }
 
@@ -673,16 +902,6 @@ function setReceiptNumber(
     }
 
 
-    /*
-       The backend is now responsible
-       for generating the real receipt
-       number.
-
-       Before saving, display a temporary
-       message instead of generating a
-       potentially conflicting number.
-    */
-
     element.value =
         receiptNumber ||
         "Generated after saving";
@@ -691,7 +910,7 @@ function setReceiptNumber(
 
 
 /* =================================
-   Error / Success
+   Messages
    ================================= */
 
 function showError(message) {
@@ -700,6 +919,7 @@ function showError(message) {
         document.getElementById(
             "errorMessage"
         );
+
 
     const success =
         document.getElementById(
@@ -734,6 +954,7 @@ function showSuccess(message) {
         document.getElementById(
             "errorMessage"
         );
+
 
     const success =
         document.getElementById(
@@ -815,9 +1036,9 @@ async function savePayment(event) {
             : "";
 
 
-    /* =============================
+    /* =================================
        Validation
-       ============================= */
+       ================================= */
 
     if (!academicYear) {
 
@@ -877,18 +1098,22 @@ async function savePayment(event) {
     }
 
 
-    /* =============================
-       Find Student
-       ============================= */
-
     const student =
         students.find(
             item =>
-                item.id ===
-                    studentId &&
 
-                item.academicYear ===
-                    academicYear
+                getStudentId(item) ===
+                    String(
+                        studentId
+                    ) &&
+
+                String(
+                    item.academicYear ||
+                    ""
+                ) ===
+                    String(
+                        academicYear
+                    )
         );
 
 
@@ -903,9 +1128,9 @@ async function savePayment(event) {
     }
 
 
-    /* =============================
+    /* =================================
        Disable Button
-       ============================= */
+       ================================= */
 
     const button =
         document.getElementById(
@@ -926,9 +1151,9 @@ async function savePayment(event) {
 
     try {
 
-        /* =============================
+        /* =================================
            Send To Backend
-           ============================= */
+           ================================= */
 
         const result =
             await apiRequest(
@@ -957,9 +1182,9 @@ async function savePayment(event) {
             );
 
 
-        /* =============================
+        /* =================================
            Backend Response
-           ============================= */
+           ================================= */
 
         const payment =
             result.payment ||
@@ -981,18 +1206,14 @@ async function savePayment(event) {
         }
 
 
-        /* =============================
-           Success
-           ============================= */
-
         showSuccess(
             `Payment recorded successfully.${receiptNumber ? ` Receipt: ${receiptNumber}` : ""}`
         );
 
 
         /*
-           Give the user enough time to
-           see the success message.
+           Return to the payments page
+           after successful recording.
         */
 
         setTimeout(
@@ -1043,6 +1264,16 @@ async function savePayment(event) {
 
 function goBack() {
 
+    if (!institutionId) {
+
+        window.location.href =
+            "school-payments.html";
+
+        return;
+
+    }
+
+
     window.location.href =
         `school-payments.html?id=${encodeURIComponent(
             institutionId
@@ -1053,98 +1284,91 @@ function goBack() {
 
 function goToPayments() {
 
-    window.location.href =
-        `school-payments.html?id=${encodeURIComponent(
-            institutionId
-        )}`;
+    goBack();
 
 }
 
 
 /* =================================
-   Events
+   Event Listeners
    ================================= */
 
-const academicYearElement =
-    document.getElementById(
-        "academicYear"
-    );
+function setupEventListeners() {
+
+    const academicYearElement =
+        document.getElementById(
+            "academicYear"
+        );
 
 
-if (academicYearElement) {
+    if (academicYearElement) {
 
-    academicYearElement.addEventListener(
-        "change",
-        () => {
+        academicYearElement.addEventListener(
+            "change",
+            loadStudents
+        );
 
-            loadStudents();
-
-        }
-    );
-
-}
+    }
 
 
-const studentElement =
-    document.getElementById(
-        "student"
-    );
+    const studentElement =
+        document.getElementById(
+            "student"
+        );
 
 
-if (studentElement) {
+    if (studentElement) {
 
-    studentElement.addEventListener(
-        "change",
-        loadStudentInformation
-    );
+        studentElement.addEventListener(
+            "change",
+            loadStudentInformation
+        );
 
-}
-
-
-const paymentForm =
-    document.getElementById(
-        "paymentForm"
-    );
+    }
 
 
-if (paymentForm) {
-
-    paymentForm.addEventListener(
-        "submit",
-        savePayment
-    );
-
-}
+    const paymentForm =
+        document.getElementById(
+            "paymentForm"
+        );
 
 
-const backButton =
-    document.getElementById(
-        "backButton"
-    );
+    if (paymentForm) {
+
+        paymentForm.addEventListener(
+            "submit",
+            savePayment
+        );
+
+    }
 
 
-if (backButton) {
-
-    backButton.addEventListener(
-        "click",
-        goBack
-    );
-
-}
+    const backButton =
+        document.getElementById(
+            "backButton"
+        );
 
 
-const cancelButton =
-    document.getElementById(
-        "cancelButton"
-    );
+    if (backButton) {
+
+        backButton.onclick =
+            goBack;
+
+    }
 
 
-if (cancelButton) {
+    const cancelButton =
+        document.getElementById(
+            "cancelButton"
+        );
 
-    cancelButton.addEventListener(
-        "click",
-        goBack
-    );
+
+    if (cancelButton) {
+
+        cancelButton.onclick =
+            goBack;
+
+    }
 
 }
 
@@ -1155,9 +1379,33 @@ if (cancelButton) {
 
 async function initializePage() {
 
+    if (pageInitialized) {
+        return;
+    }
+
+
+    pageInitialized =
+        true;
+
+
+    const authenticated =
+        initializeAuthentication();
+
+
+    if (!authenticated) {
+
+        console.error(
+            "School authentication failed."
+        );
+
+        return;
+
+    }
+
+
     if (!institutionId) {
 
-        alert(
+        showError(
             "Institution ID is missing."
         );
 
@@ -1166,34 +1414,29 @@ async function initializePage() {
     }
 
 
-    const institutionLoaded =
-        loadInstitution();
-
-
-    if (!institutionLoaded) {
-
-        return;
-
-    }
-
+    loadInstitution();
 
     loadCurrentUser();
 
 
-    document.getElementById(
-        "paymentDate"
-    ).value =
-        new Date()
-            .toISOString()
-            .split("T")[0];
+    const paymentDate =
+        document.getElementById(
+            "paymentDate"
+        );
+
+
+    if (paymentDate) {
+
+        paymentDate.value =
+            new Date()
+                .toISOString()
+                .split("T")[0];
+
+    }
 
 
     setReceiptNumber();
 
-
-    /*
-       Load students from Google Sheets.
-    */
 
     const loaded =
         await loadStudentsFromBackend();
@@ -1206,18 +1449,7 @@ async function initializePage() {
     }
 
 
-    /*
-       Build academic year list
-       from the backend students.
-    */
-
     loadAcademicYears();
-
-
-    /*
-       Load students for the
-       selected academic year.
-    */
 
     loadStudents();
 
@@ -1228,4 +1460,13 @@ async function initializePage() {
    Start
    ================================= */
 
-initializePage();
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        setupEventListeners();
+
+        initializePage();
+
+    }
+);
