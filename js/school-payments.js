@@ -44,7 +44,9 @@ let allPayments = [];
    ================================= */
 
 function getElement(id) {
+
     return document.getElementById(id);
+
 }
 
 
@@ -115,6 +117,7 @@ async function apiRequest(action, data = {}) {
 
 
     return result;
+
 }
 
 
@@ -125,15 +128,11 @@ async function apiRequest(action, data = {}) {
 function loadInstitution() {
 
     const institutionNameElement =
-        getElement(
-            "institutionName"
-        );
+        getElement("institutionName");
 
 
     const institutionIdElement =
-        getElement(
-            "institutionId"
-        );
+        getElement("institutionId");
 
 
     if (institutionIdElement) {
@@ -186,15 +185,14 @@ function getCurrentAcademicYear() {
 
 
     return `${year}-${year + 1}`;
+
 }
 
 
 function loadAcademicYearFilter() {
 
     const select =
-        getElement(
-            "academicYear"
-        );
+        getElement("academicYear");
 
 
     if (!select) {
@@ -203,8 +201,8 @@ function loadAcademicYearFilter() {
 
 
     /*
-       Keep the first option
-       ("All Academic Years").
+       Keep the first option:
+       All
     */
 
     while (
@@ -280,9 +278,7 @@ function loadAcademicYearFilter() {
 
 
     if (
-        years.has(
-            currentYear
-        )
+        years.has(currentYear)
     ) {
 
         select.value =
@@ -728,11 +724,6 @@ function renderPayments() {
             `;
 
 
-            /*
-               Click row to view
-               payment details.
-            */
-
             row.style.cursor =
                 "pointer";
 
@@ -769,12 +760,6 @@ function getMonthDisplayName(month) {
         return "-";
     }
 
-
-    /*
-       English display.
-       The backend/payment values
-       remain unchanged.
-    */
 
     const months = {
 
@@ -833,7 +818,9 @@ function formatDate(date) {
     }
 
 
-    return parsed.toLocaleDateString();
+    return parsed.toLocaleDateString(
+        "en-US"
+    );
 
 }
 
@@ -907,34 +894,56 @@ function showPaymentDetails(
     content.innerHTML = `
 
         <div class="payment-detail-row">
-            <strong>Student Number</strong>
+
+            <strong>
+                Student Number
+            </strong>
+
             <span>
                 ${escapeHtml(
                     payment.studentNumber || "-"
                 )}
             </span>
+
         </div>
 
+
         <div class="payment-detail-row">
-            <strong>Student Name</strong>
+
+            <strong>
+                Student Name
+            </strong>
+
             <span>
                 ${escapeHtml(
                     payment.studentName || "-"
                 )}
             </span>
+
         </div>
 
+
         <div class="payment-detail-row">
-            <strong>Academic Year</strong>
+
+            <strong>
+                Academic Year
+            </strong>
+
             <span>
                 ${escapeHtml(
                     payment.academicYear || "-"
                 )}
             </span>
+
         </div>
 
+
         <div class="payment-detail-row">
-            <strong>Month</strong>
+
+            <strong>
+                Month
+            </strong>
+
             <span>
                 ${escapeHtml(
                     getMonthDisplayName(
@@ -942,19 +951,31 @@ function showPaymentDetails(
                     )
                 )}
             </span>
+
         </div>
 
+
         <div class="payment-detail-row">
-            <strong>Amount</strong>
+
+            <strong>
+                Amount
+            </strong>
+
             <span>
                 ${Number(
                     payment.amount || 0
                 ).toLocaleString()}
             </span>
+
         </div>
 
+
         <div class="payment-detail-row">
-            <strong>Payment Date</strong>
+
+            <strong>
+                Payment Date
+            </strong>
+
             <span>
                 ${escapeHtml(
                     formatDate(
@@ -963,26 +984,39 @@ function showPaymentDetails(
                     )
                 )}
             </span>
+
         </div>
 
+
         <div class="payment-detail-row">
-            <strong>Receipt Number</strong>
+
+            <strong>
+                Receipt Number
+            </strong>
+
             <span>
                 ${escapeHtml(
                     payment.receiptNumber ||
                     "-"
                 )}
             </span>
+
         </div>
 
+
         <div class="payment-detail-row">
-            <strong>Recorded By</strong>
+
+            <strong>
+                Recorded By
+            </strong>
+
             <span>
                 ${escapeHtml(
                     payment.recordedBy ||
                     "-"
                 )}
             </span>
+
         </div>
 
     `;
@@ -1259,12 +1293,35 @@ function goBack() {
 }
 
 
+/*
+   Record Payment Page
+
+   This function is intentionally kept
+   as a global function because the HTML
+   button calls it directly.
+*/
+
 function goToRecordPayment() {
 
-    window.location.href =
+    if (!institutionId) {
+
+        console.error(
+            "Institution ID is missing."
+        );
+
+        return;
+
+    }
+
+
+    const targetUrl =
         `school-record-payment.html?id=${encodeURIComponent(
             institutionId
         )}`;
+
+
+    window.location.href =
+        targetUrl;
 
 }
 
@@ -1316,12 +1373,6 @@ function setupEventListeners() {
             "retryBtn"
         );
 
-
-    /*
-       IMPORTANT:
-       Record Payment button.
-       We use an ID instead of inline onclick.
-    */
 
     const recordPaymentPageBtn =
         getElement(
@@ -1415,6 +1466,12 @@ function setupEventListeners() {
 
     /*
        Record Payment
+
+       HTML already has onclick as the
+       primary navigation method.
+
+       This event listener is kept as
+       an additional backup.
     */
 
     if (recordPaymentPageBtn) {
@@ -1436,8 +1493,7 @@ function setupEventListeners() {
         event => {
 
             if (
-                event.key ===
-                "Escape"
+                event.key === "Escape"
             ) {
 
                 closePaymentDetails();
