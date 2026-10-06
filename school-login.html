@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>School Login - BMP</title>
+    <title>BMP - School Login</title>
 
     <link
         rel="stylesheet"
@@ -18,13 +18,31 @@
 
         <div class="login-card">
 
+            <!-- Language Selector -->
+            <div class="language-selector">
+
+                <label for="languageSelect" data-i18n="language">
+                    Language
+                </label>
+
+                <select id="languageSelect">
+                    <option value="en">English</option>
+                    <option value="ar">العربية</option>
+                    <option value="fr">Français</option>
+                </select>
+
+            </div>
+
+
             <div class="login-header">
 
                 <h1>BMP</h1>
 
-                <h2>School Login</h2>
+                <h2 data-i18n="schoolLogin">
+                    School Login
+                </h2>
 
-                <p>
+                <p data-i18n="loginDescription">
                     Sign in to your school account.
                 </p>
 
@@ -35,13 +53,16 @@
 
                 <div class="form-group">
 
-                    <label for="username">
+                    <label
+                        for="username"
+                        data-i18n="username">
                         Username
                     </label>
 
                     <input
                         type="text"
                         id="username"
+                        data-i18n-placeholder="usernamePlaceholder"
                         placeholder="Enter username"
                         autocomplete="username"
                         required>
@@ -51,13 +72,16 @@
 
                 <div class="form-group">
 
-                    <label for="password">
+                    <label
+                        for="password"
+                        data-i18n="password">
                         Password
                     </label>
 
                     <input
                         type="password"
                         id="password"
+                        data-i18n-placeholder="passwordPlaceholder"
                         placeholder="Enter password"
                         autocomplete="current-password"
                         required>
@@ -68,7 +92,8 @@
                 <button
                     type="submit"
                     id="loginButton"
-                    class="btn btn-primary">
+                    class="btn btn-primary"
+                    data-i18n="login">
 
                     Login
 
