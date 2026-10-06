@@ -1,110 +1,190 @@
 // =====================================================
-// Check Admin Session
+// BMP Add Institution User
+// Google Sheets / Apps Script Version
 // =====================================================
 
-const currentAdmin =
-    requireAdminLogin();
 
-if (!currentAdmin) {
-    throw new Error("Admin login required.");
+// =====================================================
+// API
+// =====================================================
+
+const API_URL =
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+
+
+// =====================================================
+// Check School Session
+// =====================================================
+
+const currentUser =
+    requireSchoolLogin();
+
+if (!currentUser) {
+    throw new Error(
+        "School login required."
+    );
 }
 
 
-// Get institutions
-const institutions =
-    JSON.parse(
-        localStorage.getItem("bmpInstitutions")
-    ) || [];
-
-
-// Get institution ID from URL
-const urlParams =
-    new URLSearchParams(
-        window.location.search
-    );
+// =====================================================
+// Institution
+// =====================================================
 
 const institutionId =
-    urlParams.get("id");
+    getActiveInstitutionId();
 
-
-// Find institution
-const institution =
-    institutions.find(
-        item => item.id === institutionId
+if (!institutionId) {
+    throw new Error(
+        "Institution access denied."
     );
+}
 
 
-// Elements
-const institutionIdElement =
-    document.getElementById("institutionId");
+// =====================================================
+// Only Director Can Add Users
+// =====================================================
 
-const institutionNameElement =
-    document.getElementById("institutionName");
+if (
+    String(currentUser.role || "")
+        .trim()
+        .toLowerCase() !== "director"
+) {
 
-const institutionTypeElement =
-    document.getElementById("institutionType");
-
-const addUserForm =
-    document.getElementById("addUserForm");
-
-const usernameInput =
-    document.getElementById("username");
-
-const passwordInput =
-    document.getElementById("password");
-
-const backButton =
-    document.getElementById("backButton");
-
-const cancelButton =
-    document.getElementById("cancelButton");
-
-
-// Check institution
-if (!institution) {
-
-    alert("Institution not found.");
+    alert(
+        "Only the Director can add users."
+    );
 
     window.location.href =
-        "institutions.html";
+        `school.html?id=${encodeURIComponent(
+            institutionId
+        )}`;
 
-} else {
-
-    // Display institution information
-
-    institutionIdElement.textContent =
-        institution.id || "-";
-
-    institutionNameElement.textContent =
-        institution.name || "-";
-
-    institutionTypeElement.textContent =
-        institution.type === "school"
-            ? "School"
-            : "Restaurant";
-}
-
-
-// Get users
-function getUsers() {
-
-    return JSON.parse(
-        localStorage.getItem("bmpUsers")
-    ) || [];
-}
-
-
-// Save users
-function saveUsers(users) {
-
-    localStorage.setItem(
-        "bmpUsers",
-        JSON.stringify(users)
+    throw new Error(
+        "Director access required."
     );
 }
 
 
-// Back button
+// =====================================================
+// Elements
+// =====================================================
+
+const institutionIdElement =
+    document.getElementById(
+        "institutionId"
+    );
+
+const institutionNameElement =
+    document.getElementById(
+        "institutionName"
+    );
+
+const institutionTypeElement =
+    document.getElementById(
+        "institutionType"
+    );
+
+const addUserForm =
+    document.getElementById(
+        "addUserForm"
+    );
+
+const usernameInput =
+    document.getElementById(
+        "username"
+    );
+
+const passwordInput =
+    document.getElementById(
+        "password"
+    );
+
+const backButton =
+    document.getElementById(
+        "backButton"
+    );
+
+const cancelButton =
+    document.getElementById(
+        "cancelButton"
+    );
+
+
+// =====================================================
+// Display Institution Information
+// =====================================================
+
+institutionIdElement.textContent =
+    institutionId || "-";
+
+
+institutionNameElement.textContent =
+    currentUser.institutionName || "-";
+
+
+institutionTypeElement.textContent =
+    "School";
+
+
+// =====================================================
+// API Request
+// =====================================================
+
+async function apiRequest(
+    payload
+) {
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+        }
+
+
+        const result =
+            await response.json();
+
+
+        return result;
+
+    } catch (error) {
+
+        console.error(
+            "API Error:",
+            error
+        );
+
+        throw error;
+    }
+}
+
+
+// =====================================================
+// Back Button
+// =====================================================
+
 backButton.addEventListener(
     "click",
     function () {
@@ -117,7 +197,10 @@ backButton.addEventListener(
 );
 
 
-// Cancel button
+// =====================================================
+// Cancel Button
+// =====================================================
+
 cancelButton.addEventListener(
     "click",
     function () {
@@ -130,10 +213,13 @@ cancelButton.addEventListener(
 );
 
 
-// Create user
+// =====================================================
+// Create User
+// =====================================================
+
 addUserForm.addEventListener(
     "submit",
-    function (event) {
+    async function (event) {
 
         event.preventDefault();
 
@@ -141,11 +227,15 @@ addUserForm.addEventListener(
         const username =
             usernameInput.value.trim();
 
+
         const password =
             passwordInput.value;
 
 
-        // Validate username
+        // =================================================
+        // Validate Username
+        // =================================================
+
         if (!username) {
 
             alert(
@@ -158,7 +248,10 @@ addUserForm.addEventListener(
         }
 
 
-        // Validate password
+        // =================================================
+        // Validate Password
+        // =================================================
+
         if (!password) {
 
             alert(
@@ -171,24 +264,16 @@ addUserForm.addEventListener(
         }
 
 
-        // Get existing users
-        const users =
-            getUsers();
+        // =================================================
+        // Basic Username Validation
+        // =================================================
 
-
-        // Check duplicate username
-        const usernameExists =
-            users.some(
-                user =>
-                    user.username.toLowerCase() ===
-                    username.toLowerCase()
-            );
-
-
-        if (usernameExists) {
+        if (
+            username.length < 3
+        ) {
 
             alert(
-                "This username is already in use."
+                "Username must contain at least 3 characters."
             );
 
             usernameInput.focus();
@@ -197,109 +282,133 @@ addUserForm.addEventListener(
         }
 
 
-        // Create new user
-        const newUser = {
+        // =================================================
+        // Basic Password Validation
+        // =================================================
 
-            id:
-                "USR-" +
-                Date.now(),
-
-            institutionId:
-                institutionId,
-
-            username:
-                username,
-
-            password:
-                password,
-
-            role:
-                "user",
-
-            status:
-                "active",
-
-            isMainUser:
-                false,
-
-            createdAt:
-                new Date().toISOString(),
-
-            permissions: {
-
-                // Full operational access
-                students:
-                    true,
-
-                payments:
-                    true,
-
-                reports:
-                    true,
-
-                receipts:
-                    true,
-
-                transactions:
-                    true,
-
-                // User management is Director/Manager only
-                manageUsers:
-                    false
-            }
-        };
-
-
-        // Add user
-        users.push(
-            newUser
-        );
-
-
-        // Save users
-        saveUsers(
-            users
-        );
-
-
-        // Activity Log
         if (
-            typeof logActivity ===
-            "function"
+            password.length < 4
         ) {
 
-            logActivity({
+            alert(
+                "Password must contain at least 4 characters."
+            );
 
-                institutionId:
-                    institutionId,
+            passwordInput.focus();
 
-                userId:
-                    "ADMIN",
-
-                username:
-                    "Admin",
-
-                role:
-                    "Admin",
-
-                action:
-                    "Created User",
-
-                details:
-                    `Created user "${newUser.username}" for institution "${institution.name}"`
-            });
+            return;
         }
 
 
-        alert(
-            "User created successfully."
-        );
+        // =================================================
+        // Disable Form
+        // =================================================
+
+        const submitButton =
+            addUserForm.querySelector(
+                'button[type="submit"]'
+            );
 
 
-        // Return to users page
-        window.location.href =
-            `users.html?id=${encodeURIComponent(
-                institutionId
-            )}`;
+        const originalText =
+            submitButton
+                ? submitButton.textContent
+                : "";
+
+
+        if (submitButton) {
+
+            submitButton.disabled =
+                true;
+
+            submitButton.textContent =
+                "Creating...";
+        }
+
+
+        try {
+
+            // =============================================
+            // Send to Google Apps Script
+            // =============================================
+
+            const result =
+                await apiRequest({
+
+                    action:
+                        "addUser",
+
+                    // Director performing the action
+                    institutionId:
+                        institutionId,
+
+                    username:
+                        currentUser.username,
+
+                    // New user's credentials
+                    newUsername:
+                        username,
+
+                    newPassword:
+                        password
+                });
+
+
+            // =============================================
+            // Backend Error
+            // =============================================
+
+            if (!result.success) {
+
+                throw new Error(
+                    result.message ||
+                    "Failed to create user."
+                );
+            }
+
+
+            // =============================================
+            // Success
+            // =============================================
+
+            alert(
+                "User created successfully."
+            );
+
+
+            // =============================================
+            // Return to Users Page
+            // =============================================
+
+            window.location.href =
+                `users.html?id=${encodeURIComponent(
+                    institutionId
+                )}`;
+
+
+        } catch (error) {
+
+            console.error(
+                "Create User Error:",
+                error
+            );
+
+
+            alert(
+                error.message ||
+                "Failed to create user."
+            );
+
+
+            // Restore button
+            if (submitButton) {
+
+                submitButton.disabled =
+                    false;
+
+                submitButton.textContent =
+                    originalText;
+            }
+        }
     }
 );
