@@ -1,4 +1,12 @@
 // =====================================================
+// Configuration
+// =====================================================
+
+const ADD_STUDENT_API_URL =
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+
+
+// =====================================================
 // Authentication
 // =====================================================
 
@@ -8,6 +16,7 @@ if (!currentUser) {
     throw new Error("School login required.");
 }
 
+
 const institutionId =
     getActiveInstitutionId();
 
@@ -16,24 +25,45 @@ if (!institutionId) {
 }
 
 
-/* Get institutions */
+// =====================================================
+// Institution
+// =====================================================
 
-const institutions =
-    JSON.parse(
-        localStorage.getItem(
-            "bmpInstitutions"
-        )
-    ) || [];
+const institution = {
+
+    id:
+        currentUser.institutionId || institutionId,
+
+    type:
+        currentUser.institutionType || "",
+
+    name:
+        currentUser.institutionName || "",
+
+    phone:
+        currentUser.institutionPhone || "",
+
+    email:
+        currentUser.institutionEmail || "",
+
+    licenseStart:
+        currentUser.licenseStart || "",
+
+    licenseEnd:
+        currentUser.licenseEnd || "",
+
+    status:
+        "active",
+
+    sheetId:
+        currentUser.sheetId || ""
+
+};
 
 
-const institution =
-    institutions.find(
-        item =>
-            item.id === institutionId
-    );
-
-
-/* Elements */
+// =====================================================
+// Elements
+// =====================================================
 
 const institutionIdElement =
     document.getElementById(
@@ -90,26 +120,557 @@ const cancelButton =
         "cancelButton"
     );
 
+const languageSelect =
+    document.getElementById(
+        "languageSelect"
+    );
 
-/* Check institution */
 
-if (!institution) {
+// =====================================================
+// Translations
+// =====================================================
+
+const translations = {
+
+    en: {
+
+        addStudent:
+            "Add Student",
+
+        registerNewStudent:
+            "Register a new student",
+
+        language:
+            "Language",
+
+        back:
+            "Back",
+
+        schoolInformation:
+            "School Information",
+
+        institutionId:
+            "Institution ID",
+
+        schoolName:
+            "School Name",
+
+        studentInformation:
+            "Student Information",
+
+        academicYear:
+            "Academic Year",
+
+        selectAcademicYear:
+            "Select academic year",
+
+        academicYearHelp:
+            "The student number is generated separately for each academic year.",
+
+        studentNumber:
+            "Student Number",
+
+        studentNumberPlaceholder:
+            "Select academic year, stage and class",
+
+        studentNumberHelp:
+            "Automatically generated according to the academic year, stage, class and registration order.",
+
+        studentName:
+            "Student Name",
+
+        studentNamePlaceholder:
+            "Enter student name",
+
+        stage:
+            "Stage",
+
+        selectStage:
+            "Select stage",
+
+        primary:
+            "Primary",
+
+        preparatory:
+            "Preparatory",
+
+        secondary:
+            "Secondary",
+
+        class:
+            "Class",
+
+        selectClass:
+            "Select class",
+
+        registrationDate:
+            "Registration Date",
+
+        cancel:
+            "Cancel",
+
+        registerStudent:
+            "Register Student",
+
+        classLabel:
+            "Class",
+
+        selectYear:
+            "Please select the academic year.",
+
+        enterName:
+            "Please enter the student name.",
+
+        selectStageError:
+            "Please select the stage.",
+
+        selectClassError:
+            "Please select the class.",
+
+        selectDate:
+            "Please select the registration date.",
+
+        generating:
+            "Generating...",
+
+        registering:
+            "Registering student...",
+
+        success:
+            "Student registered successfully.",
+
+        studentNumberMessage:
+            "Student Number",
+
+        academicYearMessage:
+            "Academic Year",
+
+        schoolNotFound:
+            "School not found.",
+
+        unableGenerate:
+            "Unable to generate the student number.",
+
+        unableConnect:
+            "Unable to connect to server.",
+
+        registrationFailed:
+            "Student registration failed."
+
+    },
+
+
+    ar: {
+
+        addStudent:
+            "إضافة طالب",
+
+        registerNewStudent:
+            "تسجيل طالب جديد",
+
+        language:
+            "اللغة",
+
+        back:
+            "رجوع",
+
+        schoolInformation:
+            "معلومات المؤسسة",
+
+        institutionId:
+            "رقم المؤسسة",
+
+        schoolName:
+            "اسم المدرسة",
+
+        studentInformation:
+            "معلومات الطالب",
+
+        academicYear:
+            "السنة الدراسية",
+
+        selectAcademicYear:
+            "اختر السنة الدراسية",
+
+        academicYearHelp:
+            "يتم إنشاء رقم الطالب بشكل مستقل لكل سنة دراسية.",
+
+        studentNumber:
+            "رقم الطالب",
+
+        studentNumberPlaceholder:
+            "اختر السنة الدراسية والمرحلة والفصل",
+
+        studentNumberHelp:
+            "يتم إنشاء الرقم تلقائيًا حسب السنة الدراسية والمرحلة والفصل وترتيب التسجيل.",
+
+        studentName:
+            "اسم الطالب",
+
+        studentNamePlaceholder:
+            "أدخل اسم الطالب",
+
+        stage:
+            "المرحلة",
+
+        selectStage:
+            "اختر المرحلة",
+
+        primary:
+            "التعليم الأساسي",
+
+        preparatory:
+            "الإعدادية",
+
+        secondary:
+            "الثانوية",
+
+        class:
+            "الفصل",
+
+        selectClass:
+            "اختر الفصل",
+
+        registrationDate:
+            "تاريخ التسجيل",
+
+        cancel:
+            "إلغاء",
+
+        registerStudent:
+            "تسجيل الطالب",
+
+        classLabel:
+            "الفصل",
+
+        selectYear:
+            "يرجى اختيار السنة الدراسية.",
+
+        enterName:
+            "يرجى إدخال اسم الطالب.",
+
+        selectStageError:
+            "يرجى اختيار المرحلة.",
+
+        selectClassError:
+            "يرجى اختيار الفصل.",
+
+        selectDate:
+            "يرجى اختيار تاريخ التسجيل.",
+
+        generating:
+            "جارٍ إنشاء الرقم...",
+
+        registering:
+            "جارٍ تسجيل الطالب...",
+
+        success:
+            "تم تسجيل الطالب بنجاح.",
+
+        studentNumberMessage:
+            "رقم الطالب",
+
+        academicYearMessage:
+            "السنة الدراسية",
+
+        schoolNotFound:
+            "لم يتم العثور على المدرسة.",
+
+        unableGenerate:
+            "تعذر إنشاء رقم الطالب.",
+
+        unableConnect:
+            "تعذر الاتصال بالخادم.",
+
+        registrationFailed:
+            "فشل تسجيل الطالب."
+
+    },
+
+
+    fr: {
+
+        addStudent:
+            "Ajouter un élève",
+
+        registerNewStudent:
+            "Enregistrer un nouvel élève",
+
+        language:
+            "Langue",
+
+        back:
+            "Retour",
+
+        schoolInformation:
+            "Informations de l'établissement",
+
+        institutionId:
+            "ID de l'établissement",
+
+        schoolName:
+            "Nom de l'école",
+
+        studentInformation:
+            "Informations de l'élève",
+
+        academicYear:
+            "Année scolaire",
+
+        selectAcademicYear:
+            "Sélectionner l'année scolaire",
+
+        academicYearHelp:
+            "Le numéro de l'élève est généré séparément pour chaque année scolaire.",
+
+        studentNumber:
+            "Numéro de l'élève",
+
+        studentNumberPlaceholder:
+            "Sélectionnez l'année, le niveau et la classe",
+
+        studentNumberHelp:
+            "Généré automatiquement selon l'année scolaire, le niveau, la classe et l'ordre d'inscription.",
+
+        studentName:
+            "Nom de l'élève",
+
+        studentNamePlaceholder:
+            "Entrez le nom de l'élève",
+
+        stage:
+            "Niveau",
+
+        selectStage:
+            "Sélectionner le niveau",
+
+        primary:
+            "Primaire",
+
+        preparatory:
+            "Collège",
+
+        secondary:
+            "Secondaire",
+
+        class:
+            "Classe",
+
+        selectClass:
+            "Sélectionner la classe",
+
+        registrationDate:
+            "Date d'inscription",
+
+        cancel:
+            "Annuler",
+
+        registerStudent:
+            "Enregistrer l'élève",
+
+        classLabel:
+            "Classe",
+
+        selectYear:
+            "Veuillez sélectionner l'année scolaire.",
+
+        enterName:
+            "Veuillez entrer le nom de l'élève.",
+
+        selectStageError:
+            "Veuillez sélectionner le niveau.",
+
+        selectClassError:
+            "Veuillez sélectionner la classe.",
+
+        selectDate:
+            "Veuillez sélectionner la date d'inscription.",
+
+        generating:
+            "Génération...",
+
+        registering:
+            "Enregistrement de l'élève...",
+
+        success:
+            "Élève enregistré avec succès.",
+
+        studentNumberMessage:
+            "Numéro de l'élève",
+
+        academicYearMessage:
+            "Année scolaire",
+
+        schoolNotFound:
+            "École introuvable.",
+
+        unableGenerate:
+            "Impossible de générer le numéro de l'élève.",
+
+        unableConnect:
+            "Impossible de se connecter au serveur.",
+
+        registrationFailed:
+            "L'enregistrement de l'élève a échoué."
+
+    }
+
+};
+
+
+// =====================================================
+// Language
+// =====================================================
+
+let currentLanguage =
+    localStorage.getItem(
+        "bmpLanguage"
+    ) || "en";
+
+
+if (
+    !translations[currentLanguage]
+) {
+    currentLanguage = "en";
+}
+
+
+function t(key) {
+
+    return (
+        translations[currentLanguage] &&
+        translations[currentLanguage][key]
+    ) || key;
+
+}
+
+
+function applyLanguage() {
+
+    document.documentElement.lang =
+        currentLanguage;
+
+    document.documentElement.dir =
+        currentLanguage === "ar"
+            ? "rtl"
+            : "ltr";
+
+
+    if (languageSelect) {
+
+        languageSelect.value =
+            currentLanguage;
+
+    }
+
+
+    document
+        .querySelectorAll(
+            "[data-i18n]"
+        )
+        .forEach(
+            element => {
+
+                const key =
+                    element.getAttribute(
+                        "data-i18n"
+                    );
+
+                if (
+                    translations[currentLanguage][key]
+                ) {
+
+                    element.textContent =
+                        translations[currentLanguage][key];
+
+                }
+
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            "[data-i18n-placeholder]"
+        )
+        .forEach(
+            element => {
+
+                const key =
+                    element.getAttribute(
+                        "data-i18n-placeholder"
+                    );
+
+                if (
+                    translations[currentLanguage][key]
+                ) {
+
+                    element.placeholder =
+                        translations[currentLanguage][key];
+
+                }
+
+            }
+        );
+
+
+    loadClasses(false);
+
+}
+
+
+if (languageSelect) {
+
+    languageSelect.addEventListener(
+        "change",
+        function () {
+
+            currentLanguage =
+                this.value;
+
+            localStorage.setItem(
+                "bmpLanguage",
+                currentLanguage
+            );
+
+            applyLanguage();
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// Check Institution
+// =====================================================
+
+if (
+    !institution.id ||
+    !institution.name
+) {
 
     alert(
-        "School not found."
+        t("schoolNotFound")
     );
 
     window.location.href =
-        "institutions.html";
+        "school.html?id=" +
+        encodeURIComponent(
+            institutionId
+        );
 
-} else {
+}
+else {
 
     initializePage();
 
 }
 
 
-/* Initialize page */
+// =====================================================
+// Initialize Page
+// =====================================================
 
 function initializePage() {
 
@@ -120,15 +681,18 @@ function initializePage() {
         institution.name || "-";
 
 
-    loadAcademicYears();
+    applyLanguage();
 
+    loadAcademicYears();
 
     setTodayDate();
 
 }
 
 
-/* Load academic years */
+// =====================================================
+// Load Academic Years
+// =====================================================
 
 function loadAcademicYears() {
 
@@ -136,9 +700,19 @@ function loadAcademicYears() {
         new Date().getFullYear();
 
 
+    academicYearInput.innerHTML = `
+        <option value="" data-i18n="selectAcademicYear">
+            ${t("selectAcademicYear")}
+        </option>
+    `;
+
+
     /*
-        Show several academic years
-        around the current year.
+        Current year - 1
+        Current year
+        Current year + 1
+        Current year + 2
+        Current year + 3
     */
 
     for (
@@ -175,23 +749,21 @@ function loadAcademicYears() {
     }
 
 
-    /*
-        Automatically select the
-        current academic year.
-    */
-
     academicYearInput.value =
         `${currentYear}-${currentYear + 1}`;
 
 }
 
 
-/* Set today's date */
+// =====================================================
+// Set Today's Date
+// =====================================================
 
 function setTodayDate() {
 
     const today =
         new Date();
+
 
     const year =
         today.getFullYear();
@@ -212,76 +784,58 @@ function setTodayDate() {
             "0"
         );
 
+
     registrationDateInput.value =
         `${year}-${month}-${day}`;
 
 }
 
 
-/* Get students */
+// =====================================================
+// Get Stage Letter
+// =====================================================
 
-function getStudents() {
-
-    return JSON.parse(
-        localStorage.getItem(
-            "bmpStudents"
-        )
-    ) || [];
-
-}
-
-
-/* Save students */
-
-function saveStudents(
-    students
-) {
-
-    localStorage.setItem(
-        "bmpStudents",
-        JSON.stringify(
-            students
-        )
-    );
-
-}
-
-
-/* Get stage letter */
-
-function getStageLetter(
-    stage
-) {
+function getStageLetter(stage) {
 
     if (
-        stage ===
-        "primary"
+        stage === "primary"
     ) {
+
         return "A";
+
     }
 
+
     if (
-        stage ===
-        "preparatory"
+        stage === "preparatory"
     ) {
+
         return "B";
+
     }
 
+
     if (
-        stage ===
-        "secondary"
+        stage === "secondary"
     ) {
+
         return "C";
+
     }
+
 
     return "";
 
 }
 
 
-/* Load classes */
+// =====================================================
+// Load Classes
+// =====================================================
 
-function loadClasses() {
+function loadClasses(
+    clearSelection = true
+) {
 
     const selectedStage =
         stageInput.value;
@@ -289,13 +843,12 @@ function loadClasses() {
 
     classInput.innerHTML = `
         <option value="">
-            Select class
+            ${t("selectClass")}
         </option>
     `;
 
 
-    let numberOfClasses =
-        0;
+    let numberOfClasses = 0;
 
 
     if (
@@ -335,11 +888,14 @@ function loadClasses() {
                 "option"
             );
 
+
         option.value =
             String(i);
 
+
         option.textContent =
-            `Class ${i}`;
+            `${t("classLabel")} ${i}`;
+
 
         classInput.appendChild(
             option
@@ -348,15 +904,29 @@ function loadClasses() {
     }
 
 
-    studentNumberInput.value =
-        "";
+    if (clearSelection) {
+
+        studentNumberInput.value =
+            "";
+
+    }
 
 }
 
 
-/* Generate student number */
+// =====================================================
+// Preview Student Number
+// =====================================================
 
-function generateStudentNumber() {
+/*
+    The final student number is generated
+    by the backend.
+
+    This function only clears the field
+    until all required selections are made.
+*/
+
+function prepareStudentNumber() {
 
     const academicYear =
         academicYearInput.value;
@@ -369,125 +939,42 @@ function generateStudentNumber() {
 
 
     if (
-        academicYear === "" ||
-        stage === "" ||
-        classNumber === ""
+        !academicYear ||
+        !stage ||
+        !classNumber
     ) {
 
         studentNumberInput.value =
             "";
 
-        return "";
+        return;
 
     }
-
-
-    const stageLetter =
-        getStageLetter(
-            stage
-        );
-
-
-    if (!stageLetter) {
-
-        studentNumberInput.value =
-            "";
-
-        return "";
-
-    }
-
-
-    const students =
-        getStudents();
-
-
-    /*
-        Count only students
-        from the same:
-
-        1. Institution
-        2. Academic year
-        3. Stage
-        4. Class
-    */
-
-    const classStudents =
-        students.filter(
-            student =>
-
-                student.institutionId ===
-                    institution.id &&
-
-                student.academicYear ===
-                    academicYear &&
-
-                student.stage ===
-                    stage &&
-
-                String(
-                    student.classNumber
-                ) ===
-                    String(
-                        classNumber
-                    )
-        );
-
-
-    /*
-        Registration order.
-
-        First student = 001
-        Second student = 002
-        Third student = 003
-    */
-
-    const nextNumber =
-        classStudents.length + 1;
-
-
-    const formattedNumber =
-        String(
-            nextNumber
-        ).padStart(
-            3,
-            "0"
-        );
-
-
-    /*
-        Example:
-
-        A + 1 + 001
-        = A1001
-    */
-
-    const studentNumber =
-        `${stageLetter}${classNumber}${formattedNumber}`;
 
 
     studentNumberInput.value =
-        studentNumber;
-
-
-    return studentNumber;
+        t("generating");
 
 }
 
 
-/* Academic year changed */
+// =====================================================
+// Academic Year Changed
+// =====================================================
 
 academicYearInput.addEventListener(
     "change",
     function () {
 
-        generateStudentNumber();
+        prepareStudentNumber();
 
     }
 );
 
 
-/* Stage changed */
+// =====================================================
+// Stage Changed
+// =====================================================
 
 stageInput.addEventListener(
     "change",
@@ -499,19 +986,23 @@ stageInput.addEventListener(
 );
 
 
-/* Class changed */
+// =====================================================
+// Class Changed
+// =====================================================
 
 classInput.addEventListener(
     "change",
     function () {
 
-        generateStudentNumber();
+        prepareStudentNumber();
 
     }
 );
 
 
-/* Back */
+// =====================================================
+// Back
+// =====================================================
 
 backButton.addEventListener(
     "click",
@@ -526,7 +1017,9 @@ backButton.addEventListener(
 );
 
 
-/* Cancel */
+// =====================================================
+// Cancel
+// =====================================================
 
 cancelButton.addEventListener(
     "click",
@@ -541,11 +1034,13 @@ cancelButton.addEventListener(
 );
 
 
-/* Register student */
+// =====================================================
+// Register Student
+// =====================================================
 
 addStudentForm.addEventListener(
     "submit",
-    function (event) {
+    async function (event) {
 
         event.preventDefault();
 
@@ -566,12 +1061,14 @@ addStudentForm.addEventListener(
             registrationDateInput.value;
 
 
-        /* Validation */
+        // -------------------------------------------------
+        // Validation
+        // -------------------------------------------------
 
         if (!academicYear) {
 
             alert(
-                "Please select the academic year."
+                t("selectYear")
             );
 
             academicYearInput.focus();
@@ -584,7 +1081,7 @@ addStudentForm.addEventListener(
         if (!studentName) {
 
             alert(
-                "Please enter the student name."
+                t("enterName")
             );
 
             studentNameInput.focus();
@@ -597,7 +1094,7 @@ addStudentForm.addEventListener(
         if (!stage) {
 
             alert(
-                "Please select the stage."
+                t("selectStageError")
             );
 
             stageInput.focus();
@@ -610,7 +1107,7 @@ addStudentForm.addEventListener(
         if (!classNumber) {
 
             alert(
-                "Please select the class."
+                t("selectClassError")
             );
 
             classInput.focus();
@@ -623,7 +1120,7 @@ addStudentForm.addEventListener(
         if (!registrationDate) {
 
             alert(
-                "Please select the registration date."
+                t("selectDate")
             );
 
             registrationDateInput.focus();
@@ -633,160 +1130,189 @@ addStudentForm.addEventListener(
         }
 
 
-        /*
-            Generate the number again
-            immediately before saving.
-        */
+        // -------------------------------------------------
+        // Disable button during request
+        // -------------------------------------------------
 
-        const studentNumber =
-            generateStudentNumber();
+        const submitButton =
+            addStudentForm.querySelector(
+                'button[type="submit"]'
+            );
 
 
-        if (!studentNumber) {
+        const originalButtonText =
+            submitButton.textContent;
+
+
+        submitButton.disabled =
+            true;
+
+
+        submitButton.textContent =
+            t("registering");
+
+
+        studentNumberInput.value =
+            t("generating");
+
+
+        // -------------------------------------------------
+        // Backend Request
+        // -------------------------------------------------
+
+        try {
+
+            const response =
+                await fetch(
+                    ADD_STUDENT_API_URL,
+                    {
+
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "text/plain;charset=utf-8"
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                action:
+                                    "addStudent",
+
+                                institutionId:
+                                    institution.id,
+
+                                username:
+                                    currentUser.username,
+
+                                academicYear:
+                                    academicYear,
+
+                                name:
+                                    studentName,
+
+                                stage:
+                                    stage,
+
+                                classNumber:
+                                    classNumber,
+
+                                registrationDate:
+                                    registrationDate
+
+                            })
+
+                    }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "HTTP " +
+                    response.status
+                );
+
+            }
+
+
+            const result =
+                await response.json();
+
+
+            // -------------------------------------------------
+            // Backend Error
+            // -------------------------------------------------
+
+            if (
+                !result.success
+            ) {
+
+                throw new Error(
+                    result.message ||
+                    t("registrationFailed")
+                );
+
+            }
+
+
+            // -------------------------------------------------
+            // Success
+            // -------------------------------------------------
+
+            const registeredStudent =
+                result.student || {};
+
+
+            const finalStudentNumber =
+                registeredStudent.studentNumber ||
+                result.studentNumber ||
+                "";
+
+
+            studentNumberInput.value =
+                finalStudentNumber;
+
 
             alert(
-                "Unable to generate the student number."
-            );
-
-            return;
-
-        }
-
-
-        const students =
-            getStudents();
-
-
-        /*
-            Check duplicate number
-            inside this school and
-            academic year.
-        */
-
-        const duplicate =
-            students.some(
-                student =>
-
-                    student.institutionId ===
-                        institution.id &&
-
-                    student.academicYear ===
-                        academicYear &&
-
-                    student.studentNumber ===
-                        studentNumber
+                `${t("success")}\n\n` +
+                `${t("studentNumberMessage")}: ${finalStudentNumber}\n` +
+                `${t("academicYearMessage")}: ${academicYear}`
             );
 
 
-        if (duplicate) {
+            // -------------------------------------------------
+            // Return to Students
+            // -------------------------------------------------
 
-            alert(
-                "This student number already exists. Please try again."
+            window.location.href =
+                `students.html?id=${encodeURIComponent(
+                    institution.id
+                )}`;
+
+        }
+        catch (error) {
+
+            console.error(
+                "Add student error:",
+                error
             );
 
-            generateStudentNumber();
 
-            return;
-
-        }
+            studentNumberInput.value =
+                "";
 
 
-        /* Create student */
+            if (
+                error.message ===
+                "Failed to fetch"
+            ) {
 
-        const newStudent = {
+                alert(
+                    t("unableConnect")
+                );
 
-            id:
-                "STU-" +
-                Date.now() +
-                "-" +
-                Math.random()
-                    .toString(36)
-                    .substring(2, 8),
+            }
+            else {
 
-            institutionId:
-                institution.id,
+                alert(
+                    error.message ||
+                    t("registrationFailed")
+                );
 
-            academicYear:
-                academicYear,
-
-            studentNumber:
-                studentNumber,
-
-            name:
-                studentName,
-
-            stage:
-                stage,
-
-            classNumber:
-                classNumber,
-
-            className:
-                `Class ${classNumber}`,
-
-            registrationDate:
-                registrationDate,
-
-            createdAt:
-                new Date().toISOString()
-
-        };
-
-
-        /* Save */
-
-        students.push(
-            newStudent
-        );
-
-        saveStudents(
-            students
-        );
-
-
-        /* Activity log */
-
-        if (
-            typeof logActivity ===
-            "function"
-        ) {
-
-            logActivity({
-
-                institutionId:
-                    institution.id,
-
-                userId:
-                    "ADMIN",
-
-                username:
-                    "Admin",
-
-                role:
-                    "Admin",
-
-                action:
-                    "Registered Student",
-
-                details:
-                    `Registered student "${newStudent.name}" - ${newStudent.studentNumber} - Academic Year: ${newStudent.academicYear}`
-
-            });
+            }
 
         }
+        finally {
 
+            submitButton.disabled =
+                false;
 
-        alert(
-            `Student registered successfully.\n\nStudent Number: ${studentNumber}\nAcademic Year: ${academicYear}`
-        );
+            submitButton.textContent =
+                originalButtonText;
 
-
-        /* Return to students */
-
-        window.location.href =
-            `students.html?id=${encodeURIComponent(
-                institution.id
-            )}`;
+        }
 
     }
 );
