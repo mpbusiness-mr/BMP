@@ -17,11 +17,8 @@ const API_URL =
    ================================= */
 
 let currentUser = null;
-
 let institutionId = null;
-
 let allPayments = [];
-
 let pageInitialized = false;
 
 
@@ -41,6 +38,11 @@ function getElement(id) {
    ================================= */
 
 function initializeAuthentication() {
+
+    /*
+     * Do NOT allow authentication errors
+     * to stop the entire page.
+     */
 
     try {
 
@@ -64,33 +66,52 @@ function initializeAuthentication() {
     }
 
 
-    try {
+    /*
+     * Get institution directly from
+     * the current user first.
+     */
 
-        if (
-            typeof getActiveInstitutionId ===
-            "function"
-        ) {
+    if (
+        currentUser &&
+        currentUser.institutionId
+    ) {
 
-            institutionId =
-                getActiveInstitutionId();
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Institution ID error:",
-            error
-        );
+        institutionId =
+            currentUser.institutionId;
 
     }
 
 
     /*
-       Fallback:
-       If the institution ID is present
-       in the page URL, use it.
-    */
+     * Try auth helper if needed.
+     */
+
+    if (
+        !institutionId &&
+        typeof getActiveInstitutionId ===
+        "function"
+    ) {
+
+        try {
+
+            institutionId =
+                getActiveInstitutionId();
+
+        } catch (error) {
+
+            console.error(
+                "Institution ID error:",
+                error
+            );
+
+        }
+
+    }
+
+
+    /*
+     * URL fallback.
+     */
 
     if (!institutionId) {
 
@@ -99,13 +120,59 @@ function initializeAuthentication() {
                 window.location.search
             );
 
+
         const urlInstitutionId =
-            params.get("id");
+            params.get(
+                "institutionId"
+            );
 
-        if (urlInstitutionId) {
 
-            institutionId =
-                urlInstitutionId;
+        const urlId =
+            params.get(
+                "id"
+            );
+
+
+        institutionId =
+            urlInstitutionId ||
+            urlId ||
+            null;
+
+    }
+
+
+    /*
+     * Final localStorage fallback.
+     */
+
+    if (!institutionId) {
+
+        try {
+
+            const storedUser =
+                JSON.parse(
+                    localStorage.getItem(
+                        "bmpCurrentUser"
+                    )
+                );
+
+
+            if (
+                storedUser &&
+                storedUser.institutionId
+            ) {
+
+                institutionId =
+                    storedUser.institutionId;
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Could not read stored user:",
+                error
+            );
 
         }
 
@@ -284,11 +351,6 @@ function getCurrentAcademicYear() {
         now.getFullYear();
 
 
-    /*
-       School year:
-       October -> June
-    */
-
     if (
         now.getMonth() < 9
     ) {
@@ -354,35 +416,32 @@ function loadAcademicYearFilter() {
     );
 
 
-    const sortedYears =
-        Array.from(years)
-            .sort()
-            .reverse();
+    Array.from(years)
+        .sort()
+        .reverse()
+        .forEach(
+            year => {
+
+                const option =
+                    document.createElement(
+                        "option"
+                    );
 
 
-    sortedYears.forEach(
-        year => {
+                option.value =
+                    year;
 
-            const option =
-                document.createElement(
-                    "option"
+
+                option.textContent =
+                    year;
+
+
+                select.appendChild(
+                    option
                 );
 
-
-            option.value =
-                year;
-
-
-            option.textContent =
-                year;
-
-
-            select.appendChild(
-                option
-            );
-
-        }
-    );
+            }
+        );
 
 
     const currentYear =
@@ -522,9 +581,7 @@ function renderPayments() {
                         payment.month ||
                         ""
                     ).toLowerCase() !==
-                    String(
-                        month
-                    ).toLowerCase()
+                    month.toLowerCase()
                 ) {
 
                     return false;
@@ -532,15 +589,18 @@ function renderPayments() {
                 }
 
 
+                /*
+                 * Only filter by stage when
+                 * payment.stage actually exists.
+                 */
+
                 if (
                     stage &&
                     payment.stage &&
                     String(
                         payment.stage
                     ).toLowerCase() !==
-                    String(
-                        stage
-                    ).toLowerCase()
+                    stage.toLowerCase()
                 ) {
 
                     return false;
@@ -596,10 +656,6 @@ function renderPayments() {
         );
 
 
-    /* =================================
-       Sort
-       ================================= */
-
     payments.sort(
         (a, b) => {
 
@@ -624,10 +680,6 @@ function renderPayments() {
         }
     );
 
-
-    /* =================================
-       Summary
-       ================================= */
 
     const totalPayments =
         payments.length;
@@ -692,10 +744,6 @@ function renderPayments() {
     }
 
 
-    /* =================================
-       Table
-       ================================= */
-
     const tbody =
         getElement(
             "paymentsTableBody"
@@ -736,97 +784,65 @@ function renderPayments() {
                 );
 
 
-            const studentNumber =
-                escapeHtml(
-                    payment.studentNumber ||
-                    "-"
-                );
-
-
-            const studentName =
-                escapeHtml(
-                    payment.studentName ||
-                    "-"
-                );
-
-
-            const academicYearValue =
-                escapeHtml(
-                    payment.academicYear ||
-                    "-"
-                );
-
-
-            const monthValue =
-                escapeHtml(
-                    getMonthDisplayName(
-                        payment.month
-                    )
-                );
-
-
-            const amount =
-                Number(
-                    payment.amount ||
-                    0
-                ).toLocaleString();
-
-
-            const paymentDate =
-                formatDate(
-                    payment.paymentDate ||
-                    payment.date
-                );
-
-
-            const receiptNumber =
-                escapeHtml(
-                    payment.receiptNumber ||
-                    "-"
-                );
-
-
-            const recordedBy =
-                escapeHtml(
-                    payment.recordedBy ||
-                    "-"
-                );
-
-
             row.innerHTML = `
 
                 <td>
-                    ${studentNumber}
-                </td>
-
-                <td>
-                    ${studentName}
-                </td>
-
-                <td>
-                    ${academicYearValue}
-                </td>
-
-                <td>
-                    ${monthValue}
-                </td>
-
-                <td>
-                    ${amount}
-                </td>
-
-                <td>
                     ${escapeHtml(
-                        paymentDate
+                        payment.studentNumber ||
+                        "-"
                     )}
                 </td>
 
                 <td>
-                    ${receiptNumber}
+                    ${escapeHtml(
+                        payment.studentName ||
+                        "-"
+                    )}
                 </td>
 
                 <td>
-                    ${recordedBy}
+                    ${escapeHtml(
+                        payment.academicYear ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        getMonthDisplayName(
+                            payment.month
+                        )
+                    )}
+                </td>
+
+                <td>
+                    ${Number(
+                        payment.amount ||
+                        0
+                    ).toLocaleString()}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        formatDate(
+                            payment.paymentDate ||
+                            payment.date
+                        )
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        payment.receiptNumber ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        payment.recordedBy ||
+                        "-"
+                    )}
                 </td>
 
             `;
@@ -838,7 +854,7 @@ function renderPayments() {
 
             row.addEventListener(
                 "click",
-                function() {
+                function () {
 
                     showPaymentDetails(
                         payment
@@ -859,7 +875,7 @@ function renderPayments() {
 
 
 /* =================================
-   Month Display
+   Month
    ================================= */
 
 function getMonthDisplayName(month) {
@@ -871,48 +887,13 @@ function getMonthDisplayName(month) {
     }
 
 
-    const months = {
-
-        October:
-            "October",
-
-        November:
-            "November",
-
-        December:
-            "December",
-
-        January:
-            "January",
-
-        February:
-            "February",
-
-        March:
-            "March",
-
-        April:
-            "April",
-
-        May:
-            "May",
-
-        June:
-            "June"
-
-    };
-
-
-    return (
-        months[month] ||
-        month
-    );
+    return month;
 
 }
 
 
 /* =================================
-   Date Format
+   Date
    ================================= */
 
 function formatDate(date) {
@@ -953,31 +934,11 @@ function formatDate(date) {
 function escapeHtml(value) {
 
     return String(value)
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 
 }
 
@@ -986,9 +947,7 @@ function escapeHtml(value) {
    Payment Details
    ================================= */
 
-function showPaymentDetails(
-    payment
-) {
+function showPaymentDetails(payment) {
 
     const modal =
         getElement(
@@ -1015,59 +974,37 @@ function showPaymentDetails(
     content.innerHTML = `
 
         <div class="payment-detail-row">
-
-            <strong>
-                Student Number
-            </strong>
-
+            <strong>Student Number</strong>
             <span>
                 ${escapeHtml(
                     payment.studentNumber ||
                     "-"
                 )}
             </span>
-
         </div>
 
-
         <div class="payment-detail-row">
-
-            <strong>
-                Student Name
-            </strong>
-
+            <strong>Student Name</strong>
             <span>
                 ${escapeHtml(
                     payment.studentName ||
                     "-"
                 )}
             </span>
-
         </div>
 
-
         <div class="payment-detail-row">
-
-            <strong>
-                Academic Year
-            </strong>
-
+            <strong>Academic Year</strong>
             <span>
                 ${escapeHtml(
                     payment.academicYear ||
                     "-"
                 )}
             </span>
-
         </div>
 
-
         <div class="payment-detail-row">
-
-            <strong>
-                Month
-            </strong>
-
+            <strong>Month</strong>
             <span>
                 ${escapeHtml(
                     getMonthDisplayName(
@@ -1075,32 +1012,20 @@ function showPaymentDetails(
                     )
                 )}
             </span>
-
         </div>
 
-
         <div class="payment-detail-row">
-
-            <strong>
-                Amount
-            </strong>
-
+            <strong>Amount</strong>
             <span>
                 ${Number(
                     payment.amount ||
                     0
                 ).toLocaleString()}
             </span>
-
         </div>
 
-
         <div class="payment-detail-row">
-
-            <strong>
-                Payment Date
-            </strong>
-
+            <strong>Payment Date</strong>
             <span>
                 ${escapeHtml(
                     formatDate(
@@ -1109,39 +1034,26 @@ function showPaymentDetails(
                     )
                 )}
             </span>
-
         </div>
 
-
         <div class="payment-detail-row">
-
-            <strong>
-                Receipt Number
-            </strong>
-
+            <strong>Receipt Number</strong>
             <span>
                 ${escapeHtml(
                     payment.receiptNumber ||
                     "-"
                 )}
             </span>
-
         </div>
 
-
         <div class="payment-detail-row">
-
-            <strong>
-                Recorded By
-            </strong>
-
+            <strong>Recorded By</strong>
             <span>
                 ${escapeHtml(
                     payment.recordedBy ||
                     "-"
                 )}
             </span>
-
         </div>
 
     `;
@@ -1154,7 +1066,7 @@ function showPaymentDetails(
 
 
 /* =================================
-   Close Payment Details
+   Close Modal
    ================================= */
 
 function closePaymentDetails() {
@@ -1416,62 +1328,78 @@ function resetFilters() {
    Navigation
    ================================= */
 
-function goBack() {
+function getNavigationInstitutionId() {
 
-    if (!institutionId) {
+    if (institutionId) {
 
-        console.error(
-            "Institution ID is missing."
-        );
-
-        return;
+        return institutionId;
 
     }
 
 
-    window.location.href =
-        "school.html?id=" +
-        encodeURIComponent(
-            institutionId
+    try {
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+
+        return (
+            params.get("institutionId") ||
+            params.get("id") ||
+            ""
         );
+
+    } catch (error) {
+
+        return "";
+
+    }
 
 }
 
 
-/*
-   Record Payment Page
+function goBack() {
 
-   Kept as a global function so it
-   can also be called from HTML
-   if necessary.
-*/
+    const id =
+        getNavigationInstitutionId();
 
-function goToRecordPayment() {
 
-    if (!institutionId) {
+    if (id) {
 
-        console.error(
-            "Institution ID is missing."
-        );
+        window.location.href =
+            "school.html?id=" +
+            encodeURIComponent(id);
 
-        showError(
-            "Institution ID is missing."
-        );
+    } else {
 
-        return;
+        window.location.href =
+            "school.html";
 
     }
 
-
-    const targetUrl =
-        "school-record-payment.html?id=" +
-        encodeURIComponent(
-            institutionId
-        );
+}
 
 
-    window.location.href =
-        targetUrl;
+function goToRecordPayment() {
+
+    const id =
+        getNavigationInstitutionId();
+
+
+    if (id) {
+
+        window.location.href =
+            "school-record-payment.html?id=" +
+            encodeURIComponent(id);
+
+    } else {
+
+        window.location.href =
+            "school-record-payment.html";
+
+    }
 
 }
 
@@ -1548,43 +1476,27 @@ function setupEventListeners() {
         );
 
 
-    /* =================================
-       Back
-       ================================= */
-
     if (backButton) {
 
-        backButton.addEventListener(
-            "click",
-            goBack
-        );
+        backButton.onclick =
+            goBack;
 
     }
 
 
-    /* =================================
-       Record Payment
-       ================================= */
-
     if (recordPaymentPageBtn) {
 
-        recordPaymentPageBtn.addEventListener(
-            "click",
-            function(event) {
+        recordPaymentPageBtn.onclick =
+            function (event) {
 
                 event.preventDefault();
 
                 goToRecordPayment();
 
-            }
-        );
+            };
 
     }
 
-
-    /* =================================
-       Academic Year
-       ================================= */
 
     if (academicYear) {
 
@@ -1596,10 +1508,6 @@ function setupEventListeners() {
     }
 
 
-    /* =================================
-       Month
-       ================================= */
-
     if (paymentMonth) {
 
         paymentMonth.addEventListener(
@@ -1609,10 +1517,6 @@ function setupEventListeners() {
 
     }
 
-
-    /* =================================
-       Stage
-       ================================= */
 
     if (stageFilter) {
 
@@ -1624,10 +1528,6 @@ function setupEventListeners() {
     }
 
 
-    /* =================================
-       Search
-       ================================= */
-
     if (studentSearch) {
 
         studentSearch.addEventListener(
@@ -1637,10 +1537,6 @@ function setupEventListeners() {
 
     }
 
-
-    /* =================================
-       Apply
-       ================================= */
 
     if (applyFiltersBtn) {
 
@@ -1652,10 +1548,6 @@ function setupEventListeners() {
     }
 
 
-    /* =================================
-       Reset
-       ================================= */
-
     if (resetFiltersBtn) {
 
         resetFiltersBtn.addEventListener(
@@ -1666,10 +1558,6 @@ function setupEventListeners() {
     }
 
 
-    /* =================================
-       Retry
-       ================================= */
-
     if (retryBtn) {
 
         retryBtn.addEventListener(
@@ -1679,10 +1567,6 @@ function setupEventListeners() {
 
     }
 
-
-    /* =================================
-       Payment Details Close
-       ================================= */
 
     if (closeButton) {
 
@@ -1704,13 +1588,9 @@ function setupEventListeners() {
     }
 
 
-    /* =================================
-       Escape
-       ================================= */
-
     document.addEventListener(
         "keydown",
-        function(event) {
+        function (event) {
 
             if (
                 event.key === "Escape"
@@ -1749,11 +1629,6 @@ function initializePage() {
 
     setupEventListeners();
 
-
-    /*
-       Only attempt to load payments
-       when an institution is available.
-    */
 
     if (institutionId) {
 
