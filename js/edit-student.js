@@ -278,13 +278,21 @@ function applyLanguage() {
         });
 
 
-    languageSelect.value =
-        currentLanguage;
+    if (languageSelect) {
+
+        languageSelect.value =
+            currentLanguage;
+
+    }
 
 
-    loadClasses(
-        classSelect.value
-    );
+    if (stageSelect && classSelect) {
+
+        loadClasses(
+            classSelect.value
+        );
+
+    }
 
 }
 
@@ -308,11 +316,19 @@ if (!currentUser) {
 }
 
 
+// =====================================================
+// Institution
+// =====================================================
+
 const institutionId =
     getActiveInstitutionId();
 
 
 if (!institutionId) {
+
+    alert(
+        t("institutionNotFound")
+    );
 
     throw new Error(
         "Institution access denied."
@@ -337,7 +353,9 @@ const studentId =
 
 if (!studentId) {
 
-    alert(t("studentNotFound"));
+    alert(
+        t("studentNotFound")
+    );
 
     window.location.href =
         `students.html?id=${encodeURIComponent(
@@ -429,8 +447,19 @@ function loadClasses(
     selectedClass = ""
 ) {
 
+    if (!stageSelect || !classSelect) {
+
+        return;
+
+    }
+
+
     const stage =
-        stageSelect.value;
+        String(
+            stageSelect.value || ""
+        )
+        .trim()
+        .toLowerCase();
 
 
     classSelect.innerHTML = "";
@@ -621,7 +650,9 @@ async function loadStudent() {
 
 
         const students =
-            Array.isArray(result.students)
+            Array.isArray(
+                result.students
+            )
                 ? result.students
                 : [];
 
@@ -691,6 +722,61 @@ async function loadStudent() {
 
 
 // =====================================================
+// Normalize Stage
+// =====================================================
+
+function normalizeStage(value) {
+
+    const stage =
+        String(
+            value || ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    if (
+        stage === "primary" ||
+        stage === "primary education" ||
+        stage === "الابتدائية" ||
+        stage === "ابتدائي"
+    ) {
+
+        return "primary";
+
+    }
+
+
+    if (
+        stage === "preparatory" ||
+        stage === "preparatory education" ||
+        stage === "الإعدادية" ||
+        stage === "إعدادي"
+    ) {
+
+        return "preparatory";
+
+    }
+
+
+    if (
+        stage === "secondary" ||
+        stage === "secondary education" ||
+        stage === "الثانوية" ||
+        stage === "ثانوي"
+    ) {
+
+        return "secondary";
+
+    }
+
+
+    return stage;
+
+}
+
+
+// =====================================================
 // Display Student
 // =====================================================
 
@@ -720,14 +806,14 @@ function displayStudent(student) {
         student.name || "";
 
 
-    stageSelect.value =
-        student.stage || "";
-
-
-    registrationDateInput.value =
-        normalizeDate(
-            student.registrationDate
+    const normalizedStage =
+        normalizeStage(
+            student.stage
         );
+
+
+    stageSelect.value =
+        normalizedStage;
 
 
     loadClasses(
@@ -735,6 +821,12 @@ function displayStudent(student) {
         student.class ||
         ""
     );
+
+
+    registrationDateInput.value =
+        normalizeDate(
+            student.registrationDate
+        );
 
 }
 
@@ -812,7 +904,9 @@ async function saveChanges() {
 
 
     const updatedStage =
-        stageSelect.value;
+        normalizeStage(
+            stageSelect.value
+        );
 
 
     const updatedClassNumber =
@@ -902,7 +996,6 @@ async function saveChanges() {
 
         goBackToStudent();
 
-
     }
 
     catch (error) {
@@ -977,56 +1070,76 @@ function goBackToStudents() {
 // Events
 // =====================================================
 
-stageSelect.addEventListener(
-    "change",
-    function () {
+if (stageSelect) {
 
-        loadClasses();
+    stageSelect.addEventListener(
+        "change",
+        function () {
 
-    }
-);
+            loadClasses();
 
+        }
+    );
 
-editStudentForm.addEventListener(
-    "submit",
-    function(event) {
-
-        event.preventDefault();
-
-        saveChanges();
-
-    }
-);
+}
 
 
-backButton.addEventListener(
-    "click",
-    goBackToStudent
-);
+if (editStudentForm) {
+
+    editStudentForm.addEventListener(
+        "submit",
+        function(event) {
+
+            event.preventDefault();
+
+            saveChanges();
+
+        }
+    );
+
+}
 
 
-cancelButton.addEventListener(
-    "click",
-    goBackToStudent
-);
+if (backButton) {
+
+    backButton.addEventListener(
+        "click",
+        goBackToStudent
+    );
+
+}
 
 
-languageSelect.addEventListener(
-    "change",
-    function() {
+if (cancelButton) {
 
-        currentLanguage =
-            languageSelect.value;
+    cancelButton.addEventListener(
+        "click",
+        goBackToStudent
+    );
 
-        localStorage.setItem(
-            "bmpLanguage",
-            currentLanguage
-        );
+}
 
-        applyLanguage();
 
-    }
-);
+if (languageSelect) {
+
+    languageSelect.addEventListener(
+        "change",
+        function() {
+
+            currentLanguage =
+                languageSelect.value;
+
+            localStorage.setItem(
+                "bmpLanguage",
+                currentLanguage
+            );
+
+            applyLanguage();
+
+        }
+    );
+
+}
 
 
 // =====================================================
