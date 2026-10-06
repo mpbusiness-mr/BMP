@@ -3,76 +3,36 @@
 <html lang="en" dir="ltr">
 
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BMP - Add Student</title>
-
-    <link
-        rel="stylesheet"
-        href="css/add-student.css"
-    >
-
+    <link rel="stylesheet" href="css/add-student.css">
 </head>
 
-
 <body>
-
-
-    <!-- =====================================================
-         Page Header
-    ====================================================== -->
 
     <header class="page-header">
 
         <div class="header-left">
-
-            <h1 data-i18n="pageTitle">
-                Add Student
-            </h1>
-
-            <p data-i18n="pageSubtitle">
-                Register a new student
-            </p>
-
+            <h1 data-i18n="pageTitle">Add Student</h1>
+            <p data-i18n="pageSubtitle">Register a new student</p>
         </div>
 
-
         <div class="header-right">
-
-            <!-- Language -->
 
             <select
                 id="languageSelect"
                 aria-label="Language"
-                data-i18n-aria-label="language"
             >
-
-                <option value="en">
-                    English
-                </option>
-
-                <option value="ar">
-                    العربية
-                </option>
-
-                <option value="fr">
-                    Français
-                </option>
-
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+                <option value="fr">Français</option>
             </select>
-
-
-            <!-- Back -->
 
             <button
                 id="backButton"
                 type="button"
+                class="btn btn-secondary"
                 data-i18n="back"
             >
                 Back
@@ -82,18 +42,7 @@
 
     </header>
 
-
-
-    <!-- =====================================================
-         Main Content
-    ====================================================== -->
-
     <main class="page-container">
-
-
-        <!-- =================================================
-             School Information
-        ================================================== -->
 
         <section class="card">
 
@@ -101,50 +50,27 @@
                 School Information
             </h2>
 
-
             <div class="info-grid">
 
-
-                <!-- Institution ID -->
-
                 <div class="info-item">
-
                     <span data-i18n="institutionId">
                         Institution ID
                     </span>
 
-                    <strong id="institutionId">
-                        —
-                    </strong>
-
+                    <strong id="institutionId">—</strong>
                 </div>
 
-
-
-                <!-- Institution Name -->
-
                 <div class="info-item">
-
                     <span data-i18n="institutionName">
                         Institution Name
                     </span>
 
-                    <strong id="institutionName">
-                        —
-                    </strong>
-
+                    <strong id="institutionName">—</strong>
                 </div>
-
 
             </div>
 
         </section>
-
-
-
-        <!-- =================================================
-             Student Information
-        ================================================== -->
 
         <section class="card">
 
@@ -152,14 +78,9 @@
                 Student Information
             </h2>
 
-
             <form id="studentForm">
 
-
                 <div class="form-grid">
-
-
-                    <!-- Academic Year -->
 
                     <div class="form-group">
 
@@ -170,19 +91,12 @@
                             Academic Year
                         </label>
 
-
                         <select
                             id="academicYear"
                             required
-                        >
-
-                        </select>
+                        ></select>
 
                     </div>
-
-
-
-                    <!-- Student Number -->
 
                     <div class="form-group">
 
@@ -192,7 +106,6 @@
                         >
                             Student Number
                         </label>
-
 
                         <input
                             type="text"
@@ -204,10 +117,6 @@
 
                     </div>
 
-
-
-                    <!-- Student Name -->
-
                     <div class="form-group">
 
                         <label
@@ -216,7 +125,6 @@
                         >
                             Student Name
                         </label>
-
 
                         <input
                             type="text"
@@ -229,10 +137,6 @@
 
                     </div>
 
-
-
-                    <!-- Stage -->
-
                     <div class="form-group">
 
                         <label
@@ -241,7 +145,6 @@
                         >
                             Stage
                         </label>
-
 
                         <select
                             id="stage"
@@ -255,7 +158,6 @@
                                 Select Stage
                             </option>
 
-
                             <option
                                 value="primary"
                                 data-i18n="primary"
@@ -263,14 +165,12 @@
                                 Primary
                             </option>
 
-
                             <option
                                 value="preparatory"
                                 data-i18n="preparatory"
                             >
                                 Preparatory
                             </option>
-
 
                             <option
                                 value="secondary"
@@ -283,10 +183,6 @@
 
                     </div>
 
-
-
-                    <!-- Class -->
-
                     <div class="form-group">
 
                         <label
@@ -295,7 +191,6 @@
                         >
                             Class
                         </label>
-
 
                         <select
                             id="className"
@@ -313,10 +208,6 @@
 
                     </div>
 
-
-
-                    <!-- Registration Date -->
-
                     <div class="form-group">
 
                         <label
@@ -326,7 +217,6 @@
                             Registration Date
                         </label>
 
-
                         <input
                             type="date"
                             id="registrationDate"
@@ -335,64 +225,41 @@
 
                     </div>
 
-
                 </div>
 
-
-
-                <!-- =================================================
-                     Form Actions
-                ================================================== -->
-
                 <div class="form-actions">
-
 
                     <button
                         type="button"
                         id="cancelButton"
+                        class="btn btn-secondary"
                         data-i18n="cancel"
                     >
                         Cancel
                     </button>
 
-
                     <button
                         type="submit"
                         id="registerButton"
+                        class="btn btn-primary"
                         data-i18n="registerStudent"
                     >
                         Register Student
                     </button>
 
-
                 </div>
-
 
             </form>
 
         </section>
 
-
     </main>
 
-
-
-    <!-- =====================================================
-         JavaScript
-    ====================================================== -->
-
     <script src="js/auth.js"></script>
-
     <script src="js/activity-log.js"></script>
-
     <script src="js/add-student.js"></script>
-
 
 </body>
 
 </html>
 ```
-
-**هذا الملف جاهز.** الآن لا نحتاج إلى تعديل HTML أكثر من ذلك.
-
-الخطوة التالية ستكون `add-student.js`، وسنضيف فيه **الترجمة + ربط تسجيل الطالب بالـ Backend/Google Sheets** مع الحفاظ على نفس التصميم والوظائف.
