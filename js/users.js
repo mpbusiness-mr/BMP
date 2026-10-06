@@ -3,13 +3,360 @@
 // Google Sheets / Apps Script Version
 // =====================================================
 
-
-// =====================================================
-// API
-// =====================================================
-
 const API_URL =
     "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+
+
+// =====================================================
+// Translations
+// =====================================================
+
+const translations = {
+
+    en: {
+        pageTitle: "Institution Users - BMP Admin",
+        institutionUsers: "Institution Users",
+        manageUsers: "Manage users for this institution",
+        back: "Back",
+        institutionId: "Institution ID",
+        institutionName: "Institution Name",
+        type: "Type",
+        school: "School",
+        users: "Users",
+        manageAccounts: "Manage accounts and user access",
+        addUser: "+ Add User",
+        searchUsername: "Search by username...",
+        allStatuses: "All Statuses",
+        active: "Active",
+        disabled: "Disabled",
+        username: "Username",
+        role: "Role",
+        status: "Status",
+        created: "Created",
+        actions: "Actions",
+        noUsersFound: "No Users Found",
+        noUsersMatching: "There are no users matching your search.",
+        loadingUsers: "Loading users...",
+        failedLoadUsers: "Failed to load users.",
+        protected: "Protected",
+        enable: "Enable",
+        disable: "Disable",
+        userNotFound: "User not found.",
+        directorCannotDisable: "The Director cannot be disabled.",
+        directorProtected: "The Director account is protected.",
+        confirmDisable: "Are you sure you want to disable user",
+        confirmEnable: "Are you sure you want to enable user",
+        userDisabled: "User disabled successfully.",
+        userEnabled: "User enabled successfully.",
+        failedDisable: "Failed to disable user.",
+        failedEnable: "Failed to enable user.",
+        directorOnly: "Only the Director can manage users.",
+        schoolLoginRequired: "School login required.",
+        institutionDenied: "Institution access denied.",
+        user: "User"
+    },
+
+    ar: {
+        pageTitle: "مستخدمو المؤسسة - BMP Admin",
+        institutionUsers: "مستخدمو المؤسسة",
+        manageUsers: "إدارة مستخدمي هذه المؤسسة",
+        back: "رجوع",
+        institutionId: "معرّف المؤسسة",
+        institutionName: "اسم المؤسسة",
+        type: "النوع",
+        school: "مدرسة",
+        users: "المستخدمون",
+        manageAccounts: "إدارة الحسابات وصلاحيات المستخدمين",
+        addUser: "+ إضافة مستخدم",
+        searchUsername: "البحث باسم المستخدم...",
+        allStatuses: "جميع الحالات",
+        active: "نشط",
+        disabled: "معطل",
+        username: "اسم المستخدم",
+        role: "الدور",
+        status: "الحالة",
+        created: "تاريخ الإنشاء",
+        actions: "الإجراءات",
+        noUsersFound: "لم يتم العثور على مستخدمين",
+        noUsersMatching: "لا يوجد مستخدمون مطابقون لبحثك.",
+        loadingUsers: "جارٍ تحميل المستخدمين...",
+        failedLoadUsers: "فشل تحميل المستخدمين.",
+        protected: "محمي",
+        enable: "تفعيل",
+        disable: "تعطيل",
+        userNotFound: "المستخدم غير موجود.",
+        directorCannotDisable: "لا يمكن تعطيل حساب المدير.",
+        directorProtected: "حساب المدير محمي.",
+        confirmDisable: "هل أنت متأكد أنك تريد تعطيل المستخدم",
+        confirmEnable: "هل أنت متأكد أنك تريد تفعيل المستخدم",
+        userDisabled: "تم تعطيل المستخدم بنجاح.",
+        userEnabled: "تم تفعيل المستخدم بنجاح.",
+        failedDisable: "فشل تعطيل المستخدم.",
+        failedEnable: "فشل تفعيل المستخدم.",
+        directorOnly: "المدير فقط يمكنه إدارة المستخدمين.",
+        schoolLoginRequired: "يجب تسجيل الدخول إلى المدرسة.",
+        institutionDenied: "تم رفض الوصول إلى المؤسسة.",
+        user: "مستخدم"
+    },
+
+    fr: {
+        pageTitle: "Utilisateurs de l'établissement - BMP Admin",
+        institutionUsers: "Utilisateurs de l'établissement",
+        manageUsers: "Gérer les utilisateurs de cet établissement",
+        back: "Retour",
+        institutionId: "ID de l'établissement",
+        institutionName: "Nom de l'établissement",
+        type: "Type",
+        school: "École",
+        users: "Utilisateurs",
+        manageAccounts: "Gérer les comptes et les accès utilisateurs",
+        addUser: "+ Ajouter un utilisateur",
+        searchUsername: "Rechercher par nom d'utilisateur...",
+        allStatuses: "Tous les statuts",
+        active: "Actif",
+        disabled: "Désactivé",
+        username: "Nom d'utilisateur",
+        role: "Rôle",
+        status: "Statut",
+        created: "Créé le",
+        actions: "Actions",
+        noUsersFound: "Aucun utilisateur trouvé",
+        noUsersMatching: "Aucun utilisateur ne correspond à votre recherche.",
+        loadingUsers: "Chargement des utilisateurs...",
+        failedLoadUsers: "Échec du chargement des utilisateurs.",
+        protected: "Protégé",
+        enable: "Activer",
+        disable: "Désactiver",
+        userNotFound: "Utilisateur introuvable.",
+        directorCannotDisable: "Le directeur ne peut pas être désactivé.",
+        directorProtected: "Le compte du directeur est protégé.",
+        confirmDisable: "Êtes-vous sûr de vouloir désactiver l'utilisateur",
+        confirmEnable: "Êtes-vous sûr de vouloir activer l'utilisateur",
+        userDisabled: "Utilisateur désactivé avec succès.",
+        userEnabled: "Utilisateur activé avec succès.",
+        failedDisable: "Échec de la désactivation de l'utilisateur.",
+        failedEnable: "Échec de l'activation de l'utilisateur.",
+        directorOnly: "Seul le directeur peut gérer les utilisateurs.",
+        schoolLoginRequired: "Connexion à l'école requise.",
+        institutionDenied: "Accès à l'établissement refusé.",
+        user: "Utilisateur"
+    }
+};
+
+
+// =====================================================
+// Current Language
+// =====================================================
+
+let currentLanguage =
+    localStorage.getItem("bmpLanguage") || "en";
+
+if (!translations[currentLanguage]) {
+    currentLanguage = "en";
+}
+
+
+// =====================================================
+// Translation Helper
+// =====================================================
+
+function t(key) {
+    return (
+        translations[currentLanguage] &&
+        translations[currentLanguage][key]
+    ) || translations.en[key] || key;
+}
+
+
+// =====================================================
+// Apply Translation
+// =====================================================
+
+function applyTranslations() {
+
+    document.documentElement.lang =
+        currentLanguage;
+
+    document.documentElement.dir =
+        currentLanguage === "ar"
+            ? "rtl"
+            : "ltr";
+
+    const pageTitle =
+        document.getElementById("pageTitle");
+
+    if (pageTitle) {
+        pageTitle.textContent =
+            t("institutionUsers");
+    }
+
+    document.title =
+        t("pageTitle");
+
+    const institutionTitle =
+        document.getElementById("institutionTitle");
+
+    if (institutionTitle) {
+        institutionTitle.textContent =
+            t("manageUsers");
+    }
+
+    const backButton =
+        document.getElementById("backButton");
+
+    if (backButton) {
+        backButton.textContent =
+            t("back");
+    }
+
+    const labelInstitutionId =
+        document.getElementById("labelInstitutionId");
+
+    if (labelInstitutionId) {
+        labelInstitutionId.textContent =
+            t("institutionId");
+    }
+
+    const labelInstitutionName =
+        document.getElementById("labelInstitutionName");
+
+    if (labelInstitutionName) {
+        labelInstitutionName.textContent =
+            t("institutionName");
+    }
+
+    const labelType =
+        document.getElementById("labelType");
+
+    if (labelType) {
+        labelType.textContent =
+            t("type");
+    }
+
+    const usersTitle =
+        document.getElementById("usersTitle");
+
+    if (usersTitle) {
+        usersTitle.textContent =
+            t("users");
+    }
+
+    const usersDescription =
+        document.getElementById("usersDescription");
+
+    if (usersDescription) {
+        usersDescription.textContent =
+            t("manageAccounts");
+    }
+
+    const addUserButton =
+        document.getElementById("addUserButton");
+
+    if (addUserButton) {
+        addUserButton.textContent =
+            t("addUser");
+    }
+
+    const searchUser =
+        document.getElementById("searchUser");
+
+    if (searchUser) {
+        searchUser.placeholder =
+            t("searchUsername");
+    }
+
+    const statusFilter =
+        document.getElementById("userStatusFilter");
+
+    if (statusFilter) {
+
+        const allOption =
+            statusFilter.querySelector(
+                'option[value="all"]'
+            );
+
+        const activeOption =
+            statusFilter.querySelector(
+                'option[value="active"]'
+            );
+
+        const disabledOption =
+            statusFilter.querySelector(
+                'option[value="disabled"]'
+            );
+
+        if (allOption) {
+            allOption.textContent =
+                t("allStatuses");
+        }
+
+        if (activeOption) {
+            activeOption.textContent =
+                t("active");
+        }
+
+        if (disabledOption) {
+            disabledOption.textContent =
+                t("disabled");
+        }
+    }
+
+    const thUsername =
+        document.getElementById("thUsername");
+
+    if (thUsername) {
+        thUsername.textContent =
+            t("username");
+    }
+
+    const thRole =
+        document.getElementById("thRole");
+
+    if (thRole) {
+        thRole.textContent =
+            t("role");
+    }
+
+    const thStatus =
+        document.getElementById("thStatus");
+
+    if (thStatus) {
+        thStatus.textContent =
+            t("status");
+    }
+
+    const thCreated =
+        document.getElementById("thCreated");
+
+    if (thCreated) {
+        thCreated.textContent =
+            t("created");
+    }
+
+    const thActions =
+        document.getElementById("thActions");
+
+    if (thActions) {
+        thActions.textContent =
+            t("actions");
+    }
+
+    const emptyTitle =
+        document.getElementById("emptyTitle");
+
+    if (emptyTitle) {
+        emptyTitle.textContent =
+            t("noUsersFound");
+    }
+
+    const emptyDescription =
+        document.getElementById("emptyDescription");
+
+    if (emptyDescription) {
+        emptyDescription.textContent =
+            t("noUsersMatching");
+    }
+}
 
 
 // =====================================================
@@ -20,7 +367,9 @@ const currentUser =
     requireSchoolLogin();
 
 if (!currentUser) {
-    throw new Error("School login required.");
+    throw new Error(
+        t("schoolLoginRequired")
+    );
 }
 
 
@@ -32,7 +381,9 @@ const institutionId =
     getActiveInstitutionId();
 
 if (!institutionId) {
-    throw new Error("Institution access denied.");
+    throw new Error(
+        t("institutionDenied")
+    );
 }
 
 
@@ -46,7 +397,9 @@ if (
         .toLowerCase() !== "director"
 ) {
 
-    alert("Only the Director can manage users.");
+    alert(
+        t("directorOnly")
+    );
 
     window.location.href =
         `school.html?id=${encodeURIComponent(
@@ -124,9 +477,7 @@ if (document.readyState === "loading") {
 
 async function initializeUsersPage() {
 
-    // -------------------------------------------------
-    // Safety check
-    // -------------------------------------------------
+    applyTranslations();
 
     if (!addUserButton) {
 
@@ -136,21 +487,14 @@ async function initializeUsersPage() {
 
     } else {
 
-        // -------------------------------------------------
-        // Add User
-        // -------------------------------------------------
-
-        addUserButton.type = "button";
+        addUserButton.type =
+            "button";
 
         addUserButton.onclick =
-            function (event) {
+            function(event) {
 
                 event.preventDefault();
                 event.stopPropagation();
-
-                console.log(
-                    "Add User button clicked."
-                );
 
                 window.location.href =
                     "add-user.html?id=" +
@@ -161,16 +505,13 @@ async function initializeUsersPage() {
     }
 
 
-    // -------------------------------------------------
-    // Back button
-    // -------------------------------------------------
-
     if (backButton) {
 
-        backButton.type = "button";
+        backButton.type =
+            "button";
 
         backButton.onclick =
-            function (event) {
+            function(event) {
 
                 event.preventDefault();
 
@@ -183,10 +524,6 @@ async function initializeUsersPage() {
     }
 
 
-    // -------------------------------------------------
-    // Search
-    // -------------------------------------------------
-
     if (searchUser) {
 
         searchUser.addEventListener(
@@ -196,10 +533,6 @@ async function initializeUsersPage() {
     }
 
 
-    // -------------------------------------------------
-    // Status filter
-    // -------------------------------------------------
-
     if (userStatusFilter) {
 
         userStatusFilter.addEventListener(
@@ -208,16 +541,6 @@ async function initializeUsersPage() {
         );
     }
 
-
-    // -------------------------------------------------
-    // Institution information
-    // -------------------------------------------------
-
-    if (institutionTitle) {
-
-        institutionTitle.textContent =
-            "Manage users";
-    }
 
     if (institutionIdElement) {
 
@@ -235,13 +558,9 @@ async function initializeUsersPage() {
     if (institutionTypeElement) {
 
         institutionTypeElement.textContent =
-            "School";
+            t("school");
     }
 
-
-    // -------------------------------------------------
-    // Load users
-    // -------------------------------------------------
 
     await loadUsers();
 }
@@ -310,18 +629,14 @@ async function loadUsers() {
 
     usersTableBody.innerHTML = `
         <tr>
-            <td
-                colspan="5"
-                style="text-align:center;padding:25px;"
-            >
-                Loading users...
+            <td colspan="5" style="text-align:center;padding:25px;">
+                ${escapeHtml(t("loadingUsers"))}
             </td>
         </tr>
     `;
 
 
     if (emptyState) {
-
         emptyState.style.display =
             "none";
     }
@@ -347,7 +662,7 @@ async function loadUsers() {
 
             throw new Error(
                 result.message ||
-                "Failed to load users."
+                t("failedLoadUsers")
             );
         }
 
@@ -375,7 +690,7 @@ async function loadUsers() {
                         color:#b00020;
                     "
                 >
-                    Failed to load users.
+                    ${escapeHtml(t("failedLoadUsers"))}
                 </td>
             </tr>
         `;
@@ -383,7 +698,7 @@ async function loadUsers() {
 
         alert(
             error.message ||
-            "Failed to load users."
+            t("failedLoadUsers")
         );
     }
 }
@@ -453,7 +768,6 @@ function renderUsers() {
     ) {
 
         if (emptyState) {
-
             emptyState.style.display =
                 "block";
         }
@@ -463,7 +777,6 @@ function renderUsers() {
 
 
     if (emptyState) {
-
         emptyState.style.display =
             "none";
     }
@@ -480,7 +793,7 @@ function renderUsers() {
 
             const role =
                 user.role ||
-                "User";
+                t("user");
 
 
             const createdDate =
@@ -501,19 +814,16 @@ function renderUsers() {
 
 
             const statusName =
-                status
-                    .charAt(0)
-                    .toUpperCase() +
-                status.slice(1);
+                status === "active"
+                    ? t("active")
+                    : status === "disabled"
+                        ? t("disabled")
+                        : status;
 
 
             let actionButton =
                 "";
 
-
-            // =================================================
-            // Director cannot be disabled
-            // =================================================
 
             const isDirector =
                 String(
@@ -533,7 +843,7 @@ function renderUsers() {
                             font-size:13px;
                         "
                     >
-                        Protected
+                        ${escapeHtml(t("protected"))}
                     </span>
                 `;
 
@@ -550,7 +860,7 @@ function renderUsers() {
                             user.id
                         )}')"
                     >
-                        Enable
+                        ${escapeHtml(t("enable"))}
                     </button>
                 `;
 
@@ -565,7 +875,7 @@ function renderUsers() {
                             user.id
                         )}')"
                     >
-                        Disable
+                        ${escapeHtml(t("disable"))}
                     </button>
                 `;
             }
@@ -643,7 +953,7 @@ async function disableUser(
     if (!user) {
 
         alert(
-            "User not found."
+            t("userNotFound")
         );
 
         return;
@@ -660,7 +970,7 @@ async function disableUser(
     ) {
 
         alert(
-            "The Director cannot be disabled."
+            t("directorCannotDisable")
         );
 
         return;
@@ -682,7 +992,7 @@ async function disableUser(
 
     const confirmed =
         confirm(
-            `Are you sure you want to disable user "${user.username}"?`
+            `${t("confirmDisable")} "${user.username}"?`
         );
 
 
@@ -721,13 +1031,13 @@ async function disableUser(
 
             throw new Error(
                 result.message ||
-                "Failed to disable user."
+                t("failedDisable")
             );
         }
 
 
         alert(
-            "User disabled successfully."
+            t("userDisabled")
         );
 
 
@@ -740,7 +1050,7 @@ async function disableUser(
 
         alert(
             error.message ||
-            "Failed to disable user."
+            t("failedDisable")
         );
 
     } finally {
@@ -772,7 +1082,7 @@ async function enableUser(
     if (!user) {
 
         alert(
-            "User not found."
+            t("userNotFound")
         );
 
         return;
@@ -789,7 +1099,7 @@ async function enableUser(
     ) {
 
         alert(
-            "The Director account is protected."
+            t("directorProtected")
         );
 
         return;
@@ -811,7 +1121,7 @@ async function enableUser(
 
     const confirmed =
         confirm(
-            `Are you sure you want to enable user "${user.username}"?`
+            `${t("confirmEnable")} "${user.username}"?`
         );
 
 
@@ -850,13 +1160,13 @@ async function enableUser(
 
             throw new Error(
                 result.message ||
-                "Failed to enable user."
+                t("failedEnable")
             );
         }
 
 
         alert(
-            "User enabled successfully."
+            t("userEnabled")
         );
 
 
@@ -869,7 +1179,7 @@ async function enableUser(
 
         alert(
             error.message ||
-            "Failed to enable user."
+            t("failedEnable")
         );
 
     } finally {
@@ -933,7 +1243,13 @@ function formatDate(
         }
 
 
-        return date.toLocaleDateString();
+        return date.toLocaleDateString(
+            currentLanguage === "ar"
+                ? "ar"
+                : currentLanguage === "fr"
+                    ? "fr-FR"
+                    : "en-US"
+        );
 
     } catch (error) {
 
