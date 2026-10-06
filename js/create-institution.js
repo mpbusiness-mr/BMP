@@ -8,8 +8,7 @@
 // =====================================================
 
 const ADMIN_API_URL =
-    "https://script.google.com/macros/s/AKfycbwlXk0Y75gfNdEbURP-SroKfsOATgyyi_lqznUv1NBHauwqCdmlIYSZGXwkF_XqlZ4OBA/exec";
-
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
 
 // =====================================================
 // Check Admin Session
