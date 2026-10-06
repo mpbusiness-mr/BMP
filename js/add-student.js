@@ -1,3 +1,205 @@
+```javascript
+const addStudentTranslations = {
+
+    en: {
+        pageTitle: "Add Student",
+        pageSubtitle: "Register a new student",
+        back: "Back",
+
+        schoolInformation: "School Information",
+        institutionId: "Institution ID",
+        institutionName: "Institution Name",
+
+        studentInformation: "Student Information",
+
+        academicYear: "Academic Year",
+        studentNumber: "Student Number",
+        generatedAutomatically: "Generated automatically",
+
+        studentName: "Student Name",
+        enterStudentName: "Enter student name",
+
+        stage: "Stage",
+        selectStage: "Select Stage",
+
+        primary: "Primary",
+        preparatory: "Preparatory",
+        secondary: "Secondary",
+
+        class: "Class",
+        selectClass: "Select Class",
+
+        registrationDate: "Registration Date",
+
+        cancel: "Cancel",
+        registerStudent: "Register Student",
+
+        classNumber: "Class"
+    },
+
+
+    ar: {
+        pageTitle: "إضافة طالب",
+        pageSubtitle: "تسجيل طالب جديد",
+        back: "رجوع",
+
+        schoolInformation: "معلومات المدرسة",
+        institutionId: "معرّف المؤسسة",
+        institutionName: "اسم المؤسسة",
+
+        studentInformation: "معلومات الطالب",
+
+        academicYear: "السنة الدراسية",
+        studentNumber: "رقم الطالب",
+        generatedAutomatically: "يتم إنشاؤه تلقائياً",
+
+        studentName: "اسم الطالب",
+        enterStudentName: "أدخل اسم الطالب",
+
+        stage: "المرحلة الدراسية",
+        selectStage: "اختر المرحلة",
+
+        primary: "التعليم الابتدائي",
+        preparatory: "التعليم الإعدادي",
+        secondary: "التعليم الثانوي",
+
+        class: "القسم",
+        selectClass: "اختر القسم",
+
+        registrationDate: "تاريخ التسجيل",
+
+        cancel: "إلغاء",
+        registerStudent: "تسجيل الطالب",
+
+        classNumber: "القسم"
+    },
+
+
+    fr: {
+        pageTitle: "Ajouter un élève",
+        pageSubtitle: "Inscrire un nouvel élève",
+        back: "Retour",
+
+        schoolInformation: "Informations de l'établissement",
+        institutionId: "Identifiant de l'établissement",
+        institutionName: "Nom de l'établissement",
+
+        studentInformation: "Informations de l'élève",
+
+        academicYear: "Année scolaire",
+        studentNumber: "Numéro de l'élève",
+        generatedAutomatically: "Généré automatiquement",
+
+        studentName: "Nom de l'élève",
+        enterStudentName: "Entrez le nom de l'élève",
+
+        stage: "Niveau scolaire",
+        selectStage: "Sélectionner le niveau",
+
+        primary: "Primaire",
+        preparatory: "Collège",
+        secondary: "Secondaire",
+
+        class: "Classe",
+        selectClass: "Sélectionner la classe",
+
+        registrationDate: "Date d'inscription",
+
+        cancel: "Annuler",
+        registerStudent: "Inscrire l'élève",
+
+        classNumber: "Classe"
+    }
+
+};
+
+
+function applyAddStudentLanguage() {
+
+    const language =
+        localStorage.getItem("bmpLanguage") || "en";
+
+    const t =
+        addStudentTranslations[language] ||
+        addStudentTranslations.en;
+
+
+    document.documentElement.lang = language;
+
+    document.documentElement.dir =
+        language === "ar" ? "rtl" : "ltr";
+
+
+    document.querySelectorAll("[data-i18n]")
+        .forEach(element => {
+
+            const key =
+                element.getAttribute("data-i18n");
+
+            if (t[key] !== undefined) {
+                element.textContent = t[key];
+            }
+
+        });
+
+
+    document.querySelectorAll("[data-i18n-placeholder]")
+        .forEach(element => {
+
+            const key =
+                element.getAttribute(
+                    "data-i18n-placeholder"
+                );
+
+            if (t[key] !== undefined) {
+                element.placeholder = t[key];
+            }
+
+        });
+
+
+    const languageSelect =
+        document.getElementById("languageSelect");
+
+    if (languageSelect) {
+        languageSelect.value = language;
+    }
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    const languageSelect =
+        document.getElementById("languageSelect");
+
+
+    if (languageSelect) {
+
+        languageSelect.addEventListener(
+            "change",
+            function () {
+
+                localStorage.setItem(
+                    "bmpLanguage",
+                    this.value
+                );
+
+                applyAddStudentLanguage();
+            }
+        );
+
+    }
+
+
+    applyAddStudentLanguage();
+
+});
+```
+
+
+
+
+
 // =====================================================
 // Configuration
 // =====================================================
