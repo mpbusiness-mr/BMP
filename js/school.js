@@ -223,46 +223,13 @@ let currentLanguage =
 // Check Session
 // =====================================================
 
-let currentUser = null;
+const currentUser =
+    requireSchoolLogin();
 
-try {
-
-    currentUser =
-        JSON.parse(
-            localStorage.getItem(
-                "bmpCurrentUser"
-            )
-        );
-
-} catch (error) {
-
-    localStorage.removeItem(
-        "bmpCurrentUser"
+if (!currentUser) {
+    throw new Error(
+        "School login required."
     );
-
-    currentUser = null;
-
-}
-
-
-// =====================================================
-// Validate User
-// =====================================================
-
-if (
-    !currentUser ||
-    !currentUser.institutionId ||
-    (
-        currentUser.role !== "Director" &&
-        currentUser.role !== "Manager" &&
-        currentUser.role !== "User"
-    ) ||
-    currentUser.status !== "active"
-) {
-
-    window.location.href =
-        "school-login.html";
-
 }
 
 
@@ -295,6 +262,9 @@ if (
             currentUser.institutionId
         );
 
+    throw new Error(
+        "Institution access denied."
+    );
 }
 
 
@@ -358,6 +328,9 @@ if (
     window.location.href =
         "school-login.html";
 
+    throw new Error(
+        "Invalid institution session."
+    );
 }
 
 
@@ -623,6 +596,11 @@ const institutionNameElement =
         "institutionName"
     );
 
+const usersButton =
+    document.getElementById(
+        "usersButton"
+    );
+
 
 // =====================================================
 // Display Institution
@@ -763,12 +741,7 @@ if (logoutButton) {
         "click",
         function () {
 
-            localStorage.removeItem(
-                "bmpCurrentUser"
-            );
-
-            window.location.href =
-                "school-login.html";
+            logoutUser();
 
         }
     );
@@ -860,20 +833,47 @@ document
     );
 
 
-document
-    .getElementById("usersButton")
-    ?.addEventListener(
-        "click",
-        function () {
+// =====================================================
+// Users Button
+// Director Only
+// =====================================================
 
-            window.location.href =
-                "users.html?id=" +
-                encodeURIComponent(
-                    activeInstitutionId
-                );
+if (usersButton) {
 
-        }
-    );
+    const role =
+        String(
+            currentUser.role || ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    if (
+        role !== "director"
+    ) {
+
+        // User should not see user management
+        usersButton.style.display =
+            "none";
+
+    } else {
+
+        usersButton.addEventListener(
+            "click",
+            function () {
+
+                window.location.href =
+                    "users.html?id=" +
+                    encodeURIComponent(
+                        activeInstitutionId
+                    );
+
+            }
+        );
+
+    }
+
+}
 
 
 document
