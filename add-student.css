@@ -27,17 +27,17 @@ body {
 }
 
 .header-left {
-    min-width: 0;
+    flex: 1;
 }
 
-.header-left h1 {
+.page-header h1 {
     font-size: 30px;
     font-weight: 700;
     color: #111827;
     margin-bottom: 7px;
 }
 
-.header-left p {
+.page-header p {
     font-size: 15px;
     color: #6b7280;
 }
@@ -81,7 +81,8 @@ body {
     margin-bottom: 22px;
 }
 
-.info-grid {
+.info-grid,
+.form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 18px;
@@ -100,6 +101,8 @@ body {
     font-size: 12px;
     font-weight: 600;
     color: #8a93a3;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
 .info-item strong {
@@ -112,12 +115,6 @@ body {
 #studentForm {
     display: flex;
     flex-direction: column;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 18px;
 }
 
 .form-group {
@@ -154,7 +151,9 @@ body {
 
 #studentNumber {
     background: #f8f9fb;
+    color: #111827;
     font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .form-actions {
@@ -174,7 +173,11 @@ body {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: 0.2s;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn:active {
+    transform: scale(0.98);
 }
 
 .btn-primary {
@@ -201,13 +204,13 @@ body {
     cursor: not-allowed;
 }
 
+html[dir="rtl"] {
+    direction: rtl;
+}
+
 html[dir="rtl"] .form-group,
 html[dir="rtl"] .info-item {
     text-align: right;
-}
-
-html[dir="rtl"] .form-actions {
-    justify-content: flex-start;
 }
 
 html[dir="rtl"] .form-group input,
@@ -215,11 +218,11 @@ html[dir="rtl"] .form-group select {
     text-align: right;
 }
 
-@media (max-width: 700px) {
-    .page-header {
-        align-items: flex-start;
-    }
+html[dir="rtl"] .form-actions {
+    justify-content: flex-start;
+}
 
+@media (max-width: 700px) {
     .info-grid,
     .form-grid {
         grid-template-columns: 1fr;
@@ -234,6 +237,7 @@ html[dir="rtl"] .form-group select {
     }
 
     .header-right {
+        width: 100%;
         justify-content: space-between;
     }
 
@@ -241,8 +245,8 @@ html[dir="rtl"] .form-group select {
         flex: 1;
     }
 
-    .page-container {
-        padding-bottom: 30px;
+    .page-header h1 {
+        font-size: 25px;
     }
 
     .card {
