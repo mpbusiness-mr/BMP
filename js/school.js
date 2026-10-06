@@ -7,10 +7,26 @@
 // Check Session
 // =====================================================
 
-const currentUser =
-    JSON.parse(
-        localStorage.getItem("bmpCurrentUser")
+let currentUser = null;
+
+try {
+
+    currentUser =
+        JSON.parse(
+            localStorage.getItem(
+                "bmpCurrentUser"
+            )
+        );
+
+} catch (error) {
+
+    localStorage.removeItem(
+        "bmpCurrentUser"
     );
+
+    currentUser = null;
+
+}
 
 
 // =====================================================
@@ -66,43 +82,58 @@ if (
 }
 
 
-// Use session institution
-// if no ID exists in URL
+// =====================================================
+// Use Session Institution
+// =====================================================
+
 const activeInstitutionId =
     currentUser.institutionId;
 
 
 // =====================================================
-// Get Institutions
+// Build Institution From Current Session
 // =====================================================
 
-const institutions =
-    JSON.parse(
-        localStorage.getItem(
-            "bmpInstitutions"
-        )
-    ) || [];
+const institution = {
+
+    id:
+        currentUser.institutionId,
+
+    type:
+        currentUser.institutionType || "",
+
+    name:
+        currentUser.institutionName || "",
+
+    phone:
+        currentUser.institutionPhone || "",
+
+    email:
+        currentUser.institutionEmail || "",
+
+    licenseStart:
+        currentUser.licenseStart || "",
+
+    licenseEnd:
+        currentUser.licenseEnd || "",
+
+    status:
+        "active",
+
+    sheetId:
+        currentUser.sheetId || ""
+
+};
 
 
 // =====================================================
-// Find Institution
+// Institution Data Validation
 // =====================================================
 
-const institution =
-    institutions.find(
-        function (item) {
-
-            return (
-                item.id ===
-                activeInstitutionId
-            );
-
-        }
-    );
-
-
-// Institution not found
-if (!institution) {
+if (
+    !institution.id ||
+    !institution.name
+) {
 
     localStorage.removeItem(
         "bmpCurrentUser"
@@ -161,6 +192,9 @@ function getInstitutionStatus(
 
 
         if (
+            !isNaN(
+                licenseEnd.getTime()
+            ) &&
             licenseEnd < today
         ) {
 
@@ -194,15 +228,17 @@ const institutionIdElement =
         "institutionId"
     );
 
-
 const statusElement =
     document.getElementById(
         "institutionStatus"
-   );
+    );
+
 const institutionNameElement =
     document.getElementById(
         "institutionName"
     );
+
+
 // =====================================================
 // Display Institution
 // =====================================================
@@ -210,7 +246,8 @@ const institutionNameElement =
 if (schoolName) {
 
     schoolName.textContent =
-        institution.name || "School";
+        institution.name ||
+        "School";
 
 }
 
@@ -232,12 +269,14 @@ if (institutionIdElement) {
 
 }
 
+
 if (institutionNameElement) {
 
     institutionNameElement.textContent =
         institution.name;
 
 }
+
 
 if (statusElement) {
 
@@ -247,8 +286,6 @@ if (statusElement) {
         );
 
 }
-
-
 
 
 // =====================================================
@@ -278,6 +315,7 @@ const logoutButton =
         "logoutButton"
     );
 
+
 if (logoutButton) {
 
     logoutButton.addEventListener(
@@ -297,76 +335,117 @@ if (logoutButton) {
 }
 
 
-
 // =====================================================
 // Dashboard Buttons
 // =====================================================
 
-document.getElementById("studentsButton")
-    ?.addEventListener("click", function () {
+document
+    .getElementById("studentsButton")
+    ?.addEventListener(
+        "click",
+        function () {
 
-        window.location.href =
-            "students.html?id=" +
-            encodeURIComponent(activeInstitutionId);
+            window.location.href =
+                "students.html?id=" +
+                encodeURIComponent(
+                    activeInstitutionId
+                );
 
-    });
-
-
-document.getElementById("paymentsButton")
-    ?.addEventListener("click", function () {
-
-        window.location.href =
-            "school-payments.html?id=" +
-            encodeURIComponent(activeInstitutionId);
-
-    });
+        }
+    );
 
 
-document.getElementById("receiptsButton")
-    ?.addEventListener("click", function () {
+document
+    .getElementById("paymentsButton")
+    ?.addEventListener(
+        "click",
+        function () {
 
-        window.location.href =
-            "school-receipt.html?id=" +
-            encodeURIComponent(activeInstitutionId);
+            window.location.href =
+                "school-payments.html?id=" +
+                encodeURIComponent(
+                    activeInstitutionId
+                );
 
-    });
-
-
-document.getElementById("reportsButton")
-    ?.addEventListener("click", function () {
-
-        window.location.href =
-            "school-reports.html?id=" +
-            encodeURIComponent(activeInstitutionId);
-
-    });
+        }
+    );
 
 
-document.getElementById("classesButton")
-    ?.addEventListener("click", function () {
+document
+    .getElementById("receiptsButton")
+    ?.addEventListener(
+        "click",
+        function () {
 
-        window.location.href =
-            "classes.html?id=" +
-            encodeURIComponent(activeInstitutionId);
+            window.location.href =
+                "school-receipt.html?id=" +
+                encodeURIComponent(
+                    activeInstitutionId
+                );
 
-    });
-
-
-document.getElementById("usersButton")
-    ?.addEventListener("click", function () {
-
-        window.location.href =
-            "users.html?id=" +
-            encodeURIComponent(activeInstitutionId);
-
-    });
+        }
+    );
 
 
-document.getElementById("settingsButton")
-    ?.addEventListener("click", function () {
+document
+    .getElementById("reportsButton")
+    ?.addEventListener(
+        "click",
+        function () {
 
-        window.location.href =
-            "school-settings.html?id=" +
-            encodeURIComponent(activeInstitutionId);
+            window.location.href =
+                "school-reports.html?id=" +
+                encodeURIComponent(
+                    activeInstitutionId
+                );
 
-    });
+        }
+    );
+
+
+document
+    .getElementById("classesButton")
+    ?.addEventListener(
+        "click",
+        function () {
+
+            window.location.href =
+                "classes.html?id=" +
+                encodeURIComponent(
+                    activeInstitutionId
+                );
+
+        }
+    );
+
+
+document
+    .getElementById("usersButton")
+    ?.addEventListener(
+        "click",
+        function () {
+
+            window.location.href =
+                "users.html?id=" +
+                encodeURIComponent(
+                    activeInstitutionId
+                );
+
+        }
+    );
+
+
+document
+    .getElementById("settingsButton")
+    ?.addEventListener(
+        "click",
+        function () {
+
+            window.location.href =
+                "school-settings.html?id=" +
+                encodeURIComponent(
+                    activeInstitutionId
+                );
+
+        }
+    );
