@@ -2,19 +2,21 @@
 <html lang="en" dir="ltr">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Payments</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="school-payments.css">
+    <title>Payments - BMP</title>
+
+    <link
+        rel="stylesheet"
+        href="school-payments.css">
 
     <style>
-        /*
-         * Safety layer:
-         * Keeps interactive controls above accidental
-         * CSS overlays from blocking mouse clicks.
-         */
+
         button,
         select,
         input {
@@ -23,7 +25,9 @@
 
         .page-header,
         .filters-section,
+        .summary-section,
         .error-state,
+        .table-section,
         .modal-content {
             position: relative;
             z-index: 10;
@@ -36,16 +40,16 @@
         .modal-content {
             z-index: 2;
         }
+
     </style>
+
 </head>
 
 <body>
 
     <div class="page-container">
 
-        <!-- ================================
-             Header
-             ================================= -->
+        <!-- Header -->
 
         <header class="page-header">
 
@@ -87,9 +91,7 @@
         </header>
 
 
-        <!-- ================================
-             Filters
-             ================================= -->
+        <!-- Filters -->
 
         <section class="filters-section">
 
@@ -202,9 +204,7 @@
         </section>
 
 
-        <!-- ================================
-             Summary
-             ================================= -->
+        <!-- Summary -->
 
         <section class="summary-section">
 
@@ -255,9 +255,7 @@
         </section>
 
 
-        <!-- ================================
-             Loading
-             ================================= -->
+        <!-- Loading -->
 
         <div
             id="loadingState"
@@ -266,16 +264,14 @@
 
             <div class="loading-spinner"></div>
 
-            <p>
-                Loading...
+            <p id="loadingMessage">
+                Loading payments...
             </p>
 
         </div>
 
 
-        <!-- ================================
-             Error
-             ================================= -->
+        <!-- Error -->
 
         <div
             id="errorState"
@@ -300,9 +296,7 @@
         </div>
 
 
-        <!-- ================================
-             Empty
-             ================================= -->
+        <!-- Empty -->
 
         <div
             id="emptyState"
@@ -324,9 +318,7 @@
         </div>
 
 
-        <!-- ================================
-             Payments Table
-             ================================= -->
+        <!-- Payments Table -->
 
         <section
             id="paymentsTableSection"
@@ -364,9 +356,7 @@
     </div>
 
 
-    <!-- ================================
-         Payment Details Modal
-         ================================= -->
+    <!-- Payment Details Modal -->
 
     <div
         id="paymentDetailsModal"
@@ -407,143 +397,10 @@
     </div>
 
 
-    <!-- ================================
-         Scripts
-         ================================= -->
+    <!-- Scripts -->
 
     <script src="js/auth.js"></script>
-    <script src="school-payments.js"></script>
-
-
-    <!-- ================================
-         Emergency Navigation Fallback
-         ================================= -->
-
-    <script>
-
-        (function () {
-
-            function getInstitutionIdFromUrl() {
-
-                const params =
-                    new URLSearchParams(
-                        window.location.search
-                    );
-
-                return (
-                    params.get("institutionId") ||
-                    params.get("id") ||
-                    ""
-                );
-
-            }
-
-
-            function getStoredInstitutionId() {
-
-                try {
-
-                    const user =
-                        JSON.parse(
-                            localStorage.getItem(
-                                "bmpCurrentUser"
-                            )
-                        );
-
-                    return (
-                        user &&
-                        user.institutionId
-                    ) || "";
-
-                } catch (error) {
-
-                    return "";
-
-                }
-
-            }
-
-
-            function getInstitutionId() {
-
-                return (
-                    getInstitutionIdFromUrl() ||
-                    getStoredInstitutionId()
-                );
-
-            }
-
-
-            const backButton =
-                document.getElementById(
-                    "backButton"
-                );
-
-
-            const recordButton =
-                document.getElementById(
-                    "recordPaymentPageBtn"
-                );
-
-
-            if (backButton) {
-
-                backButton.addEventListener(
-                    "click",
-                    function () {
-
-                        const id =
-                            getInstitutionId();
-
-                        if (id) {
-
-                            window.location.href =
-                                "school.html?id=" +
-                                encodeURIComponent(id);
-
-                        } else {
-
-                            window.location.href =
-                                "school.html";
-
-                        }
-
-                    }
-                );
-
-            }
-
-
-            if (recordButton) {
-
-                recordButton.addEventListener(
-                    "click",
-                    function () {
-
-                        const id =
-                            getInstitutionId();
-
-                        if (id) {
-
-                            window.location.href =
-                                "school-record-payment.html?id=" +
-                                encodeURIComponent(id);
-
-                        } else {
-
-                            window.location.href =
-                                "school-record-payment.html";
-
-                        }
-
-                    }
-                );
-
-            }
-
-        })();
-
-    </script>
+    <script src="js/school-payments.js"></script>
 
 </body>
 
