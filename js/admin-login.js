@@ -2,28 +2,32 @@
 // BMP Admin Login
 // =====================================================
 
+// =====================================================
+// Google Apps Script Backend
+// =====================================================
+
+const ADMIN_API_URL =
+    "https://script.google.com/macros/s/AKfycbwlXk0Y75gfNdEbURP-SroKfsOATgyyi_lqznUv1NBHauwqCdmlIYSZGXwkF_XqlZ4OBA/exec";
+
+
+// =====================================================
 // Elements
-const loginForm = document.getElementById("loginForm");
-const usernameInput = document.getElementById("username");
-const passwordInput = document.getElementById("password");
-const loginButton = document.getElementById("loginButton");
-const errorMessage = document.getElementById("errorMessage");
-
-
-// =====================================================
-// Temporary Authentication Data
 // =====================================================
 
-// TEMPORARY ONLY
-// Later this data will come from the Admin Authentication Sheet.
+const loginForm =
+    document.getElementById("loginForm");
 
-const ADMIN_ACCOUNT = {
-    id: "ADMIN-001",
-    username: "owner",
-    password: "1234",
-    role: "Admin",
-    status: "active"
-};
+const usernameInput =
+    document.getElementById("username");
+
+const passwordInput =
+    document.getElementById("password");
+
+const loginButton =
+    document.getElementById("loginButton");
+
+const errorMessage =
+    document.getElementById("errorMessage");
 
 
 // =====================================================
@@ -40,7 +44,10 @@ if (
     currentUser.role === "Admin" &&
     currentUser.status === "active"
 ) {
-    window.location.href = "admin.html";
+
+    window.location.href =
+        "admin.html";
+
 }
 
 
@@ -48,36 +55,114 @@ if (
 // Authentication Function
 // =====================================================
 
-function authenticateAdmin(username, password) {
+async function authenticateAdmin(
+    username,
+    password
+) {
 
-    // Later:
-    // This function will request the Authentication Sheet
-    // instead of checking local data.
+    try {
 
-    if (
-        username === ADMIN_ACCOUNT.username &&
-        password === ADMIN_ACCOUNT.password &&
-        ADMIN_ACCOUNT.status === "active"
-    ) {
+        const response =
+            await fetch(
+                ADMIN_API_URL,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body: JSON.stringify({
+
+                        username:
+                            username,
+
+                        password:
+                            password
+
+                    })
+                }
+            );
+
+
+        const result =
+            await response.json();
+
+
+        // =============================================
+        // Login Successful
+        // =============================================
+
+        if (
+            result.success === true &&
+            result.status === "active"
+        ) {
+
+            return {
+
+                success: true,
+
+                user: {
+
+                    id:
+                        result.id,
+
+                    username:
+                        username,
+
+                    role:
+                        "Admin",
+
+                    status:
+                        result.status,
+
+                    institutionId:
+                        null,
+
+                    loginTime:
+                        new Date().toISOString()
+
+                }
+
+            };
+
+        }
+
+
+        // =============================================
+        // Login Failed
+        // =============================================
 
         return {
-            success: true,
-            user: {
-                id: ADMIN_ACCOUNT.id,
-                username: ADMIN_ACCOUNT.username,
-                role: ADMIN_ACCOUNT.role,
-                status: ADMIN_ACCOUNT.status,
-                institutionId: null,
-                loginTime:
-                    new Date().toISOString()
-            }
+
+            success: false,
+
+            user: null
+
         };
+
+
+    } catch (error) {
+
+        console.error(
+            "Admin login error:",
+            error
+        );
+
+        return {
+
+            success: false,
+
+            user: null,
+
+            error:
+                "Unable to connect to server."
+
+        };
+
     }
 
-    return {
-        success: false,
-        user: null
-    };
 }
 
 
@@ -87,9 +172,10 @@ function authenticateAdmin(username, password) {
 
 loginForm.addEventListener(
     "submit",
-    function (event) {
+    async function (event) {
 
         event.preventDefault();
+
 
         const username =
             usernameInput.value.trim();
@@ -97,41 +183,69 @@ loginForm.addEventListener(
         const password =
             passwordInput.value;
 
+
         errorMessage.textContent = "";
 
         loginButton.disabled = true;
-        loginButton.textContent = "Signing in...";
+
+        loginButton.textContent =
+            "Signing in...";
 
 
-        // Authenticate
+        // =============================================
+        // Authenticate with Google Sheets
+        // =============================================
+
         const result =
-            authenticateAdmin(
+            await authenticateAdmin(
                 username,
                 password
             );
 
 
-        // Login successful
+        // =============================================
+        // Login Successful
+        // =============================================
+
         if (result.success) {
 
             localStorage.setItem(
                 "bmpCurrentUser",
-                JSON.stringify(result.user)
+                JSON.stringify(
+                    result.user
+                )
             );
+
 
             window.location.href =
                 "admin.html";
 
             return;
+
         }
 
 
-        // Login failed
-        errorMessage.textContent =
-            "Invalid username or password.";
+        // =============================================
+        // Login Failed
+        // =============================================
+
+        if (result.error) {
+
+            errorMessage.textContent =
+                result.error;
+
+        } else {
+
+            errorMessage.textContent =
+                "Invalid username or password.";
+
+        }
+
 
         loginButton.disabled = false;
+
         loginButton.textContent =
             "Login";
+
     }
 );
