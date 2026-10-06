@@ -1,33 +1,80 @@
 ```html
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>BMP - Add Student</title>
 
-    <link rel="stylesheet" href="css/add-student.css">
+    <link
+        rel="stylesheet"
+        href="css/add-student.css"
+    >
+
 </head>
 
+
 <body>
+
+
+    <!-- =====================================================
+         Page Header
+    ====================================================== -->
 
     <header class="page-header">
 
         <div class="header-left">
-            <h1 data-i18n="pageTitle">Add Student</h1>
-            <p data-i18n="pageSubtitle">Register a new student</p>
+
+            <h1 data-i18n="pageTitle">
+                Add Student
+            </h1>
+
+            <p data-i18n="pageSubtitle">
+                Register a new student
+            </p>
+
         </div>
+
 
         <div class="header-right">
 
-            <select id="languageSelect" aria-label="Language">
-                <option value="en">English</option>
-                <option value="ar">العربية</option>
-                <option value="fr">Français</option>
+            <!-- Language -->
+
+            <select
+                id="languageSelect"
+                aria-label="Language"
+                data-i18n-aria-label="language"
+            >
+
+                <option value="en">
+                    English
+                </option>
+
+                <option value="ar">
+                    العربية
+                </option>
+
+                <option value="fr">
+                    Français
+                </option>
+
             </select>
 
-            <button id="backButton" type="button" data-i18n="back">
+
+            <!-- Back -->
+
+            <button
+                id="backButton"
+                type="button"
+                data-i18n="back"
+            >
                 Back
             </button>
 
@@ -36,68 +83,116 @@
     </header>
 
 
+
+    <!-- =====================================================
+         Main Content
+    ====================================================== -->
+
     <main class="page-container">
 
-        <!-- School Information -->
+
+        <!-- =================================================
+             School Information
+        ================================================== -->
+
         <section class="card">
 
             <h2 data-i18n="schoolInformation">
                 School Information
             </h2>
 
+
             <div class="info-grid">
 
+
+                <!-- Institution ID -->
+
                 <div class="info-item">
+
                     <span data-i18n="institutionId">
                         Institution ID
                     </span>
 
-                    <strong id="institutionId">—</strong>
+                    <strong id="institutionId">
+                        —
+                    </strong>
+
                 </div>
 
+
+
+                <!-- Institution Name -->
+
                 <div class="info-item">
+
                     <span data-i18n="institutionName">
                         Institution Name
                     </span>
 
-                    <strong id="institutionName">—</strong>
+                    <strong id="institutionName">
+                        —
+                    </strong>
+
                 </div>
+
 
             </div>
 
         </section>
 
 
-        <!-- Student Information -->
+
+        <!-- =================================================
+             Student Information
+        ================================================== -->
+
         <section class="card">
 
             <h2 data-i18n="studentInformation">
                 Student Information
             </h2>
 
+
             <form id="studentForm">
+
 
                 <div class="form-grid">
 
+
                     <!-- Academic Year -->
+
                     <div class="form-group">
 
-                        <label for="academicYear" data-i18n="academicYear">
+                        <label
+                            for="academicYear"
+                            data-i18n="academicYear"
+                        >
                             Academic Year
                         </label>
 
-                        <select id="academicYear" required>
+
+                        <select
+                            id="academicYear"
+                            required
+                        >
+
                         </select>
 
                     </div>
 
 
+
                     <!-- Student Number -->
+
                     <div class="form-group">
 
-                        <label for="studentNumber" data-i18n="studentNumber">
+                        <label
+                            for="studentNumber"
+                            data-i18n="studentNumber"
+                        >
                             Student Number
                         </label>
+
 
                         <input
                             type="text"
@@ -110,12 +205,18 @@
                     </div>
 
 
+
                     <!-- Student Name -->
+
                     <div class="form-group">
 
-                        <label for="studentName" data-i18n="studentName">
+                        <label
+                            for="studentName"
+                            data-i18n="studentName"
+                        >
                             Student Name
                         </label>
+
 
                         <input
                             type="text"
@@ -129,28 +230,52 @@
                     </div>
 
 
+
                     <!-- Stage -->
+
                     <div class="form-group">
 
-                        <label for="stage" data-i18n="stage">
+                        <label
+                            for="stage"
+                            data-i18n="stage"
+                        >
                             Stage
                         </label>
 
-                        <select id="stage" required>
 
-                            <option value="" data-i18n="selectStage">
+                        <select
+                            id="stage"
+                            required
+                        >
+
+                            <option
+                                value=""
+                                data-i18n="selectStage"
+                            >
                                 Select Stage
                             </option>
 
-                            <option value="primary" data-i18n="primary">
+
+                            <option
+                                value="primary"
+                                data-i18n="primary"
+                            >
                                 Primary
                             </option>
 
-                            <option value="preparatory" data-i18n="preparatory">
+
+                            <option
+                                value="preparatory"
+                                data-i18n="preparatory"
+                            >
                                 Preparatory
                             </option>
 
-                            <option value="secondary" data-i18n="secondary">
+
+                            <option
+                                value="secondary"
+                                data-i18n="secondary"
+                            >
                                 Secondary
                             </option>
 
@@ -159,16 +284,28 @@
                     </div>
 
 
+
                     <!-- Class -->
+
                     <div class="form-group">
 
-                        <label for="className" data-i18n="class">
+                        <label
+                            for="className"
+                            data-i18n="class"
+                        >
                             Class
                         </label>
 
-                        <select id="className" required>
 
-                            <option value="" data-i18n="selectClass">
+                        <select
+                            id="className"
+                            required
+                        >
+
+                            <option
+                                value=""
+                                data-i18n="selectClass"
+                            >
                                 Select Class
                             </option>
 
@@ -177,12 +314,18 @@
                     </div>
 
 
+
                     <!-- Registration Date -->
+
                     <div class="form-group">
 
-                        <label for="registrationDate" data-i18n="registrationDate">
+                        <label
+                            for="registrationDate"
+                            data-i18n="registrationDate"
+                        >
                             Registration Date
                         </label>
+
 
                         <input
                             type="date"
@@ -192,10 +335,17 @@
 
                     </div>
 
+
                 </div>
 
 
+
+                <!-- =================================================
+                     Form Actions
+                ================================================== -->
+
                 <div class="form-actions">
+
 
                     <button
                         type="button"
@@ -205,6 +355,7 @@
                         Cancel
                     </button>
 
+
                     <button
                         type="submit"
                         id="registerButton"
@@ -213,19 +364,35 @@
                         Register Student
                     </button>
 
+
                 </div>
+
 
             </form>
 
         </section>
 
+
     </main>
 
 
+
+    <!-- =====================================================
+         JavaScript
+    ====================================================== -->
+
     <script src="js/auth.js"></script>
+
     <script src="js/activity-log.js"></script>
+
     <script src="js/add-student.js"></script>
 
+
 </body>
+
 </html>
 ```
+
+**هذا الملف جاهز.** الآن لا نحتاج إلى تعديل HTML أكثر من ذلك.
+
+الخطوة التالية ستكون `add-student.js`، وسنضيف فيه **الترجمة + ربط تسجيل الطالب بالـ Backend/Google Sheets** مع الحفاظ على نفس التصميم والوظائف.
