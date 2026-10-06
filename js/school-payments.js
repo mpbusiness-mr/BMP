@@ -3,15 +3,18 @@
    Google Sheets Version
    ================================= */
 
-// =====================================================
-// Authentication
-// =====================================================
 
-const currentUser = requireSchoolLogin();
+/* =================================
+   Authentication
+   ================================= */
+
+const currentUser =
+    requireSchoolLogin();
 
 if (!currentUser) {
     throw new Error("School login required.");
 }
+
 
 const institutionId =
     getActiveInstitutionId();
@@ -21,24 +24,24 @@ if (!institutionId) {
 }
 
 
-// =====================================================
-// Apps Script Backend
-// =====================================================
+/* =================================
+   Apps Script Backend
+   ================================= */
 
 const API_URL =
     "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
 
 
-// =====================================================
-// State
-// =====================================================
+/* =================================
+   State
+   ================================= */
 
 let allPayments = [];
 
 
-// =====================================================
-// Helpers
-// =====================================================
+/* =================================
+   Helpers
+   ================================= */
 
 function getElement(id) {
     return document.getElementById(id);
@@ -57,6 +60,10 @@ function getCurrentUsername() {
 }
 
 
+/* =================================
+   Backend Request
+   ================================= */
+
 async function apiRequest(action, data = {}) {
 
     const payload = {
@@ -66,59 +73,76 @@ async function apiRequest(action, data = {}) {
         ...data
     };
 
-    const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type":
-                "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(payload)
-    });
+
+    const response =
+        await fetch(
+            API_URL,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "text/plain;charset=utf-8"
+                },
+
+                body:
+                    JSON.stringify(payload)
+            }
+        );
+
 
     if (!response.ok) {
+
         throw new Error(
             `Server error: ${response.status}`
         );
+
     }
+
 
     const result =
         await response.json();
 
+
     if (!result.success) {
+
         throw new Error(
             result.message ||
             "Request failed."
         );
+
     }
+
 
     return result;
 }
 
 
-// =====================================================
-// Institution
-// =====================================================
+/* =================================
+   Institution
+   ================================= */
 
 function loadInstitution() {
 
-    /*
-     * The institution information is already
-     * available through the authenticated session.
-     *
-     * We keep this function so the existing
-     * page structure remains compatible.
-     */
-
     const institutionNameElement =
-        getElement("institutionName");
+        getElement(
+            "institutionName"
+        );
+
 
     const institutionIdElement =
-        getElement("institutionId");
+        getElement(
+            "institutionId"
+        );
+
 
     if (institutionIdElement) {
+
         institutionIdElement.textContent =
             institutionId || "-";
+
     }
+
 
     if (institutionNameElement) {
 
@@ -133,25 +157,33 @@ function loadInstitution() {
 }
 
 
-// =====================================================
-// Academic Year
-// =====================================================
+/* =================================
+   Academic Year
+   ================================= */
 
 function getCurrentAcademicYear() {
 
-    const now = new Date();
+    const now =
+        new Date();
+
 
     let year =
         now.getFullYear();
 
+
     /*
        School year:
-       October → June
+       October -> June
     */
 
-    if (now.getMonth() < 9) {
+    if (
+        now.getMonth() < 9
+    ) {
+
         year--;
+
     }
+
 
     return `${year}-${year + 1}`;
 }
@@ -160,67 +192,98 @@ function getCurrentAcademicYear() {
 function loadAcademicYearFilter() {
 
     const select =
-        getElement("academicYear");
+        getElement(
+            "academicYear"
+        );
+
 
     if (!select) {
         return;
     }
 
-    /*
-     * Remove dynamically generated options
-     * while keeping the "All" option.
-     */
 
-    while (select.options.length > 1) {
+    /*
+       Keep the first option
+       ("All Academic Years").
+    */
+
+    while (
+        select.options.length > 1
+    ) {
+
         select.remove(1);
+
     }
+
 
     const years =
         new Set();
 
-    allPayments.forEach(payment => {
 
-        if (payment.academicYear) {
+    allPayments.forEach(
+        payment => {
 
-            years.add(
-                String(
-                    payment.academicYear
-                )
-            );
+            if (
+                payment.academicYear
+            ) {
+
+                years.add(
+                    String(
+                        payment.academicYear
+                    )
+                );
+
+            }
 
         }
+    );
 
-    });
 
     const sortedYears =
         Array.from(years)
             .sort()
             .reverse();
 
-    sortedYears.forEach(year => {
 
-        const option =
-            document.createElement(
-                "option"
+    sortedYears.forEach(
+        year => {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                year;
+
+
+            option.textContent =
+                year;
+
+
+            select.appendChild(
+                option
             );
 
-        option.value = year;
-        option.textContent = year;
-
-        select.appendChild(option);
-
-    });
+        }
+    );
 
 
     /*
-     * Select current academic year
-     * if it exists.
-     */
+       Select current academic year
+       if it exists.
+    */
 
     const currentYear =
         getCurrentAcademicYear();
 
-    if (years.has(currentYear)) {
+
+    if (
+        years.has(
+            currentYear
+        )
+    ) {
 
         select.value =
             currentYear;
@@ -230,15 +293,18 @@ function loadAcademicYearFilter() {
 }
 
 
-// =====================================================
-// Load Payments From Backend
-// =====================================================
+/* =================================
+   Load Payments
+   ================================= */
 
 async function loadPayments() {
 
     showLoading(true);
+
     hideError();
+
     hideEmpty();
+
 
     try {
 
@@ -247,6 +313,7 @@ async function loadPayments() {
                 "getPayments"
             );
 
+
         allPayments =
             Array.isArray(
                 result.payments
@@ -254,9 +321,11 @@ async function loadPayments() {
                 ? result.payments
                 : [];
 
+
         loadAcademicYearFilter();
 
         renderPayments();
+
 
     } catch (error) {
 
@@ -265,10 +334,12 @@ async function loadPayments() {
             error
         );
 
+
         showError(
             error.message ||
             "Failed to load payments."
         );
+
 
     } finally {
 
@@ -279,9 +350,9 @@ async function loadPayments() {
 }
 
 
-// =====================================================
-// Render Payments
-// =====================================================
+/* =================================
+   Render Payments
+   ================================= */
 
 function renderPayments() {
 
@@ -289,9 +360,9 @@ function renderPayments() {
         [...allPayments];
 
 
-    // =================================================
-    // Filters
-    // =================================================
+    /* =================================
+       Filters
+       ================================= */
 
     const academicYear =
         getElement(
@@ -325,9 +396,8 @@ function renderPayments() {
         payments.filter(
             payment => {
 
-                /*
-                 * Academic Year
-                 */
+
+                /* Academic Year */
 
                 if (
                     academicYear &&
@@ -344,9 +414,7 @@ function renderPayments() {
                 }
 
 
-                /*
-                 * Month
-                 */
+                /* Month */
 
                 if (
                     month &&
@@ -363,9 +431,7 @@ function renderPayments() {
                 }
 
 
-                /*
-                 * Stage
-                 */
+                /* Stage */
 
                 if (
                     stage &&
@@ -382,9 +448,7 @@ function renderPayments() {
                 }
 
 
-                /*
-                 * Search
-                 */
+                /* Search */
 
                 if (search) {
 
@@ -434,9 +498,9 @@ function renderPayments() {
         );
 
 
-    // =================================================
-    // Sort
-    // =================================================
+    /* =================================
+       Sort
+       ================================= */
 
     payments.sort(
         (a, b) => {
@@ -448,6 +512,7 @@ function renderPayments() {
                     0
                 );
 
+
             const dateB =
                 new Date(
                     b.paymentDate ||
@@ -455,15 +520,16 @@ function renderPayments() {
                     0
                 );
 
+
             return dateB - dateA;
 
         }
     );
 
 
-    // =================================================
-    // Summary
-    // =================================================
+    /* =================================
+       Summary
+       ================================= */
 
     const totalPayments =
         payments.length;
@@ -471,11 +537,16 @@ function renderPayments() {
 
     const totalAmount =
         payments.reduce(
-            (total, payment) =>
-                total +
-                Number(
-                    payment.amount || 0
-                ),
+            (total, payment) => {
+
+                return (
+                    total +
+                    Number(
+                        payment.amount || 0
+                    )
+                );
+
+            },
             0
         );
 
@@ -484,6 +555,7 @@ function renderPayments() {
         getElement(
             "totalPayments"
         );
+
 
     if (totalPaymentsElement) {
 
@@ -498,6 +570,7 @@ function renderPayments() {
             "totalAmount"
         );
 
+
     if (totalAmountElement) {
 
         totalAmountElement.textContent =
@@ -511,6 +584,7 @@ function renderPayments() {
             "displayedPayments"
         );
 
+
     if (displayedPaymentsElement) {
 
         displayedPaymentsElement.textContent =
@@ -519,9 +593,9 @@ function renderPayments() {
     }
 
 
-    // =================================================
-    // Table
-    // =================================================
+    /* =================================
+       Table
+       ================================= */
 
     const tbody =
         getElement(
@@ -534,10 +608,13 @@ function renderPayments() {
     }
 
 
-    tbody.innerHTML = "";
+    tbody.innerHTML =
+        "";
 
 
-    if (payments.length === 0) {
+    if (
+        payments.length === 0
+    ) {
 
         showEmpty();
 
@@ -652,9 +729,9 @@ function renderPayments() {
 
 
             /*
-             * Allow clicking a row
-             * to view payment details.
-             */
+               Click row to view
+               payment details.
+            */
 
             row.style.cursor =
                 "pointer";
@@ -672,7 +749,9 @@ function renderPayments() {
             );
 
 
-            tbody.appendChild(row);
+            tbody.appendChild(
+                row
+            );
 
         }
     );
@@ -680,9 +759,9 @@ function renderPayments() {
 }
 
 
-// =====================================================
-// Month Display
-// =====================================================
+/* =================================
+   Month Display
+   ================================= */
 
 function getMonthDisplayName(month) {
 
@@ -690,19 +769,35 @@ function getMonthDisplayName(month) {
         return "-";
     }
 
+
+    /*
+       English display.
+       The backend/payment values
+       remain unchanged.
+    */
+
     const months = {
 
-        October: "أكتوبر",
-        November: "نوفمبر",
-        December: "ديسمبر",
-        January: "يناير",
-        February: "فبراير",
-        March: "مارس",
-        April: "أبريل",
-        May: "مايو",
-        June: "يونيو"
+        October: "October",
+
+        November: "November",
+
+        December: "December",
+
+        January: "January",
+
+        February: "February",
+
+        March: "March",
+
+        April: "April",
+
+        May: "May",
+
+        June: "June"
 
     };
+
 
     return (
         months[month] ||
@@ -712,9 +807,9 @@ function getMonthDisplayName(month) {
 }
 
 
-// =====================================================
-// Date Format
-// =====================================================
+/* =================================
+   Date Format
+   ================================= */
 
 function formatDate(date) {
 
@@ -722,8 +817,10 @@ function formatDate(date) {
         return "-";
     }
 
+
     const parsed =
         new Date(date);
+
 
     if (
         isNaN(
@@ -735,34 +832,40 @@ function formatDate(date) {
 
     }
 
+
     return parsed.toLocaleDateString();
 
 }
 
 
-// =====================================================
-// HTML Escape
-// =====================================================
+/* =================================
+   HTML Escape
+   ================================= */
 
 function escapeHtml(value) {
 
     return String(value)
+
         .replace(
             /&/g,
             "&amp;"
         )
+
         .replace(
             /</g,
             "&lt;"
         )
+
         .replace(
             />/g,
             "&gt;"
         )
+
         .replace(
             /"/g,
             "&quot;"
         )
+
         .replace(
             /'/g,
             "&#039;"
@@ -771,9 +874,9 @@ function escapeHtml(value) {
 }
 
 
-// =====================================================
-// Payment Details
-// =====================================================
+/* =================================
+   Payment Details
+   ================================= */
 
 function showPaymentDetails(
     payment
@@ -783,6 +886,7 @@ function showPaymentDetails(
         getElement(
             "paymentDetailsModal"
         );
+
 
     const content =
         getElement(
@@ -803,7 +907,7 @@ function showPaymentDetails(
     content.innerHTML = `
 
         <div class="payment-detail-row">
-            <strong>رقم الطالب</strong>
+            <strong>Student Number</strong>
             <span>
                 ${escapeHtml(
                     payment.studentNumber || "-"
@@ -812,7 +916,7 @@ function showPaymentDetails(
         </div>
 
         <div class="payment-detail-row">
-            <strong>اسم الطالب</strong>
+            <strong>Student Name</strong>
             <span>
                 ${escapeHtml(
                     payment.studentName || "-"
@@ -821,7 +925,7 @@ function showPaymentDetails(
         </div>
 
         <div class="payment-detail-row">
-            <strong>السنة الدراسية</strong>
+            <strong>Academic Year</strong>
             <span>
                 ${escapeHtml(
                     payment.academicYear || "-"
@@ -830,7 +934,7 @@ function showPaymentDetails(
         </div>
 
         <div class="payment-detail-row">
-            <strong>الشهر</strong>
+            <strong>Month</strong>
             <span>
                 ${escapeHtml(
                     getMonthDisplayName(
@@ -841,7 +945,7 @@ function showPaymentDetails(
         </div>
 
         <div class="payment-detail-row">
-            <strong>المبلغ</strong>
+            <strong>Amount</strong>
             <span>
                 ${Number(
                     payment.amount || 0
@@ -850,7 +954,7 @@ function showPaymentDetails(
         </div>
 
         <div class="payment-detail-row">
-            <strong>تاريخ الدفع</strong>
+            <strong>Payment Date</strong>
             <span>
                 ${escapeHtml(
                     formatDate(
@@ -862,7 +966,7 @@ function showPaymentDetails(
         </div>
 
         <div class="payment-detail-row">
-            <strong>رقم الإيصال</strong>
+            <strong>Receipt Number</strong>
             <span>
                 ${escapeHtml(
                     payment.receiptNumber ||
@@ -872,7 +976,7 @@ function showPaymentDetails(
         </div>
 
         <div class="payment-detail-row">
-            <strong>سجل بواسطة</strong>
+            <strong>Recorded By</strong>
             <span>
                 ${escapeHtml(
                     payment.recordedBy ||
@@ -897,6 +1001,7 @@ function closePaymentDetails() {
             "paymentDetailsModal"
         );
 
+
     if (modal) {
 
         modal.style.display =
@@ -907,9 +1012,9 @@ function closePaymentDetails() {
 }
 
 
-// =====================================================
-// Loading / Error / Empty
-// =====================================================
+/* =================================
+   Loading / Error / Empty
+   ================================= */
 
 function showLoading(show) {
 
@@ -917,6 +1022,7 @@ function showLoading(show) {
         getElement(
             "loadingState"
         );
+
 
     const table =
         getElement(
@@ -953,18 +1059,21 @@ function showError(message) {
             "errorState"
         );
 
+
     const errorMessage =
         getElement(
             "errorMessage"
         );
 
+
     if (errorMessage) {
 
         errorMessage.textContent =
             message ||
-            "حدث خطأ أثناء تحميل المدفوعات.";
+            "An error occurred while loading payments.";
 
     }
+
 
     if (errorState) {
 
@@ -983,6 +1092,7 @@ function hideError() {
             "errorState"
         );
 
+
     if (errorState) {
 
         errorState.style.display =
@@ -999,6 +1109,7 @@ function showEmpty() {
         getElement(
             "emptyState"
         );
+
 
     const table =
         getElement(
@@ -1031,6 +1142,7 @@ function hideEmpty() {
             "emptyState"
         );
 
+
     const table =
         getElement(
             "paymentsTableSection"
@@ -1055,9 +1167,9 @@ function hideEmpty() {
 }
 
 
-// =====================================================
-// Apply Filters
-// =====================================================
+/* =================================
+   Apply Filters
+   ================================= */
 
 function applyFilters() {
 
@@ -1066,9 +1178,9 @@ function applyFilters() {
 }
 
 
-// =====================================================
-// Reset Filters
-// =====================================================
+/* =================================
+   Reset Filters
+   ================================= */
 
 function resetFilters() {
 
@@ -1077,15 +1189,18 @@ function resetFilters() {
             "academicYear"
         );
 
+
     const paymentMonth =
         getElement(
             "paymentMonth"
         );
 
+
     const stageFilter =
         getElement(
             "stageFilter"
         );
+
 
     const studentSearch =
         getElement(
@@ -1094,19 +1209,34 @@ function resetFilters() {
 
 
     if (academicYear) {
-        academicYear.value = "";
+
+        academicYear.value =
+            "";
+
     }
+
 
     if (paymentMonth) {
-        paymentMonth.value = "";
+
+        paymentMonth.value =
+            "";
+
     }
+
 
     if (stageFilter) {
-        stageFilter.value = "";
+
+        stageFilter.value =
+            "";
+
     }
 
+
     if (studentSearch) {
-        studentSearch.value = "";
+
+        studentSearch.value =
+            "";
+
     }
 
 
@@ -1115,9 +1245,9 @@ function resetFilters() {
 }
 
 
-// =====================================================
-// Navigation
-// =====================================================
+/* =================================
+   Navigation
+   ================================= */
 
 function goBack() {
 
@@ -1139,158 +1269,214 @@ function goToRecordPayment() {
 }
 
 
-// =====================================================
-// Events
-// =====================================================
+/* =================================
+   Initialize Events
+   ================================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+function setupEventListeners() {
 
-        const academicYear =
-            getElement(
-                "academicYear"
-            );
-
-        const paymentMonth =
-            getElement(
-                "paymentMonth"
-            );
-
-        const stageFilter =
-            getElement(
-                "stageFilter"
-            );
-
-        const studentSearch =
-            getElement(
-                "studentSearch"
-            );
-
-        const applyFiltersBtn =
-            getElement(
-                "applyFiltersBtn"
-            );
-
-        const resetFiltersBtn =
-            getElement(
-                "resetFiltersBtn"
-            );
-
-        const retryBtn =
-            getElement(
-                "retryBtn"
-            );
-
-
-        // Academic year
-
-        if (academicYear) {
-
-            academicYear.addEventListener(
-                "change",
-                applyFilters
-            );
-
-        }
-
-
-        // Month
-
-        if (paymentMonth) {
-
-            paymentMonth.addEventListener(
-                "change",
-                applyFilters
-            );
-
-        }
-
-
-        // Stage
-
-        if (stageFilter) {
-
-            stageFilter.addEventListener(
-                "change",
-                applyFilters
-            );
-
-        }
-
-
-        // Search
-
-        if (studentSearch) {
-
-            studentSearch.addEventListener(
-                "input",
-                applyFilters
-            );
-
-        }
-
-
-        // Apply
-
-        if (applyFiltersBtn) {
-
-            applyFiltersBtn.addEventListener(
-                "click",
-                applyFilters
-            );
-
-        }
-
-
-        // Reset
-
-        if (resetFiltersBtn) {
-
-            resetFiltersBtn.addEventListener(
-                "click",
-                resetFilters
-            );
-
-        }
-
-
-        // Retry
-
-        if (retryBtn) {
-
-            retryBtn.addEventListener(
-                "click",
-                loadPayments
-            );
-
-        }
-
-
-        // Close modal with Escape
-
-        document.addEventListener(
-            "keydown",
-            event => {
-
-                if (
-                    event.key ===
-                    "Escape"
-                ) {
-
-                    closePaymentDetails();
-
-                }
-
-            }
+    const academicYear =
+        getElement(
+            "academicYear"
         );
 
 
-        // Initialize
+    const paymentMonth =
+        getElement(
+            "paymentMonth"
+        );
 
-        loadInstitution();
 
-        loadPayments();
+    const stageFilter =
+        getElement(
+            "stageFilter"
+        );
+
+
+    const studentSearch =
+        getElement(
+            "studentSearch"
+        );
+
+
+    const applyFiltersBtn =
+        getElement(
+            "applyFiltersBtn"
+        );
+
+
+    const resetFiltersBtn =
+        getElement(
+            "resetFiltersBtn"
+        );
+
+
+    const retryBtn =
+        getElement(
+            "retryBtn"
+        );
+
+
+    /*
+       IMPORTANT:
+       Record Payment button.
+       We use an ID instead of inline onclick.
+    */
+
+    const recordPaymentPageBtn =
+        getElement(
+            "recordPaymentPageBtn"
+        );
+
+
+    /* Academic Year */
+
+    if (academicYear) {
+
+        academicYear.addEventListener(
+            "change",
+            applyFilters
+        );
 
     }
-);
+
+
+    /* Month */
+
+    if (paymentMonth) {
+
+        paymentMonth.addEventListener(
+            "change",
+            applyFilters
+        );
+
+    }
+
+
+    /* Stage */
+
+    if (stageFilter) {
+
+        stageFilter.addEventListener(
+            "change",
+            applyFilters
+        );
+
+    }
+
+
+    /* Search */
+
+    if (studentSearch) {
+
+        studentSearch.addEventListener(
+            "input",
+            applyFilters
+        );
+
+    }
+
+
+    /* Apply */
+
+    if (applyFiltersBtn) {
+
+        applyFiltersBtn.addEventListener(
+            "click",
+            applyFilters
+        );
+
+    }
+
+
+    /* Reset */
+
+    if (resetFiltersBtn) {
+
+        resetFiltersBtn.addEventListener(
+            "click",
+            resetFilters
+        );
+
+    }
+
+
+    /* Retry */
+
+    if (retryBtn) {
+
+        retryBtn.addEventListener(
+            "click",
+            loadPayments
+        );
+
+    }
+
+
+    /*
+       Record Payment
+    */
+
+    if (recordPaymentPageBtn) {
+
+        recordPaymentPageBtn.addEventListener(
+            "click",
+            goToRecordPayment
+        );
+
+    }
+
+
+    /*
+       Escape closes payment details.
+    */
+
+    document.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key ===
+                "Escape"
+            ) {
+
+                closePaymentDetails();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =================================
+   Start
+   ================================= */
+
+function initializePage() {
+
+    loadInstitution();
+
+    setupEventListeners();
+
+    loadPayments();
+
+}
+
+
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initializePage
+    );
+
+} else {
+
+    initializePage();
+
+}
