@@ -1,11 +1,5 @@
 /* =================================
    School Record Payment - BMP
-   Google Apps Script Backend
-   ================================= */
-
-
-/* =================================
-   API
    ================================= */
 
 const API_URL =
@@ -32,13 +26,9 @@ function initializeAuthentication() {
 
     try {
 
-        if (
-            typeof requireSchoolLogin ===
-            "function"
-        ) {
+        if (typeof requireSchoolLogin === "function") {
 
-            currentUser =
-                requireSchoolLogin();
+            currentUser = requireSchoolLogin();
 
         }
 
@@ -84,12 +74,13 @@ function initializeAuthentication() {
     }
 
 
+    /*
+     * Resolve institution ID.
+     */
+
     try {
 
-        if (
-            typeof getActiveInstitutionId ===
-            "function"
-        ) {
+        if (typeof getActiveInstitutionId === "function") {
 
             institutionId =
                 getActiveInstitutionId();
@@ -113,14 +104,10 @@ function initializeAuthentication() {
                 window.location.search
             );
 
-
         institutionId =
-            params.get(
-                "institutionId"
-            ) ||
-            params.get(
-                "id"
-            );
+            params.get("institutionId") ||
+            params.get("id") ||
+            "";
 
     }
 
@@ -129,14 +116,67 @@ function initializeAuthentication() {
 
         institutionId =
             currentUser.institutionId ||
-            null;
+            "";
 
     }
+
+
+    institutionId =
+        String(
+            institutionId || ""
+        ).trim();
 
 
     return Boolean(
         institutionId
     );
+
+}
+
+
+/* =================================
+   Username
+   ================================= */
+
+function getCurrentUsername() {
+
+    if (
+        currentUser &&
+        currentUser.username
+    ) {
+
+        return String(
+            currentUser.username
+        ).trim();
+
+    }
+
+
+    if (
+        currentUser &&
+        currentUser.userName
+    ) {
+
+        return String(
+            currentUser.userName
+        ).trim();
+
+    }
+
+
+    if (
+        currentUser &&
+        currentUser.name
+    ) {
+
+        return String(
+            currentUser.name
+        ).trim();
+
+    }
+
+
+    return "";
 
 }
 
@@ -160,13 +200,16 @@ async function apiRequest(
 
 
     const username =
-        currentUser &&
-        (
-            currentUser.username ||
-            currentUser.userName ||
-            currentUser.name
-        )
-        || "";
+        getCurrentUsername();
+
+
+    if (!username) {
+
+        throw new Error(
+            "Current user is missing."
+        );
+
+    }
 
 
     const payload = {
@@ -178,34 +221,60 @@ async function apiRequest(
             institutionId,
 
         username:
-            username
+            username,
+
+        ...data
 
     };
 
 
-    Object.assign(
-        payload,
-        data
+    console.log(
+        "BMP API request:",
+        payload
     );
 
 
-    const response =
-        await fetch(
-            API_URL,
-            {
-                method: "POST",
+    let response;
 
-                headers: {
-                    "Content-Type":
-                        "text/plain;charset=utf-8"
-                },
 
-                body:
-                    JSON.stringify(
-                        payload
-                    )
-            }
+    try {
+
+        response =
+            await fetch(
+                API_URL,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
+                }
+            );
+
+    } catch (error) {
+
+        throw new Error(
+            "Could not connect to the school server. " +
+            "Please check the Apps Script Web App URL and your internet connection."
         );
+
+    }
+
+
+    const responseText =
+        await response.text();
+
+
+    console.log(
+        "BMP API response:",
+        responseText
+    );
 
 
     if (!response.ok) {
@@ -217,8 +286,24 @@ async function apiRequest(
     }
 
 
-    const result =
-        await response.json();
+    let result;
+
+
+    try {
+
+        result =
+            JSON.parse(
+                responseText
+            );
+
+    } catch (error) {
+
+        throw new Error(
+            "The server returned an invalid response: " +
+            responseText.substring(0, 300)
+        );
+
+    }
 
 
     if (!result.success) {
@@ -283,9 +368,6 @@ function loadInstitution() {
 
     }
 
-
-    return true;
-
 }
 
 
@@ -298,18 +380,15 @@ function getCurrentAcademicYear() {
     const now =
         new Date();
 
-
     let year =
         now.getFullYear();
 
 
     /*
-       October → June
-    */
+     * October -> June
+     */
 
-    if (
-        now.getMonth() < 9
-    ) {
+    if (now.getMonth() < 9) {
 
         year--;
 
@@ -330,14 +409,12 @@ function getAvailableAcademicYears() {
     students.forEach(
         student => {
 
-            if (
-                student.academicYear
-            ) {
+            if (student.academicYear) {
 
                 years.add(
                     String(
                         student.academicYear
-                    )
+                    ).trim()
                 );
 
             }
@@ -346,12 +423,18 @@ function getAvailableAcademicYears() {
     );
 
 
+    const currentYear =
+        getCurrentAcademicYear();
+
+
     years.add(
-        getCurrentAcademicYear()
+        currentYear
     );
 
 
-    return Array.from(years)
+    return Array
+        .from(years)
+        .filter(Boolean)
         .sort()
         .reverse();
 
@@ -367,7 +450,9 @@ function loadAcademicYears() {
 
 
     if (!select) {
+
         return;
+
     }
 
 
@@ -375,11 +460,8 @@ function loadAcademicYears() {
         getAvailableAcademicYears();
 
 
-    select.innerHTML = `
-        <option value="">
-            Select Academic Year
-        </option>
-    `;
+    select.innerHTML =
+        `<option value="">Select Academic Year</option>`;
 
 
     years.forEach(
@@ -390,14 +472,11 @@ function loadAcademicYears() {
                     "option"
                 );
 
-
             option.value =
                 year;
 
-
             option.textContent =
                 year;
-
 
             select.appendChild(
                 option
@@ -449,15 +528,32 @@ async function loadStudentsFromBackend() {
 
         students =
             students.filter(
-                student =>
-                    !student.institutionId ||
-                    String(
+                student => {
+
+                    if (
+                        !student.institutionId
+                    ) {
+
+                        return true;
+
+                    }
+
+
+                    return String(
                         student.institutionId
                     ) ===
                     String(
                         institutionId
-                    )
+                    );
+
+                }
             );
+
+
+        console.log(
+            "Students loaded:",
+            students.length
+        );
 
 
         return true;
@@ -483,13 +579,17 @@ async function loadStudentsFromBackend() {
 }
 
 
+/* =================================
+   Student Helpers
+   ================================= */
+
 function getStudentId(student) {
 
     return String(
         student.studentId ||
         student.id ||
         ""
-    );
+    ).trim();
 
 }
 
@@ -497,22 +597,29 @@ function getStudentId(student) {
 function getInstitutionStudents() {
 
     return students.filter(
-        student =>
-            !student.institutionId ||
-            String(
+        student => {
+
+            if (
+                !student.institutionId
+            ) {
+
+                return true;
+
+            }
+
+
+            return String(
                 student.institutionId
             ) ===
             String(
                 institutionId
-            )
+            );
+
+        }
     );
 
 }
 
-
-/* =================================
-   Student Search
-   ================================= */
 
 function normalizeStudentNumber(value) {
 
@@ -525,7 +632,14 @@ function normalizeStudentNumber(value) {
 }
 
 
+/* =================================
+   Search Student
+   ================================= */
+
 function searchStudentByNumber() {
+
+    clearError();
+
 
     const academicYearElement =
         document.getElementById(
@@ -581,39 +695,36 @@ function searchStudentByNumber() {
     }
 
 
-    const institutionStudents =
-        getInstitutionStudents();
-
-
     const matches =
-        institutionStudents.filter(
-            student => {
+        getInstitutionStudents()
+            .filter(
+                student => {
 
-                const sameYear =
-                    String(
-                        student.academicYear ||
-                        ""
-                    ).trim() ===
-                    academicYear;
+                    const sameYear =
+                        String(
+                            student.academicYear ||
+                            ""
+                        ).trim() ===
+                        academicYear;
 
 
-                const number =
-                    normalizeStudentNumber(
-                        student.studentNumber
+                    const number =
+                        normalizeStudentNumber(
+                            student.studentNumber
+                        );
+
+
+                    return (
+                        sameYear &&
+                        number ===
+                        studentNumber
                     );
 
-
-                return (
-                    sameYear &&
-                    number ===
-                    studentNumber
-                );
-
-            }
-        );
+                }
+            );
 
 
-    if (!matches.length) {
+    if (matches.length === 0) {
 
         selectedStudent =
             null;
@@ -638,7 +749,7 @@ function searchStudentByNumber() {
         clearStudentInformation();
 
         showStudentSearchResult(
-            "More than one student has this student number. Please contact the administrator.",
+            "More than one student has this student number.",
             true
         );
 
@@ -660,24 +771,20 @@ function searchStudentByNumber() {
             "studentId"
         );
 
-
     const studentNameElement =
         document.getElementById(
             "studentName"
         );
-
 
     const studentNumberElement =
         document.getElementById(
             "studentNumber"
         );
 
-
     const stageElement =
         document.getElementById(
             "stage"
         );
-
 
     const classNameElement =
         document.getElementById(
@@ -738,11 +845,12 @@ function searchStudentByNumber() {
         `Student found: ${student.name || "-"}`
     );
 
-
-    clearError();
-
 }
 
+
+/* =================================
+   Search Result
+   ================================= */
 
 function showStudentSearchResult(
     message,
@@ -756,7 +864,9 @@ function showStudentSearchResult(
 
 
     if (!element) {
+
         return;
+
     }
 
 
@@ -785,18 +895,18 @@ function clearStudentSearchResult() {
 
 
     if (!element) {
+
         return;
+
     }
 
 
     element.textContent =
         "";
 
-
     element.classList.remove(
         "error"
     );
-
 
     element.style.display =
         "none";
@@ -814,74 +924,32 @@ function clearStudentInformation() {
         null;
 
 
-    const studentId =
-        document.getElementById(
-            "studentId"
-        );
+    const ids = [
+        "studentId",
+        "studentName",
+        "studentNumber",
+        "stage",
+        "className"
+    ];
 
 
-    const studentName =
-        document.getElementById(
-            "studentName"
-        );
+    ids.forEach(
+        id => {
 
+            const element =
+                document.getElementById(
+                    id
+                );
 
-    const studentNumber =
-        document.getElementById(
-            "studentNumber"
-        );
+            if (element) {
 
+                element.value =
+                    "";
 
-    const stage =
-        document.getElementById(
-            "stage"
-        );
+            }
 
-
-    const className =
-        document.getElementById(
-            "className"
-        );
-
-
-    if (studentId) {
-
-        studentId.value =
-            "";
-
-    }
-
-
-    if (studentName) {
-
-        studentName.value =
-            "";
-
-    }
-
-
-    if (studentNumber) {
-
-        studentNumber.value =
-            "";
-
-    }
-
-
-    if (stage) {
-
-        stage.value =
-            "";
-
-    }
-
-
-    if (className) {
-
-        className.value =
-            "";
-
-    }
+        }
+    );
 
 
     clearStudentSearchResult();
@@ -902,6 +970,14 @@ function formatStage(stage) {
     }
 
 
+    const value =
+        String(
+            stage
+        )
+        .trim()
+        .toLowerCase();
+
+
     const stages = {
 
         primary:
@@ -916,12 +992,10 @@ function formatStage(stage) {
     };
 
 
-    return stages[
-        String(stage)
-            .trim()
-            .toLowerCase()
-    ] ||
-        stage;
+    return (
+        stages[value] ||
+        stage
+    );
 
 }
 
@@ -929,43 +1003,6 @@ function formatStage(stage) {
 /* =================================
    Current User
    ================================= */
-
-function getCurrentUsername() {
-
-    if (
-        currentUser &&
-        currentUser.username
-    ) {
-
-        return currentUser.username;
-
-    }
-
-
-    if (
-        currentUser &&
-        currentUser.userName
-    ) {
-
-        return currentUser.userName;
-
-    }
-
-
-    if (
-        currentUser &&
-        currentUser.name
-    ) {
-
-        return currentUser.name;
-
-    }
-
-
-    return "Unknown User";
-
-}
-
 
 function loadCurrentUser() {
 
@@ -978,7 +1015,8 @@ function loadCurrentUser() {
     if (recordedBy) {
 
         recordedBy.value =
-            getCurrentUsername();
+            getCurrentUsername() ||
+            "Unknown User";
 
     }
 
@@ -1000,7 +1038,9 @@ function setReceiptNumber(
 
 
     if (!element) {
+
         return;
+
     }
 
 
@@ -1043,7 +1083,6 @@ function showError(message) {
             "errorMessage"
         );
 
-
     const success =
         document.getElementById(
             "successMessage"
@@ -1061,12 +1100,21 @@ function showError(message) {
     if (error) {
 
         error.textContent =
-            message;
+            String(
+                message ||
+                "An error occurred."
+            );
 
         error.style.display =
             "block";
 
     }
+
+
+    console.error(
+        "BMP Error:",
+        message
+    );
 
 }
 
@@ -1077,7 +1125,6 @@ function showSuccess(message) {
         document.getElementById(
             "errorMessage"
         );
-
 
     const success =
         document.getElementById(
@@ -1096,7 +1143,9 @@ function showSuccess(message) {
     if (success) {
 
         success.textContent =
-            message;
+            String(
+                message
+            );
 
         success.style.display =
             "block";
@@ -1114,54 +1163,48 @@ async function savePayment(event) {
 
     event.preventDefault();
 
+    clearError();
+
 
     const academicYear =
         document.getElementById(
             "academicYear"
-        ).value;
+        )?.value.trim();
 
 
     const studentId =
         document.getElementById(
             "studentId"
-        ).value;
+        )?.value.trim();
 
 
     const month =
         document.getElementById(
             "month"
-        ).value;
+        )?.value.trim();
 
 
     const amount =
         Number(
             document.getElementById(
                 "amount"
-            ).value
+            )?.value
         );
 
 
     const paymentDate =
         document.getElementById(
             "paymentDate"
-        ).value;
-
-
-    const notesElement =
-        document.getElementById(
-            "notes"
-        );
+        )?.value;
 
 
     const notes =
-        notesElement
-            ? notesElement.value.trim()
-            : "";
+        document.getElementById(
+            "notes"
+        )?.value.trim() || "";
 
 
-    /* =================================
-       Validation
-       ================================= */
+    /* Validation */
 
     if (!academicYear) {
 
@@ -1174,7 +1217,10 @@ async function savePayment(event) {
     }
 
 
-    if (!studentId || !selectedStudent) {
+    if (
+        !studentId ||
+        !selectedStudent
+    ) {
 
         showError(
             "Please search and select a valid student first."
@@ -1197,7 +1243,7 @@ async function savePayment(event) {
 
 
     if (
-        !amount ||
+        !Number.isFinite(amount) ||
         amount <= 0
     ) {
 
@@ -1223,20 +1269,19 @@ async function savePayment(event) {
 
     const student =
         students.find(
-            item =>
+            item => {
 
-                getStudentId(item) ===
+                return (
+                    getStudentId(item) ===
+                    studentId &&
                     String(
-                        studentId
-                    ) &&
+                        item.academicYear ||
+                        ""
+                    ).trim() ===
+                    academicYear
+                );
 
-                String(
-                    item.academicYear ||
-                    ""
-                ) ===
-                    String(
-                        academicYear
-                    )
+            }
         );
 
 
@@ -1250,10 +1295,6 @@ async function savePayment(event) {
 
     }
 
-
-    /* =================================
-       Disable Button
-       ================================= */
 
     const button =
         document.getElementById(
@@ -1273,10 +1314,6 @@ async function savePayment(event) {
 
 
     try {
-
-        /* =================================
-           Send To Backend
-           ================================= */
 
         const result =
             await apiRequest(
@@ -1305,10 +1342,6 @@ async function savePayment(event) {
             );
 
 
-        /* =================================
-           Backend Response
-           ================================= */
-
         const payment =
             result.payment ||
             {};
@@ -1330,7 +1363,12 @@ async function savePayment(event) {
 
 
         showSuccess(
-            `Payment recorded successfully.${receiptNumber ? ` Receipt: ${receiptNumber}` : ""}`
+            "Payment recorded successfully." +
+            (
+                receiptNumber
+                    ? ` Receipt: ${receiptNumber}`
+                    : ""
+            )
         );
 
 
@@ -1338,9 +1376,10 @@ async function savePayment(event) {
             () => {
 
                 window.location.href =
-                    `school-payments.html?id=${encodeURIComponent(
+                    "school-payments.html?id=" +
+                    encodeURIComponent(
                         institutionId
-                    )}`;
+                    );
 
             },
             1000
@@ -1382,20 +1421,26 @@ async function savePayment(event) {
 
 function goBack() {
 
-    if (!institutionId) {
+    const id =
+        institutionId ||
+        currentUser?.institutionId ||
+        "";
+
+
+    if (id) {
+
+        window.location.href =
+            "school-payments.html?id=" +
+            encodeURIComponent(
+                id
+            );
+
+    } else {
 
         window.location.href =
             "school-payments.html";
 
-        return;
-
     }
-
-
-    window.location.href =
-        `school-payments.html?id=${encodeURIComponent(
-            institutionId
-        )}`;
 
 }
 
@@ -1413,22 +1458,19 @@ function goToPayments() {
 
 function setupEventListeners() {
 
-    /* Academic Year */
-
-    const academicYearElement =
+    const academicYear =
         document.getElementById(
             "academicYear"
         );
 
 
-    if (academicYearElement) {
+    if (academicYear) {
 
-        academicYearElement.addEventListener(
+        academicYear.addEventListener(
             "change",
             () => {
 
                 clearStudentInformation();
-
                 clearError();
 
             }
@@ -1437,17 +1479,15 @@ function setupEventListeners() {
     }
 
 
-    /* Search Button */
-
-    const searchStudentButton =
+    const searchButton =
         document.getElementById(
             "searchStudentButton"
         );
 
 
-    if (searchStudentButton) {
+    if (searchButton) {
 
-        searchStudentButton.addEventListener(
+        searchButton.addEventListener(
             "click",
             searchStudentByNumber
         );
@@ -1455,17 +1495,15 @@ function setupEventListeners() {
     }
 
 
-    /* Search using Enter */
-
-    const studentNumberSearch =
+    const studentSearch =
         document.getElementById(
             "studentNumberSearch"
         );
 
 
-    if (studentNumberSearch) {
+    if (studentSearch) {
 
-        studentNumberSearch.addEventListener(
+        studentSearch.addEventListener(
             "keydown",
             event => {
 
@@ -1486,8 +1524,6 @@ function setupEventListeners() {
     }
 
 
-    /* Payment Form */
-
     const paymentForm =
         document.getElementById(
             "paymentForm"
@@ -1504,8 +1540,6 @@ function setupEventListeners() {
     }
 
 
-    /* Back */
-
     const backButton =
         document.getElementById(
             "backButton"
@@ -1514,13 +1548,13 @@ function setupEventListeners() {
 
     if (backButton) {
 
-        backButton.onclick =
-            goBack;
+        backButton.addEventListener(
+            "click",
+            goBack
+        );
 
     }
 
-
-    /* Cancel */
 
     const cancelButton =
         document.getElementById(
@@ -1530,8 +1564,10 @@ function setupEventListeners() {
 
     if (cancelButton) {
 
-        cancelButton.onclick =
-            goBack;
+        cancelButton.addEventListener(
+            "click",
+            goBack
+        );
 
     }
 
@@ -1545,7 +1581,9 @@ function setupEventListeners() {
 async function initializePage() {
 
     if (pageInitialized) {
+
         return;
+
     }
 
 
@@ -1559,19 +1597,8 @@ async function initializePage() {
 
     if (!authenticated) {
 
-        console.error(
-            "School authentication failed."
-        );
-
-        return;
-
-    }
-
-
-    if (!institutionId) {
-
         showError(
-            "Institution ID is missing."
+            "School authentication failed. Please log in again."
         );
 
         return;
@@ -1603,6 +1630,11 @@ async function initializePage() {
     setReceiptNumber();
 
 
+    showSuccess(
+        "Loading students..."
+    );
+
+
     const loaded =
         await loadStudentsFromBackend();
 
@@ -1614,7 +1646,20 @@ async function initializePage() {
     }
 
 
+    if (!students.length) {
+
+        showError(
+            "No students were found for this school."
+        );
+
+        return;
+
+    }
+
+
     loadAcademicYears();
+
+    clearError();
 
 }
 
