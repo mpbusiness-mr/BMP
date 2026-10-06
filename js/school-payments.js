@@ -18,7 +18,10 @@ const API_URL =
 
 let currentUser = null;
 let institutionId = null;
+
 let allPayments = [];
+let allStudents = [];
+
 let pageInitialized = false;
 
 
@@ -38,11 +41,6 @@ function getElement(id) {
    ================================= */
 
 function initializeAuthentication() {
-
-    /*
-     * Do NOT allow authentication errors
-     * to stop the entire page.
-     */
 
     try {
 
@@ -67,8 +65,36 @@ function initializeAuthentication() {
 
 
     /*
-     * Get institution directly from
-     * the current user first.
+     * Fallback to localStorage
+     */
+
+    if (!currentUser) {
+
+        try {
+
+            currentUser =
+                JSON.parse(
+                    localStorage.getItem(
+                        "bmpCurrentUser"
+                    ) || "null"
+                );
+
+        } catch (error) {
+
+            console.error(
+                "Could not read current user:",
+                error
+            );
+
+            currentUser = null;
+
+        }
+
+    }
+
+
+    /*
+     * Institution from current user
      */
 
     if (
@@ -83,7 +109,7 @@ function initializeAuthentication() {
 
 
     /*
-     * Try auth helper if needed.
+     * Auth helper fallback
      */
 
     if (
@@ -110,39 +136,42 @@ function initializeAuthentication() {
 
 
     /*
-     * URL fallback.
+     * URL fallback
      */
 
     if (!institutionId) {
 
-        const params =
-            new URLSearchParams(
-                window.location.search
+        try {
+
+            const params =
+                new URLSearchParams(
+                    window.location.search
+                );
+
+
+            institutionId =
+                params.get(
+                    "institutionId"
+                ) ||
+                params.get(
+                    "id"
+                ) ||
+                null;
+
+        } catch (error) {
+
+            console.error(
+                "URL error:",
+                error
             );
 
-
-        const urlInstitutionId =
-            params.get(
-                "institutionId"
-            );
-
-
-        const urlId =
-            params.get(
-                "id"
-            );
-
-
-        institutionId =
-            urlInstitutionId ||
-            urlId ||
-            null;
+        }
 
     }
 
 
     /*
-     * Final localStorage fallback.
+     * Final localStorage fallback
      */
 
     if (!institutionId) {
@@ -153,7 +182,7 @@ function initializeAuthentication() {
                 JSON.parse(
                     localStorage.getItem(
                         "bmpCurrentUser"
-                    )
+                    ) || "null"
                 );
 
 
@@ -170,7 +199,7 @@ function initializeAuthentication() {
         } catch (error) {
 
             console.error(
-                "Could not read stored user:",
+                "Stored user error:",
                 error
             );
 
@@ -179,7 +208,9 @@ function initializeAuthentication() {
     }
 
 
-    return true;
+    return Boolean(
+        institutionId
+    );
 
 }
 
@@ -299,15 +330,15 @@ async function apiRequest(
 
 function loadInstitution() {
 
-    const institutionNameElement =
-        getElement(
-            "institutionName"
-        );
-
-
     const institutionIdElement =
         getElement(
             "institutionId"
+        );
+
+
+    const institutionNameElement =
+        getElement(
+            "institutionName"
         );
 
 
@@ -326,7 +357,8 @@ function loadInstitution() {
                 currentUser &&
                 (
                     currentUser.institutionName ||
-                    currentUser.schoolName
+                    currentUser.schoolName ||
+                    currentUser.institution
                 )
             ) ||
             institutionId ||
@@ -351,6 +383,10 @@ function getCurrentAcademicYear() {
         now.getFullYear();
 
 
+    /*
+     * October → June
+     */
+
     if (
         now.getMonth() < 9
     ) {
@@ -361,6 +397,229 @@ function getCurrentAcademicYear() {
 
 
     return `${year}-${year + 1}`;
+
+}
+
+
+/* =================================
+   Student Helpers
+   ================================= */
+
+function getStudentId(student) {
+
+    return String(
+        student.studentId ||
+        student.id ||
+        ""
+    );
+
+}
+
+
+function getStudentById(studentId) {
+
+    const id =
+        String(
+            studentId ||
+            ""
+        );
+
+
+    if (!id) {
+
+        return null;
+
+    }
+
+
+    return (
+        allStudents.find(
+            student =>
+                getStudentId(student) ===
+                id
+        ) ||
+        null
+    );
+
+}
+
+
+function formatStage(stage) {
+
+    if (!stage) {
+
+        return "";
+
+    }
+
+
+    const normalized =
+        String(stage)
+            .trim()
+            .toLowerCase();
+
+
+    const stages = {
+
+        primary:
+            "Primary",
+
+        preparatory:
+            "Preparatory",
+
+        secondary:
+            "Secondary"
+
+    };
+
+
+    return (
+        stages[normalized] ||
+        String(stage)
+    );
+
+}
+
+
+function getStudentStage(payment) {
+
+    /*
+     * If backend already sends stage,
+     * use it first.
+     */
+
+    if (payment.stage) {
+
+        return formatStage(
+            payment.stage
+        );
+
+    }
+
+
+    /*
+     * Otherwise find student.
+     */
+
+    const student =
+        getStudentById(
+            payment.studentId
+        );
+
+
+    if (!student) {
+
+        return "";
+
+    }
+
+
+    return formatStage(
+        student.stage
+    );
+
+}
+
+
+function getStudentClass(payment) {
+
+    if (payment.className) {
+
+        return payment.className;
+
+    }
+
+
+    if (payment.class) {
+
+        return payment.class;
+
+    }
+
+
+    const student =
+        getStudentById(
+            payment.studentId
+        );
+
+
+    if (!student) {
+
+        return "";
+
+    }
+
+
+    return (
+        student.className ||
+        student.class ||
+        student.classNumber ||
+        ""
+    );
+
+}
+
+
+/* =================================
+   Load Students
+   ================================= */
+
+async function loadStudents() {
+
+    try {
+
+        const result =
+            await apiRequest(
+                "getStudents"
+            );
+
+
+        allStudents =
+            Array.isArray(
+                result.students
+            )
+                ? result.students
+                : [];
+
+
+        /*
+         * Keep only students belonging
+         * to the current institution.
+         */
+
+        allStudents =
+            allStudents.filter(
+                student =>
+                    !student.institutionId ||
+                    String(
+                        student.institutionId
+                    ) ===
+                    String(
+                        institutionId
+                    )
+            );
+
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load students:",
+            error
+        );
+
+
+        /*
+         * Payments can still be displayed
+         * even if student loading fails.
+         */
+
+        allStudents = [];
+
+        return false;
+
+    }
 
 }
 
@@ -383,6 +642,10 @@ function loadAcademicYearFilter() {
 
     }
 
+
+    /*
+     * Keep "All"
+     */
 
     while (
         select.options.length > 1
@@ -416,6 +679,15 @@ function loadAcademicYearFilter() {
     );
 
 
+    /*
+     * Also include current year
+     */
+
+    years.add(
+        getCurrentAcademicYear()
+    );
+
+
     Array.from(years)
         .sort()
         .reverse()
@@ -443,6 +715,11 @@ function loadAcademicYearFilter() {
             }
         );
 
+
+    /*
+     * Automatically select current
+     * academic year if payments exist.
+     */
 
     const currentYear =
         getCurrentAcademicYear();
@@ -477,7 +754,11 @@ async function loadPayments() {
 
     try {
 
-        const result =
+        /*
+         * Load payments
+         */
+
+        const paymentResult =
             await apiRequest(
                 "getPayments"
             );
@@ -485,15 +766,34 @@ async function loadPayments() {
 
         allPayments =
             Array.isArray(
-                result.payments
+                paymentResult.payments
             )
-                ? result.payments
+                ? paymentResult.payments
                 : [];
 
 
+        /*
+         * Load students as well.
+         * This allows us to determine
+         * stage/class from studentId.
+         */
+
+        await loadStudents();
+
+
+        /*
+         * Build academic-year filter.
+         */
+
         loadAcademicYearFilter();
 
+
+        /*
+         * Display payments.
+         */
+
         renderPayments();
+
 
     } catch (error) {
 
@@ -527,11 +827,19 @@ function renderPayments() {
         [...allPayments];
 
 
+    /*
+     * Academic Year
+     */
+
     const academicYear =
         getElement(
             "academicYear"
         )?.value || "";
 
+
+    /*
+     * Month
+     */
 
     const month =
         getElement(
@@ -539,11 +847,19 @@ function renderPayments() {
         )?.value || "";
 
 
+    /*
+     * Stage
+     */
+
     const stage =
         getElement(
             "stageFilter"
         )?.value || "";
 
+
+    /*
+     * Search
+     */
 
     const search =
         (
@@ -555,9 +871,17 @@ function renderPayments() {
         .toLowerCase();
 
 
+    /*
+     * Apply filters
+     */
+
     payments =
         payments.filter(
             payment => {
+
+                /*
+                 * Academic Year
+                 */
 
                 if (
                     academicYear &&
@@ -575,13 +899,19 @@ function renderPayments() {
                 }
 
 
+                /*
+                 * Month
+                 */
+
                 if (
                     month &&
                     String(
                         payment.month ||
                         ""
                     ).toLowerCase() !==
-                    month.toLowerCase()
+                    String(
+                        month
+                    ).toLowerCase()
                 ) {
 
                     return false;
@@ -590,23 +920,36 @@ function renderPayments() {
 
 
                 /*
-                 * Only filter by stage when
-                 * payment.stage actually exists.
+                 * Stage
                  */
 
-                if (
-                    stage &&
-                    payment.stage &&
-                    String(
-                        payment.stage
-                    ).toLowerCase() !==
-                    stage.toLowerCase()
-                ) {
+                if (stage) {
 
-                    return false;
+                    const paymentStage =
+                        String(
+                            getStudentStage(
+                                payment
+                            )
+                        )
+                        .trim()
+                        .toLowerCase();
+
+
+                    if (
+                        paymentStage !==
+                        stage.toLowerCase()
+                    ) {
+
+                        return false;
+
+                    }
 
                 }
 
+
+                /*
+                 * Search
+                 */
 
                 if (search) {
 
@@ -631,6 +974,13 @@ function renderPayments() {
                         ).toLowerCase();
 
 
+                    const receiptNumber =
+                        String(
+                            payment.receiptNumber ||
+                            ""
+                        ).toLowerCase();
+
+
                     if (
                         !studentName.includes(
                             search
@@ -639,6 +989,9 @@ function renderPayments() {
                             search
                         ) &&
                         !studentId.includes(
+                            search
+                        ) &&
+                        !receiptNumber.includes(
                             search
                         )
                     ) {
@@ -656,22 +1009,26 @@ function renderPayments() {
         );
 
 
+    /*
+     * Newest payments first
+     */
+
     payments.sort(
         (a, b) => {
 
             const dateA =
-                new Date(
+                parsePaymentDate(
                     a.paymentDate ||
                     a.date ||
-                    0
+                    a.createdAt
                 );
 
 
             const dateB =
-                new Date(
+                parsePaymentDate(
                     b.paymentDate ||
                     b.date ||
-                    0
+                    b.createdAt
                 );
 
 
@@ -681,11 +1038,36 @@ function renderPayments() {
     );
 
 
+    /*
+     * Summary
+     */
+
     const totalPayments =
-        payments.length;
+        allPayments.length;
 
 
     const totalAmount =
+        allPayments.reduce(
+            (total, payment) => {
+
+                return (
+                    total +
+                    Number(
+                        payment.amount ||
+                        0
+                    )
+                );
+
+            },
+            0
+        );
+
+
+    const displayedPayments =
+        payments.length;
+
+
+    const displayedAmount =
         payments.reduce(
             (total, payment) => {
 
@@ -702,6 +1084,10 @@ function renderPayments() {
         );
 
 
+    /*
+     * Total Payments
+     */
+
     const totalPaymentsElement =
         getElement(
             "totalPayments"
@@ -715,6 +1101,10 @@ function renderPayments() {
 
     }
 
+
+    /*
+     * Total Amount
+     */
 
     const totalAmountElement =
         getElement(
@@ -730,6 +1120,10 @@ function renderPayments() {
     }
 
 
+    /*
+     * Displayed Payments
+     */
+
     const displayedPaymentsElement =
         getElement(
             "displayedPayments"
@@ -739,10 +1133,14 @@ function renderPayments() {
     if (displayedPaymentsElement) {
 
         displayedPaymentsElement.textContent =
-            totalPayments.toLocaleString();
+            displayedPayments.toLocaleString();
 
     }
 
+
+    /*
+     * Table
+     */
 
     const tbody =
         getElement(
@@ -761,6 +1159,10 @@ function renderPayments() {
         "";
 
 
+    /*
+     * No payments
+     */
+
     if (
         payments.length === 0
     ) {
@@ -775,12 +1177,28 @@ function renderPayments() {
     hideEmpty();
 
 
+    /*
+     * Display each payment
+     */
+
     payments.forEach(
         payment => {
 
             const row =
                 document.createElement(
                     "tr"
+                );
+
+
+            const stage =
+                getStudentStage(
+                    payment
+                );
+
+
+            const className =
+                getStudentClass(
+                    payment
                 );
 
 
@@ -848,6 +1266,19 @@ function renderPayments() {
             `;
 
 
+            /*
+             * Store extra information
+             * for the details modal.
+             */
+
+            row.dataset.studentStage =
+                stage;
+
+
+            row.dataset.studentClass =
+                className;
+
+
             row.style.cursor =
                 "pointer";
 
@@ -887,13 +1318,67 @@ function getMonthDisplayName(month) {
     }
 
 
-    return month;
+    return String(
+        month
+    );
 
 }
 
 
 /* =================================
-   Date
+   Date Parsing
+   ================================= */
+
+function parsePaymentDate(value) {
+
+    if (!value) {
+
+        return 0;
+
+    }
+
+
+    /*
+     * Handle YYYY-MM-DD safely
+     * without timezone shifting.
+     */
+
+    if (
+        /^\d{4}-\d{2}-\d{2}$/.test(
+            String(value)
+        )
+    ) {
+
+        const parts =
+            String(value)
+                .split("-")
+                .map(Number);
+
+
+        return new Date(
+            parts[0],
+            parts[1] - 1,
+            parts[2]
+        ).getTime();
+
+    }
+
+
+    const date =
+        new Date(value);
+
+
+    return isNaN(
+        date.getTime()
+    )
+        ? 0
+        : date.getTime();
+
+}
+
+
+/* =================================
+   Date Display
    ================================= */
 
 function formatDate(date) {
@@ -901,6 +1386,26 @@ function formatDate(date) {
     if (!date) {
 
         return "-";
+
+    }
+
+
+    /*
+     * YYYY-MM-DD
+     */
+
+    if (
+        /^\d{4}-\d{2}-\d{2}$/.test(
+            String(date)
+        )
+    ) {
+
+        const parts =
+            String(date)
+                .split("-");
+
+
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
 
     }
 
@@ -921,7 +1426,7 @@ function formatDate(date) {
 
 
     return parsed.toLocaleDateString(
-        "en-US"
+        "en-GB"
     );
 
 }
@@ -933,12 +1438,29 @@ function formatDate(date) {
 
 function escapeHtml(value) {
 
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    return String(
+        value ?? ""
+    )
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
@@ -947,7 +1469,9 @@ function escapeHtml(value) {
    Payment Details
    ================================= */
 
-function showPaymentDetails(payment) {
+function showPaymentDetails(
+    payment
+) {
 
     const modal =
         getElement(
@@ -971,6 +1495,18 @@ function showPaymentDetails(payment) {
     }
 
 
+    const stage =
+        getStudentStage(
+            payment
+        );
+
+
+    const className =
+        getStudentClass(
+            payment
+        );
+
+
     content.innerHTML = `
 
         <div class="payment-detail-row">
@@ -983,6 +1519,7 @@ function showPaymentDetails(payment) {
             </span>
         </div>
 
+
         <div class="payment-detail-row">
             <strong>Student Name</strong>
             <span>
@@ -993,6 +1530,29 @@ function showPaymentDetails(payment) {
             </span>
         </div>
 
+
+        <div class="payment-detail-row">
+            <strong>Stage</strong>
+            <span>
+                ${escapeHtml(
+                    stage ||
+                    "-"
+                )}
+            </span>
+        </div>
+
+
+        <div class="payment-detail-row">
+            <strong>Class</strong>
+            <span>
+                ${escapeHtml(
+                    className ||
+                    "-"
+                )}
+            </span>
+        </div>
+
+
         <div class="payment-detail-row">
             <strong>Academic Year</strong>
             <span>
@@ -1002,6 +1562,7 @@ function showPaymentDetails(payment) {
                 )}
             </span>
         </div>
+
 
         <div class="payment-detail-row">
             <strong>Month</strong>
@@ -1014,6 +1575,7 @@ function showPaymentDetails(payment) {
             </span>
         </div>
 
+
         <div class="payment-detail-row">
             <strong>Amount</strong>
             <span>
@@ -1023,6 +1585,7 @@ function showPaymentDetails(payment) {
                 ).toLocaleString()}
             </span>
         </div>
+
 
         <div class="payment-detail-row">
             <strong>Payment Date</strong>
@@ -1036,6 +1599,7 @@ function showPaymentDetails(payment) {
             </span>
         </div>
 
+
         <div class="payment-detail-row">
             <strong>Receipt Number</strong>
             <span>
@@ -1046,11 +1610,23 @@ function showPaymentDetails(payment) {
             </span>
         </div>
 
+
         <div class="payment-detail-row">
             <strong>Recorded By</strong>
             <span>
                 ${escapeHtml(
                     payment.recordedBy ||
+                    "-"
+                )}
+            </span>
+        </div>
+
+
+        <div class="payment-detail-row">
+            <strong>Notes</strong>
+            <span>
+                ${escapeHtml(
+                    payment.notes ||
                     "-"
                 )}
             </span>
@@ -1256,6 +1832,8 @@ function hideEmpty() {
 
 function applyFilters() {
 
+    hideError();
+
     renderPayments();
 
 }
@@ -1319,6 +1897,8 @@ function resetFilters() {
     }
 
 
+    hideError();
+
     renderPayments();
 
 }
@@ -1346,8 +1926,12 @@ function getNavigationInstitutionId() {
 
 
         return (
-            params.get("institutionId") ||
-            params.get("id") ||
+            params.get(
+                "institutionId"
+            ) ||
+            params.get(
+                "id"
+            ) ||
             ""
         );
 
@@ -1593,7 +2177,8 @@ function setupEventListeners() {
         function (event) {
 
             if (
-                event.key === "Escape"
+                event.key ===
+                "Escape"
             ) {
 
                 closePaymentDetails();
@@ -1610,7 +2195,7 @@ function setupEventListeners() {
    Initialize
    ================================= */
 
-function initializePage() {
+async function initializePage() {
 
     if (pageInitialized) {
 
@@ -1623,24 +2208,27 @@ function initializePage() {
         true;
 
 
-    initializeAuthentication();
+    const authenticated =
+        initializeAuthentication();
+
+
+    if (!authenticated) {
+
+        showError(
+            "School authentication failed."
+        );
+
+        return;
+
+    }
+
 
     loadInstitution();
 
     setupEventListeners();
 
 
-    if (institutionId) {
-
-        loadPayments();
-
-    } else {
-
-        showError(
-            "Institution ID is missing."
-        );
-
-    }
+    await loadPayments();
 
 }
 
