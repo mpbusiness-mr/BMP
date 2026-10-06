@@ -4,6 +4,222 @@
 
 
 // =====================================================
+// Translations
+// =====================================================
+
+const translations = {
+
+    en: {
+
+        language: "Language",
+
+        back: "Back",
+
+        institutionId: "Institution ID",
+
+        schoolNameLabel: "School Name",
+
+        status: "Status",
+
+        students: "Students",
+
+        studentsDescription:
+            "Register, search and manage students.",
+
+        payments: "Payments",
+
+        paymentsDescription:
+            "Manage monthly student payments.",
+
+        receipts: "Receipts",
+
+        receiptsDescription:
+            "View and manage payment receipts.",
+
+        reports: "Reports",
+
+        reportsDescription:
+            "View school statistics and reports.",
+
+        classesStages: "Classes & Stages",
+
+        classesStagesDescription:
+            "Manage academic stages and classes.",
+
+        users: "Users",
+
+        usersDescription:
+            "Manage school users and access.",
+
+        settings: "Settings",
+
+        settingsDescription:
+            "Manage school settings.",
+
+        logout: "Logout",
+
+        schoolDashboard:
+            "School Dashboard",
+
+        manageSchoolOperations:
+            "Manage school operations",
+
+        active: "Active",
+
+        disabled: "Disabled",
+
+        expired: "Expired",
+
+        school: "School"
+
+    },
+
+
+    ar: {
+
+        language: "اللغة",
+
+        back: "رجوع",
+
+        institutionId: "رقم المؤسسة",
+
+        schoolNameLabel: "اسم المدرسة",
+
+        status: "الحالة",
+
+        students: "الطلاب",
+
+        studentsDescription:
+            "تسجيل الطلاب والبحث عنهم وإدارتهم.",
+
+        payments: "المدفوعات",
+
+        paymentsDescription:
+            "إدارة المدفوعات الشهرية للطلاب.",
+
+        receipts: "الإيصالات",
+
+        receiptsDescription:
+            "عرض وإدارة إيصالات الدفع.",
+
+        reports: "التقارير",
+
+        reportsDescription:
+            "عرض إحصائيات وتقارير المدرسة.",
+
+        classesStages: "المراحل والأقسام",
+
+        classesStagesDescription:
+            "إدارة المراحل الدراسية والأقسام.",
+
+        users: "المستخدمون",
+
+        usersDescription:
+            "إدارة مستخدمي المدرسة والصلاحيات.",
+
+        settings: "الإعدادات",
+
+        settingsDescription:
+            "إدارة إعدادات المدرسة.",
+
+        logout: "تسجيل الخروج",
+
+        schoolDashboard:
+            "لوحة تحكم المدرسة",
+
+        manageSchoolOperations:
+            "إدارة عمليات المدرسة",
+
+        active: "نشطة",
+
+        disabled: "معطلة",
+
+        expired: "منتهية",
+
+        school: "المدرسة"
+
+    },
+
+
+    fr: {
+
+        language: "Langue",
+
+        back: "Retour",
+
+        institutionId: "ID de l'établissement",
+
+        schoolNameLabel: "Nom de l'école",
+
+        status: "Statut",
+
+        students: "Élèves",
+
+        studentsDescription:
+            "Inscrire, rechercher et gérer les élèves.",
+
+        payments: "Paiements",
+
+        paymentsDescription:
+            "Gérer les paiements mensuels des élèves.",
+
+        receipts: "Reçus",
+
+        receiptsDescription:
+            "Consulter et gérer les reçus de paiement.",
+
+        reports: "Rapports",
+
+        reportsDescription:
+            "Consulter les statistiques et rapports de l'école.",
+
+        classesStages: "Classes et niveaux",
+
+        classesStagesDescription:
+            "Gérer les niveaux scolaires et les classes.",
+
+        users: "Utilisateurs",
+
+        usersDescription:
+            "Gérer les utilisateurs et les accès de l'école.",
+
+        settings: "Paramètres",
+
+        settingsDescription:
+            "Gérer les paramètres de l'école.",
+
+        logout: "Déconnexion",
+
+        schoolDashboard:
+            "Tableau de bord de l'école",
+
+        manageSchoolOperations:
+            "Gérer les opérations de l'école",
+
+        active: "Active",
+
+        disabled: "Désactivée",
+
+        expired: "Expirée",
+
+        school: "École"
+
+    }
+
+};
+
+
+// =====================================================
+// Current Language
+// =====================================================
+
+let currentLanguage =
+    localStorage.getItem(
+        "bmpLanguage"
+    ) || "en";
+
+
+// =====================================================
 // Check Session
 // =====================================================
 
@@ -158,7 +374,7 @@ function getInstitutionStatus(
         "disabled"
     ) {
 
-        return "Disabled";
+        return "disabled";
 
     }
 
@@ -198,14 +414,183 @@ function getInstitutionStatus(
             licenseEnd < today
         ) {
 
-            return "Expired";
+            return "expired";
 
         }
 
     }
 
 
-    return "Active";
+    return "active";
+}
+
+
+// =====================================================
+// Translate Status
+// =====================================================
+
+function translateStatus(
+    status
+) {
+
+    const key =
+        String(
+            status || ""
+        ).toLowerCase();
+
+    return (
+        translations[currentLanguage][key]
+        ||
+        status
+    );
+
+}
+
+
+// =====================================================
+// Apply Language
+// =====================================================
+
+function applyLanguage(
+    language
+) {
+
+    if (
+        !translations[language]
+    ) {
+
+        language = "en";
+
+    }
+
+
+    currentLanguage =
+        language;
+
+
+    localStorage.setItem(
+        "bmpLanguage",
+        language
+    );
+
+
+    // =============================================
+    // Direction
+    // =============================================
+
+    document.documentElement.lang =
+        language;
+
+    document.documentElement.dir =
+        language === "ar"
+            ? "rtl"
+            : "ltr";
+
+
+    // =============================================
+    // Static Text
+    // =============================================
+
+    document
+        .querySelectorAll(
+            "[data-i18n]"
+        )
+        .forEach(
+            function (element) {
+
+                const key =
+                    element.getAttribute(
+                        "data-i18n"
+                    );
+
+                if (
+                    translations[language][key]
+                ) {
+
+                    element.textContent =
+                        translations[language][key];
+
+                }
+
+            }
+        );
+
+
+    // =============================================
+    // Dashboard Header
+    // =============================================
+
+    if (schoolInfo) {
+
+        schoolInfo.textContent =
+            institution.phone ||
+            institution.email ||
+            translations[
+                language
+            ].manageSchoolOperations;
+
+    }
+
+
+    // =============================================
+    // School Name
+    // =============================================
+
+    if (schoolName) {
+
+        if (
+            institution.name
+        ) {
+
+            schoolName.textContent =
+                institution.name;
+
+        } else {
+
+            schoolName.textContent =
+                translations[
+                    language
+                ].schoolDashboard;
+
+        }
+
+    }
+
+
+    // =============================================
+    // Status
+    // =============================================
+
+    if (statusElement) {
+
+        statusElement.textContent =
+            translateStatus(
+                getInstitutionStatus(
+                    institution
+                )
+            );
+
+    }
+
+
+    // =============================================
+    // Language Selector
+    // =============================================
+
+    const languageSelect =
+        document.getElementById(
+            "languageSelect"
+        );
+
+    if (
+        languageSelect
+    ) {
+
+        languageSelect.value =
+            language;
+
+    }
+
 }
 
 
@@ -247,7 +632,9 @@ if (schoolName) {
 
     schoolName.textContent =
         institution.name ||
-        "School";
+        translations[
+            currentLanguage
+        ].school;
 
 }
 
@@ -257,7 +644,9 @@ if (schoolInfo) {
     schoolInfo.textContent =
         institution.phone ||
         institution.email ||
-        "";
+        translations[
+            currentLanguage
+        ].manageSchoolOperations;
 
 }
 
@@ -281,9 +670,37 @@ if (institutionNameElement) {
 if (statusElement) {
 
     statusElement.textContent =
-        getInstitutionStatus(
-            institution
+        translateStatus(
+            getInstitutionStatus(
+                institution
+            )
         );
+
+}
+
+
+// =====================================================
+// Language Selector
+// =====================================================
+
+const languageSelect =
+    document.getElementById(
+        "languageSelect"
+    );
+
+
+if (languageSelect) {
+
+    languageSelect.addEventListener(
+        "change",
+        function () {
+
+            applyLanguage(
+                languageSelect.value
+            );
+
+        }
+    );
 
 }
 
@@ -302,6 +719,30 @@ function openSchoolPage(
         encodeURIComponent(
             activeInstitutionId
         );
+
+}
+
+
+// =====================================================
+// Back Button
+// =====================================================
+
+const backButton =
+    document.getElementById(
+        "backButton"
+    );
+
+
+if (backButton) {
+
+    backButton.addEventListener(
+        "click",
+        function () {
+
+            window.history.back();
+
+        }
+    );
 
 }
 
@@ -449,3 +890,12 @@ document
 
         }
     );
+
+
+// =====================================================
+// Initialize Language
+// =====================================================
+
+applyLanguage(
+    currentLanguage
+);
