@@ -1,11 +1,10 @@
 /* =================================
    School Payments - BMP
-   Google Sheets Version
    ================================= */
 
 
 /* =================================
-   Configuration
+   API
    ================================= */
 
 const API_URL =
@@ -23,17 +22,7 @@ let allPayments = [];
 let allStudents = [];
 
 let pageInitialized = false;
-
-
-/* =================================
-   Helpers
-   ================================= */
-
-function getElement(id) {
-
-    return document.getElementById(id);
-
-}
+let paymentsLoaded = false;
 
 
 /* =================================
@@ -57,16 +46,12 @@ function initializeAuthentication() {
     } catch (error) {
 
         console.error(
-            "School authentication error:",
+            "Authentication error:",
             error
         );
 
     }
 
-
-    /*
-     * Fallback to localStorage
-     */
 
     if (!currentUser) {
 
@@ -82,7 +67,7 @@ function initializeAuthentication() {
         } catch (error) {
 
             console.error(
-                "Could not read current user:",
+                "Invalid stored user:",
                 error
             );
 
@@ -93,119 +78,81 @@ function initializeAuthentication() {
     }
 
 
-    /*
-     * Institution from current user
-     */
+    if (!currentUser) {
 
-    if (
-        currentUser &&
-        currentUser.institutionId
-    ) {
-
-        institutionId =
-            currentUser.institutionId;
+        return false;
 
     }
 
 
     /*
-     * Auth helper fallback
+     * First try the authenticated
+     * institution helper.
      */
 
-    if (
-        !institutionId &&
-        typeof getActiveInstitutionId ===
-        "function"
-    ) {
+    try {
 
-        try {
+        if (
+            typeof getActiveInstitutionId ===
+            "function"
+        ) {
 
             institutionId =
                 getActiveInstitutionId();
 
-        } catch (error) {
-
-            console.error(
-                "Institution ID error:",
-                error
-            );
-
         }
+
+    } catch (error) {
+
+        console.error(
+            "Institution helper error:",
+            error
+        );
 
     }
 
 
     /*
-     * URL fallback
+     * Then URL.
      */
 
     if (!institutionId) {
 
-        try {
-
-            const params =
-                new URLSearchParams(
-                    window.location.search
-                );
-
-
-            institutionId =
-                params.get(
-                    "institutionId"
-                ) ||
-                params.get(
-                    "id"
-                ) ||
-                null;
-
-        } catch (error) {
-
-            console.error(
-                "URL error:",
-                error
+        const params =
+            new URLSearchParams(
+                window.location.search
             );
 
-        }
+        institutionId =
+            params.get(
+                "institutionId"
+            ) ||
+            params.get(
+                "id"
+            ) ||
+            "";
 
     }
 
 
     /*
-     * Final localStorage fallback
+     * Finally stored user.
      */
 
     if (!institutionId) {
 
-        try {
-
-            const storedUser =
-                JSON.parse(
-                    localStorage.getItem(
-                        "bmpCurrentUser"
-                    ) || "null"
-                );
-
-
-            if (
-                storedUser &&
-                storedUser.institutionId
-            ) {
-
-                institutionId =
-                    storedUser.institutionId;
-
-            }
-
-        } catch (error) {
-
-            console.error(
-                "Stored user error:",
-                error
-            );
-
-        }
+        institutionId =
+            currentUser.institutionId ||
+            "";
 
     }
+
+
+    institutionId =
+        String(
+            institutionId ||
+            ""
+        ).trim();
 
 
     return Boolean(
@@ -221,25 +168,49 @@ function initializeAuthentication() {
 
 function getCurrentUsername() {
 
-    if (!currentUser) {
+    if (
+        currentUser &&
+        currentUser.username
+    ) {
 
-        return "";
+        return String(
+            currentUser.username
+        ).trim();
 
     }
 
 
-    return (
-        currentUser.username ||
-        currentUser.userName ||
-        currentUser.name ||
-        ""
-    );
+    if (
+        currentUser &&
+        currentUser.userName
+    ) {
+
+        return String(
+            currentUser.userName
+        ).trim();
+
+    }
+
+
+    if (
+        currentUser &&
+        currentUser.name
+    ) {
+
+        return String(
+            currentUser.name
+        ).trim();
+
+    }
+
+
+    return "";
 
 }
 
 
 /* =================================
-   Backend Request
+   API Request
    ================================= */
 
 async function apiRequest(
@@ -256,6 +227,19 @@ async function apiRequest(
     }
 
 
+    const username =
+        getCurrentUsername();
+
+
+    if (!username) {
+
+        throw new Error(
+            "Current user is missing."
+        );
+
+    }
+
+
     const payload = {
 
         action:
@@ -265,35 +249,60 @@ async function apiRequest(
             institutionId,
 
         username:
-            getCurrentUsername(),
+            username,
 
         ...data
 
     };
 
 
-    const response =
-        await fetch(
-            API_URL,
-            {
+    console.log(
+        "BMP API request:",
+        payload
+    );
 
-                method:
-                    "POST",
 
-                headers: {
+    let response;
 
-                    "Content-Type":
-                        "text/plain;charset=utf-8"
 
-                },
+    try {
 
-                body:
-                    JSON.stringify(
-                        payload
-                    )
+        response =
+            await fetch(
+                API_URL,
+                {
+                    method:
+                        "POST",
 
-            }
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
+                }
+            );
+
+    } catch (error) {
+
+        throw new Error(
+            "Could not connect to the BMP server."
         );
+
+    }
+
+
+    const responseText =
+        await response.text();
+
+
+    console.log(
+        "BMP API response:",
+        responseText
+    );
 
 
     if (!response.ok) {
@@ -305,15 +314,29 @@ async function apiRequest(
     }
 
 
-    const result =
-        await response.json();
+    let result;
+
+    try {
+
+        result =
+            JSON.parse(
+                responseText
+            );
+
+    } catch (error) {
+
+        throw new Error(
+            "The server returned an invalid response."
+        );
+
+    }
 
 
     if (!result.success) {
 
         throw new Error(
             result.message ||
-            "Request failed."
+            "The request failed."
         );
 
     }
@@ -325,52 +348,7 @@ async function apiRequest(
 
 
 /* =================================
-   Institution
-   ================================= */
-
-function loadInstitution() {
-
-    const institutionIdElement =
-        getElement(
-            "institutionId"
-        );
-
-
-    const institutionNameElement =
-        getElement(
-            "institutionName"
-        );
-
-
-    if (institutionIdElement) {
-
-        institutionIdElement.textContent =
-            institutionId || "-";
-
-    }
-
-
-    if (institutionNameElement) {
-
-        institutionNameElement.textContent =
-            (
-                currentUser &&
-                (
-                    currentUser.institutionName ||
-                    currentUser.schoolName ||
-                    currentUser.institution
-                )
-            ) ||
-            institutionId ||
-            "-";
-
-    }
-
-}
-
-
-/* =================================
-   Academic Year
+   Current Academic Year
    ================================= */
 
 function getCurrentAcademicYear() {
@@ -384,7 +362,7 @@ function getCurrentAcademicYear() {
 
 
     /*
-     * October → June
+     * October -> June
      */
 
     if (
@@ -402,166 +380,7 @@ function getCurrentAcademicYear() {
 
 
 /* =================================
-   Student Helpers
-   ================================= */
-
-function getStudentId(student) {
-
-    return String(
-        student.studentId ||
-        student.id ||
-        ""
-    );
-
-}
-
-
-function getStudentById(studentId) {
-
-    const id =
-        String(
-            studentId ||
-            ""
-        );
-
-
-    if (!id) {
-
-        return null;
-
-    }
-
-
-    return (
-        allStudents.find(
-            student =>
-                getStudentId(student) ===
-                id
-        ) ||
-        null
-    );
-
-}
-
-
-function formatStage(stage) {
-
-    if (!stage) {
-
-        return "";
-
-    }
-
-
-    const normalized =
-        String(stage)
-            .trim()
-            .toLowerCase();
-
-
-    const stages = {
-
-        primary:
-            "Primary",
-
-        preparatory:
-            "Preparatory",
-
-        secondary:
-            "Secondary"
-
-    };
-
-
-    return (
-        stages[normalized] ||
-        String(stage)
-    );
-
-}
-
-
-function getStudentStage(payment) {
-
-    /*
-     * If backend already sends stage,
-     * use it first.
-     */
-
-    if (payment.stage) {
-
-        return formatStage(
-            payment.stage
-        );
-
-    }
-
-
-    /*
-     * Otherwise find student.
-     */
-
-    const student =
-        getStudentById(
-            payment.studentId
-        );
-
-
-    if (!student) {
-
-        return "";
-
-    }
-
-
-    return formatStage(
-        student.stage
-    );
-
-}
-
-
-function getStudentClass(payment) {
-
-    if (payment.className) {
-
-        return payment.className;
-
-    }
-
-
-    if (payment.class) {
-
-        return payment.class;
-
-    }
-
-
-    const student =
-        getStudentById(
-            payment.studentId
-        );
-
-
-    if (!student) {
-
-        return "";
-
-    }
-
-
-    return (
-        student.className ||
-        student.class ||
-        student.classNumber ||
-        ""
-    );
-
-}
-
-
-/* =================================
-   Load Students
+   Students
    ================================= */
 
 async function loadStudents() {
@@ -582,40 +401,53 @@ async function loadStudents() {
                 : [];
 
 
-        /*
-         * Keep only students belonging
-         * to the current institution.
-         */
-
         allStudents =
             allStudents.filter(
-                student =>
-                    !student.institutionId ||
-                    String(
+                student => {
+
+                    if (
+                        !student.institutionId
+                    ) {
+
+                        return true;
+
+                    }
+
+
+                    return String(
                         student.institutionId
                     ) ===
                     String(
                         institutionId
-                    )
+                    );
+
+                }
             );
+
+
+        console.log(
+            "Students loaded:",
+            allStudents.length
+        );
 
 
         return true;
 
     } catch (error) {
 
+        /*
+         * Student loading should NOT
+         * prevent payment loading.
+         */
+
         console.error(
-            "Failed to load students:",
+            "Students could not be loaded:",
             error
         );
 
 
-        /*
-         * Payments can still be displayed
-         * even if student loading fails.
-         */
-
         allStudents = [];
+
 
         return false;
 
@@ -625,13 +457,398 @@ async function loadStudents() {
 
 
 /* =================================
-   Academic Year Filter
+   Payment Helpers
    ================================= */
 
-function loadAcademicYearFilter() {
+function getPaymentStudentId(payment) {
+
+    return String(
+        payment.studentId ||
+        payment.studentID ||
+        payment.student_id ||
+        ""
+    ).trim();
+
+}
+
+
+function getPaymentStudentNumber(payment) {
+
+    return String(
+        payment.studentNumber ||
+        payment.student_number ||
+        ""
+    ).trim();
+
+}
+
+
+function getPaymentStudentName(payment) {
+
+    return String(
+        payment.studentName ||
+        payment.name ||
+        ""
+    ).trim();
+
+}
+
+
+function getPaymentAcademicYear(payment) {
+
+    return String(
+        payment.academicYear ||
+        payment.academic_year ||
+        ""
+    ).trim();
+
+}
+
+
+function getPaymentMonth(payment) {
+
+    return String(
+        payment.month ||
+        ""
+    ).trim();
+
+}
+
+
+function getPaymentAmount(payment) {
+
+    const value =
+        Number(
+            payment.amount
+        );
+
+
+    return Number.isFinite(
+        value
+    )
+        ? value
+        : 0;
+
+}
+
+
+function getPaymentDate(payment) {
+
+    return String(
+        payment.paymentDate ||
+        payment.date ||
+        ""
+    ).trim();
+
+}
+
+
+function getReceiptNumber(payment) {
+
+    return String(
+        payment.receiptNumber ||
+        payment.receipt_number ||
+        ""
+    ).trim();
+
+}
+
+
+function getRecordedBy(payment) {
+
+    return String(
+        payment.recordedBy ||
+        payment.recorded_by ||
+        ""
+    ).trim();
+
+}
+
+
+/* =================================
+   Student Lookup
+   ================================= */
+
+function findStudentForPayment(payment) {
+
+    const studentId =
+        getPaymentStudentId(
+            payment
+        );
+
+
+    const studentNumber =
+        getPaymentStudentNumber(
+            payment
+        );
+
+
+    /*
+     * Prefer student ID.
+     */
+
+    if (studentId) {
+
+        const byId =
+            allStudents.find(
+                student =>
+                    String(
+                        student.studentId ||
+                        student.id ||
+                        ""
+                    ).trim() ===
+                    studentId
+            );
+
+
+        if (byId) {
+
+            return byId;
+
+        }
+
+    }
+
+
+    /*
+     * Fallback to student number.
+     */
+
+    if (studentNumber) {
+
+        const byNumber =
+            allStudents.find(
+                student =>
+                    String(
+                        student.studentNumber ||
+                        ""
+                    ).trim().toLowerCase() ===
+                    studentNumber.toLowerCase() &&
+                    String(
+                        student.academicYear ||
+                        ""
+                    ).trim() ===
+                    getPaymentAcademicYear(
+                        payment
+                    )
+            );
+
+
+        if (byNumber) {
+
+            return byNumber;
+
+        }
+
+    }
+
+
+    return null;
+
+}
+
+
+/* =================================
+   Stage
+   ================================= */
+
+function normalizeStage(stage) {
+
+    return String(
+        stage ||
+        ""
+    )
+        .trim()
+        .toLowerCase();
+
+}
+
+
+function getStageForPayment(payment) {
+
+    /*
+     * In case the backend already
+     * sends the stage.
+     */
+
+    if (payment.stage) {
+
+        return normalizeStage(
+            payment.stage
+        );
+
+    }
+
+
+    const student =
+        findStudentForPayment(
+            payment
+        );
+
+
+    if (!student) {
+
+        return "";
+
+    }
+
+
+    return normalizeStage(
+        student.stage
+    );
+
+}
+
+
+function formatStage(stage) {
+
+    const value =
+        normalizeStage(
+            stage
+        );
+
+
+    const stages = {
+
+        primary:
+            "Primary",
+
+        preparatory:
+            "Preparatory",
+
+        secondary:
+            "Secondary"
+
+    };
+
+
+    return (
+        stages[value] ||
+        stage ||
+        "-"
+    );
+
+}
+
+
+/* =================================
+   Load Payments
+   ================================= */
+
+async function loadPayments() {
+
+    hideError();
+    showLoading(
+        "Loading payments..."
+    );
+
+
+    try {
+
+        const result =
+            await apiRequest(
+                "getPayments"
+            );
+
+
+        /*
+         * Support the normal:
+         * result.payments
+         *
+         * and fallback:
+         * result.data
+         */
+
+        if (
+            Array.isArray(
+                result.payments
+            )
+        ) {
+
+            allPayments =
+                result.payments;
+
+        } else if (
+            Array.isArray(
+                result.data
+            )
+        ) {
+
+            allPayments =
+                result.data;
+
+        } else {
+
+            allPayments = [];
+
+        }
+
+
+        console.log(
+            "Payments loaded:",
+            allPayments.length
+        );
+
+
+        paymentsLoaded =
+            true;
+
+
+        hideLoading();
+
+
+        return true;
+
+    } catch (error) {
+
+        console.error(
+            "Failed to load payments:",
+            error
+        );
+
+
+        paymentsLoaded =
+            false;
+
+
+        allPayments =
+            [];
+
+
+        hideLoading();
+
+
+        showError(
+            error.message ||
+            "Failed to load payments."
+        );
+
+
+        updateSummary(
+            []
+        );
+
+
+        renderPayments(
+            []
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+/* =================================
+   Academic Years
+   ================================= */
+
+function loadAcademicYears() {
 
     const select =
-        getElement(
+        document.getElementById(
             "academicYear"
         );
 
@@ -643,19 +860,6 @@ function loadAcademicYearFilter() {
     }
 
 
-    /*
-     * Keep "All"
-     */
-
-    while (
-        select.options.length > 1
-    ) {
-
-        select.remove(1);
-
-    }
-
-
     const years =
         new Set();
 
@@ -663,14 +867,16 @@ function loadAcademicYearFilter() {
     allPayments.forEach(
         payment => {
 
-            if (
-                payment.academicYear
-            ) {
+            const year =
+                getPaymentAcademicYear(
+                    payment
+                );
+
+
+            if (year) {
 
                 years.add(
-                    String(
-                        payment.academicYear
-                    )
+                    year
                 );
 
             }
@@ -679,16 +885,41 @@ function loadAcademicYearFilter() {
     );
 
 
-    /*
-     * Also include current year
-     */
+    allStudents.forEach(
+        student => {
+
+            if (
+                student.academicYear
+            ) {
+
+                years.add(
+                    String(
+                        student.academicYear
+                    ).trim()
+                );
+
+            }
+
+        }
+    );
+
 
     years.add(
         getCurrentAcademicYear()
     );
 
 
-    Array.from(years)
+    const currentValue =
+        select.value;
+
+
+    select.innerHTML =
+        `<option value="">All</option>`;
+
+
+    Array
+        .from(years)
+        .filter(Boolean)
         .sort()
         .reverse()
         .forEach(
@@ -699,14 +930,11 @@ function loadAcademicYearFilter() {
                         "option"
                     );
 
-
                 option.value =
                     year;
 
-
                 option.textContent =
                     year;
-
 
                 select.appendChild(
                     option
@@ -716,23 +944,15 @@ function loadAcademicYearFilter() {
         );
 
 
-    /*
-     * Automatically select current
-     * academic year if payments exist.
-     */
-
-    const currentYear =
-        getCurrentAcademicYear();
-
-
     if (
+        currentValue &&
         years.has(
-            currentYear
+            currentValue
         )
     ) {
 
         select.value =
-            currentYear;
+            currentValue;
 
     }
 
@@ -740,693 +960,183 @@ function loadAcademicYearFilter() {
 
 
 /* =================================
-   Load Payments
+   Filtering
    ================================= */
 
-async function loadPayments() {
-
-    showLoading(true);
-
-    hideError();
-
-    hideEmpty();
-
-
-    try {
-
-        /*
-         * Load payments
-         */
-
-        const paymentResult =
-            await apiRequest(
-                "getPayments"
-            );
-
-
-        allPayments =
-            Array.isArray(
-                paymentResult.payments
-            )
-                ? paymentResult.payments
-                : [];
-
-
-        /*
-         * Load students as well.
-         * This allows us to determine
-         * stage/class from studentId.
-         */
-
-        await loadStudents();
-
-
-        /*
-         * Build academic-year filter.
-         */
-
-        loadAcademicYearFilter();
-
-
-        /*
-         * Display payments.
-         */
-
-        renderPayments();
-
-
-    } catch (error) {
-
-        console.error(
-            "Failed to load payments:",
-            error
-        );
-
-
-        showError(
-            error.message ||
-            "Failed to load payments."
-        );
-
-    } finally {
-
-        showLoading(false);
-
-    }
-
-}
-
-
-/* =================================
-   Render Payments
-   ================================= */
-
-function renderPayments() {
-
-    let payments =
-        [...allPayments];
-
-
-    /*
-     * Academic Year
-     */
+function getFilteredPayments() {
 
     const academicYear =
-        getElement(
-            "academicYear"
-        )?.value || "";
+        String(
+            document.getElementById(
+                "academicYear"
+            )?.value ||
+            ""
+        ).trim();
 
-
-    /*
-     * Month
-     */
 
     const month =
-        getElement(
-            "paymentMonth"
-        )?.value || "";
-
-
-    /*
-     * Stage
-     */
-
-    const stage =
-        getElement(
-            "stageFilter"
-        )?.value || "";
-
-
-    /*
-     * Search
-     */
-
-    const search =
-        (
-            getElement(
-                "studentSearch"
-            )?.value || ""
-        )
-        .trim()
+        String(
+            document.getElementById(
+                "paymentMonth"
+            )?.value ||
+            ""
+        ).trim()
         .toLowerCase();
 
 
-    /*
-     * Apply filters
-     */
-
-    payments =
-        payments.filter(
-            payment => {
-
-                /*
-                 * Academic Year
-                 */
-
-                if (
-                    academicYear &&
-                    String(
-                        payment.academicYear ||
-                        ""
-                    ) !==
-                    String(
-                        academicYear
-                    )
-                ) {
-
-                    return false;
-
-                }
+    const stage =
+        String(
+            document.getElementById(
+                "stageFilter"
+            )?.value ||
+            ""
+        ).trim()
+        .toLowerCase();
 
 
-                /*
-                 * Month
-                 */
-
-                if (
-                    month &&
-                    String(
-                        payment.month ||
-                        ""
-                    ).toLowerCase() !==
-                    String(
-                        month
-                    ).toLowerCase()
-                ) {
-
-                    return false;
-
-                }
+    const search =
+        String(
+            document.getElementById(
+                "studentSearch"
+            )?.value ||
+            ""
+        ).trim()
+        .toLowerCase();
 
 
-                /*
-                 * Stage
-                 */
+    return allPayments.filter(
+        payment => {
 
-                if (stage) {
-
-                    const paymentStage =
-                        String(
-                            getStudentStage(
-                                payment
-                            )
-                        )
-                        .trim()
-                        .toLowerCase();
+            const paymentYear =
+                getPaymentAcademicYear(
+                    payment
+                );
 
 
-                    if (
-                        paymentStage !==
-                        stage.toLowerCase()
-                    ) {
-
-                        return false;
-
-                    }
-
-                }
+            const paymentMonth =
+                getPaymentMonth(
+                    payment
+                )
+                .toLowerCase();
 
 
-                /*
-                 * Search
-                 */
-
-                if (search) {
-
-                    const studentName =
-                        String(
-                            payment.studentName ||
-                            ""
-                        ).toLowerCase();
+            const paymentStudentNumber =
+                getPaymentStudentNumber(
+                    payment
+                )
+                .toLowerCase();
 
 
-                    const studentNumber =
-                        String(
-                            payment.studentNumber ||
-                            ""
-                        ).toLowerCase();
+            const paymentStudentName =
+                getPaymentStudentName(
+                    payment
+                )
+                .toLowerCase();
 
 
-                    const studentId =
-                        String(
-                            payment.studentId ||
-                            ""
-                        ).toLowerCase();
+            const paymentStage =
+                getStageForPayment(
+                    payment
+                );
 
 
-                    const receiptNumber =
-                        String(
-                            payment.receiptNumber ||
-                            ""
-                        ).toLowerCase();
+            if (
+                academicYear &&
+                paymentYear !==
+                academicYear
+            ) {
 
-
-                    if (
-                        !studentName.includes(
-                            search
-                        ) &&
-                        !studentNumber.includes(
-                            search
-                        ) &&
-                        !studentId.includes(
-                            search
-                        ) &&
-                        !receiptNumber.includes(
-                            search
-                        )
-                    ) {
-
-                        return false;
-
-                    }
-
-                }
-
-
-                return true;
+                return false;
 
             }
-        );
 
 
-    /*
-     * Newest payments first
-     */
+            if (
+                month &&
+                paymentMonth !==
+                month
+            ) {
 
-    payments.sort(
-        (a, b) => {
+                return false;
+
+            }
+
+
+            if (
+                stage &&
+                paymentStage !==
+                stage
+            ) {
+
+                return false;
+
+            }
+
+
+            if (search) {
+
+                const matchesSearch =
+                    paymentStudentNumber
+                        .includes(search) ||
+                    paymentStudentName
+                        .includes(search);
+
+
+                if (!matchesSearch) {
+
+                    return false;
+
+                }
+
+            }
+
+
+            return true;
+
+        }
+    );
+
+}
+
+
+/* =================================
+   Sorting
+   ================================= */
+
+function sortPayments(payments) {
+
+    return [
+        ...payments
+    ].sort(
+        (
+            a,
+            b
+        ) => {
 
             const dateA =
-                parsePaymentDate(
-                    a.paymentDate ||
-                    a.date ||
-                    a.createdAt
-                );
+                new Date(
+                    getPaymentDate(
+                        a
+                    ) ||
+                    0
+                ).getTime();
 
 
             const dateB =
-                parsePaymentDate(
-                    b.paymentDate ||
-                    b.date ||
-                    b.createdAt
-                );
-
-
-            return dateB - dateA;
-
-        }
-    );
-
-
-    /*
-     * Summary
-     */
-
-    const totalPayments =
-        allPayments.length;
-
-
-    const totalAmount =
-        allPayments.reduce(
-            (total, payment) => {
-
-                return (
-                    total +
-                    Number(
-                        payment.amount ||
-                        0
-                    )
-                );
-
-            },
-            0
-        );
-
-
-    const displayedPayments =
-        payments.length;
-
-
-    const displayedAmount =
-        payments.reduce(
-            (total, payment) => {
-
-                return (
-                    total +
-                    Number(
-                        payment.amount ||
-                        0
-                    )
-                );
-
-            },
-            0
-        );
-
-
-    /*
-     * Total Payments
-     */
-
-    const totalPaymentsElement =
-        getElement(
-            "totalPayments"
-        );
-
-
-    if (totalPaymentsElement) {
-
-        totalPaymentsElement.textContent =
-            totalPayments.toLocaleString();
-
-    }
-
-
-    /*
-     * Total Amount
-     */
-
-    const totalAmountElement =
-        getElement(
-            "totalAmount"
-        );
-
-
-    if (totalAmountElement) {
-
-        totalAmountElement.textContent =
-            totalAmount.toLocaleString();
-
-    }
-
-
-    /*
-     * Displayed Payments
-     */
-
-    const displayedPaymentsElement =
-        getElement(
-            "displayedPayments"
-        );
-
-
-    if (displayedPaymentsElement) {
-
-        displayedPaymentsElement.textContent =
-            displayedPayments.toLocaleString();
-
-    }
-
-
-    /*
-     * Table
-     */
-
-    const tbody =
-        getElement(
-            "paymentsTableBody"
-        );
-
-
-    if (!tbody) {
-
-        return;
-
-    }
-
-
-    tbody.innerHTML =
-        "";
-
-
-    /*
-     * No payments
-     */
-
-    if (
-        payments.length === 0
-    ) {
-
-        showEmpty();
-
-        return;
-
-    }
-
-
-    hideEmpty();
-
-
-    /*
-     * Display each payment
-     */
-
-    payments.forEach(
-        payment => {
-
-            const row =
-                document.createElement(
-                    "tr"
-                );
-
-
-            const stage =
-                getStudentStage(
-                    payment
-                );
-
-
-            const className =
-                getStudentClass(
-                    payment
-                );
-
-
-            row.innerHTML = `
-
-                <td>
-                    ${escapeHtml(
-                        payment.studentNumber ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        payment.studentName ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        payment.academicYear ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        getMonthDisplayName(
-                            payment.month
-                        )
-                    )}
-                </td>
-
-                <td>
-                    ${Number(
-                        payment.amount ||
-                        0
-                    ).toLocaleString()}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        formatDate(
-                            payment.paymentDate ||
-                            payment.date
-                        )
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        payment.receiptNumber ||
-                        "-"
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        payment.recordedBy ||
-                        "-"
-                    )}
-                </td>
-
-            `;
-
-
-            /*
-             * Store extra information
-             * for the details modal.
-             */
-
-            row.dataset.studentStage =
-                stage;
-
-
-            row.dataset.studentClass =
-                className;
-
-
-            row.style.cursor =
-                "pointer";
-
-
-            row.addEventListener(
-                "click",
-                function () {
-
-                    showPaymentDetails(
-                        payment
-                    );
-
-                }
-            );
-
-
-            tbody.appendChild(
-                row
+                new Date(
+                    getPaymentDate(
+                        b
+                    ) ||
+                    0
+                ).getTime();
+
+
+            return (
+                dateB -
+                dateA
             );
 
         }
-    );
-
-}
-
-
-/* =================================
-   Month
-   ================================= */
-
-function getMonthDisplayName(month) {
-
-    if (!month) {
-
-        return "-";
-
-    }
-
-
-    return String(
-        month
-    );
-
-}
-
-
-/* =================================
-   Date Parsing
-   ================================= */
-
-function parsePaymentDate(value) {
-
-    if (!value) {
-
-        return 0;
-
-    }
-
-
-    /*
-     * Handle YYYY-MM-DD safely
-     * without timezone shifting.
-     */
-
-    if (
-        /^\d{4}-\d{2}-\d{2}$/.test(
-            String(value)
-        )
-    ) {
-
-        const parts =
-            String(value)
-                .split("-")
-                .map(Number);
-
-
-        return new Date(
-            parts[0],
-            parts[1] - 1,
-            parts[2]
-        ).getTime();
-
-    }
-
-
-    const date =
-        new Date(value);
-
-
-    return isNaN(
-        date.getTime()
-    )
-        ? 0
-        : date.getTime();
-
-}
-
-
-/* =================================
-   Date Display
-   ================================= */
-
-function formatDate(date) {
-
-    if (!date) {
-
-        return "-";
-
-    }
-
-
-    /*
-     * YYYY-MM-DD
-     */
-
-    if (
-        /^\d{4}-\d{2}-\d{2}$/.test(
-            String(date)
-        )
-    ) {
-
-        const parts =
-            String(date)
-                .split("-");
-
-
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
-
-    }
-
-
-    const parsed =
-        new Date(date);
-
-
-    if (
-        isNaN(
-            parsed.getTime()
-        )
-    ) {
-
-        return String(date);
-
-    }
-
-
-    return parsed.toLocaleDateString(
-        "en-GB"
     );
 
 }
@@ -1439,7 +1149,8 @@ function formatDate(date) {
 function escapeHtml(value) {
 
     return String(
-        value ?? ""
+        value ??
+        ""
     )
         .replace(
             /&/g,
@@ -1466,360 +1177,301 @@ function escapeHtml(value) {
 
 
 /* =================================
-   Payment Details
+   Render Payments
    ================================= */
 
-function showPaymentDetails(
-    payment
+function renderPayments(
+    payments = getFilteredPayments()
 ) {
 
-    const modal =
-        getElement(
-            "paymentDetailsModal"
+    const tbody =
+        document.getElementById(
+            "paymentsTableBody"
         );
 
 
-    const content =
-        getElement(
-            "paymentDetailsContent"
+    const tableSection =
+        document.getElementById(
+            "paymentsTableSection"
         );
 
 
-    if (
-        !modal ||
-        !content
-    ) {
+    const emptyState =
+        document.getElementById(
+            "emptyState"
+        );
+
+
+    if (!tbody) {
 
         return;
 
     }
 
 
-    const stage =
-        getStudentStage(
-            payment
+    tbody.innerHTML =
+        "";
+
+
+    const sorted =
+        sortPayments(
+            payments
         );
 
 
-    const className =
-        getStudentClass(
-            payment
-        );
+    if (
+        tableSection
+    ) {
 
-
-    content.innerHTML = `
-
-        <div class="payment-detail-row">
-            <strong>Student Number</strong>
-            <span>
-                ${escapeHtml(
-                    payment.studentNumber ||
-                    "-"
-                )}
-            </span>
-        </div>
-
-
-        <div class="payment-detail-row">
-            <strong>Student Name</strong>
-            <span>
-                ${escapeHtml(
-                    payment.studentName ||
-                    "-"
-                )}
-            </span>
-        </div>
-
-
-        <div class="payment-detail-row">
-            <strong>Stage</strong>
-            <span>
-                ${escapeHtml(
-                    stage ||
-                    "-"
-                )}
-            </span>
-        </div>
-
-
-        <div class="payment-detail-row">
-            <strong>Class</strong>
-            <span>
-                ${escapeHtml(
-                    className ||
-                    "-"
-                )}
-            </span>
-        </div>
-
-
-        <div class="payment-detail-row">
-            <strong>Academic Year</strong>
-            <span>
-                ${escapeHtml(
-                    payment.academicYear ||
-                    "-"
-                )}
-            </span>
-        </div>
-
-
-        <div class="payment-detail-row">
-            <strong>Month</strong>
-            <span>
-                ${escapeHtml(
-                    getMonthDisplayName(
-                        payment.month
-                    )
-                )}
-            </span>
-        </div>
-
-
-        <div class="payment-detail-row">
-            <strong>Amount</strong>
-            <span>
-                ${Number(
-                    payment.amount ||
-                    0
-                ).toLocaleString()}
-            </span>
-        </div>
-
-
-        <div class="payment-detail-row">
-            <strong>Payment Date</strong>
-            <span>
-                ${escapeHtml(
-                    formatDate(
-                        payment.paymentDate ||
-                        payment.date
-                    )
-                )}
-            </span>
-        </div>
-
-
-        <div class="payment-detail-row">
-            <strong>Receipt Number</strong>
-            <span>
-                ${escapeHtml(
-                    payment.receiptNumber ||
-                    "-"
-                )}
-            </span>
-        </div>
-
-
-        <div class="payment-detail-row">
-            <strong>Recorded By</strong>
-            <span>
-                ${escapeHtml(
-                    payment.recordedBy ||
-                    "-"
-                )}
-            </span>
-        </div>
-
-
-        <div class="payment-detail-row">
-            <strong>Notes</strong>
-            <span>
-                ${escapeHtml(
-                    payment.notes ||
-                    "-"
-                )}
-            </span>
-        </div>
-
-    `;
-
-
-    modal.style.display =
-        "flex";
-
-}
-
-
-/* =================================
-   Close Modal
-   ================================= */
-
-function closePaymentDetails() {
-
-    const modal =
-        getElement(
-            "paymentDetailsModal"
-        );
-
-
-    if (modal) {
-
-        modal.style.display =
-            "none";
-
-    }
-
-}
-
-
-/* =================================
-   Loading
-   ================================= */
-
-function showLoading(show) {
-
-    const loading =
-        getElement(
-            "loadingState"
-        );
-
-
-    const table =
-        getElement(
-            "paymentsTableSection"
-        );
-
-
-    if (loading) {
-
-        loading.style.display =
-            show
+        tableSection.style.display =
+            sorted.length
                 ? "block"
                 : "none";
 
     }
 
 
-    if (table) {
+    if (
+        emptyState
+    ) {
 
-        table.style.display =
-            show
+        emptyState.style.display =
+            sorted.length
                 ? "none"
                 : "block";
 
     }
 
+
+    sorted.forEach(
+        payment => {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            const studentNumber =
+                getPaymentStudentNumber(
+                    payment
+                );
+
+
+            const studentName =
+                getPaymentStudentName(
+                    payment
+                ) ||
+                (
+                    findStudentForPayment(
+                        payment
+                    )?.name ||
+                    "-"
+                );
+
+
+            const academicYear =
+                getPaymentAcademicYear(
+                    payment
+                );
+
+
+            const month =
+                getPaymentMonth(
+                    payment
+                );
+
+
+            const amount =
+                getPaymentAmount(
+                    payment
+                );
+
+
+            const paymentDate =
+                getPaymentDate(
+                    payment
+                );
+
+
+            const receiptNumber =
+                getReceiptNumber(
+                    payment
+                );
+
+
+            const recordedBy =
+                getRecordedBy(
+                    payment
+                );
+
+
+            row.innerHTML = `
+
+                <td>
+                    ${escapeHtml(
+                        studentNumber ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        studentName ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        academicYear ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        month ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        amount.toFixed(2)
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        paymentDate ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        receiptNumber ||
+                        "-"
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        recordedBy ||
+                        "-"
+                    )}
+                </td>
+
+            `;
+
+
+            row.style.cursor =
+                "pointer";
+
+
+            row.addEventListener(
+                "click",
+                () => {
+
+                    showPaymentDetails(
+                        payment
+                    );
+
+                }
+            );
+
+
+            tbody.appendChild(
+                row
+            );
+
+        }
+    );
+
+
+    updateSummary(
+        payments
+    );
+
 }
 
 
 /* =================================
-   Error
+   Summary
    ================================= */
 
-function showError(message) {
+function updateSummary(
+    displayedPayments
+) {
 
-    const errorState =
-        getElement(
-            "errorState"
+    const totalPaymentsElement =
+        document.getElementById(
+            "totalPayments"
         );
 
 
-    const errorMessage =
-        getElement(
-            "errorMessage"
+    const totalAmountElement =
+        document.getElementById(
+            "totalAmount"
         );
 
 
-    if (errorMessage) {
+    const displayedPaymentsElement =
+        document.getElementById(
+            "displayedPayments"
+        );
 
-        errorMessage.textContent =
-            message ||
-            "An error occurred while loading payments.";
+
+    const totalAmount =
+        allPayments.reduce(
+            (
+                sum,
+                payment
+            ) => {
+
+                return (
+                    sum +
+                    getPaymentAmount(
+                        payment
+                    )
+                );
+
+            },
+            0
+        );
+
+
+    if (
+        totalPaymentsElement
+    ) {
+
+        totalPaymentsElement.textContent =
+            String(
+                allPayments.length
+            );
 
     }
 
 
-    if (errorState) {
+    if (
+        totalAmountElement
+    ) {
 
-        errorState.style.display =
-            "block";
-
-    }
-
-}
-
-
-function hideError() {
-
-    const errorState =
-        getElement(
-            "errorState"
-        );
-
-
-    if (errorState) {
-
-        errorState.style.display =
-            "none";
-
-    }
-
-}
-
-
-/* =================================
-   Empty
-   ================================= */
-
-function showEmpty() {
-
-    const emptyState =
-        getElement(
-            "emptyState"
-        );
-
-
-    const table =
-        getElement(
-            "paymentsTableSection"
-        );
-
-
-    if (emptyState) {
-
-        emptyState.style.display =
-            "block";
+        totalAmountElement.textContent =
+            totalAmount.toFixed(2);
 
     }
 
 
-    if (table) {
+    if (
+        displayedPaymentsElement
+    ) {
 
-        table.style.display =
-            "none";
-
-    }
-
-}
-
-
-function hideEmpty() {
-
-    const emptyState =
-        getElement(
-            "emptyState"
-        );
-
-
-    const table =
-        getElement(
-            "paymentsTableSection"
-        );
-
-
-    if (emptyState) {
-
-        emptyState.style.display =
-            "none";
-
-    }
-
-
-    if (table) {
-
-        table.style.display =
-            "block";
+        displayedPaymentsElement.textContent =
+            String(
+                displayedPayments.length
+            );
 
     }
 
@@ -1827,40 +1479,55 @@ function hideEmpty() {
 
 
 /* =================================
-   Filters
+   Apply Filters
    ================================= */
 
 function applyFilters() {
 
-    hideError();
+    if (!paymentsLoaded) {
 
-    renderPayments();
+        return;
+
+    }
+
+
+    const filtered =
+        getFilteredPayments();
+
+
+    renderPayments(
+        filtered
+    );
 
 }
 
 
+/* =================================
+   Reset Filters
+   ================================= */
+
 function resetFilters() {
 
     const academicYear =
-        getElement(
+        document.getElementById(
             "academicYear"
         );
 
 
     const paymentMonth =
-        getElement(
+        document.getElementById(
             "paymentMonth"
         );
 
 
     const stageFilter =
-        getElement(
+        document.getElementById(
             "stageFilter"
         );
 
 
     const studentSearch =
-        getElement(
+        document.getElementById(
             "studentSearch"
         );
 
@@ -1897,9 +1564,382 @@ function resetFilters() {
     }
 
 
-    hideError();
+    applyFilters();
 
-    renderPayments();
+}
+
+
+/* =================================
+   Loading
+   ================================= */
+
+function showLoading(
+    message = "Loading..."
+) {
+
+    const loading =
+        document.getElementById(
+            "loadingState"
+        );
+
+
+    const messageElement =
+        document.getElementById(
+            "loadingMessage"
+        );
+
+
+    if (messageElement) {
+
+        messageElement.textContent =
+            message;
+
+    }
+
+
+    if (loading) {
+
+        loading.style.display =
+            "block";
+
+    }
+
+}
+
+
+function hideLoading() {
+
+    const loading =
+        document.getElementById(
+            "loadingState"
+        );
+
+
+    if (loading) {
+
+        loading.style.display =
+            "none";
+
+    }
+
+}
+
+
+/* =================================
+   Error
+   ================================= */
+
+function showError(message) {
+
+    const errorState =
+        document.getElementById(
+            "errorState"
+        );
+
+
+    const errorMessage =
+        document.getElementById(
+            "errorMessage"
+        );
+
+
+    if (errorMessage) {
+
+        errorMessage.textContent =
+            String(
+                message ||
+                "An error occurred."
+            );
+
+    }
+
+
+    if (errorState) {
+
+        errorState.style.display =
+            "block";
+
+    }
+
+
+    console.error(
+        "BMP Payments Error:",
+        message
+    );
+
+}
+
+
+function hideError() {
+
+    const errorState =
+        document.getElementById(
+            "errorState"
+        );
+
+
+    if (errorState) {
+
+        errorState.style.display =
+            "none";
+
+    }
+
+}
+
+
+/* =================================
+   Payment Details
+   ================================= */
+
+function showPaymentDetails(
+    payment
+) {
+
+    const modal =
+        document.getElementById(
+            "paymentDetailsModal"
+        );
+
+
+    const content =
+        document.getElementById(
+            "paymentDetailsContent"
+        );
+
+
+    if (
+        !modal ||
+        !content
+    ) {
+
+        return;
+
+    }
+
+
+    const student =
+        findStudentForPayment(
+            payment
+        );
+
+
+    const studentName =
+        getPaymentStudentName(
+            payment
+        ) ||
+        student?.name ||
+        "-";
+
+
+    const stage =
+        getStageForPayment(
+            payment
+        );
+
+
+    const className =
+        student?.className ||
+        student?.class ||
+        student?.classNumber ||
+        "-";
+
+
+    const studentNumber =
+        getPaymentStudentNumber(
+            payment
+        ) ||
+        student?.studentNumber ||
+        "-";
+
+
+    const academicYear =
+        getPaymentAcademicYear(
+            payment
+        );
+
+
+    const month =
+        getPaymentMonth(
+            payment
+        );
+
+
+    const amount =
+        getPaymentAmount(
+            payment
+        );
+
+
+    const paymentDate =
+        getPaymentDate(
+            payment
+        );
+
+
+    const receiptNumber =
+        getReceiptNumber(
+            payment
+        );
+
+
+    const recordedBy =
+        getRecordedBy(
+            payment
+        );
+
+
+    const notes =
+        String(
+            payment.notes ||
+            ""
+        );
+
+
+    content.innerHTML = `
+
+        <div class="info-grid">
+
+            <div class="info-item">
+                <span>Student Name</span>
+                <strong>
+                    ${escapeHtml(
+                        studentName
+                    )}
+                </strong>
+            </div>
+
+            <div class="info-item">
+                <span>Student Number</span>
+                <strong>
+                    ${escapeHtml(
+                        studentNumber
+                    )}
+                </strong>
+            </div>
+
+            <div class="info-item">
+                <span>Academic Year</span>
+                <strong>
+                    ${escapeHtml(
+                        academicYear
+                    )}
+                </strong>
+            </div>
+
+            <div class="info-item">
+                <span>Stage</span>
+                <strong>
+                    ${escapeHtml(
+                        formatStage(
+                            stage
+                        )
+                    )}
+                </strong>
+            </div>
+
+            <div class="info-item">
+                <span>Class</span>
+                <strong>
+                    ${escapeHtml(
+                        className
+                    )}
+                </strong>
+            </div>
+
+            <div class="info-item">
+                <span>Month</span>
+                <strong>
+                    ${escapeHtml(
+                        month
+                    )}
+                </strong>
+            </div>
+
+            <div class="info-item">
+                <span>Amount</span>
+                <strong>
+                    ${escapeHtml(
+                        amount.toFixed(2)
+                    )}
+                </strong>
+            </div>
+
+            <div class="info-item">
+                <span>Payment Date</span>
+                <strong>
+                    ${escapeHtml(
+                        paymentDate
+                    )}
+                </strong>
+            </div>
+
+            <div class="info-item">
+                <span>Receipt Number</span>
+                <strong>
+                    ${escapeHtml(
+                        receiptNumber ||
+                        "-"
+                    )}
+                </strong>
+            </div>
+
+            <div class="info-item">
+                <span>Recorded By</span>
+                <strong>
+                    ${escapeHtml(
+                        recordedBy ||
+                        "-"
+                    )}
+                </strong>
+            </div>
+
+            ${
+                notes
+                    ? `
+                    <div
+                        class="info-item"
+                        style="grid-column: 1 / -1;">
+                        <span>Notes</span>
+                        <strong>
+                            ${escapeHtml(
+                                notes
+                            )}
+                        </strong>
+                    </div>
+                    `
+                    : ""
+            }
+
+        </div>
+
+    `;
+
+
+    modal.style.display =
+        "block";
+
+}
+
+
+/* =================================
+   Close Modal
+   ================================= */
+
+function closePaymentDetails() {
+
+    const modal =
+        document.getElementById(
+            "paymentDetailsModal"
+        );
+
+
+    if (modal) {
+
+        modal.style.display =
+            "none";
+
+    }
 
 }
 
@@ -1917,29 +1957,33 @@ function getNavigationInstitutionId() {
     }
 
 
-    try {
+    if (
+        currentUser &&
+        currentUser.institutionId
+    ) {
 
-        const params =
-            new URLSearchParams(
-                window.location.search
-            );
-
-
-        return (
-            params.get(
-                "institutionId"
-            ) ||
-            params.get(
-                "id"
-            ) ||
-            ""
+        return String(
+            currentUser.institutionId
         );
 
-    } catch (error) {
-
-        return "";
-
     }
+
+
+    const params =
+        new URLSearchParams(
+            window.location.search
+        );
+
+
+    return (
+        params.get(
+            "institutionId"
+        ) ||
+        params.get(
+            "id"
+        ) ||
+        ""
+    );
 
 }
 
@@ -1954,7 +1998,9 @@ function goBack() {
 
         window.location.href =
             "school.html?id=" +
-            encodeURIComponent(id);
+            encodeURIComponent(
+                id
+            );
 
     } else {
 
@@ -1976,7 +2022,9 @@ function goToRecordPayment() {
 
         window.location.href =
             "school-record-payment.html?id=" +
-            encodeURIComponent(id);
+            encodeURIComponent(
+                id
+            );
 
     } else {
 
@@ -1995,89 +2043,140 @@ function goToRecordPayment() {
 function setupEventListeners() {
 
     const backButton =
-        getElement(
+        document.getElementById(
             "backButton"
         );
 
 
-    const recordPaymentPageBtn =
-        getElement(
+    const recordPaymentButton =
+        document.getElementById(
             "recordPaymentPageBtn"
         );
 
 
+    const applyFiltersButton =
+        document.getElementById(
+            "applyFiltersBtn"
+        );
+
+
+    const resetFiltersButton =
+        document.getElementById(
+            "resetFiltersBtn"
+        );
+
+
+    const retryButton =
+        document.getElementById(
+            "retryBtn"
+        );
+
+
+    const searchInput =
+        document.getElementById(
+            "studentSearch"
+        );
+
+
     const academicYear =
-        getElement(
+        document.getElementById(
             "academicYear"
         );
 
 
     const paymentMonth =
-        getElement(
+        document.getElementById(
             "paymentMonth"
         );
 
 
     const stageFilter =
-        getElement(
+        document.getElementById(
             "stageFilter"
         );
 
 
-    const studentSearch =
-        getElement(
-            "studentSearch"
-        );
-
-
-    const applyFiltersBtn =
-        getElement(
-            "applyFiltersBtn"
-        );
-
-
-    const resetFiltersBtn =
-        getElement(
-            "resetFiltersBtn"
-        );
-
-
-    const retryBtn =
-        getElement(
-            "retryBtn"
-        );
-
-
-    const closeButton =
-        getElement(
+    const modalCloseButton =
+        document.getElementById(
             "paymentDetailsCloseBtn"
         );
 
 
-    const overlay =
-        getElement(
+    const modalOverlay =
+        document.getElementById(
             "paymentDetailsOverlay"
         );
 
 
     if (backButton) {
 
-        backButton.onclick =
-            goBack;
+        backButton.addEventListener(
+            "click",
+            goBack
+        );
 
     }
 
 
-    if (recordPaymentPageBtn) {
+    if (recordPaymentButton) {
 
-        recordPaymentPageBtn.onclick =
-            function (event) {
+        recordPaymentButton.addEventListener(
+            "click",
+            goToRecordPayment
+        );
 
-                event.preventDefault();
+    }
 
-                goToRecordPayment();
 
-            };
+    if (applyFiltersButton) {
+
+        applyFiltersButton.addEventListener(
+            "click",
+            applyFilters
+        );
+
+    }
+
+
+    if (resetFiltersButton) {
+
+        resetFiltersButton.addEventListener(
+            "click",
+            resetFilters
+        );
+
+    }
+
+
+    if (retryButton) {
+
+        retryButton.addEventListener(
+            "click",
+            initializePage
+        );
+
+    }
+
+
+    if (searchInput) {
+
+        searchInput.addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    event.key ===
+                    "Enter"
+                ) {
+
+                    event.preventDefault();
+
+                    applyFilters();
+
+                }
+
+            }
+        );
 
     }
 
@@ -2112,49 +2211,9 @@ function setupEventListeners() {
     }
 
 
-    if (studentSearch) {
+    if (modalCloseButton) {
 
-        studentSearch.addEventListener(
-            "input",
-            applyFilters
-        );
-
-    }
-
-
-    if (applyFiltersBtn) {
-
-        applyFiltersBtn.addEventListener(
-            "click",
-            applyFilters
-        );
-
-    }
-
-
-    if (resetFiltersBtn) {
-
-        resetFiltersBtn.addEventListener(
-            "click",
-            resetFilters
-        );
-
-    }
-
-
-    if (retryBtn) {
-
-        retryBtn.addEventListener(
-            "click",
-            loadPayments
-        );
-
-    }
-
-
-    if (closeButton) {
-
-        closeButton.addEventListener(
+        modalCloseButton.addEventListener(
             "click",
             closePaymentDetails
         );
@@ -2162,9 +2221,9 @@ function setupEventListeners() {
     }
 
 
-    if (overlay) {
+    if (modalOverlay) {
 
-        overlay.addEventListener(
+        modalOverlay.addEventListener(
             "click",
             closePaymentDetails
         );
@@ -2174,7 +2233,7 @@ function setupEventListeners() {
 
     document.addEventListener(
         "keydown",
-        function (event) {
+        event => {
 
             if (
                 event.key ===
@@ -2197,7 +2256,10 @@ function setupEventListeners() {
 
 async function initializePage() {
 
-    if (pageInitialized) {
+    if (
+        pageInitialized &&
+        paymentsLoaded
+    ) {
 
         return;
 
@@ -2208,6 +2270,9 @@ async function initializePage() {
         true;
 
 
+    hideError();
+
+
     const authenticated =
         initializeAuthentication();
 
@@ -2215,7 +2280,7 @@ async function initializePage() {
     if (!authenticated) {
 
         showError(
-            "School authentication failed."
+            "School authentication failed. Please log in again."
         );
 
         return;
@@ -2223,12 +2288,39 @@ async function initializePage() {
     }
 
 
-    loadInstitution();
+    console.log(
+        "Institution ID:",
+        institutionId
+    );
 
-    setupEventListeners();
+
+    /*
+     * Load payments first.
+     *
+     * This is intentionally independent
+     * from student loading.
+     */
+
+    const paymentsResult =
+        await loadPayments();
 
 
-    await loadPayments();
+    /*
+     * Student data is only needed for
+     * stage/class/name fallbacks.
+     */
+
+    await loadStudents();
+
+
+    loadAcademicYears();
+
+
+    if (paymentsResult) {
+
+        applyFilters();
+
+    }
 
 }
 
@@ -2237,21 +2329,13 @@ async function initializePage() {
    Start
    ================================= */
 
-if (
-    document.readyState ===
-    "loading"
-) {
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
 
-    document.addEventListener(
-        "DOMContentLoaded",
-        initializePage,
-        {
-            once: true
-        }
-    );
+        setupEventListeners();
 
-} else {
+        initializePage();
 
-    initializePage();
-
-}
+    }
+);
