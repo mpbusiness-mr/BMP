@@ -1,71 +1,66 @@
+```html
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Add Student - BMP</title>
+    <title>BMP - Add Student</title>
 
-    <link rel="stylesheet" href="add-student.css">
+    <link rel="stylesheet" href="css/add-student.css">
 </head>
 
 <body>
 
-    <div class="page-container">
+    <header class="page-header">
 
-        <!-- Header -->
+        <div class="header-left">
+            <h1 data-i18n="pageTitle">Add Student</h1>
+            <p data-i18n="pageSubtitle">Register a new student</p>
+        </div>
 
-        <header class="page-header">
+        <div class="header-right">
 
-            <div>
-                <h1>Add Student</h1>
+            <select id="languageSelect" aria-label="Language">
+                <option value="en">English</option>
+                <option value="ar">العربية</option>
+                <option value="fr">Français</option>
+            </select>
 
-                <p>
-                    Register a new student
-                </p>
-            </div>
-
-            <button
-                id="backButton"
-                class="btn btn-secondary">
+            <button id="backButton" type="button" data-i18n="back">
                 Back
             </button>
 
-        </header>
+        </div>
 
+    </header>
+
+
+    <main class="page-container">
 
         <!-- School Information -->
-
         <section class="card">
 
-            <h2>School Information</h2>
+            <h2 data-i18n="schoolInformation">
+                School Information
+            </h2>
 
             <div class="info-grid">
 
                 <div class="info-item">
-
-                    <span>
+                    <span data-i18n="institutionId">
                         Institution ID
                     </span>
 
-                    <strong id="institutionId">
-                        -
-                    </strong>
-
+                    <strong id="institutionId">—</strong>
                 </div>
 
-
                 <div class="info-item">
-
-                    <span>
-                        School Name
+                    <span data-i18n="institutionName">
+                        Institution Name
                     </span>
 
-                    <strong id="institutionName">
-                        -
-                    </strong>
-
+                    <strong id="institutionName">—</strong>
                 </div>
 
             </div>
@@ -74,168 +69,147 @@
 
 
         <!-- Student Information -->
-
         <section class="card">
 
-            <h2>Student Information</h2>
+            <h2 data-i18n="studentInformation">
+                Student Information
+            </h2>
+
+            <form id="studentForm">
+
+                <div class="form-grid">
+
+                    <!-- Academic Year -->
+                    <div class="form-group">
+
+                        <label for="academicYear" data-i18n="academicYear">
+                            Academic Year
+                        </label>
+
+                        <select id="academicYear" required>
+                        </select>
+
+                    </div>
 
 
-            <form id="addStudentForm">
+                    <!-- Student Number -->
+                    <div class="form-group">
+
+                        <label for="studentNumber" data-i18n="studentNumber">
+                            Student Number
+                        </label>
+
+                        <input
+                            type="text"
+                            id="studentNumber"
+                            readonly
+                            placeholder="Generated automatically"
+                            data-i18n-placeholder="generatedAutomatically"
+                        >
+
+                    </div>
 
 
-                <!-- Academic Year -->
+                    <!-- Student Name -->
+                    <div class="form-group">
 
-                <div class="form-group">
+                        <label for="studentName" data-i18n="studentName">
+                            Student Name
+                        </label>
 
-                    <label for="academicYear">
-                        Academic Year
-                    </label>
+                        <input
+                            type="text"
+                            id="studentName"
+                            required
+                            autocomplete="off"
+                            placeholder="Enter student name"
+                            data-i18n-placeholder="enterStudentName"
+                        >
 
-                    <select
-                        id="academicYear"
-                        required>
-
-                        <option value="">
-                            Select academic year
-                        </option>
-
-                    </select>
-
-                    <small>
-                        The student number is generated
-                        separately for each academic year.
-                    </small>
-
-                </div>
+                    </div>
 
 
-                <!-- Student Number -->
+                    <!-- Stage -->
+                    <div class="form-group">
 
-                <div class="form-group">
+                        <label for="stage" data-i18n="stage">
+                            Stage
+                        </label>
 
-                    <label for="studentNumber">
-                        Student Number
-                    </label>
+                        <select id="stage" required>
 
-                    <input
-                        type="text"
-                        id="studentNumber"
-                        placeholder="Select academic year, stage and class"
-                        readonly
-                    >
+                            <option value="" data-i18n="selectStage">
+                                Select Stage
+                            </option>
 
-                    <small>
-                        Automatically generated according
-                        to the academic year, stage, class
-                        and registration order.
-                    </small>
+                            <option value="primary" data-i18n="primary">
+                                Primary
+                            </option>
 
-                </div>
+                            <option value="preparatory" data-i18n="preparatory">
+                                Preparatory
+                            </option>
 
+                            <option value="secondary" data-i18n="secondary">
+                                Secondary
+                            </option>
 
-                <!-- Student Name -->
+                        </select>
 
-                <div class="form-group">
-
-                    <label for="studentName">
-                        Student Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="studentName"
-                        placeholder="Enter student name"
-                        required
-                    >
-
-                </div>
+                    </div>
 
 
-                <!-- Stage -->
+                    <!-- Class -->
+                    <div class="form-group">
 
-                <div class="form-group">
+                        <label for="className" data-i18n="class">
+                            Class
+                        </label>
 
-                    <label for="stage">
-                        Stage
-                    </label>
+                        <select id="className" required>
 
-                    <select
-                        id="stage"
-                        required>
+                            <option value="" data-i18n="selectClass">
+                                Select Class
+                            </option>
 
-                        <option value="">
-                            Select stage
-                        </option>
+                        </select>
 
-                        <option value="primary">
-                            Primary
-                        </option>
-
-                        <option value="preparatory">
-                            Preparatory
-                        </option>
-
-                        <option value="secondary">
-                            Secondary
-                        </option>
-
-                    </select>
-
-                </div>
+                    </div>
 
 
-                <!-- Class -->
+                    <!-- Registration Date -->
+                    <div class="form-group">
 
-                <div class="form-group">
+                        <label for="registrationDate" data-i18n="registrationDate">
+                            Registration Date
+                        </label>
 
-                    <label for="className">
-                        Class
-                    </label>
+                        <input
+                            type="date"
+                            id="registrationDate"
+                            required
+                        >
 
-                    <select
-                        id="className"
-                        required>
-
-                        <option value="">
-                            Select class
-                        </option>
-
-                    </select>
+                    </div>
 
                 </div>
 
-
-                <!-- Registration Date -->
-
-                <div class="form-group">
-
-                    <label for="registrationDate">
-                        Registration Date
-                    </label>
-
-                    <input
-                        type="date"
-                        id="registrationDate"
-                        required
-                    >
-
-                </div>
-
-
-                <!-- Actions -->
 
                 <div class="form-actions">
 
                     <button
                         type="button"
                         id="cancelButton"
-                        class="btn btn-secondary">
+                        data-i18n="cancel"
+                    >
                         Cancel
                     </button>
 
                     <button
                         type="submit"
-                        class="btn btn-primary">
+                        id="registerButton"
+                        data-i18n="registerStudent"
+                    >
                         Register Student
                     </button>
 
@@ -245,12 +219,13 @@
 
         </section>
 
-    </div>
+    </main>
+
 
     <script src="js/auth.js"></script>
     <script src="js/activity-log.js"></script>
     <script src="js/add-student.js"></script>
 
 </body>
-
 </html>
+```
