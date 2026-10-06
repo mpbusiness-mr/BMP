@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Students - BMP</title>
+    <title>BMP - Students</title>
 
     <link rel="stylesheet" href="students.css">
 </head>
@@ -19,7 +19,7 @@
         <header class="page-header">
 
             <div>
-                <h1 id="pageTitle">
+                <h1 id="pageTitle" data-i18n="students">
                     Students
                 </h1>
 
@@ -30,16 +30,50 @@
 
             <div class="header-actions">
 
+                <div class="language-selector">
+
+                    <label
+                        for="languageSelect"
+                        data-i18n="language">
+                        Language
+                    </label>
+
+                    <select id="languageSelect">
+
+                        <option value="en">
+                            English
+                        </option>
+
+                        <option value="ar">
+                            العربية
+                        </option>
+
+                        <option value="fr">
+                            Français
+                        </option>
+
+                    </select>
+
+                </div>
+
+
                 <button
                     id="backButton"
-                    class="btn btn-secondary">
+                    class="btn btn-secondary"
+                    data-i18n="back">
+
                     Back
+
                 </button>
+
 
                 <button
                     id="addStudentButton"
-                    class="btn btn-primary">
+                    class="btn btn-primary"
+                    data-i18n="addStudent">
+
                     + Add Student
+
                 </button>
 
             </div>
@@ -53,8 +87,12 @@
 
             <div class="summary-item">
 
-                <span class="summary-label">
+                <span
+                    class="summary-label"
+                    data-i18n="institutionId">
+
                     Institution ID
+
                 </span>
 
                 <strong id="institutionId">
@@ -66,8 +104,12 @@
 
             <div class="summary-item">
 
-                <span class="summary-label">
+                <span
+                    class="summary-label"
+                    data-i18n="school">
+
                     School
+
                 </span>
 
                 <strong id="institutionName">
@@ -79,8 +121,12 @@
 
             <div class="summary-item">
 
-                <span class="summary-label">
+                <span
+                    class="summary-label"
+                    data-i18n="studentsInSelectedYear">
+
                     Students in Selected Year
+
                 </span>
 
                 <strong id="totalStudents">
@@ -100,11 +146,11 @@
 
                 <div>
 
-                    <h2>
+                    <h2 data-i18n="studentList">
                         Student List
                     </h2>
 
-                    <p>
+                    <p data-i18n="searchAndFilter">
                         Search and filter students
                     </p>
 
@@ -120,15 +166,23 @@
 
                 <div class="filter-group">
 
-                    <label for="academicYearFilter">
+                    <label
+                        for="academicYearFilter"
+                        data-i18n="academicYear">
+
                         Academic Year
+
                     </label>
 
                     <select
                         id="academicYearFilter">
 
-                        <option value="all">
+                        <option
+                            value="all"
+                            data-i18n="allAcademicYears">
+
                             All Academic Years
+
                         </option>
 
                     </select>
@@ -140,15 +194,19 @@
 
                 <div class="filter-group search-group">
 
-                    <label for="searchStudent">
+                    <label
+                        for="searchStudent"
+                        data-i18n="search">
+
                         Search
+
                     </label>
 
                     <input
                         type="text"
                         id="searchStudent"
-                        placeholder="Search by name or student number..."
-                    >
+                        data-i18n-placeholder="searchPlaceholder"
+                        placeholder="Search by name or student number...">
 
                 </div>
 
@@ -157,27 +215,47 @@
 
                 <div class="filter-group">
 
-                    <label for="stageFilter">
+                    <label
+                        for="stageFilter"
+                        data-i18n="stage">
+
                         Stage
+
                     </label>
 
                     <select
                         id="stageFilter">
 
-                        <option value="all">
+                        <option
+                            value="all"
+                            data-i18n="allStages">
+
                             All Stages
+
                         </option>
 
-                        <option value="primary">
+                        <option
+                            value="primary"
+                            data-i18n="primary">
+
                             Primary
+
                         </option>
 
-                        <option value="preparatory">
+                        <option
+                            value="preparatory"
+                            data-i18n="preparatory">
+
                             Preparatory
+
                         </option>
 
-                        <option value="secondary">
+                        <option
+                            value="secondary"
+                            data-i18n="secondary">
+
                             Secondary
+
                         </option>
 
                     </select>
@@ -189,15 +267,23 @@
 
                 <div class="filter-group">
 
-                    <label for="classFilter">
+                    <label
+                        for="classFilter"
+                        data-i18n="class">
+
                         Class
+
                     </label>
 
                     <select
                         id="classFilter">
 
-                        <option value="all">
+                        <option
+                            value="all"
+                            data-i18n="allClasses">
+
                             All Classes
+
                         </option>
 
                     </select>
@@ -221,31 +307,31 @@
 
                         <tr>
 
-                            <th>
+                            <th data-i18n="studentNumber">
                                 Student Number
                             </th>
 
-                            <th>
+                            <th data-i18n="studentName">
                                 Student Name
                             </th>
 
-                            <th>
+                            <th data-i18n="academicYear">
                                 Academic Year
                             </th>
 
-                            <th>
+                            <th data-i18n="stage">
                                 Stage
                             </th>
 
-                            <th>
+                            <th data-i18n="class">
                                 Class
                             </th>
 
-                            <th>
+                            <th data-i18n="registrationDate">
                                 Registration Date
                             </th>
 
-                            <th>
+                            <th data-i18n="actions">
                                 Actions
                             </th>
 
@@ -271,19 +357,22 @@
                     +
                 </div>
 
-                <h3>
+                <h3 data-i18n="noStudentsFound">
                     No Students Found
                 </h3>
 
-                <p>
+                <p data-i18n="noStudentsDescription">
                     There are no students matching
                     your search or filters.
                 </p>
 
                 <button
                     id="emptyAddStudentButton"
-                    class="btn btn-primary">
+                    class="btn btn-primary"
+                    data-i18n="addStudent">
+
                     + Add Student
+
                 </button>
 
             </div>
@@ -291,6 +380,7 @@
         </section>
 
     </div>
+
 
     <script src="js/auth.js"></script>
     <script src="js/students.js"></script>
