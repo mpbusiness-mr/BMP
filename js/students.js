@@ -1,9 +1,340 @@
 // =====================================================
-// Students
+// BMP Students
+// =====================================================
+
+
+// =====================================================
+// Backend API
 // =====================================================
 
 const STUDENTS_API_URL =
     "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+
+
+// =====================================================
+// Translations
+// =====================================================
+
+const translations = {
+
+    en: {
+
+        language: "Language",
+
+        back: "Back",
+
+        addStudent: "+ Add Student",
+
+        students: "Students",
+
+        manageStudents:
+            "Manage school students",
+
+        institutionId:
+            "Institution ID",
+
+        school:
+            "School",
+
+        studentsInSelectedYear:
+            "Students in Selected Year",
+
+        studentList:
+            "Student List",
+
+        searchAndFilter:
+            "Search and filter students",
+
+        academicYear:
+            "Academic Year",
+
+        allAcademicYears:
+            "All Academic Years",
+
+        search:
+            "Search",
+
+        searchPlaceholder:
+            "Search by name or student number...",
+
+        stage:
+            "Stage",
+
+        allStages:
+            "All Stages",
+
+        primary:
+            "Primary",
+
+        preparatory:
+            "Preparatory",
+
+        secondary:
+            "Secondary",
+
+        class:
+            "Class",
+
+        allClasses:
+            "All Classes",
+
+        studentNumber:
+            "Student Number",
+
+        studentName:
+            "Student Name",
+
+        registrationDate:
+            "Registration Date",
+
+        actions:
+            "Actions",
+
+        view:
+            "View",
+
+        edit:
+            "Edit",
+
+        noStudentsFound:
+            "No Students Found",
+
+        noStudentsDescription:
+            "There are no students matching your search or filters.",
+
+        classNumber:
+            "Class",
+
+        serverConnectionFailed:
+            "Server connection failed.",
+
+        unableToLoadStudents:
+            "Unable to load students.",
+
+        institutionAccessDenied:
+            "Institution access denied."
+
+    },
+
+
+    ar: {
+
+        language:
+            "اللغة",
+
+        back:
+            "رجوع",
+
+        addStudent:
+            "+ إضافة طالب",
+
+        students:
+            "الطلاب",
+
+        manageStudents:
+            "إدارة طلاب المدرسة",
+
+        institutionId:
+            "رقم المؤسسة",
+
+        school:
+            "المدرسة",
+
+        studentsInSelectedYear:
+            "الطلاب في السنة المحددة",
+
+        studentList:
+            "قائمة الطلاب",
+
+        searchAndFilter:
+            "البحث عن الطلاب وتصفيتهم",
+
+        academicYear:
+            "السنة الدراسية",
+
+        allAcademicYears:
+            "جميع السنوات الدراسية",
+
+        search:
+            "بحث",
+
+        searchPlaceholder:
+            "البحث بالاسم أو رقم الطالب...",
+
+        stage:
+            "المرحلة",
+
+        allStages:
+            "جميع المراحل",
+
+        primary:
+            "التعليم الابتدائي",
+
+        preparatory:
+            "التعليم الإعدادي",
+
+        secondary:
+            "التعليم الثانوي",
+
+        class:
+            "القسم",
+
+        allClasses:
+            "جميع الأقسام",
+
+        studentNumber:
+            "رقم الطالب",
+
+        studentName:
+            "اسم الطالب",
+
+        registrationDate:
+            "تاريخ التسجيل",
+
+        actions:
+            "الإجراءات",
+
+        view:
+            "عرض",
+
+        edit:
+            "تعديل",
+
+        noStudentsFound:
+            "لم يتم العثور على طلاب",
+
+        noStudentsDescription:
+            "لا يوجد طلاب يطابقون البحث أو عوامل التصفية المحددة.",
+
+        classNumber:
+            "القسم",
+
+        serverConnectionFailed:
+            "فشل الاتصال بالخادم.",
+
+        unableToLoadStudents:
+            "تعذر تحميل الطلاب.",
+
+        institutionAccessDenied:
+            "تم رفض الوصول إلى المؤسسة."
+
+    },
+
+
+    fr: {
+
+        language:
+            "Langue",
+
+        back:
+            "Retour",
+
+        addStudent:
+            "+ Ajouter un élève",
+
+        students:
+            "Élèves",
+
+        manageStudents:
+            "Gérer les élèves de l'école",
+
+        institutionId:
+            "ID de l'établissement",
+
+        school:
+            "École",
+
+        studentsInSelectedYear:
+            "Élèves pour l'année sélectionnée",
+
+        studentList:
+            "Liste des élèves",
+
+        searchAndFilter:
+            "Rechercher et filtrer les élèves",
+
+        academicYear:
+            "Année scolaire",
+
+        allAcademicYears:
+            "Toutes les années scolaires",
+
+        search:
+            "Recherche",
+
+        searchPlaceholder:
+            "Rechercher par nom ou numéro d'élève...",
+
+        stage:
+            "Niveau",
+
+        allStages:
+            "Tous les niveaux",
+
+        primary:
+            "Primaire",
+
+        preparatory:
+            "Collège",
+
+        secondary:
+            "Secondaire",
+
+        class:
+            "Classe",
+
+        allClasses:
+            "Toutes les classes",
+
+        studentNumber:
+            "Numéro d'élève",
+
+        studentName:
+            "Nom de l'élève",
+
+        registrationDate:
+            "Date d'inscription",
+
+        actions:
+            "Actions",
+
+        view:
+            "Voir",
+
+        edit:
+            "Modifier",
+
+        noStudentsFound:
+            "Aucun élève trouvé",
+
+        noStudentsDescription:
+            "Aucun élève ne correspond à votre recherche ou à vos filtres.",
+
+        classNumber:
+            "Classe",
+
+        serverConnectionFailed:
+            "Échec de la connexion au serveur.",
+
+        unableToLoadStudents:
+            "Impossible de charger les élèves.",
+
+        institutionAccessDenied:
+            "Accès à l'établissement refusé."
+
+    }
+
+};
+
+
+// =====================================================
+// Current Language
+// =====================================================
+
+let currentLanguage =
+    localStorage.getItem(
+        "bmpLanguage"
+    ) || "en";
 
 
 // =====================================================
@@ -52,7 +383,11 @@ if (
     institutionId
 ) {
 
-    alert("Institution access denied.");
+    alert(
+        translations[
+            currentLanguage
+        ].institutionAccessDenied
+    );
 
     window.location.href =
         "school-login.html";
@@ -134,12 +469,174 @@ const backButton =
         "backButton"
     );
 
+const languageSelect =
+    document.getElementById(
+        "languageSelect"
+    );
+
 
 // =====================================================
 // Students data
 // =====================================================
 
 let students = [];
+
+
+// =====================================================
+// Apply Language
+// =====================================================
+
+function applyLanguage(
+    language
+) {
+
+    if (
+        !translations[language]
+    ) {
+
+        language = "en";
+
+    }
+
+
+    currentLanguage =
+        language;
+
+
+    localStorage.setItem(
+        "bmpLanguage",
+        language
+    );
+
+
+    // =============================================
+    // Direction
+    // =============================================
+
+    document.documentElement.lang =
+        language;
+
+    document.documentElement.dir =
+        language === "ar"
+            ? "rtl"
+            : "ltr";
+
+
+    // =============================================
+    // Static Text
+    // =============================================
+
+    document
+        .querySelectorAll(
+            "[data-i18n]"
+        )
+        .forEach(
+            function (element) {
+
+                const key =
+                    element.getAttribute(
+                        "data-i18n"
+                    );
+
+                if (
+                    translations[language][key]
+                ) {
+
+                    element.textContent =
+                        translations[language][key];
+
+                }
+
+            }
+        );
+
+
+    // =============================================
+    // Placeholder
+    // =============================================
+
+    document
+        .querySelectorAll(
+            "[data-i18n-placeholder]"
+        )
+        .forEach(
+            function (element) {
+
+                const key =
+                    element.getAttribute(
+                        "data-i18n-placeholder"
+                    );
+
+                if (
+                    translations[language][key]
+                ) {
+
+                    element.placeholder =
+                        translations[language][key];
+
+                }
+
+            }
+        );
+
+
+    // =============================================
+    // Page Subtitle
+    // =============================================
+
+    if (pageSubtitle) {
+
+        pageSubtitle.textContent =
+            institution.name
+                ? `${translations[language].manageStudents} - ${institution.name}`
+                : translations[language].manageStudents;
+
+    }
+
+
+    // =============================================
+    // Language Selector
+    // =============================================
+
+    if (languageSelect) {
+
+        languageSelect.value =
+            language;
+
+    }
+
+
+    // =============================================
+    // Reload Dynamic Elements
+    // =============================================
+
+    loadClassFilter();
+
+    loadAcademicYearFilter();
+
+    renderStudents();
+
+}
+
+
+// =====================================================
+// Language Change
+// =====================================================
+
+if (languageSelect) {
+
+    languageSelect.addEventListener(
+        "change",
+        function () {
+
+            applyLanguage(
+                languageSelect.value
+            );
+
+        }
+    );
+
+}
 
 
 // =====================================================
@@ -152,11 +649,15 @@ initializeStudents();
 async function initializeStudents() {
 
     pageTitle.textContent =
-        "Students";
+        translations[
+            currentLanguage
+        ].students;
 
 
     pageSubtitle.textContent =
-        `Manage students for ${institution.name}`;
+        institution.name
+            ? `${translations[currentLanguage].manageStudents} - ${institution.name}`
+            : translations[currentLanguage].manageStudents;
 
 
     institutionIdElement.textContent =
@@ -167,7 +668,9 @@ async function initializeStudents() {
         institution.name;
 
 
-    loadClassFilter();
+    applyLanguage(
+        currentLanguage
+    );
 
 
     await loadStudents();
@@ -220,7 +723,9 @@ async function loadStudents() {
         if (!response.ok) {
 
             throw new Error(
-                "Server connection failed."
+                translations[
+                    currentLanguage
+                ].serverConnectionFailed
             );
 
         }
@@ -234,7 +739,9 @@ async function loadStudents() {
 
             throw new Error(
                 result.message ||
-                "Unable to load students."
+                translations[
+                    currentLanguage
+                ].unableToLoadStudents
             );
 
         }
@@ -266,7 +773,9 @@ async function loadStudents() {
 
         alert(
             error.message ||
-            "Unable to load students."
+            translations[
+                currentLanguage
+            ].unableToLoadStudents
         );
 
     }
@@ -304,7 +813,7 @@ function normalizeStudent(student) {
 
         className:
             student.class
-                ? `Class ${student.class}`
+                ? `${translations[currentLanguage].classNumber} ${student.class}`
                 : "",
 
         registrationDate:
@@ -320,6 +829,10 @@ function normalizeStudent(student) {
 // =====================================================
 
 function loadAcademicYearFilter() {
+
+    const selectedValue =
+        academicYearFilter.value;
+
 
     const academicYears =
         [
@@ -356,13 +869,24 @@ function loadAcademicYearFilter() {
     );
 
 
-    academicYearFilter.innerHTML = `
+    academicYearFilter.innerHTML = "";
 
-        <option value="all">
-            All Academic Years
-        </option>
+    const allOption =
+        document.createElement(
+            "option"
+        );
 
-    `;
+    allOption.value =
+        "all";
+
+    allOption.textContent =
+        translations[
+            currentLanguage
+        ].allAcademicYears;
+
+    academicYearFilter.appendChild(
+        allOption
+    );
 
 
     academicYears.forEach(
@@ -400,12 +924,28 @@ function loadAcademicYearFilter() {
 
     if (
         academicYears.includes(
+            selectedValue
+        )
+    ) {
+
+        academicYearFilter.value =
+            selectedValue;
+
+    }
+    else if (
+        academicYears.includes(
             currentAcademicYear
         )
     ) {
 
         academicYearFilter.value =
             currentAcademicYear;
+
+    }
+    else {
+
+        academicYearFilter.value =
+            "all";
 
     }
 
@@ -418,17 +958,33 @@ function loadAcademicYearFilter() {
 
 function loadClassFilter() {
 
+    const selectedClass =
+        classFilter.value;
+
+
     const stage =
         stageFilter.value;
 
 
-    classFilter.innerHTML = `
+    classFilter.innerHTML = "";
 
-        <option value="all">
-            All Classes
-        </option>
 
-    `;
+    const allOption =
+        document.createElement(
+            "option"
+        );
+
+    allOption.value =
+        "all";
+
+    allOption.textContent =
+        translations[
+            currentLanguage
+        ].allClasses;
+
+    classFilter.appendChild(
+        allOption
+    );
 
 
     let numberOfClasses = 6;
@@ -474,12 +1030,30 @@ function loadClassFilter() {
 
 
         option.textContent =
-            `Class ${i}`;
+            `${translations[currentLanguage].classNumber} ${i}`;
 
 
         classFilter.appendChild(
             option
         );
+
+    }
+
+
+    if (
+        selectedClass &&
+        Number(selectedClass) <=
+            numberOfClasses
+    ) {
+
+        classFilter.value =
+            selectedClass;
+
+    }
+    else {
+
+        classFilter.value =
+            "all";
 
     }
 
@@ -653,12 +1227,9 @@ function renderStudents() {
 
 
             const className =
-                student.className ||
-                (
-                    student.classNumber
-                        ? `Class ${student.classNumber}`
-                        : "-"
-                );
+                student.classNumber
+                    ? `${translations[currentLanguage].classNumber} ${student.classNumber}`
+                    : "-";
 
 
             row.innerHTML = `
@@ -748,7 +1319,7 @@ function renderStudents() {
                             student.id
                         )}')">
 
-                        View
+                        ${translations[currentLanguage].view}
 
                     </button>
 
@@ -759,7 +1330,7 @@ function renderStudents() {
                             student.id
                         )}')">
 
-                        Edit
+                        ${translations[currentLanguage].edit}
 
                     </button>
 
@@ -787,21 +1358,33 @@ function formatStage(stage) {
     if (
         stage === "primary"
     ) {
-        return "Primary";
+
+        return translations[
+            currentLanguage
+        ].primary;
+
     }
 
 
     if (
         stage === "preparatory"
     ) {
-        return "Preparatory";
+
+        return translations[
+            currentLanguage
+        ].preparatory;
+
     }
 
 
     if (
         stage === "secondary"
     ) {
-        return "Secondary";
+
+        return translations[
+            currentLanguage
+        ].secondary;
+
     }
 
 
@@ -836,7 +1419,13 @@ function formatDate(dateValue) {
     }
 
 
-    return date.toLocaleDateString();
+    return date.toLocaleDateString(
+        currentLanguage === "ar"
+            ? "ar"
+            : currentLanguage === "fr"
+                ? "fr-FR"
+                : "en-US"
+    );
 
 }
 
