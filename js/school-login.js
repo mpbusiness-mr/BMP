@@ -2,12 +2,43 @@
 // BMP School Login
 // =====================================================
 
+
+// =====================================================
+// Backend API
+// =====================================================
+
+const SCHOOL_API_URL =
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+
+
+// =====================================================
 // Elements
-const loginForm = document.getElementById("loginForm");
-const usernameInput = document.getElementById("username");
-const passwordInput = document.getElementById("password");
-const loginButton = document.getElementById("loginButton");
-const errorMessage = document.getElementById("errorMessage");
+// =====================================================
+
+const loginForm =
+    document.getElementById(
+        "loginForm"
+    );
+
+const usernameInput =
+    document.getElementById(
+        "username"
+    );
+
+const passwordInput =
+    document.getElementById(
+        "password"
+    );
+
+const loginButton =
+    document.getElementById(
+        "loginButton"
+    );
+
+const errorMessage =
+    document.getElementById(
+        "errorMessage"
+    );
 
 
 // =====================================================
@@ -16,8 +47,11 @@ const errorMessage = document.getElementById("errorMessage");
 
 const currentUser =
     JSON.parse(
-        localStorage.getItem("bmpCurrentUser")
+        localStorage.getItem(
+            "bmpCurrentUser"
+        )
     );
+
 
 if (
     currentUser &&
@@ -29,238 +63,13 @@ if (
     ) &&
     currentUser.status === "active"
 ) {
+
     window.location.href =
         "school.html?id=" +
         encodeURIComponent(
             currentUser.institutionId
         );
-}
 
-
-// =====================================================
-// Get Institutions
-// =====================================================
-
-function getInstitutions() {
-
-    return JSON.parse(
-        localStorage.getItem("bmpInstitutions")
-    ) || [];
-}
-
-
-// =====================================================
-// Get Users
-// =====================================================
-
-function getUsers() {
-
-    return JSON.parse(
-        localStorage.getItem("bmpUsers")
-    ) || [];
-}
-
-
-// =====================================================
-// Authenticate School User
-// =====================================================
-
-function authenticateSchoolUser(
-    username,
-    password
-) {
-
-    const institutions =
-        getInstitutions();
-
-    const users =
-        getUsers();
-
-
-    // Find Director / Manager
-    // stored inside the institution
-    const institution =
-        institutions.find(
-            function (item) {
-
-                return (
-                    item.type === "school" &&
-                    item.username === username &&
-                    item.password === password
-                );
-
-            }
-        );
-
-
-    if (institution) {
-
-        // Institution disabled
-        if (
-            institution.status ===
-            "disabled"
-        ) {
-
-            return {
-                success: false,
-                message:
-                    "This school account is disabled."
-            };
-        }
-
-
-        // Create Director session
-        return {
-
-            success: true,
-
-            user: {
-
-                id:
-                    "DIRECTOR-" +
-                    institution.id,
-
-                username:
-                    institution.username,
-
-                role:
-                    "Director",
-
-                status:
-                    "active",
-
-                institutionId:
-                    institution.id,
-
-                institutionType:
-                    institution.type,
-
-                loginTime:
-                    new Date().toISOString()
-
-            }
-
-        };
-    }
-
-
-    // =================================================
-    // Find Additional User
-    // =================================================
-
-    const user =
-        users.find(
-            function (item) {
-
-                return (
-                    item.institutionId &&
-                    item.username === username &&
-                    item.password === password
-                );
-
-            }
-        );
-
-
-    if (user) {
-
-        // Disabled user
-        if (
-            user.status !== "active"
-        ) {
-
-            return {
-                success: false,
-                message:
-                    "This user account is disabled."
-            };
-        }
-
-
-        // Find institution
-        const userInstitution =
-            institutions.find(
-                function (item) {
-
-                    return (
-                        item.id ===
-                        user.institutionId
-                    );
-
-                }
-            );
-
-
-        if (!userInstitution) {
-
-            return {
-                success: false,
-                message:
-                    "Institution not found."
-            };
-        }
-
-
-        // Institution disabled
-        if (
-            userInstitution.status ===
-            "disabled"
-        ) {
-
-            return {
-                success: false,
-                message:
-                    "This school is currently disabled."
-            };
-        }
-
-
-        // Create user session
-        return {
-
-            success: true,
-
-            user: {
-
-                id:
-                    user.id,
-
-                username:
-                    user.username,
-
-                role:
-                    user.role,
-
-                status:
-                    user.status,
-
-                institutionId:
-                    user.institutionId,
-
-                institutionType:
-                    userInstitution.type,
-
-                loginTime:
-                    new Date().toISOString()
-
-            }
-
-        };
-    }
-
-
-    // =================================================
-    // Invalid Login
-    // =================================================
-
-    return {
-
-        success: false,
-
-        message:
-            "Invalid username or password."
-
-    };
 }
 
 
@@ -270,7 +79,7 @@ function authenticateSchoolUser(
 
 loginForm.addEventListener(
     "submit",
-    function (event) {
+    async function (event) {
 
         event.preventDefault();
 
@@ -282,28 +91,123 @@ loginForm.addEventListener(
             passwordInput.value;
 
 
-        errorMessage.textContent = "";
+        errorMessage.textContent =
+            "";
 
 
-        loginButton.disabled = true;
+        if (!username || !password) {
+
+            errorMessage.textContent =
+                "Please enter username and password.";
+
+            return;
+
+        }
+
+
+        loginButton.disabled =
+            true;
 
         loginButton.textContent =
             "Signing in...";
 
 
-        // Authenticate
-        const result =
-            authenticateSchoolUser(
-                username,
-                password
+        try {
+
+            const response =
+                await fetch(
+                    SCHOOL_API_URL,
+                    {
+
+                        method:
+                            "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "text/plain;charset=utf-8"
+
+                        },
+
+                        body:
+                            JSON.stringify({
+
+                                action:
+                                    "schoolLogin",
+
+                                username:
+                                    username,
+
+                                password:
+                                    password
+
+                            })
+
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            // =========================================
+            // Login Failed
+            // =========================================
+
+            if (!result.success) {
+
+                errorMessage.textContent =
+                    result.message ||
+                    "Login failed.";
+
+                loginButton.disabled =
+                    false;
+
+                loginButton.textContent =
+                    "Login";
+
+                return;
+
+            }
+
+
+            // =========================================
+            // Save Session
+            // =========================================
+
+            localStorage.setItem(
+
+                "bmpCurrentUser",
+
+                JSON.stringify(
+                    result.user
+                )
+
             );
 
 
-        // Login failed
-        if (!result.success) {
+            // =========================================
+            // Go To Dashboard
+            // =========================================
+
+            window.location.href =
+                "school.html?id=" +
+                encodeURIComponent(
+                    result.user.institutionId
+                );
+
+
+        } catch (error) {
+
+            console.error(
+                error
+            );
+
 
             errorMessage.textContent =
-                result.message;
+                "Unable to connect to server.";
+
 
             loginButton.disabled =
                 false;
@@ -311,31 +215,7 @@ loginForm.addEventListener(
             loginButton.textContent =
                 "Login";
 
-            return;
         }
-
-
-        // =================================================
-        // Save Session
-        // =================================================
-
-        localStorage.setItem(
-            "bmpCurrentUser",
-            JSON.stringify(
-                result.user
-            )
-        );
-
-
-        // =================================================
-        // Go To School Dashboard
-        // =================================================
-
-        window.location.href =
-            "school.html?id=" +
-            encodeURIComponent(
-                result.user.institutionId
-            );
 
     }
 );
