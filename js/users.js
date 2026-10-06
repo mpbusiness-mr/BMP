@@ -36,7 +36,10 @@ if (!institutionId) {
 }
 
 
+// =====================================================
 // Only Director can manage users
+// =====================================================
+
 if (
     String(currentUser.role || "")
         .trim()
@@ -61,54 +64,34 @@ if (
 // =====================================================
 
 const institutionTitle =
-    document.getElementById(
-        "institutionTitle"
-    );
+    document.getElementById("institutionTitle");
 
 const institutionIdElement =
-    document.getElementById(
-        "institutionId"
-    );
+    document.getElementById("institutionId");
 
 const institutionNameElement =
-    document.getElementById(
-        "institutionName"
-    );
+    document.getElementById("institutionName");
 
 const institutionTypeElement =
-    document.getElementById(
-        "institutionType"
-    );
+    document.getElementById("institutionType");
 
 const usersTableBody =
-    document.getElementById(
-        "usersTableBody"
-    );
+    document.getElementById("usersTableBody");
 
 const emptyState =
-    document.getElementById(
-        "emptyState"
-    );
+    document.getElementById("emptyState");
 
 const searchUser =
-    document.getElementById(
-        "searchUser"
-    );
+    document.getElementById("searchUser");
 
 const userStatusFilter =
-    document.getElementById(
-        "userStatusFilter"
-    );
+    document.getElementById("userStatusFilter");
 
 const addUserButton =
-    document.getElementById(
-        "addUserButton"
-    );
+    document.getElementById("addUserButton");
 
 const backButton =
-    document.getElementById(
-        "backButton"
-    );
+    document.getElementById("backButton");
 
 
 // =====================================================
@@ -122,28 +105,143 @@ let users = [];
 // Initialize
 // =====================================================
 
-initializeUsers();
+if (document.readyState === "loading") {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initializeUsersPage
+    );
+
+} else {
+
+    initializeUsersPage();
+}
 
 
 // =====================================================
 // Initialize Users Page
 // =====================================================
 
-async function initializeUsers() {
+async function initializeUsersPage() {
 
-    institutionTitle.textContent =
-        `Manage users`;
+    // -------------------------------------------------
+    // Safety check
+    // -------------------------------------------------
 
-    institutionIdElement.textContent =
-        institutionId;
+    if (!addUserButton) {
 
-    institutionNameElement.textContent =
-        currentUser.institutionName ||
-        "-";
+        console.error(
+            "Add User button was not found."
+        );
 
-    institutionTypeElement.textContent =
-        "School";
+    } else {
 
+        // -------------------------------------------------
+        // Add User
+        // -------------------------------------------------
+
+        addUserButton.type = "button";
+
+        addUserButton.onclick =
+            function (event) {
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                console.log(
+                    "Add User button clicked."
+                );
+
+                window.location.href =
+                    "add-user.html?id=" +
+                    encodeURIComponent(
+                        institutionId
+                    );
+            };
+    }
+
+
+    // -------------------------------------------------
+    // Back button
+    // -------------------------------------------------
+
+    if (backButton) {
+
+        backButton.type = "button";
+
+        backButton.onclick =
+            function (event) {
+
+                event.preventDefault();
+
+                window.location.href =
+                    "school.html?id=" +
+                    encodeURIComponent(
+                        institutionId
+                    );
+            };
+    }
+
+
+    // -------------------------------------------------
+    // Search
+    // -------------------------------------------------
+
+    if (searchUser) {
+
+        searchUser.addEventListener(
+            "input",
+            renderUsers
+        );
+    }
+
+
+    // -------------------------------------------------
+    // Status filter
+    // -------------------------------------------------
+
+    if (userStatusFilter) {
+
+        userStatusFilter.addEventListener(
+            "change",
+            renderUsers
+        );
+    }
+
+
+    // -------------------------------------------------
+    // Institution information
+    // -------------------------------------------------
+
+    if (institutionTitle) {
+
+        institutionTitle.textContent =
+            "Manage users";
+    }
+
+    if (institutionIdElement) {
+
+        institutionIdElement.textContent =
+            institutionId;
+    }
+
+    if (institutionNameElement) {
+
+        institutionNameElement.textContent =
+            currentUser.institutionName ||
+            "-";
+    }
+
+    if (institutionTypeElement) {
+
+        institutionTypeElement.textContent =
+            "School";
+    }
+
+
+    // -------------------------------------------------
+    // Load users
+    // -------------------------------------------------
 
     await loadUsers();
 }
@@ -169,9 +267,7 @@ async function apiRequest(payload) {
                     },
 
                     body:
-                        JSON.stringify(
-                            payload
-                        )
+                        JSON.stringify(payload)
                 }
             );
 
@@ -208,6 +304,10 @@ async function apiRequest(payload) {
 
 async function loadUsers() {
 
+    if (!usersTableBody) {
+        return;
+    }
+
     usersTableBody.innerHTML = `
         <tr>
             <td
@@ -219,7 +319,12 @@ async function loadUsers() {
         </tr>
     `;
 
-    emptyState.style.display = "none";
+
+    if (emptyState) {
+
+        emptyState.style.display =
+            "none";
+    }
 
 
     try {
@@ -248,9 +353,7 @@ async function loadUsers() {
 
 
         users =
-            Array.isArray(
-                result.users
-            )
+            Array.isArray(result.users)
                 ? result.users
                 : [];
 
@@ -292,14 +395,23 @@ async function loadUsers() {
 
 function renderUsers() {
 
+    if (!usersTableBody) {
+        return;
+    }
+
+
     const searchValue =
-        searchUser.value
-            .trim()
-            .toLowerCase();
+        searchUser
+            ? searchUser.value
+                .trim()
+                .toLowerCase()
+            : "";
 
 
     const selectedStatus =
-        userStatusFilter.value;
+        userStatusFilter
+            ? userStatusFilter.value
+            : "all";
 
 
     const filteredUsers =
@@ -318,8 +430,11 @@ function renderUsers() {
 
                 const matchesStatus =
                     selectedStatus === "all" ||
-                    user.status ===
-                        selectedStatus;
+                    String(
+                        user.status || ""
+                    )
+                    .toLowerCase() ===
+                    selectedStatus;
 
 
                 return (
@@ -337,15 +452,21 @@ function renderUsers() {
         filteredUsers.length === 0
     ) {
 
-        emptyState.style.display =
-            "block";
+        if (emptyState) {
+
+            emptyState.style.display =
+                "block";
+        }
 
         return;
     }
 
 
-    emptyState.style.display =
-        "none";
+    if (emptyState) {
+
+        emptyState.style.display =
+            "none";
+    }
 
 
     filteredUsers.forEach(
@@ -371,8 +492,12 @@ function renderUsers() {
 
 
             const status =
-                user.status ||
-                "active";
+                String(
+                    user.status ||
+                    "active"
+                )
+                .trim()
+                .toLowerCase();
 
 
             const statusName =
@@ -418,6 +543,7 @@ function renderUsers() {
 
                 actionButton = `
                     <button
+                        type="button"
                         class="action-btn enable-btn"
                         onclick="enableUser('${escapeJs(
                             user.userId ||
@@ -432,6 +558,7 @@ function renderUsers() {
 
                 actionButton = `
                     <button
+                        type="button"
                         class="action-btn disable-btn"
                         onclick="disableUser('${escapeJs(
                             user.userId ||
@@ -523,7 +650,6 @@ async function disableUser(
     }
 
 
-    // Never allow Director to be disabled
     if (
         String(
             user.role || ""
@@ -542,7 +668,11 @@ async function disableUser(
 
 
     if (
-        user.status ===
+        String(
+            user.status || ""
+        )
+        .trim()
+        .toLowerCase() ===
         "disabled"
     ) {
 
@@ -649,8 +779,6 @@ async function enableUser(
     }
 
 
-    // Director should normally never be disabled,
-    // but keep this protection here too.
     if (
         String(
             user.role || ""
@@ -669,7 +797,11 @@ async function enableUser(
 
 
     if (
-        user.status ===
+        String(
+            user.status || ""
+        )
+        .trim()
+        .toLowerCase() ===
         "active"
     ) {
 
@@ -797,9 +929,7 @@ function formatDate(
             )
         ) {
 
-            return String(
-                value
-            );
+            return String(value);
         }
 
 
@@ -807,9 +937,7 @@ function formatDate(
 
     } catch (error) {
 
-        return String(
-            value
-        );
+        return String(value);
     }
 }
 
@@ -822,29 +950,12 @@ function escapeHtml(
     value
 ) {
 
-    return String(
-        value
-    )
-    .replace(
-        /&/g,
-        "&amp;"
-    )
-    .replace(
-        /</g,
-        "&lt;"
-    )
-    .replace(
-        />/g,
-        "&gt;"
-    )
-    .replace(
-        /"/g,
-        "&quot;"
-    )
-    .replace(
-        /'/g,
-        "&#039;"
-    );
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 
@@ -856,71 +967,8 @@ function escapeJs(
     value
 ) {
 
-    return String(
-        value
-    )
-    .replace(
-        /\\/g,
-        "\\\\"
-    )
-    .replace(
-        /'/g,
-        "\\'"
-    )
-    .replace(
-        /"/g,
-        '\\"'
-    );
+    return String(value)
+        .replace(/\\/g, "\\\\")
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"');
 }
-
-
-// =====================================================
-// Search
-// =====================================================
-
-searchUser.addEventListener(
-    "input",
-    renderUsers
-);
-
-
-// =====================================================
-// Status Filter
-// =====================================================
-
-userStatusFilter.addEventListener(
-    "change",
-    renderUsers
-);
-
-
-// =====================================================
-// Add User
-// =====================================================
-
-addUserButton.addEventListener(
-    "click",
-    function () {
-
-        window.location.href =
-            `add-user.html?id=${encodeURIComponent(
-                institutionId
-            )}`;
-    }
-);
-
-
-// =====================================================
-// Back
-// =====================================================
-
-backButton.addEventListener(
-    "click",
-    function () {
-
-        window.location.href =
-            `school.html?id=${encodeURIComponent(
-                institutionId
-            )}`;
-    }
-);
