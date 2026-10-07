@@ -168,82 +168,189 @@ const backButton =
 
 
 // =====================================================
+// API Request Helper
+// =====================================================
+
+async function apiRequest(
+    payload
+) {
+
+    const response =
+        await fetch(
+            API_URL,
+            {
+                method:
+                    "POST",
+
+                headers: {
+                    "Content-Type":
+                        "text/plain;charset=utf-8"
+                },
+
+                body:
+                    JSON.stringify(
+                        payload
+                    )
+            }
+        );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Unable to connect to the server."
+        );
+
+    }
+
+
+    const result =
+        await response.json();
+
+
+    if (!result.success) {
+
+        throw new Error(
+            result.message ||
+            "Request failed."
+        );
+
+    }
+
+
+    return result;
+
+}
+
+
+// =====================================================
+// Get Latest Payment
+// =====================================================
+
+async function getLatestPayment() {
+
+    const result =
+        await apiRequest({
+
+            action:
+                "getPayments",
+
+            institutionId:
+                institutionId,
+
+            username:
+                currentUser.username
+
+        });
+
+
+    const payments =
+        Array.isArray(
+            result.payments
+        )
+            ? result.payments
+            : [];
+
+
+    if (
+        payments.length === 0
+    ) {
+
+        throw new Error(
+            "No payments found."
+        );
+
+    }
+
+
+    payments.sort(
+        function (a, b) {
+
+            const dateA =
+                new Date(
+                    a.paymentDate ||
+                    a.date ||
+                    0
+                );
+
+            const dateB =
+                new Date(
+                    b.paymentDate ||
+                    b.date ||
+                    0
+                );
+
+
+            return dateB - dateA;
+
+        }
+    );
+
+
+    return payments[0];
+
+}
+
+
+// =====================================================
 // Load Receipt From Backend
 // =====================================================
 
 async function loadReceipt() {
 
-    if (!paymentId) {
-
-        alert(
-            "Payment not found."
-        );
-
-        window.location.href =
-            `school-payments.html?id=${encodeURIComponent(
-                institutionId
-            )}`;
-
-        return;
-
-    }
-
-
     try {
 
-        const response =
-            await fetch(
-                API_URL,
-                {
-                    method:
-                        "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "text/plain;charset=utf-8"
-                    },
-
-                    body:
-                        JSON.stringify({
-
-                            action:
-                                "getReceipt",
-
-                            institutionId:
-                                institutionId,
-
-                            username:
-                                currentUser.username,
-
-                            paymentId:
-                                paymentId
-
-                        })
-                }
-            );
+        let selectedPaymentId =
+            paymentId;
 
 
-        if (!response.ok) {
+        /*
+         * If the receipt page is opened
+         * without paymentId, load the latest
+         * payment automatically.
+         */
 
-            throw new Error(
-                "Unable to connect to the server."
-            );
+        if (
+            !selectedPaymentId
+        ) {
+
+            const latestPayment =
+                await getLatestPayment();
+
+
+            selectedPaymentId =
+                latestPayment.paymentId;
+
+
+            if (
+                !selectedPaymentId
+            ) {
+
+                throw new Error(
+                    "Payment ID not found."
+                );
+
+            }
 
         }
 
 
         const result =
-            await response.json();
+            await apiRequest({
 
+                action:
+                    "getReceipt",
 
-        if (!result.success) {
+                institutionId:
+                    institutionId,
 
-            throw new Error(
-                result.message ||
-                "Failed to load receipt."
-            );
+                username:
+                    currentUser.username,
 
-        }
+                paymentId:
+                    selectedPaymentId
+
+            });
 
 
         const payment =
@@ -291,12 +398,6 @@ async function loadReceipt() {
             "Failed to load receipt."
         );
 
-
-        window.location.href =
-            `school-payments.html?id=${encodeURIComponent(
-                institutionId
-            )}`;
-
     }
 
 }
@@ -327,6 +428,8 @@ function renderReceipt(
 
         schoolName.textContent =
             school.name ||
+            currentUser.institutionName ||
+            currentUser.schoolName ||
             "School Name";
 
     }
@@ -382,7 +485,9 @@ function renderReceipt(
             schoolLogoContainer.style.display =
                 "block";
 
-        } else {
+        }
+
+        else {
 
             schoolLogoContainer.innerHTML =
                 "";
@@ -557,7 +662,9 @@ function renderReceipt(
             notesSection.style.display =
                 "block";
 
-        } else {
+        }
+
+        else {
 
             notes.textContent =
                 "";
