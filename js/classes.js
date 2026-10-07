@@ -1,4 +1,3 @@
-
 // =====================================================
 // BMP Classes & Stages
 // =====================================================
@@ -9,7 +8,7 @@
 // =====================================================
 
 const API_URL =
-    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDd_T6k0w0AWWK/exec";
 
 
 // =====================================================
@@ -173,13 +172,16 @@ async function loadClasses() {
                 result.institution &&
                 result.institution.name
                     ? result.institution.name
-                    : "-";
+                    : (
+                        currentUser.institutionName ||
+                        "-"
+                    );
 
         }
 
 
         // =============================================
-        // Classes
+        // Classes From Backend
         // =============================================
 
         const classes =
@@ -190,9 +192,19 @@ async function loadClasses() {
                 : [];
 
 
-        renderClasses(
-            classes
-        );
+        if (
+            classes.length > 0
+        ) {
+
+            renderClasses(
+                classes
+            );
+
+        } else {
+
+            renderDefaultClasses();
+
+        }
 
 
         if (
@@ -205,6 +217,7 @@ async function loadClasses() {
 
         }
 
+
     }
 
     catch (error) {
@@ -215,23 +228,33 @@ async function loadClasses() {
         );
 
 
-        showError(
-            primaryClasses
-        );
+        // =============================================
+        // Keep Classes Page Working
+        // =============================================
 
-        showError(
-            preparatoryClasses
-        );
+        if (
+            institutionIdElement
+        ) {
 
-        showError(
-            secondaryClasses
-        );
+            institutionIdElement.textContent =
+                institutionId;
+
+        }
 
 
-        alert(
-            error.message ||
-            "Failed to load classes."
-        );
+        if (
+            institutionNameElement
+        ) {
+
+            institutionNameElement.textContent =
+                currentUser.institutionName ||
+                "-";
+
+        }
+
+
+        renderDefaultClasses();
+
 
     }
 
@@ -239,7 +262,7 @@ async function loadClasses() {
 
 
 // =====================================================
-// Render Classes
+// Render Classes From Backend
 // =====================================================
 
 function renderClasses(
@@ -297,7 +320,126 @@ function renderClasses(
 
 
 // =====================================================
-// Render Stage Classes
+// Render Default Classes
+// =====================================================
+
+function renderDefaultClasses() {
+
+    renderDefaultStageClasses(
+        primaryClasses,
+        "primary",
+        "A",
+        "Primary Class",
+        6
+    );
+
+
+    renderDefaultStageClasses(
+        preparatoryClasses,
+        "preparatory",
+        "B",
+        "Preparatory Class",
+        4
+    );
+
+
+    renderDefaultStageClasses(
+        secondaryClasses,
+        "secondary",
+        "C",
+        "Secondary Class",
+        3
+    );
+
+}
+
+
+// =====================================================
+// Render Default Stage Classes
+// =====================================================
+
+function renderDefaultStageClasses(
+    container,
+    stage,
+    stageLetter,
+    classPrefix,
+    numberOfClasses
+) {
+
+    if (!container) {
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+        "";
+
+
+    for (
+        let classNumber = 1;
+        classNumber <= numberOfClasses;
+        classNumber++
+    ) {
+
+        const classItem =
+            document.createElement(
+                "div"
+            );
+
+
+        classItem.className =
+            "class-item";
+
+
+        classItem.style.cursor =
+            "pointer";
+
+
+        classItem.innerHTML = `
+            <div class="class-info">
+
+                <span class="class-number">
+                    ${classNumber}
+                </span>
+
+                <div>
+
+                    <div class="class-name">
+                        ${classPrefix}
+                        ${classNumber}
+                    </div>
+
+                    <div class="class-code">
+                        Code:
+                        ${stageLetter}${classNumber}
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+
+
+        attachClassClick(
+            classItem,
+            stage,
+            classNumber
+        );
+
+
+        container.appendChild(
+            classItem
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// Render Stage Classes From Backend
 // =====================================================
 
 function renderStageClasses(
@@ -382,6 +524,13 @@ function renderStageClasses(
                 );
 
 
+            const stage =
+                String(
+                    item.stage ||
+                    ""
+                );
+
+
             const classItem =
                 document.createElement(
                     "div"
@@ -426,41 +575,51 @@ function renderStageClasses(
             `;
 
 
-            // =========================================
-            // Open Class Students Page
-            // =========================================
-
-            classItem.onclick =
-                function () {
-
-                    const targetUrl =
-                        "./school-class.html" +
-                        "?stage=" +
-                        encodeURIComponent(
-                            item.stage
-                        ) +
-                        "&class=" +
-                        encodeURIComponent(
-                            item.classNumber
-                        );
-
-
-                    console.log(
-                        "Opening class page:",
-                        targetUrl
-                    );
-
-
-                    window.location.assign(
-                        targetUrl
-                    );
-
-                };
+            attachClassClick(
+                classItem,
+                stage,
+                classNumber
+            );
 
 
             container.appendChild(
                 classItem
             );
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// Class Click
+// =====================================================
+
+function attachClassClick(
+    classItem,
+    stage,
+    classNumber
+) {
+
+    classItem.addEventListener(
+        "click",
+        function () {
+
+            const url =
+                "./school-class.html" +
+                "?stage=" +
+                encodeURIComponent(
+                    stage
+                ) +
+                "&class=" +
+                encodeURIComponent(
+                    classNumber
+                );
+
+
+            window.location.href =
+                url;
 
         }
     );
@@ -492,42 +651,6 @@ function showLoading(
 
                     <div class="class-name">
                         Loading...
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-    `;
-
-}
-
-
-// =====================================================
-// Error
-// =====================================================
-
-function showError(
-    container
-) {
-
-    if (!container) {
-
-        return;
-
-    }
-
-
-    container.innerHTML = `
-        <div class="class-item">
-
-            <div class="class-info">
-
-                <div>
-
-                    <div class="class-name">
-                        Failed to load classes.
                     </div>
 
                 </div>
