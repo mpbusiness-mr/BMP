@@ -1,231 +1,160 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMP - Add Student</title>
+    <title>BMP · إضافة طالب | Add Student</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <link rel="stylesheet" href="css/add-student.css">
+
+    <!-- Preload the students page so the redirect feels instant -->
+    <link rel="prefetch" href="students.html">
 </head>
-<body>
+<body class="lang-ar">
 
-<header class="page-header">
-    <div class="header-left">
-        <h1 data-i18n="pageTitle">Add Student</h1>
-        <p data-i18n="pageSubtitle">Register a new student</p>
-    </div>
+    <div class="bg-blob bg-blob-1" aria-hidden="true"></div>
+    <div class="bg-blob bg-blob-2" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
 
-    <div class="header-right">
-        <select id="languageSelect" aria-label="Language">
-            <option value="en">English</option>
-            <option value="ar">العربية</option>
-            <option value="fr">Français</option>
-        </select>
+    <header class="page-header">
 
-        <button
-            id="backButton"
-            type="button"
-            class="btn btn-secondary"
-            data-i18n="back"
-        >
-            Back
-        </button>
-    </div>
-</header>
-
-<main class="page-container">
-
-    <section class="card">
-        <h2 data-i18n="schoolInformation">
-            School Information
-        </h2>
-
-        <div class="info-grid">
-            <div class="info-item">
-                <span data-i18n="institutionId">
-                    Institution ID
-                </span>
-
-                <strong id="institutionId">—</strong>
-            </div>
-
-            <div class="info-item">
-                <span data-i18n="institutionName">
-                    Institution Name
-                </span>
-
-                <strong id="institutionName">—</strong>
+        <div class="header-left">
+            <a href="students.html" class="topbar-logo">
+                <i class="fas fa-cubes"></i> BMP
+            </a>
+            <div>
+                <h1 data-i18n="pageTitle">Add Student</h1>
+                <p data-i18n="pageSubtitle">Register a new student</p>
             </div>
         </div>
-    </section>
 
-    <section class="card">
-        <h2 data-i18n="studentInformation">
-            Student Information
-        </h2>
+        <div class="header-right">
 
-        <form id="studentForm">
-
-            <div class="form-grid">
-
-                <div class="form-group">
-                    <label
-                        for="academicYear"
-                        data-i18n="academicYear"
-                    >
-                        Academic Year
-                    </label>
-
-                    <select
-                        id="academicYear"
-                        required
-                    ></select>
-                </div>
-
-                <div class="form-group">
-                    <label
-                        for="studentNumber"
-                        data-i18n="studentNumber"
-                    >
-                        Student Number
-                    </label>
-
-                    <input
-                        type="text"
-                        id="studentNumber"
-                        readonly
-                        placeholder="Generated automatically"
-                        data-i18n-placeholder="generatedAutomatically"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label
-                        for="studentName"
-                        data-i18n="studentName"
-                    >
-                        Student Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="studentName"
-                        required
-                        autocomplete="off"
-                        placeholder="Enter student name"
-                        data-i18n-placeholder="enterStudentName"
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label
-                        for="stage"
-                        data-i18n="stage"
-                    >
-                        Stage
-                    </label>
-
-                    <select
-                        id="stage"
-                        required
-                    >
-                        <option
-                            value=""
-                            data-i18n="selectStage"
-                        >
-                            Select Stage
-                        </option>
-
-                        <option
-                            value="primary"
-                            data-i18n="primary"
-                        >
-                            Primary
-                        </option>
-
-                        <option
-                            value="preparatory"
-                            data-i18n="preparatory"
-                        >
-                            Preparatory
-                        </option>
-
-                        <option
-                            value="secondary"
-                            data-i18n="secondary"
-                        >
-                            Secondary
-                        </option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label
-                        for="className"
-                        data-i18n="class"
-                    >
-                        Class
-                    </label>
-
-                    <select
-                        id="className"
-                        required
-                    >
-                        <option
-                            value=""
-                            data-i18n="selectClass"
-                        >
-                            Select Class
-                        </option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label
-                        for="registrationDate"
-                        data-i18n="registrationDate"
-                    >
-                        Registration Date
-                    </label>
-
-                    <input
-                        type="date"
-                        id="registrationDate"
-                        required
-                    >
-                </div>
-
+            <div class="lang-switcher" role="group" aria-label="Language">
+                <button type="button" class="lang-btn active" data-lang="ar">عربية</button>
+                <button type="button" class="lang-btn"        data-lang="fr">Français</button>
+                <button type="button" class="lang-btn"        data-lang="en">English</button>
             </div>
 
-            <div class="form-actions">
+            <button id="backButton" type="button" class="btn btn-secondary" data-i18n="back">
+                <i class="fas fa-arrow-right"></i>
+                <span>Back</span>
+            </button>
 
-                <button
-                    type="button"
-                    id="cancelButton"
-                    class="btn btn-secondary"
-                    data-i18n="cancel"
-                >
-                    Cancel
-                </button>
+        </div>
 
-                <button
-                    type="submit"
-                    id="registerButton"
-                    class="btn btn-primary"
-                    data-i18n="registerStudent"
-                >
-                    Register Student
-                </button>
+    </header>
 
+    <main class="page-container">
+
+        <section class="card">
+            <h2 data-i18n="schoolInformation">School Information</h2>
+
+            <div class="info-grid">
+                <div class="info-item">
+                    <span data-i18n="institutionId">Institution ID</span>
+                    <strong id="institutionId">—</strong>
+                </div>
+
+                <div class="info-item">
+                    <span data-i18n="institutionName">Institution Name</span>
+                    <strong id="institutionName">—</strong>
+                </div>
             </div>
+        </section>
 
-        </form>
-    </section>
+        <section class="card">
+            <h2 data-i18n="studentInformation">Student Information</h2>
 
-</main>
+            <form id="studentForm" novalidate>
 
-<script src="js/auth.js"></script>
-<script src="js/activity-log.js"></script>
-<script src="js/add-student.js"></script>
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label for="academicYear" data-i18n="academicYear">
+                            Academic Year
+                        </label>
+                        <select id="academicYear" required></select>
+                        <span class="field-error" data-error-for="academicYear"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="studentNumber" data-i18n="studentNumber">
+                            Student Number
+                        </label>
+                        <input type="text" id="studentNumber" readonly
+                               placeholder="Generated automatically"
+                               data-i18n-placeholder="generatedAutomatically">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="studentName" data-i18n="studentName">
+                            Student Name
+                        </label>
+                        <input type="text" id="studentName" required autocomplete="off"
+                               placeholder="Enter student name"
+                               data-i18n-placeholder="enterStudentName">
+                        <span class="field-error" data-error-for="studentName"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stage" data-i18n="stage">Stage</label>
+                        <select id="stage" required>
+                            <option value="" data-i18n="selectStage">Select Stage</option>
+                            <option value="primary" data-i18n="primary">Primary</option>
+                            <option value="preparatory" data-i18n="preparatory">Preparatory</option>
+                            <option value="secondary" data-i18n="secondary">Secondary</option>
+                        </select>
+                        <span class="field-error" data-error-for="stage"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="className" data-i18n="class">Class</label>
+                        <select id="className" required>
+                            <option value="" data-i18n="selectClass">Select Class</option>
+                        </select>
+                        <span class="field-error" data-error-for="className"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registrationDate" data-i18n="registrationDate">
+                            Registration Date
+                        </label>
+                        <input type="date" id="registrationDate" required>
+                        <span class="field-error" data-error-for="registrationDate"></span>
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+
+                    <button type="button" id="cancelButton" class="btn btn-secondary" data-i18n="cancel">
+                        Cancel
+                    </button>
+
+                    <button type="submit" id="registerButton" class="btn btn-primary">
+                        <span class="btn-spinner" aria-hidden="true"></span>
+                        <span class="btn-label" data-i18n="registerStudent">
+                            Register Student
+                        </span>
+                    </button>
+
+                </div>
+
+            </form>
+        </section>
+
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script src="js/activity-log.js"></script>
+    <script src="js/add-student.js"></script>
 
 </body>
 </html>
