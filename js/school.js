@@ -9,201 +9,31 @@
 
 const translations = {
 
-    en: {
-
-        language: "Language",
-
-        back: "Back",
-
-        institutionId: "Institution ID",
-
-        schoolNameLabel: "School Name",
-
-        status: "Status",
-
-        students: "Students",
-
-        studentsDescription:
-            "Register, search and manage students.",
-
-        payments: "Payments",
-
-        paymentsDescription:
-            "Manage monthly student payments.",
-
-        receipts: "Receipts",
-
-        receiptsDescription:
-            "View and manage payment receipts.",
-
-        reports: "Reports",
-
-        reportsDescription:
-            "View school statistics and reports.",
-
-        classesStages: "Classes & Stages",
-
-        classesStagesDescription:
-            "Manage academic stages and classes.",
-
-        users: "Users",
-
-        usersDescription:
-            "Manage school users and access.",
-
-        settings: "Settings",
-
-        settingsDescription:
-            "Manage school settings.",
-
-        logout: "Logout",
-
-        schoolDashboard:
-            "School Dashboard",
-
-        manageSchoolOperations:
-            "Manage school operations",
-
-        active: "Active",
-
-        disabled: "Disabled",
-
-        expired: "Expired",
-
-        school: "School"
-
-    },
-
-
     ar: {
-
-        language: "اللغة",
-
-        back: "رجوع",
-
-        institutionId: "رقم المؤسسة",
-
-        schoolNameLabel: "اسم المدرسة",
-
-        status: "الحالة",
-
-        students: "الطلاب",
-
-        studentsDescription:
-            "تسجيل الطلاب والبحث عنهم وإدارتهم.",
-
-        payments: "المدفوعات",
-
-        paymentsDescription:
-            "إدارة المدفوعات الشهرية للطلاب.",
-
-        receipts: "الإيصالات",
-
-        receiptsDescription:
-            "عرض وإدارة إيصالات الدفع.",
-
-        reports: "التقارير",
-
-        reportsDescription:
-            "عرض إحصائيات وتقارير المدرسة.",
-
-        classesStages: "المراحل والأقسام",
-
-        classesStagesDescription:
-            "إدارة المراحل الدراسية والأقسام.",
-
-        users: "المستخدمون",
-
-        usersDescription:
-            "إدارة مستخدمي المدرسة والصلاحيات.",
-
-        settings: "الإعدادات",
-
-        settingsDescription:
-            "إدارة إعدادات المدرسة.",
-
-        logout: "تسجيل الخروج",
-
-        schoolDashboard:
-            "لوحة تحكم المدرسة",
-
-        manageSchoolOperations:
-            "إدارة عمليات المدرسة",
-
-        active: "نشطة",
-
-        disabled: "معطلة",
-
-        expired: "منتهية",
-
-        school: "المدرسة"
-
+        schoolDashboard:        "لوحة تحكم المدرسة",
+        manageSchoolOperations: "إدارة عمليات المدرسة",
+        active:                 "نشطة",
+        disabled:               "معطلة",
+        expired:                "منتهية",
+        school:                 "المدرسة"
     },
-
 
     fr: {
+        schoolDashboard:        "Tableau de bord de l'école",
+        manageSchoolOperations: "Gérer les opérations de l'école",
+        active:                 "Active",
+        disabled:               "Désactivée",
+        expired:                "Expirée",
+        school:                 "École"
+    },
 
-        language: "Langue",
-
-        back: "Retour",
-
-        institutionId: "ID de l'établissement",
-
-        schoolNameLabel: "Nom de l'école",
-
-        status: "Statut",
-
-        students: "Élèves",
-
-        studentsDescription:
-            "Inscrire, rechercher et gérer les élèves.",
-
-        payments: "Paiements",
-
-        paymentsDescription:
-            "Gérer les paiements mensuels des élèves.",
-
-        receipts: "Reçus",
-
-        receiptsDescription:
-            "Consulter et gérer les reçus de paiement.",
-
-        reports: "Rapports",
-
-        reportsDescription:
-            "Consulter les statistiques et rapports de l'école.",
-
-        classesStages: "Classes et niveaux",
-
-        classesStagesDescription:
-            "Gérer les niveaux scolaires et les classes.",
-
-        users: "Utilisateurs",
-
-        usersDescription:
-            "Gérer les utilisateurs et les accès de l'école.",
-
-        settings: "Paramètres",
-
-        settingsDescription:
-            "Gérer les paramètres de l'école.",
-
-        logout: "Déconnexion",
-
-        schoolDashboard:
-            "Tableau de bord de l'école",
-
-        manageSchoolOperations:
-            "Gérer les opérations de l'école",
-
-        active: "Active",
-
-        disabled: "Désactivée",
-
-        expired: "Expirée",
-
-        school: "École"
-
+    en: {
+        schoolDashboard:        "School Dashboard",
+        manageSchoolOperations: "Manage school operations",
+        active:                 "Active",
+        disabled:               "Disabled",
+        expired:                "Expired",
+        school:                 "School"
     }
 
 };
@@ -213,23 +43,20 @@ const translations = {
 // Current Language
 // =====================================================
 
+const DEFAULT_LANG = "ar";
+
 let currentLanguage =
-    localStorage.getItem(
-        "bmpLanguage"
-    ) || "en";
+    localStorage.getItem("bmpLanguage") || DEFAULT_LANG;
 
 
 // =====================================================
 // Check Session
 // =====================================================
 
-const currentUser =
-    requireSchoolLogin();
+const currentUser = requireSchoolLogin();
 
 if (!currentUser) {
-    throw new Error(
-        "School login required."
-    );
+    throw new Error("School login required.");
 }
 
 
@@ -237,13 +64,8 @@ if (!currentUser) {
 // Get Institution ID
 // =====================================================
 
-const urlParams =
-    new URLSearchParams(
-        window.location.search
-    );
-
-const institutionId =
-    urlParams.get("id");
+const urlParams = new URLSearchParams(window.location.search);
+const institutionId = urlParams.get("id");
 
 
 // =====================================================
@@ -252,19 +74,13 @@ const institutionId =
 
 if (
     institutionId &&
-    institutionId !==
-        currentUser.institutionId
+    institutionId !== currentUser.institutionId
 ) {
-
     window.location.href =
         "school.html?id=" +
-        encodeURIComponent(
-            currentUser.institutionId
-        );
+        encodeURIComponent(currentUser.institutionId);
 
-    throw new Error(
-        "Institution access denied."
-    );
+    throw new Error("Institution access denied.");
 }
 
 
@@ -272,8 +88,7 @@ if (
 // Use Session Institution
 // =====================================================
 
-const activeInstitutionId =
-    currentUser.institutionId;
+const activeInstitutionId = currentUser.institutionId;
 
 
 // =====================================================
@@ -281,34 +96,15 @@ const activeInstitutionId =
 // =====================================================
 
 const institution = {
-
-    id:
-        currentUser.institutionId,
-
-    type:
-        currentUser.institutionType || "",
-
-    name:
-        currentUser.institutionName || "",
-
-    phone:
-        currentUser.institutionPhone || "",
-
-    email:
-        currentUser.institutionEmail || "",
-
-    licenseStart:
-        currentUser.licenseStart || "",
-
-    licenseEnd:
-        currentUser.licenseEnd || "",
-
-    status:
-        "active",
-
-    sheetId:
-        currentUser.sheetId || ""
-
+    id:           currentUser.institutionId,
+    type:         currentUser.institutionType  || "",
+    name:         currentUser.institutionName  || "",
+    phone:        currentUser.institutionPhone || "",
+    email:        currentUser.institutionEmail || "",
+    licenseStart: currentUser.licenseStart     || "",
+    licenseEnd:   currentUser.licenseEnd       || "",
+    status:       "active",
+    sheetId:      currentUser.sheetId          || ""
 };
 
 
@@ -316,21 +112,10 @@ const institution = {
 // Institution Data Validation
 // =====================================================
 
-if (
-    !institution.id ||
-    !institution.name
-) {
-
-    localStorage.removeItem(
-        "bmpCurrentUser"
-    );
-
-    window.location.href =
-        "school-login.html";
-
-    throw new Error(
-        "Invalid institution session."
-    );
+if (!institution.id || !institution.name) {
+    localStorage.removeItem("bmpCurrentUser");
+    window.location.href = "school-login.html";
+    throw new Error("Invalid institution session.");
 }
 
 
@@ -338,61 +123,24 @@ if (
 // Check Institution Status
 // =====================================================
 
-function getInstitutionStatus(
-    institution
-) {
+function getInstitutionStatus(institution) {
 
-    if (
-        institution.status ===
-        "disabled"
-    ) {
-
+    if (institution.status === "disabled") {
         return "disabled";
-
     }
 
+    if (institution.licenseEnd) {
 
-    if (
-        institution.licenseEnd
-    ) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-        const today =
-            new Date();
+        const licenseEnd = new Date(institution.licenseEnd);
+        licenseEnd.setHours(0, 0, 0, 0);
 
-        today.setHours(
-            0,
-            0,
-            0,
-            0
-        );
-
-
-        const licenseEnd =
-            new Date(
-                institution.licenseEnd
-            );
-
-        licenseEnd.setHours(
-            0,
-            0,
-            0,
-            0
-        );
-
-
-        if (
-            !isNaN(
-                licenseEnd.getTime()
-            ) &&
-            licenseEnd < today
-        ) {
-
+        if (!isNaN(licenseEnd.getTime()) && licenseEnd < today) {
             return "expired";
-
         }
-
     }
-
 
     return "active";
 }
@@ -402,204 +150,88 @@ function getInstitutionStatus(
 // Translate Status
 // =====================================================
 
-function translateStatus(
-    status
-) {
-
-    const key =
-        String(
-            status || ""
-        ).toLowerCase();
-
-    return (
-        translations[currentLanguage][key]
-        ||
-        status
-    );
-
+function translateStatus(status) {
+    const key = String(status || "").toLowerCase();
+    return translations[currentLanguage][key] || status;
 }
+
+
+// =====================================================
+// Elements
+// =====================================================
+
+const schoolName             = document.getElementById("schoolName");
+const schoolInfo             = document.getElementById("schoolInfo");
+const institutionIdElement   = document.getElementById("institutionId");
+const statusElement          = document.getElementById("institutionStatus");
+const institutionNameElement = document.getElementById("institutionName");
+const usersButton            = document.getElementById("usersButton");
+const pageLoader             = document.getElementById("pageLoader");
+const langButtons            = document.querySelectorAll(".lang-btn");
 
 
 // =====================================================
 // Apply Language
 // =====================================================
 
-function applyLanguage(
-    language
-) {
+function applyLanguage(language) {
 
-    if (
-        !translations[language]
-    ) {
+    if (!translations[language]) language = DEFAULT_LANG;
 
-        language = "en";
+    currentLanguage = language;
+    localStorage.setItem("bmpLanguage", language);
 
-    }
-
-
-    currentLanguage =
-        language;
-
-
-    localStorage.setItem(
-        "bmpLanguage",
-        language
-    );
-
-
-    // =============================================
     // Direction
-    // =============================================
+    document.documentElement.lang = language;
+    document.documentElement.dir  = (language === "ar") ? "rtl" : "ltr";
 
-    document.documentElement.lang =
-        language;
+    // Font swap
+    document.body.classList.remove("lang-ar", "lang-fr", "lang-en");
+    document.body.classList.add("lang-" + language);
 
-    document.documentElement.dir =
-        language === "ar"
-            ? "rtl"
-            : "ltr";
+    // Static text
+    document.querySelectorAll("[data-ar]").forEach(function (el) {
+        const value = el.dataset[language];
+        if (value !== undefined) el.textContent = value;
+    });
 
+    // Active lang button
+    langButtons.forEach(function (btn) {
+        btn.classList.toggle("active", btn.dataset.lang === language);
+    });
 
-    // =============================================
-    // Static Text
-    // =============================================
-
-    document
-        .querySelectorAll(
-            "[data-i18n]"
-        )
-        .forEach(
-            function (element) {
-
-                const key =
-                    element.getAttribute(
-                        "data-i18n"
-                    );
-
-                if (
-                    translations[language][key]
-                ) {
-
-                    element.textContent =
-                        translations[language][key];
-
-                }
-
-            }
-        );
-
-
-    // =============================================
-    // Dashboard Header
-    // =============================================
-
+    // Dynamic: school info line
     if (schoolInfo) {
-
         schoolInfo.textContent =
             institution.phone ||
             institution.email ||
-            translations[
-                language
-            ].manageSchoolOperations;
-
+            translations[language].manageSchoolOperations;
     }
 
-
-    // =============================================
-    // School Name
-    // =============================================
-
+    // Dynamic: school name
     if (schoolName) {
-
-        if (
-            institution.name
-        ) {
-
-            schoolName.textContent =
-                institution.name;
-
-        } else {
-
-            schoolName.textContent =
-                translations[
-                    language
-                ].schoolDashboard;
-
-        }
-
+        schoolName.textContent =
+            institution.name ||
+            translations[language].schoolDashboard;
     }
 
-
-    // =============================================
-    // Status
-    // =============================================
-
+    // Dynamic: status
     if (statusElement) {
-
         statusElement.textContent =
-            translateStatus(
-                getInstitutionStatus(
-                    institution
-                )
-            );
-
+            translateStatus(getInstitutionStatus(institution));
     }
-
-
-    // =============================================
-    // Language Selector
-    // =============================================
-
-    const languageSelect =
-        document.getElementById(
-            "languageSelect"
-        );
-
-    if (
-        languageSelect
-    ) {
-
-        languageSelect.value =
-            language;
-
-    }
-
 }
 
 
 // =====================================================
-// Dashboard Elements
+// Language Switcher
 // =====================================================
 
-const schoolName =
-    document.getElementById(
-        "schoolName"
-    );
-
-const schoolInfo =
-    document.getElementById(
-        "schoolInfo"
-    );
-
-const institutionIdElement =
-    document.getElementById(
-        "institutionId"
-    );
-
-const statusElement =
-    document.getElementById(
-        "institutionStatus"
-    );
-
-const institutionNameElement =
-    document.getElementById(
-        "institutionName"
-    );
-
-const usersButton =
-    document.getElementById(
-        "usersButton"
-    );
+langButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+        applyLanguage(btn.dataset.lang);
+    });
+});
 
 
 // =====================================================
@@ -607,97 +239,29 @@ const usersButton =
 // =====================================================
 
 if (schoolName) {
-
     schoolName.textContent =
         institution.name ||
-        translations[
-            currentLanguage
-        ].school;
-
+        translations[currentLanguage].school;
 }
 
-
 if (schoolInfo) {
-
     schoolInfo.textContent =
         institution.phone ||
         institution.email ||
-        translations[
-            currentLanguage
-        ].manageSchoolOperations;
-
+        translations[currentLanguage].manageSchoolOperations;
 }
-
 
 if (institutionIdElement) {
-
-    institutionIdElement.textContent =
-        institution.id;
-
+    institutionIdElement.textContent = institution.id;
 }
-
 
 if (institutionNameElement) {
-
-    institutionNameElement.textContent =
-        institution.name;
-
+    institutionNameElement.textContent = institution.name;
 }
-
 
 if (statusElement) {
-
     statusElement.textContent =
-        translateStatus(
-            getInstitutionStatus(
-                institution
-            )
-        );
-
-}
-
-
-// =====================================================
-// Language Selector
-// =====================================================
-
-const languageSelect =
-    document.getElementById(
-        "languageSelect"
-    );
-
-
-if (languageSelect) {
-
-    languageSelect.addEventListener(
-        "change",
-        function () {
-
-            applyLanguage(
-                languageSelect.value
-            );
-
-        }
-    );
-
-}
-
-
-// =====================================================
-// Navigation Helper
-// =====================================================
-
-function openSchoolPage(
-    page
-) {
-
-    window.location.href =
-        page +
-        "?id=" +
-        encodeURIComponent(
-            activeInstitutionId
-        );
-
+        translateStatus(getInstitutionStatus(institution));
 }
 
 
@@ -705,23 +269,12 @@ function openSchoolPage(
 // Back Button
 // =====================================================
 
-const backButton =
-    document.getElementById(
-        "backButton"
-    );
-
+const backButton = document.getElementById("backButton");
 
 if (backButton) {
-
-    backButton.addEventListener(
-        "click",
-        function () {
-
-            window.history.back();
-
-        }
-    );
-
+    backButton.addEventListener("click", function () {
+        window.history.back();
+    });
 }
 
 
@@ -729,23 +282,12 @@ if (backButton) {
 // Logout
 // =====================================================
 
-const logoutButton =
-    document.getElementById(
-        "logoutButton"
-    );
-
+const logoutButton = document.getElementById("logoutButton");
 
 if (logoutButton) {
-
-    logoutButton.addEventListener(
-        "click",
-        function () {
-
-            logoutUser();
-
-        }
-    );
-
+    logoutButton.addEventListener("click", function () {
+        logoutUser();
+    });
 }
 
 
@@ -753,149 +295,79 @@ if (logoutButton) {
 // Dashboard Buttons
 // =====================================================
 
-document
-    .getElementById("studentsButton")
-    ?.addEventListener(
-        "click",
-        function () {
+document.getElementById("studentsButton")?.addEventListener("click", function () {
+    window.location.href =
+        "students.html?id=" +
+        encodeURIComponent(activeInstitutionId);
+});
 
-            window.location.href =
-                "students.html?id=" +
-                encodeURIComponent(
-                    activeInstitutionId
-                );
+document.getElementById("paymentsButton")?.addEventListener("click", function () {
+    window.location.href =
+        "school-payments.html?id=" +
+        encodeURIComponent(activeInstitutionId);
+});
 
-        }
-    );
+document.getElementById("receiptsButton")?.addEventListener("click", function () {
+    window.location.href =
+        "school-receipt.html?id=" +
+        encodeURIComponent(activeInstitutionId);
+});
 
+document.getElementById("reportsButton")?.addEventListener("click", function () {
+    window.location.href =
+        "school-reports.html?id=" +
+        encodeURIComponent(activeInstitutionId);
+});
 
-document
-    .getElementById("paymentsButton")
-    ?.addEventListener(
-        "click",
-        function () {
-
-            window.location.href =
-                "school-payments.html?id=" +
-                encodeURIComponent(
-                    activeInstitutionId
-                );
-
-        }
-    );
-
-
-document
-    .getElementById("receiptsButton")
-    ?.addEventListener(
-        "click",
-        function () {
-
-            window.location.href =
-                "school-receipt.html?id=" +
-                encodeURIComponent(
-                    activeInstitutionId
-                );
-
-        }
-    );
-
-
-document
-    .getElementById("reportsButton")
-    ?.addEventListener(
-        "click",
-        function () {
-
-            window.location.href =
-                "school-reports.html?id=" +
-                encodeURIComponent(
-                    activeInstitutionId
-                );
-
-        }
-    );
-
-
-document
-    .getElementById("classesButton")
-    ?.addEventListener(
-        "click",
-        function () {
-
-            window.location.href =
-                "classes.html?id=" +
-                encodeURIComponent(
-                    activeInstitutionId
-                );
-
-        }
-    );
+document.getElementById("classesButton")?.addEventListener("click", function () {
+    window.location.href =
+        "classes.html?id=" +
+        encodeURIComponent(activeInstitutionId);
+});
 
 
 // =====================================================
-// Users Button
-// Director Only
+// Users Button — Director Only
 // =====================================================
 
 if (usersButton) {
 
-    const role =
-        String(
-            currentUser.role || ""
-        )
-        .trim()
-        .toLowerCase();
+    const role = String(currentUser.role || "").trim().toLowerCase();
 
-
-    if (
-        role !== "director"
-    ) {
-
-        // User should not see user management
-        usersButton.style.display =
-            "none";
-
+    if (role !== "director") {
+        usersButton.style.display = "none";
     } else {
-
-        usersButton.addEventListener(
-            "click",
-            function () {
-
-                window.location.href =
-                    "users.html?id=" +
-                    encodeURIComponent(
-                        activeInstitutionId
-                    );
-
-            }
-        );
-
+        usersButton.addEventListener("click", function () {
+            window.location.href =
+                "users.html?id=" +
+                encodeURIComponent(activeInstitutionId);
+        });
     }
-
 }
 
 
-document
-    .getElementById("settingsButton")
-    ?.addEventListener(
-        "click",
-        function () {
+// =====================================================
+// Settings Button
+// =====================================================
 
-            window.location.href =
-                "school-settings.html?id=" +
-                encodeURIComponent(
-                    activeInstitutionId
-                );
-
-        }
-    );
+document.getElementById("settingsButton")?.addEventListener("click", function () {
+    window.location.href =
+        "school-settings.html?id=" +
+        encodeURIComponent(activeInstitutionId);
+});
 
 
 // =====================================================
-// Initialize Language
+// Initialize Language + Hide Loader
 // =====================================================
 
-applyLanguage(
-    currentLanguage
-);
+applyLanguage(currentLanguage);
+
+// Hide the loading overlay after everything is initialized
+if (pageLoader) {
+    requestAnimationFrame(function () {
+        setTimeout(function () {
+            pageLoader.classList.add("hidden");
+        }, 250);
+    });
+}
