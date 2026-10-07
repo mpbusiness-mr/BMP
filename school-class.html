@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,17 +13,13 @@
 
     <link
         rel="stylesheet"
-        href="classes-students.css">
+        href="school-class.css">
 
 </head>
 
 <body>
 
     <div class="page-container">
-
-        <!-- =========================================
-             Header
-             ========================================= -->
 
         <header class="page-header">
 
@@ -50,10 +45,6 @@
 
         </header>
 
-
-        <!-- =========================================
-             Class Information
-             ========================================= -->
 
         <section class="class-summary">
 
@@ -138,19 +129,14 @@
         </section>
 
 
-        <!-- =========================================
-             Filters
-             ========================================= -->
+        <!-- Filters -->
 
         <section class="filters-card">
 
             <div class="filter-group">
 
-                <label
-                    for="monthFilter">
-
+                <label for="monthFilter">
                     Month
-
                 </label>
 
                 <select
@@ -204,11 +190,8 @@
 
             <div class="filter-group">
 
-                <label
-                    for="paymentStatusFilter">
-
+                <label for="paymentStatusFilter">
                     Payment Status
-
                 </label>
 
                 <select
@@ -247,9 +230,7 @@
         </section>
 
 
-        <!-- =========================================
-             Payment Legend
-             ========================================= -->
+        <!-- Legend -->
 
         <section class="legend">
 
@@ -281,9 +262,7 @@
         </section>
 
 
-        <!-- =========================================
-             Students Table
-             ========================================= -->
+        <!-- Students Table -->
 
         <main class="table-card">
 
@@ -369,11 +348,9 @@
     </div>
 
 
-    <!-- =============================================
-         Print Only Area
-         ============================================= -->
+    <!-- Printable unpaid list -->
 
-    <section
+    <div
         id="printUnpaidArea"
         class="print-unpaid-area">
 
@@ -433,7 +410,7 @@
 
         </table>
 
-    </section>
+    </div>
 
 
     <script src="js/auth.js"></script>
