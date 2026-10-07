@@ -1923,6 +1923,7 @@ function getPaymentId(
         payment.paymentId ||
         payment.paymentID ||
         payment.payment_id ||
+        payment.id ||
         ""
     ).trim();
 
@@ -2519,6 +2520,230 @@ function escapeHtml(
             /'/g,
             "&#039;"
         );
+
+}
+
+
+/* =================================
+   Receipt Logo Helper
+   ================================= */
+
+/*
+ * Finds a logo value without assuming
+ * one exact backend field name.
+ *
+ * Supported examples:
+ *
+ * logo
+ * logoUrl
+ * logoURL
+ * schoolLogo
+ * schoolLogoUrl
+ * institutionLogo
+ * imageLogo
+ * etc.
+ */
+
+function findReceiptLogo(
+    institution,
+    payment
+) {
+
+    const objects = [
+
+        institution,
+        payment
+
+    ];
+
+    for (
+        const object of objects
+    ) {
+
+        if (
+            !object ||
+            typeof object !== "object"
+        ) {
+
+            continue;
+
+        }
+
+        const keys =
+            Object.keys(
+                object
+            );
+
+        for (
+            const key of keys
+        ) {
+
+            if (
+                !/logo/i.test(
+                    key
+                )
+            ) {
+
+                continue;
+
+            }
+
+            const value =
+                object[key];
+
+            if (
+                typeof value !== "string"
+            ) {
+
+                continue;
+
+            }
+
+            const trimmed =
+                value.trim();
+
+            if (
+                trimmed
+            ) {
+
+                return trimmed;
+
+            }
+
+        }
+
+    }
+
+    return "";
+
+}
+
+
+/* =================================
+   Receipt Image Wait Helper
+   ================================= */
+
+async function waitForReceiptImages(
+    container
+) {
+
+    if (!container) {
+
+        return;
+
+    }
+
+    const images =
+        Array.from(
+            container.querySelectorAll(
+                "img"
+            )
+        );
+
+    if (
+        images.length === 0
+    ) {
+
+        return;
+
+    }
+
+    await Promise.all(
+
+        images.map(
+            image =>
+                new Promise(
+                    resolve => {
+
+                        let finished =
+                            false;
+
+                        const finish =
+                            () => {
+
+                                if (
+                                    finished
+                                ) {
+
+                                    return;
+
+                                }
+
+                                finished =
+                                    true;
+
+                                resolve();
+
+                            };
+
+
+                        if (
+                            image.complete
+                        ) {
+
+                            if (
+                                image.naturalWidth === 0
+                            ) {
+
+                                image.remove();
+
+                            }
+
+                            finish();
+
+                            return;
+
+                        }
+
+
+                        image.addEventListener(
+                            "load",
+                            finish,
+                            {
+                                once:
+                                    true
+                            }
+                        );
+
+
+                        image.addEventListener(
+                            "error",
+                            () => {
+
+                                image.remove();
+
+                                finish();
+
+                            },
+                            {
+                                once:
+                                    true
+                            }
+                        );
+
+
+                        setTimeout(
+                            () => {
+
+                                if (
+                                    !image.complete
+                                ) {
+
+                                    image.remove();
+
+                                }
+
+                                finish();
+
+                            },
+                            4000
+                        );
+
+                    }
+                )
+        )
+
+    );
 
 }
 
@@ -3228,7 +3453,7 @@ function showPaymentDetails(
 
                 <span>
                     ${escapeHtml(
-                        t("amount")
+                        t("amount"
                     )}
                 </span>
 
@@ -3497,8 +3722,8 @@ function ensureReceiptPrintStyles() {
         @media print {
 
             @page {
-                size: auto;
-                margin: 8mm;
+                size: 80mm auto;
+                margin: 0;
             }
 
 
@@ -3510,29 +3735,16 @@ function ensureReceiptPrintStyles() {
             }
 
 
-            /*
-             * Hide the complete webpage.
-             */
-
             body * {
                 visibility: hidden !important;
             }
 
-
-            /*
-             * Show ONLY the temporary
-             * payment receipt.
-             */
 
             #bmpPrintReceipt,
             #bmpPrintReceipt * {
                 visibility: visible !important;
             }
 
-
-            /*
-             * 80mm thermal receipt.
-             */
 
             #bmpPrintReceipt {
 
@@ -3551,7 +3763,7 @@ function ensureReceiptPrintStyles() {
 
                 margin: 0 !important;
 
-                padding: 4mm !important;
+                padding: 5mm 4.5mm !important;
 
                 box-sizing:
                     border-box !important;
@@ -3560,11 +3772,12 @@ function ensureReceiptPrintStyles() {
                     #ffffff !important;
 
                 color:
-                    #000000 !important;
+                    #111111 !important;
 
                 font-family:
                     Arial,
-                    Helvetica,
+                    "Segoe UI",
+                    Tahoma,
                     sans-serif !important;
 
                 font-size:
@@ -3573,20 +3786,57 @@ function ensureReceiptPrintStyles() {
                 line-height:
                     1.45 !important;
 
+                border:
+                    1.5px solid #222222 !important;
+
+                border-radius:
+                    3mm !important;
+
+                box-shadow:
+                    none !important;
+
             }
 
 
-            /*
-             * Receipt title.
-             */
-
             .bmp-receipt-header {
+
                 text-align:
                     center !important;
+
+                margin-bottom:
+                    4mm !important;
+
+            }
+
+
+            .bmp-receipt-logo {
+
+                display:
+                    block !important;
+
+                width:
+                    auto !important;
+
+                height:
+                    auto !important;
+
+                max-width:
+                    28mm !important;
+
+                max-height:
+                    20mm !important;
+
+                margin:
+                    0 auto 3mm auto !important;
+
+                object-fit:
+                    contain !important;
+
             }
 
 
             .bmp-receipt-title {
+
                 font-size:
                     16px !important;
 
@@ -3595,25 +3845,23 @@ function ensureReceiptPrintStyles() {
 
                 margin:
                     0 !important;
+
+                color:
+                    #111111 !important;
+
             }
 
-
-            /*
-             * Divider.
-             */
 
             .bmp-receipt-divider {
+
                 border-top:
-                    1px dashed #000000 !important;
+                    1px dashed #222222 !important;
 
                 margin:
-                    8px 0 !important;
+                    3mm 0 !important;
+
             }
 
-
-            /*
-             * Receipt number.
-             */
 
             .bmp-receipt-number {
 
@@ -3635,10 +3883,6 @@ function ensureReceiptPrintStyles() {
             }
 
 
-            /*
-             * Student name label.
-             */
-
             .bmp-receipt-section-title {
 
                 text-align:
@@ -3655,10 +3899,6 @@ function ensureReceiptPrintStyles() {
 
             }
 
-
-            /*
-             * Student name.
-             */
 
             .bmp-receipt-main-name {
 
@@ -3680,10 +3920,6 @@ function ensureReceiptPrintStyles() {
             }
 
 
-            /*
-             * Information rows.
-             */
-
             .bmp-receipt-row {
 
                 display:
@@ -3701,21 +3937,44 @@ function ensureReceiptPrintStyles() {
                 padding:
                     3px 0 !important;
 
+                border-bottom:
+                    1px solid #e5e5e5 !important;
+
+                font-size:
+                    10.5px !important;
+
+            }
+
+
+            .bmp-receipt-row:last-child {
+
+                border-bottom:
+                    none !important;
+
             }
 
 
             .bmp-receipt-row span {
 
                 flex:
-                    0 0 auto !important;
+                    0 0 40% !important;
+
+                color:
+                    #555555 !important;
 
             }
 
 
             .bmp-receipt-row strong {
 
+                flex:
+                    1 !important;
+
                 text-align:
                     right !important;
+
+                color:
+                    #111111 !important;
 
                 word-break:
                     break-word !important;
@@ -3723,9 +3982,14 @@ function ensureReceiptPrintStyles() {
             }
 
 
-            /*
-             * RTL value alignment.
-             */
+            #bmpPrintReceipt[dir="rtl"]
+            .bmp-receipt-row span {
+
+                text-align:
+                    right !important;
+
+            }
+
 
             #bmpPrintReceipt[dir="rtl"]
             .bmp-receipt-row strong {
@@ -3735,19 +3999,6 @@ function ensureReceiptPrintStyles() {
 
             }
 
-
-            #bmpPrintReceipt[dir="rtl"]
-            .bmp-receipt-number strong {
-
-                text-align:
-                    left !important;
-
-            }
-
-
-            /*
-             * Amount.
-             */
 
             .bmp-receipt-amount {
 
@@ -3758,22 +4009,25 @@ function ensureReceiptPrintStyles() {
                     space-between !important;
 
                 align-items:
-                    flex-start !important;
+                    center !important;
 
                 gap:
                     8px !important;
 
-                border-top:
-                    1px solid #000000 !important;
+                border:
+                    1.5px solid #222222 !important;
 
-                border-bottom:
-                    1px solid #000000 !important;
+                border-radius:
+                    2mm !important;
 
                 margin:
-                    7px 0 !important;
+                    4mm 0 !important;
 
                 padding:
-                    7px 0 !important;
+                    4mm 3mm !important;
+
+                background:
+                    #f8f8f8 !important;
 
                 font-size:
                     13px !important;
@@ -3784,9 +4038,13 @@ function ensureReceiptPrintStyles() {
             }
 
 
-            /*
-             * Notes.
-             */
+            .bmp-receipt-amount strong {
+
+                font-size:
+                    14px !important;
+
+            }
+
 
             .bmp-receipt-notes {
 
@@ -3797,7 +4055,7 @@ function ensureReceiptPrintStyles() {
                     6px !important;
 
                 border-top:
-                    1px dashed #000000 !important;
+                    1px dashed #222222 !important;
 
                 word-break:
                     break-word !important;
@@ -3851,8 +4109,8 @@ async function printPaymentReceipt(
 
 
         /*
-         * Keep the exact payment that
-         * the user selected.
+         * Keep the exact payment selected
+         * by the user.
          */
 
         let payment = {
@@ -3867,9 +4125,8 @@ async function printPaymentReceipt(
 
 
         /*
-         * Institution is used ONLY for
-         * currency. No school information
-         * is printed.
+         * Institution information is used
+         * for currency and logo.
          */
 
         let institution = {};
@@ -3903,10 +4160,7 @@ async function printPaymentReceipt(
 
 
                 /*
-                 * Merge instead of replacing.
-                 * This prevents missing fields
-                 * when getReceipt returns partial
-                 * information.
+                 * Merge payment data.
                  */
 
                 if (
@@ -3924,6 +4178,10 @@ async function printPaymentReceipt(
                 }
 
 
+                /*
+                 * Merge student data.
+                 */
+
                 if (
                     receiptResult.student
                 ) {
@@ -3938,6 +4196,12 @@ async function printPaymentReceipt(
 
                 }
 
+
+                /*
+                 * Get institution information.
+                 *
+                 * This may contain the school logo.
+                 */
 
                 if (
                     receiptResult.institution
@@ -3961,11 +4225,21 @@ async function printPaymentReceipt(
 
 
         /*
-         * Currency only.
+         * Find school logo.
          *
-         * No school name, logo, phone,
-         * address, email or Institution ID
-         * is included in the receipt.
+         * The helper supports different
+         * backend field names.
+         */
+
+        const logoSource =
+            findReceiptLogo(
+                institution,
+                payment
+            );
+
+
+        /*
+         * Currency.
          */
 
         const currency =
@@ -4081,7 +4355,7 @@ async function printPaymentReceipt(
 
 
         /*
-         * Create the print-only receipt.
+         * Create print-only receipt.
          */
 
         const printArea =
@@ -4099,17 +4373,31 @@ async function printPaymentReceipt(
 
 
         /*
-         * IMPORTANT:
+         * Logo HTML.
          *
-         * ONLY selected payment information
-         * is printed.
-         *
-         * No school information.
+         * If no logo exists,
+         * nothing is inserted.
          */
+
+        const logoHtml =
+            logoSource
+                ? `
+                    <img
+                        class="bmp-receipt-logo"
+                        src="${escapeHtml(
+                            logoSource
+                        )}"
+                        alt=""
+                    >
+                  `
+                : "";
+
 
         printArea.innerHTML = `
 
             <div class="bmp-receipt-header">
+
+                ${logoHtml}
 
                 <div class="bmp-receipt-title">
 
@@ -4344,15 +4632,26 @@ async function printPaymentReceipt(
 
 
         /*
-         * Close the payment details modal
-         * before printing.
+         * Wait for the logo to finish loading.
+         *
+         * If the image fails,
+         * it is removed automatically.
+         */
+
+        await waitForReceiptImages(
+            printArea
+        );
+
+
+        /*
+         * Close payment details modal.
          */
 
         closePaymentDetails();
 
 
         /*
-         * Clean up after printing.
+         * Cleanup after printing.
          */
 
         const cleanup =
@@ -4385,8 +4684,8 @@ async function printPaymentReceipt(
 
 
         /*
-         * Small delay so the browser has
-         * time to render the receipt.
+         * Give the browser a moment
+         * to render the receipt.
          */
 
         await new Promise(
