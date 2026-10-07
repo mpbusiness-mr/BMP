@@ -1,259 +1,350 @@
+/* =====================================================
+   BMP · School Login
+   Brand-matched to index.html
+   ===================================================== */
+
+/* ---------- RESET ---------- */
 * {
     box-sizing: border-box;
-}
-
-body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f4f7fb;
-    color: #1f2937;
+    padding: 0;
 }
 
+:root {
+    --primary: #0f2b4b;
+    --primary-light: #1a3f66;
+    --accent: #00b4d8;
+    --accent-soft: #e6f7fd;
+    --gold: #f4c542;
+    --gray-bg: #f9fbfd;
+    --text-dark: #0b1a2a;
+    --text-muted: #3e5a76;
+    --white: #ffffff;
+    --danger: #dc2626;
+    --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 16px 40px rgba(0, 20, 40, 0.08);
+    --shadow-lg: 0 30px 60px rgba(0, 30, 60, 0.12);
+    --radius: 24px;
+    --radius-sm: 14px;
+    --transition: all 0.25s ease;
+}
 
-/* ================================
-   Login Page
-================================ */
-
-.login-page {
+/* ---------- BODY ---------- */
+body {
     min-height: 100vh;
+    font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
+    color: var(--text-dark);
+    line-height: 1.6;
+    font-weight: 400;
+
+    background:
+        radial-gradient(1200px 600px at 100% -10%, rgba(0, 180, 216, 0.10), transparent 60%),
+        radial-gradient(900px 500px at -10% 110%, rgba(15, 43, 75, 0.08), transparent 60%),
+        linear-gradient(180deg, #ffffff 0%, #f2f8fe 100%);
 
     display: flex;
     align-items: center;
     justify-content: center;
-
-    padding: 20px;
+    padding: 32px 20px;
 }
 
+body.lang-ar { font-family: 'IBM Plex Sans Arabic', sans-serif; }
+body.lang-fr,
+body.lang-en { font-family: 'Inter', sans-serif; }
 
-/* ================================
-   Login Card
-================================ */
-
-.login-card {
+/* ---------- PAGE ---------- */
+.login-page {
     width: 100%;
-    max-width: 430px;
-
-    background: #ffffff;
-
-    border-radius: 14px;
-
-    padding: 40px;
-
-    box-shadow:
-        0 10px 30px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+/* ---------- CARD ---------- */
+.login-card {
+    position: relative;
+    width: 100%;
+    max-width: 440px;
 
-/* ================================
-   Header
-================================ */
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 40px 36px 32px;
 
+    box-shadow: var(--shadow-lg);
+    border: 1px solid rgba(0, 0, 0, 0.03);
+
+    animation: fadeUp 0.5s ease forwards;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =====================================================
+   Language Switcher (identical to index.html)
+   ===================================================== */
+
+.lang-switcher {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f0f5fa;
+    border: 1px solid #dbe4ee;
+    border-radius: 40px;
+    padding: 4px;
+    position: absolute;
+    top: 16px;
+    inset-inline-end: 16px;
+}
+
+.lang-btn {
+    background: transparent;
+    border: none;
+    padding: 7px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-radius: 30px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+    letter-spacing: 0.3px;
+}
+
+.lang-btn:hover { color: var(--primary); }
+
+.lang-btn.active {
+    background: var(--primary);
+    color: var(--white);
+    box-shadow: 0 4px 10px rgba(15, 43, 75, 0.2);
+}
+
+/* ---------- HEADER ---------- */
 .login-header {
     text-align: center;
-
-    margin-bottom: 30px;
+    margin: 36px 0 30px;
 }
 
 .login-header h1 {
-    margin: 0;
-
-    font-size: 34px;
-
+    font-size: 36px;
     font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--primary);
+}
 
-    color: #2563eb;
+.login-header h1::after {
+    content: "";
+    display: block;
+    width: 44px;
+    height: 3px;
+    margin: 10px auto 0;
+    background: linear-gradient(90deg, var(--accent), var(--primary));
+    border-radius: 4px;
 }
 
 .login-header h2 {
-    margin: 10px 0 8px;
-
-    font-size: 24px;
-
-    color: #111827;
+    margin: 18px 0 8px;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--primary);
 }
 
 .login-header p {
-    margin: 0;
-
     font-size: 14px;
-
-    color: #6b7280;
+    color: var(--text-muted);
 }
 
-
-/* ================================
-   Form
-================================ */
-
+/* ---------- FORM ---------- */
 .form-group {
     margin-bottom: 20px;
 }
 
 .form-group label {
     display: block;
-
     margin-bottom: 8px;
-
     font-size: 14px;
-
     font-weight: 600;
-
-    color: #374151;
+    color: var(--primary);
 }
 
 .form-group input {
     width: 100%;
-
     padding: 13px 14px;
-
-    border: 1px solid #d1d5db;
-
-    border-radius: 8px;
-
+    border: 1.5px solid #dbe4ee;
+    border-radius: var(--radius-sm);
     font-size: 15px;
-
+    font-family: inherit;
+    color: var(--text-dark);
     outline: none;
+    background: #fbfdff;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
 
-    transition:
-        border-color 0.2s,
-        box-shadow 0.2s;
+.form-group input::placeholder {
+    color: #9aacc1;
 }
 
 .form-group input:focus {
-    border-color: #2563eb;
-
-    box-shadow:
-        0 0 0 3px rgba(37, 99, 235, 0.12);
+    border-color: var(--accent);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.15);
 }
 
+/* ---------- PASSWORD FIELD ---------- */
+.password-field {
+    position: relative;
+}
 
-/* ================================
-   Button
-================================ */
+.password-field input {
+    padding-inline-end: 46px;
+}
 
+.toggle-password {
+    position: absolute;
+    inset-inline-end: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.toggle-password:hover {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+/* ---------- BUTTON ---------- */
 .btn {
     width: 100%;
-
     border: none;
-
-    border-radius: 8px;
-
-    padding: 13px 16px;
-
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
     font-size: 15px;
-
-    font-weight: 600;
-
+    font-weight: 700;
+    font-family: inherit;
     cursor: pointer;
+    transition: var(--transition);
 
-    transition:
-        background 0.2s,
-        opacity 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
 }
 
 .btn-primary {
-    background: #2563eb;
-
-    color: #ffffff;
+    background: var(--primary);
+    color: var(--white);
+    box-shadow: var(--shadow-sm);
 }
 
-.btn-primary:hover {
-    background: #1d4ed8;
+.btn-primary:hover:not(:disabled) {
+    background: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
 }
 
 .btn:disabled {
-    opacity: 0.7;
-
+    opacity: 0.75;
     cursor: not-allowed;
+    transform: none;
 }
 
+/* ---------- SPINNER ---------- */
+.btn-spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
 
-/* ================================
-   Error Message
-================================ */
+.btn.loading .btn-spinner {
+    display: inline-block;
+}
 
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ---------- ERROR MESSAGE ---------- */
 .error-message {
-    min-height: 20px;
-
-    margin-top: 15px;
-
+    min-height: 22px;
+    margin-top: 14px;
     text-align: center;
-
     font-size: 14px;
-
-    color: #dc2626;
+    font-weight: 500;
+    color: var(--danger);
 }
 
+/* ---------- FOOTER LINK ---------- */
+.login-footer {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid #eef2f7;
+    text-align: center;
+    font-size: 13px;
+}
 
-/* ================================
-   Mobile
-================================ */
+.login-footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+}
 
+.login-footer a:hover {
+    color: var(--accent);
+}
+
+/* ---------- RTL ---------- */
+html[dir="rtl"] .lang-switcher {
+    inset-inline-end: auto;
+    inset-inline-start: 16px;
+}
+
+html[dir="rtl"] .lang-btn { letter-spacing: 0; }
+
+html[dir="rtl"] input { text-align: right; }
+html[dir="ltr"] input { text-align: left; }
+
+/* ---------- MOBILE ---------- */
 @media (max-width: 480px) {
 
-    .login-page {
-        padding: 15px;
-    }
+    body { padding: 20px 14px; }
 
     .login-card {
-        padding: 30px 22px;
+        padding: 32px 22px 26px;
+        border-radius: 20px;
     }
 
-    .login-header h1 {
-        font-size: 30px;
+    .lang-switcher {
+        position: static;
+        margin: 0 auto 20px;
+        width: fit-content;
     }
 
-    .login-header h2 {
-        font-size: 21px;
+    .login-header { margin: 20px 0 24px; }
+
+    .login-header h1 { font-size: 30px; }
+    .login-header h2 { font-size: 19px; }
+
+    .lang-btn {
+        padding: 6px 10px;
+        font-size: 0.72rem;
     }
-}
-
-
-
-
-
-
-
-
-
-
-/* =====================================================
-   Language Selector
-   ===================================================== */
-
-.language-selector {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-bottom: 20px;
-}
-
-.language-selector label {
-    font-size: 14px;
-}
-
-.language-selector select {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    background: #fff;
-    cursor: pointer;
-}
-
-
-/* =====================================================
-   RTL Support
-   ===================================================== */
-
-html[dir="rtl"] .language-selector {
-    justify-content: flex-start;
-}
-
-html[dir="rtl"] input {
-    text-align: right;
-}
-
-html[dir="ltr"] input {
-    text-align: left;
 }
