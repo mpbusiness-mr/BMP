@@ -91,7 +91,16 @@ let students = [];
 
 let payments = [];
 
-let institution = null;
+let institution = {
+
+    id:
+        institutionId,
+
+    name:
+        currentUser.institutionName ||
+        "-"
+
+};
 
 
 // =====================================================
@@ -149,6 +158,54 @@ const studentCountElement =
 const studentsTableBody =
     document.getElementById(
         "studentsTableBody"
+    );
+
+
+const monthFilter =
+    document.getElementById(
+        "monthFilter"
+    );
+
+
+const paymentStatusFilter =
+    document.getElementById(
+        "paymentStatusFilter"
+    );
+
+
+const printUnpaidButton =
+    document.getElementById(
+        "printUnpaidButton"
+    );
+
+
+const printUnpaidArea =
+    document.getElementById(
+        "printUnpaidArea"
+    );
+
+
+const printSchoolName =
+    document.getElementById(
+        "printSchoolName"
+    );
+
+
+const printClassTitle =
+    document.getElementById(
+        "printClassTitle"
+    );
+
+
+const printPeriod =
+    document.getElementById(
+        "printPeriod"
+    );
+
+
+const printUnpaidBody =
+    document.getElementById(
+        "printUnpaidBody"
     );
 
 
@@ -313,19 +370,8 @@ async function loadClassData() {
 
 
         // =============================================
-        // Determine Institution Information
+        // Header
         // =============================================
-
-        institution = {
-
-            id:
-                institutionId,
-
-            name:
-                ""
-
-        };
-
 
         updateClassHeader();
 
@@ -621,16 +667,6 @@ function loadAcademicYears() {
 
     }
 
-
-    academicYearFilter.addEventListener(
-        "change",
-        function () {
-
-            renderStudents();
-
-        }
-    );
-
 }
 
 
@@ -655,7 +691,6 @@ function getClassStudents() {
             const classNumber =
                 String(
                     student.class ||
-                    student.className ||
                     ""
                 ).trim();
 
@@ -704,6 +739,144 @@ function getClassStudents() {
 
 
 // =====================================================
+// Get Visible Students
+// =====================================================
+
+function getVisibleStudents() {
+
+    const classStudents =
+        getClassStudents();
+
+
+    const selectedMonth =
+        monthFilter
+            ? monthFilter.value
+            : "";
+
+
+    const selectedStatus =
+        paymentStatusFilter
+            ? paymentStatusFilter.value
+            : "";
+
+
+    if (
+        !selectedMonth &&
+        !selectedStatus
+    ) {
+
+        return classStudents;
+
+    }
+
+
+    return classStudents.filter(
+        student => {
+
+            const studentId =
+                String(
+                    student.studentId ||
+                    student.id ||
+                    ""
+                );
+
+
+            const academicYear =
+                String(
+                    student.academicYear ||
+                    ""
+                );
+
+
+            const month =
+                selectedMonth;
+
+
+            // If status is selected but no month
+            // is selected, status filtering is based
+            // on whether the student has paid at least
+            // one of the nine months.
+
+            if (
+                !month
+            ) {
+
+                if (
+                    selectedStatus ===
+                    "paid"
+                ) {
+
+                    return months.some(
+                        currentMonth =>
+                            isMonthPaid(
+                                studentId,
+                                academicYear,
+                                currentMonth
+                            )
+                    );
+
+                }
+
+
+                if (
+                    selectedStatus ===
+                    "unpaid"
+                ) {
+
+                    return months.some(
+                        currentMonth =>
+                            !isMonthPaid(
+                                studentId,
+                                academicYear,
+                                currentMonth
+                            )
+                    );
+
+                }
+
+
+                return true;
+
+            }
+
+
+            const paid =
+                isMonthPaid(
+                    studentId,
+                    academicYear,
+                    month
+                );
+
+
+            if (
+                selectedStatus ===
+                "paid"
+            ) {
+
+                return paid;
+
+            }
+
+
+            if (
+                selectedStatus ===
+                "unpaid"
+            ) {
+
+                return !paid;
+
+            }
+
+
+            return true;
+
+        }
+    );
+
+}
+
+
+// =====================================================
 // Render Students
 // =====================================================
 
@@ -718,8 +891,8 @@ function renderStudents() {
     }
 
 
-    const classStudents =
-        getClassStudents();
+    const visibleStudents =
+        getVisibleStudents();
 
 
     if (
@@ -727,7 +900,7 @@ function renderStudents() {
     ) {
 
         studentCountElement.textContent =
-            classStudents.length;
+            visibleStudents.length;
 
     }
 
@@ -737,7 +910,7 @@ function renderStudents() {
 
 
     if (
-        classStudents.length === 0
+        visibleStudents.length === 0
     ) {
 
         studentsTableBody.innerHTML = `
@@ -747,7 +920,7 @@ function renderStudents() {
                     colspan="11"
                     class="empty-state">
 
-                    No students found in this class.
+                    No students match the selected filters.
 
                 </td>
 
@@ -760,7 +933,7 @@ function renderStudents() {
 
 
     const sortedStudents =
-        [...classStudents];
+        [...visibleStudents];
 
 
     sortedStudents.sort(
@@ -926,6 +1099,380 @@ function isMonthPaid(
 
 
 // =====================================================
+// Print Unpaid List
+// =====================================================
+
+function printUnpaidList() {
+
+    const selectedMonth =
+        monthFilter
+            ? monthFilter.value
+            : "";
+
+
+    const selectedYear =
+        academicYearFilter
+            ? academicYearFilter.value
+            : "";
+
+
+    if (
+        !selectedMonth
+    ) {
+
+        alert(
+            "Please select a month before printing the unpaid list."
+        );
+
+        return;
+
+    }
+
+
+    const classStudents =
+        getClassStudents();
+
+
+    const unpaidStudents =
+        classStudents.filter(
+            student => {
+
+                const studentId =
+                    String(
+                        student.studentId ||
+                        student.id ||
+                        ""
+                    );
+
+
+                const studentYear =
+                    String(
+                        student.academicYear ||
+                        ""
+                    );
+
+
+                /*
+                 * If a specific academic year is
+                 * selected, use it naturally through
+                 * getClassStudents().
+                 */
+
+                return !isMonthPaid(
+                    studentId,
+                    studentYear,
+                    selectedMonth
+                );
+
+            }
+        );
+
+
+    if (
+        printUnpaidBody
+    ) {
+
+        printUnpaidBody.innerHTML =
+            "";
+
+    }
+
+
+    if (
+        printSchoolName
+    ) {
+
+        printSchoolName.textContent =
+            institution.name ||
+            "School";
+
+    }
+
+
+    if (
+        printClassTitle
+    ) {
+
+        printClassTitle.textContent =
+            `${getStageName(
+                selectedStage
+            )} - Class ${selectedClass} - Unpaid Students`;
+
+    }
+
+
+    if (
+        printPeriod
+    ) {
+
+        const yearText =
+            selectedYear ||
+            "All Academic Years";
+
+
+        printPeriod.textContent =
+            `Month: ${selectedMonth} | Academic Year: ${yearText}`;
+
+    }
+
+
+    if (
+        unpaidStudents.length === 0
+    ) {
+
+        if (
+            printUnpaidBody
+        ) {
+
+            printUnpaidBody.innerHTML = `
+
+                <tr>
+
+                    <td
+                        colspan="6"
+                        style="text-align:center;">
+
+                        All students have paid for
+                        ${escapeHtml(
+                            selectedMonth
+                        )}.
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+
+    } else {
+
+        unpaidStudents
+            .sort(
+                (
+                    a,
+                    b
+                ) =>
+                    String(
+                        a.studentNumber ||
+                        ""
+                    ).localeCompare(
+                        String(
+                            b.studentNumber ||
+                            ""
+                        ),
+                        undefined,
+                        {
+                            numeric:
+                                true
+                        }
+                    )
+            )
+            .forEach(
+                student => {
+
+                    if (
+                        !printUnpaidBody
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const row =
+                        document.createElement(
+                            "tr"
+                        );
+
+
+                    row.innerHTML = `
+
+                        <td>
+                            ${escapeHtml(
+                                student.studentNumber ||
+                                ""
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                student.name ||
+                                ""
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                student.class ||
+                                selectedClass
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                student.academicYear ||
+                                ""
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                selectedMonth
+                            )}
+                        </td>
+
+                        <td>
+                            Unpaid
+                        </td>
+
+                    `;
+
+
+                    printUnpaidBody.appendChild(
+                        row
+                    );
+
+                }
+            );
+
+    }
+
+
+    document.body.classList.add(
+        "printing-unpaid"
+    );
+
+
+    window.print();
+
+
+    setTimeout(
+        function () {
+
+            document.body.classList.remove(
+                "printing-unpaid"
+            );
+
+        },
+        500
+    );
+
+}
+
+
+// =====================================================
+// Filters
+// =====================================================
+
+if (
+    academicYearFilter
+) {
+
+    academicYearFilter.addEventListener(
+        "change",
+        function () {
+
+            renderStudents();
+
+        }
+    );
+
+}
+
+
+if (
+    monthFilter
+) {
+
+    monthFilter.addEventListener(
+        "change",
+        function () {
+
+            /*
+             * When a month is selected,
+             * default to All Students.
+             */
+
+            if (
+                monthFilter.value &&
+                paymentStatusFilter
+            ) {
+
+                paymentStatusFilter.value =
+                    "";
+
+            }
+
+
+            renderStudents();
+
+        }
+    );
+
+}
+
+
+if (
+    paymentStatusFilter
+) {
+
+    paymentStatusFilter.addEventListener(
+        "change",
+        function () {
+
+            renderStudents();
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// Print Button
+// =====================================================
+
+if (
+    printUnpaidButton
+) {
+
+    printUnpaidButton.addEventListener(
+        "click",
+        function () {
+
+            printUnpaidList();
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// Back
+// =====================================================
+
+if (
+    backButton
+) {
+
+    backButton.addEventListener(
+        "click",
+        function () {
+
+            window.location.href =
+                `classes.html?id=${encodeURIComponent(
+                    institutionId
+                )}`;
+
+        }
+    );
+
+}
+
+
+// =====================================================
 // Loading State
 // =====================================================
 
@@ -1013,29 +1560,6 @@ function escapeHtml(
     .replace(
         /'/g,
         "&#039;"
-    );
-
-}
-
-
-// =====================================================
-// Back
-// =====================================================
-
-if (
-    backButton
-) {
-
-    backButton.addEventListener(
-        "click",
-        function () {
-
-            window.location.href =
-                `classes.html?id=${encodeURIComponent(
-                    institutionId
-                )}`;
-
-        }
     );
 
 }
