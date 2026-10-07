@@ -1045,6 +1045,26 @@ function applyLanguage() {
 
 
     /*
+     * Dynamic Print Receipt button.
+     */
+
+    const printReceiptButton =
+        document.getElementById(
+            "printPaymentReceiptBtn"
+        );
+
+
+    if (
+        printReceiptButton
+    ) {
+
+        printReceiptButton.textContent =
+            t("printReceipt");
+
+    }
+
+
+    /*
      * Table headers.
      */
 
@@ -3509,7 +3529,7 @@ function showPaymentDetails(
 
                 <span>
                     ${escapeHtml(
-                        t("amount")
+                        t("amount"
                     )}
                 </span>
 
@@ -3602,13 +3622,13 @@ function showPaymentDetails(
         </div>
 
 
+        <!-- Print Receipt -->
+
         <div
             style="
                 margin-top:20px;
                 display:flex;
                 justify-content:center;
-                gap:10px;
-                flex-wrap:wrap;
             ">
 
             <button
@@ -3631,17 +3651,21 @@ function showPaymentDetails(
         "block";
 
 
-    const printButton =
+    /*
+     * Print button for this exact payment.
+     */
+
+    const printPaymentReceiptButton =
         document.getElementById(
             "printPaymentReceiptBtn"
         );
 
 
     if (
-        printButton
+        printPaymentReceiptButton
     ) {
 
-        printButton.addEventListener(
+        printPaymentReceiptButton.addEventListener(
             "click",
             function () {
 
@@ -3667,15 +3691,20 @@ async function printPaymentReceipt(
 
     try {
 
+        /*
+         * Close the payment details
+         * modal before printing.
+         */
+
         closePaymentDetails();
 
 
         /*
-         * Read school information.
+         * Get school information.
          *
-         * If the school settings endpoint
-         * is unavailable, fall back to the
-         * authenticated user session.
+         * This is optional. If the settings
+         * request fails, the receipt still
+         * prints using the current session.
          */
 
         let schoolSettings = {};
@@ -3824,8 +3853,8 @@ async function printPaymentReceipt(
 
 
         /*
-         * Remove any previous print
-         * container.
+         * Remove previous print receipt,
+         * if any.
          */
 
         const oldPrintArea =
@@ -3844,7 +3873,7 @@ async function printPaymentReceipt(
 
 
         /*
-         * Create receipt print area.
+         * Create printable receipt.
          */
 
         const printArea =
@@ -3855,6 +3884,12 @@ async function printPaymentReceipt(
 
         printArea.id =
             "bmpPrintReceipt";
+
+
+        printArea.dir =
+            currentLanguage === "ar"
+                ? "rtl"
+                : "ltr";
 
 
         printArea.innerHTML = `
@@ -4174,14 +4209,139 @@ async function printPaymentReceipt(
         );
 
 
-        addReceiptPrintStyles();
+        /*
+         * Print immediately if there are
+         * no images; otherwise wait until
+         * the logo finishes loading.
+         */
+
+        const images =
+            printArea.querySelectorAll(
+                "img"
+            );
+
+
+        const printNow =
+            function () {
+
+                setTimeout(
+                    function () {
+
+                        window.print();
+
+                    },
+                    150
+                );
+
+            };
+
+
+        if (
+            images.length === 0
+        ) {
+
+            printNow();
+
+        } else {
+
+            let remainingImages =
+                images.length;
+
+
+            let printed =
+                false;
+
+
+            const imageFinished =
+                function () {
+
+                    remainingImages--;
+
+
+                    if (
+                        remainingImages <= 0 &&
+                        !printed
+                    ) {
+
+                        printed =
+                            true;
+
+                        printNow();
+
+                    }
+
+                };
+
+
+            images.forEach(
+                image => {
+
+                    if (
+                        image.complete
+                    ) {
+
+                        imageFinished();
+
+                    } else {
+
+                        image.addEventListener(
+                            "load",
+                            imageFinished,
+                            {
+                                once:
+                                    true
+                            }
+                        );
+
+
+                        image.addEventListener(
+                            "error",
+                            imageFinished,
+                            {
+                                once:
+                                    true
+                            }
+                        );
+
+                    }
+
+                }
+            );
+
+
+            /*
+             * Fallback in case the browser
+             * does not fire the image event.
+             */
+
+            setTimeout(
+                function () {
+
+                    if (
+                        !printed
+                    ) {
+
+                        printed =
+                            true;
+
+                        printNow();
+
+                    }
+
+                },
+                1500
+            );
+
+        }
 
 
         /*
-         * Remove print area after printing.
+         * Remove the temporary receipt
+         * after the browser finishes printing.
          */
 
-        const cleanupReceipt =
+        window.addEventListener(
+            "afterprint",
             function () {
 
                 const currentPrintArea =
@@ -4198,32 +4358,11 @@ async function printPaymentReceipt(
 
                 }
 
-            };
-
-
-        window.addEventListener(
-            "afterprint",
-            cleanupReceipt,
+            },
             {
                 once:
                     true
             }
-        );
-
-
-        /*
-         * Give the browser a moment to
-         * render the receipt before opening
-         * the print dialog.
-         */
-
-        setTimeout(
-            function () {
-
-                window.print();
-
-            },
-            150
         );
 
     }
@@ -4242,399 +4381,6 @@ async function printPaymentReceipt(
         );
 
     }
-
-}
-
-
-/* =================================
-   Receipt Print Styles
-   ================================= */
-
-function addReceiptPrintStyles() {
-
-    let style =
-        document.getElementById(
-            "bmpReceiptPrintStyles"
-        );
-
-
-    if (
-        style
-    ) {
-
-        return;
-
-    }
-
-
-    style =
-        document.createElement(
-            "style"
-        );
-
-
-    style.id =
-        "bmpReceiptPrintStyles";
-
-
-    style.textContent = `
-
-        #bmpPrintReceipt {
-
-            display:
-                none;
-
-        }
-
-
-        @media print {
-
-            @page {
-
-                size:
-                    80mm auto;
-
-                margin:
-                    4mm;
-
-            }
-
-
-            html,
-            body {
-
-                margin:
-                    0 !important;
-
-                padding:
-                    0 !important;
-
-            }
-
-
-            body > * {
-
-                display:
-                    none !important;
-
-            }
-
-
-            #bmpPrintReceipt {
-
-                display:
-                    block !important;
-
-                width:
-                    72mm;
-
-                max-width:
-                    72mm;
-
-                margin:
-                    0 auto;
-
-                padding:
-                    0;
-
-                background:
-                    #ffffff;
-
-                color:
-                    #000000;
-
-                font-family:
-                    Arial,
-                    Helvetica,
-                    sans-serif;
-
-                font-size:
-                    11px;
-
-                line-height:
-                    1.45;
-
-            }
-
-
-            .bmp-receipt-logo {
-
-                text-align:
-                    center;
-
-                margin-bottom:
-                    7px;
-
-            }
-
-
-            .bmp-receipt-logo img {
-
-                max-width:
-                    45mm;
-
-                max-height:
-                    22mm;
-
-                object-fit:
-                    contain;
-
-            }
-
-
-            .bmp-receipt-school {
-
-                text-align:
-                    center;
-
-            }
-
-
-            .bmp-receipt-school h1 {
-
-                margin:
-                    0 0 4px;
-
-                font-size:
-                    17px;
-
-                line-height:
-                    1.2;
-
-            }
-
-
-            .bmp-receipt-subtitle {
-
-                font-size:
-                    12px;
-
-                font-weight:
-                    700;
-
-                margin-bottom:
-                    5px;
-
-            }
-
-
-            .bmp-receipt-school-detail {
-
-                font-size:
-                    9px;
-
-                line-height:
-                    1.35;
-
-                word-break:
-                    break-word;
-
-            }
-
-
-            .bmp-receipt-divider {
-
-                text-align:
-                    center;
-
-                margin:
-                    7px 0;
-
-                font-family:
-                    "Courier New",
-                    monospace;
-
-                white-space:
-                    nowrap;
-
-                overflow:
-                    hidden;
-
-            }
-
-
-            .bmp-receipt-receipt-number {
-
-                display:
-                    flex;
-
-                justify-content:
-                    space-between;
-
-                align-items:
-                    flex-start;
-
-                gap:
-                    8px;
-
-                font-size:
-                    11px;
-
-            }
-
-
-            .bmp-receipt-receipt-number strong {
-
-                text-align:
-                    right;
-
-                max-width:
-                    55%;
-
-                word-break:
-                    break-word;
-
-            }
-
-
-            .bmp-receipt-row {
-
-                display:
-                    flex;
-
-                justify-content:
-                    space-between;
-
-                align-items:
-                    flex-start;
-
-                gap:
-                    10px;
-
-                margin:
-                    4px 0;
-
-            }
-
-
-            .bmp-receipt-row span {
-
-                text-align:
-                    left;
-
-            }
-
-
-            .bmp-receipt-row strong {
-
-                text-align:
-                    right;
-
-                max-width:
-                    52%;
-
-                word-break:
-                    break-word;
-
-            }
-
-
-            .bmp-receipt-amount {
-
-                display:
-                    flex;
-
-                justify-content:
-                    space-between;
-
-                align-items:
-                    center;
-
-                gap:
-                    10px;
-
-                margin:
-                    9px 0;
-
-                padding:
-                    7px 0;
-
-                border-top:
-                    1px solid #000;
-
-                border-bottom:
-                    1px solid #000;
-
-                font-size:
-                    13px;
-
-            }
-
-
-            .bmp-receipt-amount strong {
-
-                font-size:
-                    15px;
-
-                text-align:
-                    right;
-
-            }
-
-
-            .bmp-receipt-notes {
-
-                margin-top:
-                    7px;
-
-                padding-top:
-                    5px;
-
-                border-top:
-                    1px dashed #000;
-
-            }
-
-
-            .bmp-receipt-notes > div {
-
-                margin-top:
-                    3px;
-
-                white-space:
-                    pre-wrap;
-
-                word-break:
-                    break-word;
-
-            }
-
-
-            .bmp-receipt-thanks {
-
-                text-align:
-                    center;
-
-                margin-top:
-                    8px;
-
-                font-weight:
-                    600;
-
-            }
-
-
-            .bmp-receipt-footer {
-
-                text-align:
-                    center;
-
-                margin-top:
-                    8px;
-
-                font-size:
-                    8px;
-
-            }
-
-        }
-
-    `;
-
-
-    document.head.appendChild(
-        style
-    );
 
 }
 
