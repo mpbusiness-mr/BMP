@@ -22,7 +22,6 @@
     <div class="bg-blob bg-blob-2" aria-hidden="true"></div>
     <div class="bg-grid" aria-hidden="true"></div>
 
-    <!-- Full-page overlay — only shown until layout is ready -->
     <div class="page-loader" id="pageLoader" aria-hidden="true">
         <div class="loader-spinner"></div>
         <span class="loader-text" data-i18n="loading">Loading...</span>
@@ -30,7 +29,6 @@
 
     <div class="page-container">
 
-        <!-- HEADER -->
         <header class="page-header">
 
             <div class="header-brand">
@@ -65,24 +63,27 @@
 
         </header>
 
-        <!-- SUMMARY -->
         <section class="school-summary">
+
             <div class="summary-item">
                 <span class="summary-label" data-i18n="institutionId">Institution ID</span>
                 <strong id="institutionId">-</strong>
             </div>
+
             <div class="summary-item">
                 <span class="summary-label" data-i18n="school">School</span>
                 <strong id="institutionName">-</strong>
             </div>
+
             <div class="summary-item">
                 <span class="summary-label" data-i18n="studentsInSelectedYear">Students in Selected Year</span>
                 <strong id="totalStudents">0</strong>
             </div>
+
         </section>
 
-        <!-- FILTERS -->
         <section class="filters-card">
+
             <div class="filter-header">
                 <div>
                     <h2 data-i18n="studentList">Student List</h2>
@@ -124,13 +125,12 @@
                 </div>
 
             </div>
+
         </section>
 
-        <!-- STUDENTS TABLE -->
         <section class="students-section">
 
             <div class="table-container">
-
                 <table>
                     <thead>
                         <tr>
@@ -145,7 +145,6 @@
                     </thead>
 
                     <tbody id="studentsTableBody">
-                        <!-- Skeleton rows — replaced when data arrives -->
                         <tr class="skeleton-row"><td colspan="7"><span class="skeleton-line"></span></td></tr>
                         <tr class="skeleton-row"><td colspan="7"><span class="skeleton-line"></span></td></tr>
                         <tr class="skeleton-row"><td colspan="7"><span class="skeleton-line"></span></td></tr>
@@ -153,10 +152,8 @@
                         <tr class="skeleton-row"><td colspan="7"><span class="skeleton-line"></span></td></tr>
                     </tbody>
                 </table>
-
             </div>
 
-            <!-- Empty state -->
             <div id="emptyState" class="empty-state" style="display:none">
                 <div class="empty-icon"><i class="fas fa-user-graduate"></i></div>
                 <h3 data-i18n="noStudentsFound">No Students Found</h3>
