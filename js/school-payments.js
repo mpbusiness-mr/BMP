@@ -3529,7 +3529,7 @@ function showPaymentDetails(
 
                 <span>
                     ${escapeHtml(
-                        t("amount"
+                        t("amount")
                     )}
                 </span>
 
