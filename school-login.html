@@ -20,18 +20,32 @@
 
 <body class="lang-ar">
 
-    <div class="login-page">
+    <!-- Decorative gradient blobs -->
+    <div class="bg-blob bg-blob-1" aria-hidden="true"></div>
+    <div class="bg-blob bg-blob-2" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <!-- Minimal top bar (logo + language switcher) -->
+    <header class="topbar">
+        <a href="index.html" class="topbar-logo">
+            <i class="fas fa-cubes"></i> BMP
+        </a>
+
+        <div class="lang-switcher" role="group" aria-label="Language">
+            <button type="button" class="lang-btn active" data-lang="ar">عربية</button>
+            <button type="button" class="lang-btn"        data-lang="fr">Français</button>
+            <button type="button" class="lang-btn"        data-lang="en">English</button>
+        </div>
+    </header>
+
+    <!-- Login -->
+    <main class="login-page">
 
         <div class="login-card">
 
-            <!-- Language Switcher (identical to index.html) -->
-            <div class="lang-switcher" role="group" aria-label="Language">
-                <button type="button" class="lang-btn active" data-lang="ar">عربية</button>
-                <button type="button" class="lang-btn"        data-lang="fr">Français</button>
-                <button type="button" class="lang-btn"        data-lang="en">English</button>
-            </div>
-
             <div class="login-header">
+                <div class="brand-mark"><i class="fas fa-cubes"></i></div>
+
                 <h1>BMP</h1>
 
                 <h2 data-ar="تسجيل دخول المدرسة"
@@ -57,14 +71,18 @@
                         اسم المستخدم
                     </label>
 
-                    <input type="text"
-                           id="username"
-                           autocomplete="username"
-                           data-ar-placeholder="أدخل اسم المستخدم"
-                           data-fr-placeholder="Entrez le nom d'utilisateur"
-                           data-en-placeholder="Enter username"
-                           placeholder="أدخل اسم المستخدم"
-                           required>
+                    <div class="input-wrap">
+                        <i class="fas fa-user input-icon" aria-hidden="true"></i>
+
+                        <input type="text"
+                               id="username"
+                               autocomplete="username"
+                               data-ar-placeholder="أدخل اسم المستخدم"
+                               data-fr-placeholder="Entrez le nom d'utilisateur"
+                               data-en-placeholder="Enter username"
+                               placeholder="أدخل اسم المستخدم"
+                               required>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -75,7 +93,9 @@
                         كلمة المرور
                     </label>
 
-                    <div class="password-field">
+                    <div class="input-wrap">
+                        <i class="fas fa-lock input-icon" aria-hidden="true"></i>
+
                         <input type="password"
                                id="password"
                                autocomplete="current-password"
@@ -111,7 +131,6 @@
 
             </form>
 
-            <!-- Back to home -->
             <div class="login-footer">
                 <a href="index.html"
                    data-ar="العودة إلى الرئيسية"
@@ -123,7 +142,7 @@
 
         </div>
 
-    </div>
+    </main>
 
     <script src="js/school-login.js"></script>
 
