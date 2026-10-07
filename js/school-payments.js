@@ -762,17 +762,9 @@ function applyLanguage() {
             : "ltr";
 
 
-    /*
-     * Page title.
-     */
-
     document.title =
         `${t("pageTitle")} - BMP`;
 
-
-    /*
-     * Header.
-     */
 
     const backButton =
         document.getElementById(
@@ -827,10 +819,6 @@ function applyLanguage() {
     }
 
 
-    /*
-     * Filter labels.
-     */
-
     const academicYearLabel =
         document.querySelector(
             'label[for="academicYear"]'
@@ -884,10 +872,6 @@ function applyLanguage() {
     }
 
 
-    /*
-     * Search input.
-     */
-
     const searchInput =
         document.getElementById(
             "studentSearch"
@@ -901,10 +885,6 @@ function applyLanguage() {
 
     }
 
-
-    /*
-     * Filter buttons.
-     */
 
     const applyFiltersButton =
         document.getElementById(
@@ -933,10 +913,6 @@ function applyLanguage() {
     }
 
 
-    /*
-     * Summary.
-     */
-
     const summaryLabels =
         document.querySelectorAll(
             ".summary-label"
@@ -959,10 +935,6 @@ function applyLanguage() {
     }
 
 
-    /*
-     * Loading.
-     */
-
     const loadingMessage =
         document.getElementById(
             "loadingMessage"
@@ -977,10 +949,6 @@ function applyLanguage() {
     }
 
 
-    /*
-     * Retry.
-     */
-
     const retryButton =
         document.getElementById(
             "retryBtn"
@@ -994,10 +962,6 @@ function applyLanguage() {
 
     }
 
-
-    /*
-     * Empty state.
-     */
 
     const emptyTitle =
         document.querySelector(
@@ -1026,10 +990,6 @@ function applyLanguage() {
     }
 
 
-    /*
-     * Modal title.
-     */
-
     const modalTitle =
         document.querySelector(
             "#paymentDetailsModal .modal-header h2"
@@ -1043,10 +1003,6 @@ function applyLanguage() {
 
     }
 
-
-    /*
-     * Dynamic Print Receipt button.
-     */
 
     const printReceiptButton =
         document.getElementById(
@@ -1063,10 +1019,6 @@ function applyLanguage() {
 
     }
 
-
-    /*
-     * Table headers.
-     */
 
     const headers =
         document.querySelectorAll(
@@ -1109,24 +1061,10 @@ function applyLanguage() {
     );
 
 
-    /*
-     * Filter options.
-     */
-
     updateFilterOptions();
-
-
-    /*
-     * Language selector.
-     */
 
     updateLanguageSelector();
 
-
-    /*
-     * Re-render current table
-     * using translated values.
-     */
 
     if (paymentsLoaded) {
 
@@ -1170,11 +1108,6 @@ function updateFilterOptions() {
 
         }
 
-
-        /*
-         * Academic years themselves
-         * must remain unchanged.
-         */
 
         if (
             currentValue
@@ -1273,9 +1206,9 @@ function updateFilterOptions() {
 
 
                     if (
-                        TRANSLATIONS[
-                            "en"
-                        ][stageKey]
+                        TRANSLATIONS.en[
+                            stageKey
+                        ]
                     ) {
 
                         option.textContent =
@@ -1702,12 +1635,6 @@ function translateBackendError(
 
     }
 
-
-    /*
-     * Unknown backend errors are kept
-     * because they may contain useful
-     * diagnostic information.
-     */
 
     return text;
 
@@ -3602,7 +3529,7 @@ function showPaymentDetails(
 
                 <span>
                     ${escapeHtml(
-                        t("recordedBy")
+                        t("recordedBy"
                     )}
                 </span>
 
@@ -3660,10 +3587,6 @@ function showPaymentDetails(
 
     `;
 
-
-    /*
-     * The CSS modal uses flex.
-     */
 
     modal.style.display =
         "flex";
@@ -3825,6 +3748,364 @@ function formatReceiptDate(
 
 
 /* =================================
+   Receipt Print Styles
+   ================================= */
+
+function ensureReceiptPrintStyles() {
+
+    const existingStyles =
+        document.getElementById(
+            "bmpReceiptPrintStyles"
+        );
+
+
+    if (
+        existingStyles
+    ) {
+
+        return;
+
+    }
+
+
+    const style =
+        document.createElement(
+            "style"
+        );
+
+
+    style.id =
+        "bmpReceiptPrintStyles";
+
+
+    style.textContent = `
+
+        /*
+         * The receipt exists only for
+         * printing and stays hidden normally.
+         */
+
+        #bmpPrintReceipt {
+            display: none;
+        }
+
+
+        @media print {
+
+            @page {
+                size: auto;
+                margin: 8mm;
+            }
+
+
+            html,
+            body {
+                background: #ffffff !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+
+            /*
+             * Hide absolutely everything
+             * except the temporary receipt.
+             */
+
+            body * {
+                visibility: hidden !important;
+            }
+
+
+            #bmpPrintReceipt,
+            #bmpPrintReceipt * {
+                visibility: visible !important;
+            }
+
+
+            /*
+             * Receipt paper width.
+             * Suitable for an 80mm thermal
+             * receipt printer.
+             */
+
+            #bmpPrintReceipt {
+                display: block !important;
+
+                position: absolute !important;
+
+                left: 50% !important;
+                top: 0 !important;
+
+                transform:
+                    translateX(-50%) !important;
+
+                width: 80mm !important;
+                max-width: 80mm !important;
+
+                margin: 0 !important;
+                padding: 4mm !important;
+
+                box-sizing: border-box !important;
+
+                background: #ffffff !important;
+                color: #000000 !important;
+
+                font-family:
+                    Arial,
+                    Helvetica,
+                    sans-serif !important;
+
+                font-size: 11px !important;
+                line-height: 1.45 !important;
+            }
+
+
+            /*
+             * Receipt header.
+             */
+
+            .bmp-receipt-header {
+                text-align: center !important;
+            }
+
+
+            .bmp-receipt-header h1 {
+                margin:
+                    0 0 4px 0 !important;
+
+                font-size:
+                    17px !important;
+            }
+
+
+            .bmp-receipt-title {
+                font-size:
+                    12px !important;
+
+                font-weight:
+                    700 !important;
+
+                margin-bottom:
+                    5px !important;
+            }
+
+
+            /*
+             * Divider.
+             */
+
+            .bmp-receipt-divider {
+                border-top:
+                    1px dashed #000000 !important;
+
+                margin:
+                    8px 0 !important;
+            }
+
+
+            /*
+             * Receipt number.
+             */
+
+            .bmp-receipt-number {
+                display:
+                    flex !important;
+
+                justify-content:
+                    space-between !important;
+
+                align-items:
+                    flex-start !important;
+
+                gap:
+                    8px !important;
+
+                font-size:
+                    10px !important;
+            }
+
+
+            /*
+             * Section title.
+             */
+
+            .bmp-receipt-section-title {
+                text-align:
+                    center !important;
+
+                font-size:
+                    9px !important;
+
+                font-weight:
+                    700 !important;
+
+                margin-bottom:
+                    3px !important;
+            }
+
+
+            /*
+             * Student name.
+             */
+
+            .bmp-receipt-main-name {
+                text-align:
+                    center !important;
+
+                font-size:
+                    15px !important;
+
+                font-weight:
+                    700 !important;
+
+                margin-bottom:
+                    6px !important;
+
+                word-break:
+                    break-word !important;
+            }
+
+
+            /*
+             * Normal information rows.
+             */
+
+            .bmp-receipt-row {
+                display:
+                    flex !important;
+
+                justify-content:
+                    space-between !important;
+
+                align-items:
+                    flex-start !important;
+
+                gap:
+                    8px !important;
+
+                padding:
+                    3px 0 !important;
+            }
+
+
+            .bmp-receipt-row strong {
+                text-align:
+                    right !important;
+
+                word-break:
+                    break-word !important;
+            }
+
+
+            /*
+             * Amount.
+             */
+
+            .bmp-receipt-amount {
+                display:
+                    flex !important;
+
+                justify-content:
+                    space-between !important;
+
+                align-items:
+                    flex-start !important;
+
+                gap:
+                    8px !important;
+
+                border-top:
+                    1px solid #000000 !important;
+
+                border-bottom:
+                    1px solid #000000 !important;
+
+                margin:
+                    7px 0 !important;
+
+                padding:
+                    7px 0 !important;
+
+                font-size:
+                    13px !important;
+
+                font-weight:
+                    700 !important;
+            }
+
+
+            /*
+             * Notes.
+             */
+
+            .bmp-receipt-notes {
+                margin-top:
+                    7px !important;
+
+                padding-top:
+                    6px !important;
+
+                border-top:
+                    1px dashed #000000 !important;
+
+                word-break:
+                    break-word !important;
+            }
+
+
+            .bmp-receipt-notes strong {
+                display:
+                    block !important;
+
+                margin-bottom:
+                    3px !important;
+            }
+
+
+            /*
+             * Thank-you message.
+             */
+
+            .bmp-receipt-thanks {
+                text-align:
+                    center !important;
+
+                font-weight:
+                    700 !important;
+
+                margin-top:
+                    7px !important;
+            }
+
+
+            /*
+             * BMP footer.
+             */
+
+            .bmp-receipt-footer {
+                text-align:
+                    center !important;
+
+                margin-top:
+                    7px !important;
+
+                font-size:
+                    8px !important;
+            }
+
+        }
+
+    `;
+
+
+    document.head.appendChild(
+        style
+    );
+
+}
+
+
+/* =================================
    Print Payment Receipt
    ================================= */
 
@@ -3833,6 +4114,14 @@ async function printPaymentReceipt(
 ) {
 
     try {
+
+        /*
+         * Make sure the print-only CSS
+         * is installed before printing.
+         */
+
+        ensureReceiptPrintStyles();
+
 
         if (
             !selectedPayment
@@ -3859,6 +4148,13 @@ async function printPaymentReceipt(
                 selectedPayment
             );
 
+
+        /*
+         * Keep institution lookup because
+         * the existing getReceipt backend
+         * may return additional payment
+         * information such as currency.
+         */
 
         let institution =
             {};
@@ -3939,7 +4235,11 @@ async function printPaymentReceipt(
 
 
         /*
-         * School information.
+         * Keep the old institution data
+         * handling so existing backend
+         * functionality is preserved.
+         *
+         * These values are NOT printed.
          */
 
         const schoolName =
@@ -3981,8 +4281,14 @@ async function printPaymentReceipt(
             "";
 
 
+        /*
+         * Currency is still useful for
+         * displaying the payment amount.
+         */
+
         const currency =
             institution.currency ||
+            payment.currency ||
             "MRU";
 
 
@@ -4111,33 +4417,21 @@ async function printPaymentReceipt(
                 : "ltr";
 
 
+        /*
+         * IMPORTANT:
+         *
+         * Only student/payment information
+         * is placed inside the printable
+         * receipt.
+         *
+         * School logo, phone, address,
+         * email and Institution ID are
+         * intentionally NOT printed.
+         */
+
         printArea.innerHTML = `
 
-            ${
-                schoolLogo
-                    ? `
-                    <div class="bmp-receipt-logo">
-
-                        <img
-                            src="${escapeHtml(
-                                schoolLogo
-                            )}"
-                            alt="School Logo">
-
-                    </div>
-                    `
-                    : ""
-            }
-
-
             <div class="bmp-receipt-header">
-
-                <h1>
-                    ${escapeHtml(
-                        schoolName
-                    )}
-                </h1>
-
 
                 <div class="bmp-receipt-title">
 
@@ -4146,45 +4440,6 @@ async function printPaymentReceipt(
                     )}
 
                 </div>
-
-
-                ${
-                    schoolPhone
-                        ? `
-                        <div class="bmp-receipt-school-detail">
-                            ${escapeHtml(
-                                schoolPhone
-                            )}
-                        </div>
-                        `
-                        : ""
-                }
-
-
-                ${
-                    schoolAddress
-                        ? `
-                        <div class="bmp-receipt-school-detail">
-                            ${escapeHtml(
-                                schoolAddress
-                            )}
-                        </div>
-                        `
-                        : ""
-                }
-
-
-                ${
-                    schoolEmail
-                        ? `
-                        <div class="bmp-receipt-school-detail">
-                            ${escapeHtml(
-                                schoolEmail
-                            )}
-                        </div>
-                        `
-                        : ""
-                }
 
             </div>
 
@@ -4374,21 +4629,6 @@ async function printPaymentReceipt(
             </div>
 
 
-            <div class="bmp-receipt-row">
-
-                <span>
-                    Institution ID
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        schoolInstitutionId
-                    )}
-                </strong>
-
-            </div>
-
-
             ${
                 notes
                     ? `
@@ -4482,7 +4722,12 @@ async function printPaymentReceipt(
 
 
         /*
-         * Wait for school logo if present.
+         * No logo is printed anymore,
+         * therefore there are normally
+         * no images to wait for.
+         *
+         * Keep this code for compatibility
+         * if an image is added later.
          */
 
         const images =
@@ -4917,11 +5162,6 @@ function initializeLanguage() {
 
     applyLanguage();
 
-
-    /*
-     * Allow another page/component
-     * to change the language.
-     */
 
     window.addEventListener(
         "bmpLanguageChanged",
