@@ -1,15 +1,13 @@
-
 // =====================================================
 // BMP School Class Students
 // =====================================================
-
 
 // =====================================================
 // API
 // =====================================================
 
 const API_URL =
-    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDd_T6k0w0AWWK/exec";
 
 
 // =====================================================
@@ -20,23 +18,18 @@ const currentUser =
     requireSchoolLogin();
 
 if (!currentUser) {
-
     throw new Error(
         "School login required."
     );
-
 }
-
 
 const institutionId =
     getActiveInstitutionId();
 
 if (!institutionId) {
-
     throw new Error(
         "Institution access denied."
     );
-
 }
 
 
@@ -49,18 +42,14 @@ const urlParams =
         window.location.search
     );
 
-
 const selectedStage =
     String(
-        urlParams.get("stage") ||
-        ""
+        urlParams.get("stage") || ""
     ).trim();
-
 
 const selectedClass =
     String(
-        urlParams.get("class") ||
-        ""
+        urlParams.get("class") || ""
     ).trim();
 
 
@@ -69,7 +58,6 @@ const selectedClass =
 // =====================================================
 
 const months = [
-
     "October",
     "November",
     "December",
@@ -79,7 +67,6 @@ const months = [
     "April",
     "May",
     "June"
-
 ];
 
 
@@ -88,19 +75,11 @@ const months = [
 // =====================================================
 
 let students = [];
-
 let payments = [];
 
-let institution = {
-
-    id:
-        institutionId,
-
-    name:
-        currentUser.institutionName ||
-        "-"
-
-};
+let schoolName =
+    currentUser.institutionName ||
+    "";
 
 
 // =====================================================
@@ -112,102 +91,80 @@ const pageTitle =
         "pageTitle"
     );
 
-
 const pageSubtitle =
     document.getElementById(
         "pageSubtitle"
     );
-
 
 const institutionIdElement =
     document.getElementById(
         "institutionId"
     );
 
-
 const institutionNameElement =
     document.getElementById(
         "institutionName"
     );
-
 
 const academicYearFilter =
     document.getElementById(
         "academicYearFilter"
     );
 
-
 const stageNameElement =
     document.getElementById(
         "stageName"
     );
-
 
 const classNameElement =
     document.getElementById(
         "className"
     );
 
-
 const studentCountElement =
     document.getElementById(
         "studentCount"
     );
-
 
 const studentsTableBody =
     document.getElementById(
         "studentsTableBody"
     );
 
-
 const monthFilter =
     document.getElementById(
         "monthFilter"
     );
-
 
 const paymentStatusFilter =
     document.getElementById(
         "paymentStatusFilter"
     );
 
-
 const printUnpaidButton =
     document.getElementById(
         "printUnpaidButton"
     );
-
-
-const printUnpaidArea =
-    document.getElementById(
-        "printUnpaidArea"
-    );
-
 
 const printSchoolName =
     document.getElementById(
         "printSchoolName"
     );
 
-
 const printClassTitle =
     document.getElementById(
         "printClassTitle"
     );
-
 
 const printPeriod =
     document.getElementById(
         "printPeriod"
     );
 
-
 const printUnpaidBody =
     document.getElementById(
         "printUnpaidBody"
     );
-
 
 const backButton =
     document.getElementById(
@@ -236,7 +193,6 @@ function getStageName(
 
     };
 
-
     return (
         names[
             String(
@@ -259,18 +215,13 @@ function getCurrentAcademicYear() {
     const today =
         new Date();
 
-
     const month =
         today.getMonth() + 1;
-
 
     const year =
         today.getFullYear();
 
-
-    if (
-        month >= 10
-    ) {
+    if (month >= 10) {
 
         return (
             `${year}-${year + 1}`
@@ -278,136 +229,9 @@ function getCurrentAcademicYear() {
 
     }
 
-
     return (
         `${year - 1}-${year}`
     );
-
-}
-
-
-// =====================================================
-// Load Data From Backend
-// =====================================================
-
-async function loadClassData() {
-
-    try {
-
-        showLoading();
-
-
-        if (
-            !selectedStage ||
-            !selectedClass
-        ) {
-
-            throw new Error(
-                "Class information is missing."
-            );
-
-        }
-
-
-        // =============================================
-        // Load Students
-        // =============================================
-
-        const studentsResult =
-            await callApi(
-                "getStudents"
-            );
-
-
-        if (
-            !studentsResult.success
-        ) {
-
-            throw new Error(
-                studentsResult.message ||
-                "Failed to load students."
-            );
-
-        }
-
-
-        // =============================================
-        // Load Payments
-        // =============================================
-
-        const paymentsResult =
-            await callApi(
-                "getPayments"
-            );
-
-
-        if (
-            !paymentsResult.success
-        ) {
-
-            throw new Error(
-                paymentsResult.message ||
-                "Failed to load payments."
-            );
-
-        }
-
-
-        students =
-            Array.isArray(
-                studentsResult.students
-            )
-                ? studentsResult.students
-                : [];
-
-
-        payments =
-            Array.isArray(
-                paymentsResult.payments
-            )
-                ? paymentsResult.payments
-                : [];
-
-
-        // =============================================
-        // Header
-        // =============================================
-
-        updateClassHeader();
-
-
-        // =============================================
-        // Academic Years
-        // =============================================
-
-        loadAcademicYears();
-
-
-        // =============================================
-        // Render
-        // =============================================
-
-        renderStudents();
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Class page error:",
-            error
-        );
-
-
-        showError();
-
-
-        alert(
-            error.message ||
-            "Failed to load class information."
-        );
-
-    }
 
 }
 
@@ -424,8 +248,7 @@ async function callApi(
         await fetch(
             API_URL,
             {
-                method:
-                    "POST",
+                method: "POST",
 
                 headers: {
                     "Content-Type":
@@ -448,7 +271,6 @@ async function callApi(
             }
         );
 
-
     if (!response.ok) {
 
         throw new Error(
@@ -457,84 +279,176 @@ async function callApi(
 
     }
 
-
     return await response.json();
 
 }
 
 
 // =====================================================
-// Update Header
+// Load Class Data
 // =====================================================
 
-function updateClassHeader() {
+async function loadClassData() {
+
+    if (
+        !selectedStage ||
+        !selectedClass
+    ) {
+
+        showError();
+
+        alert(
+            "Class information is missing."
+        );
+
+        return;
+
+    }
+
+    try {
+
+        showLoading();
+
+
+        // Students
+
+        const studentsResult =
+            await callApi(
+                "getStudents"
+            );
+
+        if (
+            !studentsResult.success
+        ) {
+
+            throw new Error(
+                studentsResult.message ||
+                "Failed to load students."
+            );
+
+        }
+
+
+        students =
+            Array.isArray(
+                studentsResult.students
+            )
+                ? studentsResult.students
+                : [];
+
+
+        // Payments
+
+        const paymentsResult =
+            await callApi(
+                "getPayments"
+            );
+
+        if (
+            !paymentsResult.success
+        ) {
+
+            throw new Error(
+                paymentsResult.message ||
+                "Failed to load payments."
+            );
+
+        }
+
+
+        payments =
+            Array.isArray(
+                paymentsResult.payments
+            )
+                ? paymentsResult.payments
+                : [];
+
+
+        // School information
+
+        schoolName =
+            currentUser.institutionName ||
+            institutionId;
+
+
+        updateHeader();
+        loadAcademicYears();
+        renderStudents();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Class page error:",
+            error
+        );
+
+        showError();
+
+        alert(
+            error.message ||
+            "Failed to load class information."
+        );
+
+    }
+
+}
+
+
+// =====================================================
+// Header
+// =====================================================
+
+function updateHeader() {
 
     const stageName =
         getStageName(
             selectedStage
         );
 
-
-    if (
-        pageTitle
-    ) {
+    if (pageTitle) {
 
         pageTitle.textContent =
             `${stageName} - Class ${selectedClass}`;
 
     }
 
-
-    if (
-        pageSubtitle
-    ) {
+    if (pageSubtitle) {
 
         pageSubtitle.textContent =
             "Student payment status";
 
     }
 
-
-    if (
-        institutionIdElement
-    ) {
+    if (institutionIdElement) {
 
         institutionIdElement.textContent =
             institutionId;
 
     }
 
-
-    if (
-        institutionNameElement
-    ) {
+    if (institutionNameElement) {
 
         institutionNameElement.textContent =
-            institution.name ||
+            schoolName ||
             "-";
 
     }
 
-
-    if (
-        stageNameElement
-    ) {
+    if (stageNameElement) {
 
         stageNameElement.textContent =
             stageName;
 
     }
 
-
-    if (
-        classNameElement
-    ) {
+    if (classNameElement) {
 
         classNameElement.textContent =
             `${stageName} ${selectedClass}`;
 
     }
-
 
     document.title =
         `${stageName} - Class ${selectedClass}`;
@@ -546,79 +460,54 @@ function updateClassHeader() {
 // Academic Years
 // =====================================================
 
-function getAcademicYears() {
-
-    const years =
-        students
-            .map(
-                student =>
-                    String(
-                        student.academicYear ||
-                        ""
-                    ).trim()
-            )
-            .filter(
-                year =>
-                    year !== ""
-            );
-
-
-    return [
-        ...new Set(
-            years
-        )
-    ].sort(
-        (
-            a,
-            b
-        ) =>
-            b.localeCompare(
-                a
-            )
-    );
-
-}
-
-
-// =====================================================
-// Load Academic Year Filter
-// =====================================================
-
 function loadAcademicYears() {
 
-    if (
-        !academicYearFilter
-    ) {
-
+    if (!academicYearFilter) {
         return;
-
     }
 
-
     const years =
-        getAcademicYears();
+        [
+            ...new Set(
+                students
+                    .map(
+                        student =>
+                            String(
+                                student.academicYear ||
+                                ""
+                            ).trim()
+                    )
+                    .filter(
+                        year =>
+                            year !== ""
+                    )
+            )
+        ]
+        .sort(
+            (
+                a,
+                b
+            ) =>
+                b.localeCompare(a)
+        );
 
 
     academicYearFilter.innerHTML =
         "";
 
 
-    const allYearsOption =
+    const allOption =
         document.createElement(
             "option"
         );
 
+    allOption.value = "";
 
-    allYearsOption.value =
-        "";
-
-
-    allYearsOption.textContent =
+    allOption.textContent =
         "All Academic Years";
 
-
     academicYearFilter.appendChild(
-        allYearsOption
+        allOption
     );
 
 
@@ -630,14 +519,11 @@ function loadAcademicYears() {
                     "option"
                 );
 
-
             option.value =
                 year;
 
-
             option.textContent =
                 year;
-
 
             academicYearFilter.appendChild(
                 option
@@ -671,7 +557,7 @@ function loadAcademicYears() {
 
 
 // =====================================================
-// Get Students In Selected Class
+// Get Class Students
 // =====================================================
 
 function getClassStudents() {
@@ -697,7 +583,8 @@ function getClassStudents() {
 
             if (
                 stage !==
-                selectedStage.toLowerCase()
+                selectedStage
+                    .toLowerCase()
             ) {
 
                 return false;
@@ -739,6 +626,51 @@ function getClassStudents() {
 
 
 // =====================================================
+// Check Payment
+// =====================================================
+
+function isMonthPaid(
+    studentId,
+    academicYear,
+    month
+) {
+
+    return payments.some(
+        payment => {
+
+            return (
+                String(
+                    payment.studentId ||
+                    ""
+                ) ===
+                String(
+                    studentId ||
+                    ""
+                ) &&
+
+                String(
+                    payment.academicYear ||
+                    ""
+                ) ===
+                String(
+                    academicYear ||
+                    ""
+                ) &&
+
+                String(
+                    payment.month ||
+                    ""
+                ) ===
+                month
+            );
+
+        }
+    );
+
+}
+
+
+// =====================================================
 // Get Visible Students
 // =====================================================
 
@@ -747,12 +679,10 @@ function getVisibleStudents() {
     const classStudents =
         getClassStudents();
 
-
     const selectedMonth =
         monthFilter
             ? monthFilter.value
             : "";
-
 
     const selectedStatus =
         paymentStatusFilter
@@ -774,31 +704,23 @@ function getVisibleStudents() {
         student => {
 
             const studentId =
-                String(
-                    student.studentId ||
-                    student.id ||
-                    ""
-                );
+                student.studentId ||
+                student.id ||
+                "";
 
-
-            const academicYear =
+            const year =
                 String(
                     student.academicYear ||
                     ""
                 );
 
 
-            const month =
-                selectedMonth;
-
-
-            // If status is selected but no month
-            // is selected, status filtering is based
-            // on whether the student has paid at least
-            // one of the nine months.
+            // No month selected:
+            // show students who have at least
+            // one paid/unpaid month.
 
             if (
-                !month
+                !selectedMonth
             ) {
 
                 if (
@@ -807,11 +729,11 @@ function getVisibleStudents() {
                 ) {
 
                     return months.some(
-                        currentMonth =>
+                        month =>
                             isMonthPaid(
                                 studentId,
-                                academicYear,
-                                currentMonth
+                                year,
+                                month
                             )
                     );
 
@@ -824,11 +746,11 @@ function getVisibleStudents() {
                 ) {
 
                     return months.some(
-                        currentMonth =>
+                        month =>
                             !isMonthPaid(
                                 studentId,
-                                academicYear,
-                                currentMonth
+                                year,
+                                month
                             )
                     );
 
@@ -843,8 +765,8 @@ function getVisibleStudents() {
             const paid =
                 isMonthPaid(
                     studentId,
-                    academicYear,
-                    month
+                    year,
+                    selectedMonth
                 );
 
 
@@ -882,12 +804,8 @@ function getVisibleStudents() {
 
 function renderStudents() {
 
-    if (
-        !studentsTableBody
-    ) {
-
+    if (!studentsTableBody) {
         return;
-
     }
 
 
@@ -895,9 +813,7 @@ function renderStudents() {
         getVisibleStudents();
 
 
-    if (
-        studentCountElement
-    ) {
+    if (studentCountElement) {
 
         studentCountElement.textContent =
             visibleStudents.length;
@@ -933,33 +849,43 @@ function renderStudents() {
 
 
     const sortedStudents =
-        [...visibleStudents];
-
-
-    sortedStudents.sort(
-        (
-            a,
-            b
-        ) =>
-            String(
-                a.studentNumber ||
-                ""
-            ).localeCompare(
-                String(
-                    b.studentNumber ||
-                    ""
-                ),
-                undefined,
-                {
-                    numeric:
-                        true
-                }
-            )
-    );
+        [...visibleStudents]
+            .sort(
+                (
+                    a,
+                    b
+                ) =>
+                    String(
+                        a.studentNumber ||
+                        ""
+                    ).localeCompare(
+                        String(
+                            b.studentNumber ||
+                            ""
+                        ),
+                        undefined,
+                        {
+                            numeric:
+                                true
+                        }
+                    )
+            );
 
 
     sortedStudents.forEach(
         student => {
+
+            const studentId =
+                student.studentId ||
+                student.id ||
+                "";
+
+            const year =
+                String(
+                    student.academicYear ||
+                    ""
+                );
+
 
             const row =
                 document.createElement(
@@ -967,22 +893,7 @@ function renderStudents() {
                 );
 
 
-            const studentId =
-                String(
-                    student.studentId ||
-                    student.id ||
-                    ""
-                );
-
-
-            const studentYear =
-                String(
-                    student.academicYear ||
-                    ""
-                );
-
-
-            let rowHtml = `
+            row.innerHTML = `
 
                 <td>
                     ${escapeHtml(
@@ -998,98 +909,45 @@ function renderStudents() {
                     )}
                 </td>
 
+                ${months.map(
+                    month => {
+
+                        const paid =
+                            isMonthPaid(
+                                studentId,
+                                year,
+                                month
+                            );
+
+                        return `
+                            <td>
+
+                                <span
+                                    class="status-badge ${
+                                        paid
+                                            ? "paid"
+                                            : "unpaid"
+                                    }">
+
+                                    ${
+                                        paid
+                                            ? "Paid"
+                                            : "Unpaid"
+                                    }
+
+                                </span>
+
+                            </td>
+                        `;
+
+                    }
+                ).join("")}
+
             `;
-
-
-            months.forEach(
-                month => {
-
-                    const paid =
-                        isMonthPaid(
-                            studentId,
-                            studentYear,
-                            month
-                        );
-
-
-                    rowHtml += `
-
-                        <td>
-
-                            <span
-                                class="status-badge ${paid ? "paid" : "unpaid"}">
-
-                                ${paid
-                                    ? "Paid"
-                                    : "Unpaid"}
-
-                            </span>
-
-                        </td>
-
-                    `;
-
-                }
-            );
-
-
-            row.innerHTML =
-                rowHtml;
 
 
             studentsTableBody.appendChild(
                 row
-            );
-
-        }
-    );
-
-}
-
-
-// =====================================================
-// Check Monthly Payment
-// =====================================================
-
-function isMonthPaid(
-    studentId,
-    academicYear,
-    month
-) {
-
-    return payments.some(
-        payment => {
-
-            const paymentStudentId =
-                String(
-                    payment.studentId ||
-                    ""
-                );
-
-
-            const paymentYear =
-                String(
-                    payment.academicYear ||
-                    ""
-                );
-
-
-            const paymentMonth =
-                String(
-                    payment.month ||
-                    ""
-                );
-
-
-            return (
-                paymentStudentId ===
-                    studentId &&
-
-                paymentYear ===
-                    academicYear &&
-
-                paymentMonth ===
-                    month
             );
 
         }
@@ -1109,19 +967,10 @@ function printUnpaidList() {
             ? monthFilter.value
             : "";
 
-
-    const selectedYear =
-        academicYearFilter
-            ? academicYearFilter.value
-            : "";
-
-
-    if (
-        !selectedMonth
-    ) {
+    if (!selectedMonth) {
 
         alert(
-            "Please select a month before printing the unpaid list."
+            "Please select a month first."
         );
 
         return;
@@ -1138,29 +987,20 @@ function printUnpaidList() {
             student => {
 
                 const studentId =
-                    String(
-                        student.studentId ||
-                        student.id ||
-                        ""
-                    );
+                    student.studentId ||
+                    student.id ||
+                    "";
 
-
-                const studentYear =
+                const year =
                     String(
                         student.academicYear ||
                         ""
                     );
 
 
-                /*
-                 * If a specific academic year is
-                 * selected, use it naturally through
-                 * getClassStudents().
-                 */
-
                 return !isMonthPaid(
                     studentId,
-                    studentYear,
+                    year,
                     selectedMonth
                 );
 
@@ -1168,30 +1008,16 @@ function printUnpaidList() {
         );
 
 
-    if (
-        printUnpaidBody
-    ) {
-
-        printUnpaidBody.innerHTML =
-            "";
-
-    }
-
-
-    if (
-        printSchoolName
-    ) {
+    if (printSchoolName) {
 
         printSchoolName.textContent =
-            institution.name ||
+            schoolName ||
             "School";
 
     }
 
 
-    if (
-        printClassTitle
-    ) {
+    if (printClassTitle) {
 
         printClassTitle.textContent =
             `${getStageName(
@@ -1201,17 +1027,23 @@ function printUnpaidList() {
     }
 
 
-    if (
-        printPeriod
-    ) {
-
-        const yearText =
-            selectedYear ||
-            "All Academic Years";
-
+    if (printPeriod) {
 
         printPeriod.textContent =
-            `Month: ${selectedMonth} | Academic Year: ${yearText}`;
+            `Month: ${selectedMonth} | Academic Year: ${
+                academicYearFilter &&
+                academicYearFilter.value
+                    ? academicYearFilter.value
+                    : "All Academic Years"
+            }`;
+
+    }
+
+
+    if (printUnpaidBody) {
+
+        printUnpaidBody.innerHTML =
+            "";
 
     }
 
@@ -1220,27 +1052,20 @@ function printUnpaidList() {
         unpaidStudents.length === 0
     ) {
 
-        if (
-            printUnpaidBody
-        ) {
+        if (printUnpaidBody) {
 
             printUnpaidBody.innerHTML = `
-
                 <tr>
 
                     <td
                         colspan="6"
                         style="text-align:center;">
 
-                        All students have paid for
-                        ${escapeHtml(
-                            selectedMonth
-                        )}.
+                        All students have paid.
 
                     </td>
 
                 </tr>
-
             `;
 
         }
@@ -1271,15 +1096,6 @@ function printUnpaidList() {
             .forEach(
                 student => {
 
-                    if (
-                        !printUnpaidBody
-                    ) {
-
-                        return;
-
-                    }
-
-
                     const row =
                         document.createElement(
                             "tr"
@@ -1304,7 +1120,6 @@ function printUnpaidList() {
 
                         <td>
                             ${escapeHtml(
-                                student.class ||
                                 selectedClass
                             )}
                         </td>
@@ -1339,24 +1154,7 @@ function printUnpaidList() {
     }
 
 
-    document.body.classList.add(
-        "printing-unpaid"
-    );
-
-
     window.print();
-
-
-    setTimeout(
-        function () {
-
-            document.body.classList.remove(
-                "printing-unpaid"
-            );
-
-        },
-        500
-    );
 
 }
 
@@ -1365,9 +1163,7 @@ function printUnpaidList() {
 // Filters
 // =====================================================
 
-if (
-    academicYearFilter
-) {
+if (academicYearFilter) {
 
     academicYearFilter.addEventListener(
         "change",
@@ -1381,29 +1177,11 @@ if (
 }
 
 
-if (
-    monthFilter
-) {
+if (monthFilter) {
 
     monthFilter.addEventListener(
         "change",
         function () {
-
-            /*
-             * When a month is selected,
-             * default to All Students.
-             */
-
-            if (
-                monthFilter.value &&
-                paymentStatusFilter
-            ) {
-
-                paymentStatusFilter.value =
-                    "";
-
-            }
-
 
             renderStudents();
 
@@ -1413,9 +1191,7 @@ if (
 }
 
 
-if (
-    paymentStatusFilter
-) {
+if (paymentStatusFilter) {
 
     paymentStatusFilter.addEventListener(
         "change",
@@ -1430,20 +1206,14 @@ if (
 
 
 // =====================================================
-// Print Button
+// Print
 // =====================================================
 
-if (
-    printUnpaidButton
-) {
+if (printUnpaidButton) {
 
     printUnpaidButton.addEventListener(
         "click",
-        function () {
-
-            printUnpaidList();
-
-        }
+        printUnpaidList
     );
 
 }
@@ -1453,9 +1223,7 @@ if (
 // Back
 // =====================================================
 
-if (
-    backButton
-) {
+if (backButton) {
 
     backButton.addEventListener(
         "click",
@@ -1473,59 +1241,55 @@ if (
 
 
 // =====================================================
-// Loading State
+// Loading
 // =====================================================
 
 function showLoading() {
 
-    if (
-        studentsTableBody
-    ) {
-
-        studentsTableBody.innerHTML = `
-            <tr>
-
-                <td
-                    colspan="11"
-                    class="empty-state">
-
-                    Loading students...
-
-                </td>
-
-            </tr>
-        `;
-
+    if (!studentsTableBody) {
+        return;
     }
+
+    studentsTableBody.innerHTML = `
+        <tr>
+
+            <td
+                colspan="11"
+                class="empty-state">
+
+                Loading students...
+
+            </td>
+
+        </tr>
+    `;
 
 }
 
 
 // =====================================================
-// Error State
+// Error
 // =====================================================
 
 function showError() {
 
-    if (
-        studentsTableBody
-    ) {
-
-        studentsTableBody.innerHTML = `
-            <tr>
-
-                <td
-                    colspan="11"
-                    class="empty-state">
-
-                    Failed to load class data.
-
-                </td>
-
-            </tr>
-        `;
-
+    if (!studentsTableBody) {
+        return;
     }
+
+    studentsTableBody.innerHTML = `
+        <tr>
+
+            <td
+                colspan="11"
+                class="empty-state">
+
+                Failed to load class data.
+
+            </td>
+
+        </tr>
+    `;
 
 }
 
@@ -1560,6 +1324,27 @@ function escapeHtml(
     .replace(
         /'/g,
         "&#039;"
+    );
+
+}
+
+
+// =====================================================
+// Back Button
+// =====================================================
+
+if (backButton) {
+
+    backButton.addEventListener(
+        "click",
+        function () {
+
+            window.location.href =
+                `classes.html?id=${encodeURIComponent(
+                    institutionId
+                )}`;
+
+        }
     );
 
 }
