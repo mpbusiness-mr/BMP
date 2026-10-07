@@ -7,12 +7,10 @@
 
     <title>BMP · الطلاب | Students</title>
 
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <link rel="stylesheet" href="students.css">
@@ -20,12 +18,11 @@
 
 <body class="lang-ar">
 
-    <!-- Decorative background -->
     <div class="bg-blob bg-blob-1" aria-hidden="true"></div>
     <div class="bg-blob bg-blob-2" aria-hidden="true"></div>
     <div class="bg-grid" aria-hidden="true"></div>
 
-    <!-- Loading overlay -->
+    <!-- Full-page overlay — only shown until layout is ready -->
     <div class="page-loader" id="pageLoader" aria-hidden="true">
         <div class="loader-spinner"></div>
         <span class="loader-text" data-i18n="loading">Loading...</span>
@@ -33,7 +30,7 @@
 
     <div class="page-container">
 
-        <!-- ============ HEADER ============ -->
+        <!-- HEADER -->
         <header class="page-header">
 
             <div class="header-brand">
@@ -48,7 +45,6 @@
 
             <div class="header-actions">
 
-                <!-- Language switcher -->
                 <div class="lang-switcher" role="group" aria-label="Language">
                     <button type="button" class="lang-btn active" data-lang="ar">عربية</button>
                     <button type="button" class="lang-btn"        data-lang="fr">Français</button>
@@ -69,37 +65,24 @@
 
         </header>
 
-
-        <!-- ============ SCHOOL SUMMARY ============ -->
+        <!-- SUMMARY -->
         <section class="school-summary">
-
             <div class="summary-item">
-                <span class="summary-label" data-i18n="institutionId">
-                    Institution ID
-                </span>
+                <span class="summary-label" data-i18n="institutionId">Institution ID</span>
                 <strong id="institutionId">-</strong>
             </div>
-
             <div class="summary-item">
-                <span class="summary-label" data-i18n="school">
-                    School
-                </span>
+                <span class="summary-label" data-i18n="school">School</span>
                 <strong id="institutionName">-</strong>
             </div>
-
             <div class="summary-item">
-                <span class="summary-label" data-i18n="studentsInSelectedYear">
-                    Students in Selected Year
-                </span>
+                <span class="summary-label" data-i18n="studentsInSelectedYear">Students in Selected Year</span>
                 <strong id="totalStudents">0</strong>
             </div>
-
         </section>
 
-
-        <!-- ============ FILTERS ============ -->
+        <!-- FILTERS -->
         <section class="filters-card">
-
             <div class="filter-header">
                 <div>
                     <h2 data-i18n="studentList">Student List</h2>
@@ -109,34 +92,22 @@
 
             <div class="filters-grid">
 
-                <!-- Academic Year -->
                 <div class="filter-group">
-                    <label for="academicYearFilter" data-i18n="academicYear">
-                        Academic Year
-                    </label>
+                    <label for="academicYearFilter" data-i18n="academicYear">Academic Year</label>
                     <select id="academicYearFilter">
-                        <option value="all" data-i18n="allAcademicYears">
-                            All Academic Years
-                        </option>
+                        <option value="all" data-i18n="allAcademicYears">All Academic Years</option>
                     </select>
                 </div>
 
-                <!-- Search -->
                 <div class="filter-group search-group">
-                    <label for="searchStudent" data-i18n="search">
-                        Search
-                    </label>
-                    <input type="text"
-                           id="searchStudent"
+                    <label for="searchStudent" data-i18n="search">Search</label>
+                    <input type="text" id="searchStudent"
                            data-i18n-placeholder="searchPlaceholder"
                            placeholder="Search by name or student number...">
                 </div>
 
-                <!-- Stage -->
                 <div class="filter-group">
-                    <label for="stageFilter" data-i18n="stage">
-                        Stage
-                    </label>
+                    <label for="stageFilter" data-i18n="stage">Stage</label>
                     <select id="stageFilter">
                         <option value="all" data-i18n="allStages">All Stages</option>
                         <option value="primary" data-i18n="primary">Primary</option>
@@ -145,22 +116,17 @@
                     </select>
                 </div>
 
-                <!-- Class -->
                 <div class="filter-group">
-                    <label for="classFilter" data-i18n="class">
-                        Class
-                    </label>
+                    <label for="classFilter" data-i18n="class">Class</label>
                     <select id="classFilter">
                         <option value="all" data-i18n="allClasses">All Classes</option>
                     </select>
                 </div>
 
             </div>
-
         </section>
 
-
-        <!-- ============ STUDENTS TABLE ============ -->
+        <!-- STUDENTS TABLE -->
         <section class="students-section">
 
             <div class="table-container">
@@ -177,30 +143,29 @@
                             <th data-i18n="actions">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="studentsTableBody"></tbody>
+
+                    <tbody id="studentsTableBody">
+                        <!-- Skeleton rows — replaced when data arrives -->
+                        <tr class="skeleton-row"><td colspan="7"><span class="skeleton-line"></span></td></tr>
+                        <tr class="skeleton-row"><td colspan="7"><span class="skeleton-line"></span></td></tr>
+                        <tr class="skeleton-row"><td colspan="7"><span class="skeleton-line"></span></td></tr>
+                        <tr class="skeleton-row"><td colspan="7"><span class="skeleton-line"></span></td></tr>
+                        <tr class="skeleton-row"><td colspan="7"><span class="skeleton-line"></span></td></tr>
+                    </tbody>
                 </table>
 
             </div>
 
             <!-- Empty state -->
             <div id="emptyState" class="empty-state" style="display:none">
-
-                <div class="empty-icon">
-                    <i class="fas fa-user-graduate"></i>
-                </div>
-
+                <div class="empty-icon"><i class="fas fa-user-graduate"></i></div>
                 <h3 data-i18n="noStudentsFound">No Students Found</h3>
-
                 <p data-i18n="noStudentsDescription">
                     There are no students matching your search or filters.
                 </p>
-
-                <button id="emptyAddStudentButton"
-                        class="btn btn-primary"
-                        data-i18n="addStudent">
+                <button id="emptyAddStudentButton" class="btn btn-primary" data-i18n="addStudent">
                     + Add Student
                 </button>
-
             </div>
 
         </section>
