@@ -1,79 +1,68 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>BMP - Students</title>
+    <title>BMP · الطلاب | Students</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <link rel="stylesheet" href="students.css">
 </head>
 
-<body>
+<body class="lang-ar">
+
+    <!-- Decorative background -->
+    <div class="bg-blob bg-blob-1" aria-hidden="true"></div>
+    <div class="bg-blob bg-blob-2" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <!-- Loading overlay -->
+    <div class="page-loader" id="pageLoader" aria-hidden="true">
+        <div class="loader-spinner"></div>
+        <span class="loader-text" data-i18n="loading">Loading...</span>
+    </div>
 
     <div class="page-container">
 
-        <!-- Header -->
-
+        <!-- ============ HEADER ============ -->
         <header class="page-header">
 
-            <div>
-                <h1 id="pageTitle" data-i18n="students">
-                    Students
-                </h1>
-
-                <p id="pageSubtitle">
-                    Manage school students
-                </p>
+            <div class="header-brand">
+                <a href="school.html" class="topbar-logo">
+                    <i class="fas fa-cubes"></i> BMP
+                </a>
+                <div>
+                    <h1 id="pageTitle" data-i18n="students">Students</h1>
+                    <p id="pageSubtitle">Manage school students</p>
+                </div>
             </div>
 
             <div class="header-actions">
 
-                <div class="language-selector">
-
-                    <label
-                        for="languageSelect"
-                        data-i18n="language">
-                        Language
-                    </label>
-
-                    <select id="languageSelect">
-
-                        <option value="en">
-                            English
-                        </option>
-
-                        <option value="ar">
-                            العربية
-                        </option>
-
-                        <option value="fr">
-                            Français
-                        </option>
-
-                    </select>
-
+                <!-- Language switcher -->
+                <div class="lang-switcher" role="group" aria-label="Language">
+                    <button type="button" class="lang-btn active" data-lang="ar">عربية</button>
+                    <button type="button" class="lang-btn"        data-lang="fr">Français</button>
+                    <button type="button" class="lang-btn"        data-lang="en">English</button>
                 </div>
 
-
-                <button
-                    id="backButton"
-                    class="btn btn-secondary"
-                    data-i18n="back">
-
-                    Back
-
+                <button id="backButton" class="btn btn-secondary" data-i18n="back">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Back</span>
                 </button>
 
-
-                <button
-                    id="addStudentButton"
-                    class="btn btn-primary"
-                    data-i18n="addStudent">
-
-                    + Add Student
-
+                <button id="addStudentButton" class="btn btn-primary" data-i18n="addStudent">
+                    <i class="fas fa-plus"></i>
+                    <span>+ Add Student</span>
                 </button>
 
             </div>
@@ -81,213 +70,89 @@
         </header>
 
 
-        <!-- School Summary -->
-
+        <!-- ============ SCHOOL SUMMARY ============ -->
         <section class="school-summary">
 
             <div class="summary-item">
-
-                <span
-                    class="summary-label"
-                    data-i18n="institutionId">
-
+                <span class="summary-label" data-i18n="institutionId">
                     Institution ID
-
                 </span>
-
-                <strong id="institutionId">
-                    -
-                </strong>
-
+                <strong id="institutionId">-</strong>
             </div>
 
-
             <div class="summary-item">
-
-                <span
-                    class="summary-label"
-                    data-i18n="school">
-
+                <span class="summary-label" data-i18n="school">
                     School
-
                 </span>
-
-                <strong id="institutionName">
-                    -
-                </strong>
-
+                <strong id="institutionName">-</strong>
             </div>
 
-
             <div class="summary-item">
-
-                <span
-                    class="summary-label"
-                    data-i18n="studentsInSelectedYear">
-
+                <span class="summary-label" data-i18n="studentsInSelectedYear">
                     Students in Selected Year
-
                 </span>
-
-                <strong id="totalStudents">
-                    0
-                </strong>
-
+                <strong id="totalStudents">0</strong>
             </div>
 
         </section>
 
 
-        <!-- Filters -->
-
+        <!-- ============ FILTERS ============ -->
         <section class="filters-card">
 
             <div class="filter-header">
-
                 <div>
-
-                    <h2 data-i18n="studentList">
-                        Student List
-                    </h2>
-
-                    <p data-i18n="searchAndFilter">
-                        Search and filter students
-                    </p>
-
+                    <h2 data-i18n="studentList">Student List</h2>
+                    <p data-i18n="searchAndFilter">Search and filter students</p>
                 </div>
-
             </div>
-
 
             <div class="filters-grid">
 
-
                 <!-- Academic Year -->
-
                 <div class="filter-group">
-
-                    <label
-                        for="academicYearFilter"
-                        data-i18n="academicYear">
-
+                    <label for="academicYearFilter" data-i18n="academicYear">
                         Academic Year
-
                     </label>
-
-                    <select
-                        id="academicYearFilter">
-
-                        <option
-                            value="all"
-                            data-i18n="allAcademicYears">
-
+                    <select id="academicYearFilter">
+                        <option value="all" data-i18n="allAcademicYears">
                             All Academic Years
-
                         </option>
-
                     </select>
-
                 </div>
-
 
                 <!-- Search -->
-
                 <div class="filter-group search-group">
-
-                    <label
-                        for="searchStudent"
-                        data-i18n="search">
-
+                    <label for="searchStudent" data-i18n="search">
                         Search
-
                     </label>
-
-                    <input
-                        type="text"
-                        id="searchStudent"
-                        data-i18n-placeholder="searchPlaceholder"
-                        placeholder="Search by name or student number...">
-
+                    <input type="text"
+                           id="searchStudent"
+                           data-i18n-placeholder="searchPlaceholder"
+                           placeholder="Search by name or student number...">
                 </div>
-
 
                 <!-- Stage -->
-
                 <div class="filter-group">
-
-                    <label
-                        for="stageFilter"
-                        data-i18n="stage">
-
+                    <label for="stageFilter" data-i18n="stage">
                         Stage
-
                     </label>
-
-                    <select
-                        id="stageFilter">
-
-                        <option
-                            value="all"
-                            data-i18n="allStages">
-
-                            All Stages
-
-                        </option>
-
-                        <option
-                            value="primary"
-                            data-i18n="primary">
-
-                            Primary
-
-                        </option>
-
-                        <option
-                            value="preparatory"
-                            data-i18n="preparatory">
-
-                            Preparatory
-
-                        </option>
-
-                        <option
-                            value="secondary"
-                            data-i18n="secondary">
-
-                            Secondary
-
-                        </option>
-
+                    <select id="stageFilter">
+                        <option value="all" data-i18n="allStages">All Stages</option>
+                        <option value="primary" data-i18n="primary">Primary</option>
+                        <option value="preparatory" data-i18n="preparatory">Preparatory</option>
+                        <option value="secondary" data-i18n="secondary">Secondary</option>
                     </select>
-
                 </div>
 
-
                 <!-- Class -->
-
                 <div class="filter-group">
-
-                    <label
-                        for="classFilter"
-                        data-i18n="class">
-
+                    <label for="classFilter" data-i18n="class">
                         Class
-
                     </label>
-
-                    <select
-                        id="classFilter">
-
-                        <option
-                            value="all"
-                            data-i18n="allClasses">
-
-                            All Classes
-
-                        </option>
-
+                    <select id="classFilter">
+                        <option value="all" data-i18n="allClasses">All Classes</option>
                     </select>
-
                 </div>
 
             </div>
@@ -295,84 +160,45 @@
         </section>
 
 
-        <!-- Students -->
-
+        <!-- ============ STUDENTS TABLE ============ -->
         <section class="students-section">
 
             <div class="table-container">
 
                 <table>
-
                     <thead>
-
                         <tr>
-
-                            <th data-i18n="studentNumber">
-                                Student Number
-                            </th>
-
-                            <th data-i18n="studentName">
-                                Student Name
-                            </th>
-
-                            <th data-i18n="academicYear">
-                                Academic Year
-                            </th>
-
-                            <th data-i18n="stage">
-                                Stage
-                            </th>
-
-                            <th data-i18n="class">
-                                Class
-                            </th>
-
-                            <th data-i18n="registrationDate">
-                                Registration Date
-                            </th>
-
-                            <th data-i18n="actions">
-                                Actions
-                            </th>
-
+                            <th data-i18n="studentNumber">Student Number</th>
+                            <th data-i18n="studentName">Student Name</th>
+                            <th data-i18n="academicYear">Academic Year</th>
+                            <th data-i18n="stage">Stage</th>
+                            <th data-i18n="class">Class</th>
+                            <th data-i18n="registrationDate">Registration Date</th>
+                            <th data-i18n="actions">Actions</th>
                         </tr>
-
                     </thead>
-
-                    <tbody id="studentsTableBody">
-                    </tbody>
-
+                    <tbody id="studentsTableBody"></tbody>
                 </table>
 
             </div>
 
-
-            <!-- Empty State -->
-
-            <div
-                id="emptyState"
-                class="empty-state">
+            <!-- Empty state -->
+            <div id="emptyState" class="empty-state" style="display:none">
 
                 <div class="empty-icon">
-                    +
+                    <i class="fas fa-user-graduate"></i>
                 </div>
 
-                <h3 data-i18n="noStudentsFound">
-                    No Students Found
-                </h3>
+                <h3 data-i18n="noStudentsFound">No Students Found</h3>
 
                 <p data-i18n="noStudentsDescription">
-                    There are no students matching
-                    your search or filters.
+                    There are no students matching your search or filters.
                 </p>
 
-                <button
-                    id="emptyAddStudentButton"
-                    class="btn btn-primary"
-                    data-i18n="addStudent">
-
+                <button id="emptyAddStudentButton"
+                        class="btn btn-primary"
+                        data-i18n="addStudent">
                     + Add Student
-
                 </button>
 
             </div>
@@ -380,7 +206,6 @@
         </section>
 
     </div>
-
 
     <script src="js/auth.js"></script>
     <script src="js/students.js"></script>
