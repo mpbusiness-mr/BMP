@@ -4,6 +4,14 @@
 
 
 // =====================================================
+// API
+// =====================================================
+
+const API_URL =
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+
+
+// =====================================================
 // Authentication
 // =====================================================
 
@@ -11,9 +19,11 @@ const currentUser =
     requireSchoolLogin();
 
 if (!currentUser) {
+
     throw new Error(
         "School login required."
     );
+
 }
 
 
@@ -21,9 +31,11 @@ const institutionId =
     getActiveInstitutionId();
 
 if (!institutionId) {
+
     throw new Error(
         "Institution access denied."
     );
+
 }
 
 
@@ -38,58 +50,8 @@ const urlParams =
 
 
 const paymentId =
-    urlParams.get("paymentId");
-
-
-// =====================================================
-// Storage
-// =====================================================
-
-const institutions =
-    JSON.parse(
-        localStorage.getItem(
-            "bmpInstitutions"
-        )
-    ) || [];
-
-
-const payments =
-    JSON.parse(
-        localStorage.getItem(
-            "bmpPayments"
-        )
-    ) || [];
-
-
-const students =
-    JSON.parse(
-        localStorage.getItem(
-            "bmpStudents"
-        )
-    ) || [];
-
-
-// =====================================================
-// Find Institution
-// =====================================================
-
-const institution =
-    institutions.find(
-        item =>
-            item.id === institutionId
-    );
-
-
-// =====================================================
-// Find Payment
-// =====================================================
-
-const payment =
-    payments.find(
-        item =>
-            item.id === paymentId &&
-            item.institutionId ===
-                institutionId
+    urlParams.get(
+        "paymentId"
     );
 
 
@@ -206,66 +168,180 @@ const backButton =
 
 
 // =====================================================
-// Check Institution
+// Load Receipt From Backend
 // =====================================================
 
-if (!institution) {
+async function loadReceipt() {
 
-    alert(
-        "School not found."
-    );
+    if (!paymentId) {
 
-    window.location.href =
-        "institutions.html";
+        alert(
+            "Payment not found."
+        );
+
+        window.location.href =
+            `school-payments.html?id=${encodeURIComponent(
+                institutionId
+            )}`;
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                "getReceipt",
+
+                            institutionId:
+                                institutionId,
+
+                            username:
+                                currentUser.username,
+
+                            paymentId:
+                                paymentId
+
+                        })
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to connect to the server."
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Failed to load receipt."
+            );
+
+        }
+
+
+        const payment =
+            result.payment ||
+            null;
+
+
+        const student =
+            result.student ||
+            null;
+
+
+        const institution =
+            result.institution ||
+            null;
+
+
+        if (!payment) {
+
+            throw new Error(
+                "Payment not found."
+            );
+
+        }
+
+
+        renderReceipt(
+            payment,
+            student,
+            institution
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Receipt loading error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Failed to load receipt."
+        );
+
+
+        window.location.href =
+            `school-payments.html?id=${encodeURIComponent(
+                institutionId
+            )}`;
+
+    }
+
 }
 
 
 // =====================================================
-// Check Payment
+// Render Receipt
 // =====================================================
 
-else if (!payment) {
+function renderReceipt(
+    payment,
+    student,
+    institution
+) {
 
-    alert(
-        "Payment not found."
-    );
+    const school =
+        institution ||
+        {};
 
-    window.location.href =
-        `school-payments.html?id=${encodeURIComponent(
-            institutionId
-        )}`;
-}
-
-
-// =====================================================
-// Load Receipt
-// =====================================================
-
-else {
-
-    loadReceipt();
-
-}
-
-
-// =====================================================
-// Load Receipt Function
-// =====================================================
-
-function loadReceipt() {
 
     // -------------------------------------------------
     // School Information
     // -------------------------------------------------
 
-    schoolName.textContent =
-        institution.name ||
-        "School Name";
+    if (
+        schoolName
+    ) {
+
+        schoolName.textContent =
+            school.name ||
+            "School Name";
+
+    }
 
 
-    institutionIdElement.textContent =
-        institution.id ||
-        "-";
+    if (
+        institutionIdElement
+    ) {
+
+        institutionIdElement.textContent =
+            school.id ||
+            institutionId ||
+            "-";
+
+    }
 
 
     // -------------------------------------------------
@@ -273,42 +349,50 @@ function loadReceipt() {
     // -------------------------------------------------
 
     if (
-        institution.logo &&
         schoolLogoContainer
     ) {
 
-        const logo =
-            document.createElement(
-                "img"
+        if (
+            school.logo
+        ) {
+
+            const logo =
+                document.createElement(
+                    "img"
+                );
+
+
+            logo.src =
+                school.logo;
+
+
+            logo.alt =
+                "School Logo";
+
+
+            schoolLogoContainer.innerHTML =
+                "";
+
+
+            schoolLogoContainer.appendChild(
+                logo
             );
 
 
-        logo.src =
-            institution.logo;
+            schoolLogoContainer.style.display =
+                "block";
+
+        } else {
+
+            schoolLogoContainer.innerHTML =
+                "";
 
 
-        logo.alt =
-            "School Logo";
+            schoolLogoContainer.style.display =
+                "none";
 
+        }
 
-        schoolLogoContainer.innerHTML =
-            "";
-
-
-        schoolLogoContainer.appendChild(
-            logo
-        );
-
-
-        schoolLogoContainer.style.display =
-            "block";
-
-    } else if (
-        schoolLogoContainer
-    ) {
-
-        schoolLogoContainer.style.display =
-            "none";
     }
 
 
@@ -316,66 +400,138 @@ function loadReceipt() {
     // Receipt Information
     // -------------------------------------------------
 
-    receiptNumber.textContent =
-        payment.receiptNumber ||
-        "-";
+    if (
+        receiptNumber
+    ) {
+
+        receiptNumber.textContent =
+            payment.receiptNumber ||
+            "-";
+
+    }
 
 
-    academicYear.textContent =
-        payment.academicYear ||
-        "-";
+    if (
+        academicYear
+    ) {
+
+        academicYear.textContent =
+            payment.academicYear ||
+            "-";
+
+    }
 
 
     // -------------------------------------------------
     // Student Information
     // -------------------------------------------------
 
-    studentName.textContent =
-        payment.studentName ||
-        "-";
+    if (
+        studentName
+    ) {
+
+        studentName.textContent =
+            payment.studentName ||
+            (
+                student &&
+                student.name
+            ) ||
+            "-";
+
+    }
 
 
-    studentNumber.textContent =
-        payment.studentNumber ||
-        "-";
+    if (
+        studentNumber
+    ) {
+
+        studentNumber.textContent =
+            payment.studentNumber ||
+            (
+                student &&
+                student.studentNumber
+            ) ||
+            "-";
+
+    }
 
 
-    stage.textContent =
-        getStageName(
-            payment.studentId
-        );
+    if (
+        stage
+    ) {
+
+        stage.textContent =
+            getStageName(
+                payment,
+                student
+            );
+
+    }
 
 
-    className.textContent =
-        getClassName(
-            payment.studentId
-        );
+    if (
+        className
+    ) {
+
+        className.textContent =
+            getClassName(
+                payment,
+                student
+            );
+
+    }
 
 
     // -------------------------------------------------
     // Payment Information
     // -------------------------------------------------
 
-    month.textContent =
-        payment.month ||
-        "-";
+    if (
+        month
+    ) {
+
+        month.textContent =
+            payment.month ||
+            "-";
+
+    }
 
 
-    amount.textContent =
-        formatAmount(
-            payment.amount
-        );
+    if (
+        amount
+    ) {
+
+        amount.textContent =
+            formatAmount(
+                payment.amount,
+                school
+            );
+
+    }
 
 
-    paymentDate.textContent =
-        formatDate(
-            payment.paymentDate
-        );
+    if (
+        paymentDate
+    ) {
+
+        paymentDate.textContent =
+            formatDate(
+                payment.paymentDate ||
+                payment.date
+            );
+
+    }
 
 
-    recordedBy.textContent =
-        payment.recordedBy ||
-        "-";
+    if (
+        recordedBy
+    ) {
+
+        recordedBy.textContent =
+            payment.recordedBy ||
+            "-";
+
+    }
 
 
     // -------------------------------------------------
@@ -383,21 +539,35 @@ function loadReceipt() {
     // -------------------------------------------------
 
     if (
-        payment.notes &&
-        payment.notes.trim() !== ""
+        notesSection &&
+        notes
     ) {
 
-        notes.textContent =
-            payment.notes;
+        if (
+            payment.notes &&
+            String(
+                payment.notes
+            ).trim() !== ""
+        ) {
+
+            notes.textContent =
+                payment.notes;
 
 
-        notesSection.style.display =
-            "block";
+            notesSection.style.display =
+                "block";
 
-    } else {
+        } else {
 
-        notesSection.style.display =
-            "none";
+            notes.textContent =
+                "";
+
+
+            notesSection.style.display =
+                "none";
+
+        }
+
     }
 
 
@@ -406,7 +576,8 @@ function loadReceipt() {
     // -------------------------------------------------
 
     document.title =
-        `${payment.receiptNumber || "Receipt"} - ${institution.name || "School"}`;
+        `${payment.receiptNumber || "Receipt"} - ${school.name || "School"}`;
+
 }
 
 
@@ -415,26 +586,32 @@ function loadReceipt() {
 // =====================================================
 
 function getStageName(
-    studentId
+    payment,
+    student
 ) {
 
-    const student =
-        students.find(
-            item =>
-                item.id === studentId &&
-                item.institutionId ===
-                    institutionId
-        );
+    if (
+        student &&
+        student.stage
+    ) {
 
+        return student.stage;
 
-    if (!student) {
-
-        return "-";
     }
 
 
-    return student.stage ||
-        "-";
+    if (
+        payment &&
+        payment.stage
+    ) {
+
+        return payment.stage;
+
+    }
+
+
+    return "-";
+
 }
 
 
@@ -443,26 +620,56 @@ function getStageName(
 // =====================================================
 
 function getClassName(
-    studentId
+    payment,
+    student
 ) {
 
-    const student =
-        students.find(
-            item =>
-                item.id === studentId &&
-                item.institutionId ===
-                    institutionId
-        );
+    if (
+        student
+    ) {
+
+        if (
+            student.className
+        ) {
+
+            return student.className;
+
+        }
 
 
-    if (!student) {
+        if (
+            student.class
+        ) {
 
-        return "-";
+            return student.class;
+
+        }
+
     }
 
 
-    return student.className ||
-        "-";
+    if (
+        payment &&
+        payment.className
+    ) {
+
+        return payment.className;
+
+    }
+
+
+    if (
+        payment &&
+        payment.class
+    ) {
+
+        return payment.class;
+
+    }
+
+
+    return "-";
+
 }
 
 
@@ -471,27 +678,41 @@ function getClassName(
 // =====================================================
 
 function formatAmount(
-    value
+    value,
+    institution
 ) {
 
     const number =
-        Number(value);
+        Number(
+            value
+        );
 
 
     if (
-        Number.isNaN(number)
+        Number.isNaN(
+            number
+        )
     ) {
 
         return value || "-";
+
     }
 
 
     const currency =
-        institution.currency ||
+        (
+            institution &&
+            institution.currency
+        ) ||
         "MRU";
 
 
-    return `${number.toLocaleString()} ${currency}`;
+    return (
+        number.toLocaleString() +
+        " " +
+        currency
+    );
+
 }
 
 
@@ -506,11 +727,14 @@ function formatDate(
     if (!value) {
 
         return "-";
+
     }
 
 
     const date =
-        new Date(value);
+        new Date(
+            value
+        );
 
 
     if (
@@ -520,12 +744,14 @@ function formatDate(
     ) {
 
         return value;
+
     }
 
 
     return date.toLocaleDateString(
         "en-GB"
     );
+
 }
 
 
@@ -533,42 +759,67 @@ function formatDate(
 // Print Receipt
 // =====================================================
 
-printButton.addEventListener(
-    "click",
-    function () {
+if (
+    printButton
+) {
 
-        window.print();
+    printButton.addEventListener(
+        "click",
+        function () {
 
-    }
-);
+            window.print();
+
+        }
+    );
+
+}
 
 
 // =====================================================
 // Save as PDF
 // =====================================================
 
-pdfButton.addEventListener(
-    "click",
-    function () {
+if (
+    pdfButton
+) {
 
-        window.print();
+    pdfButton.addEventListener(
+        "click",
+        function () {
 
-    }
-);
+            window.print();
+
+        }
+    );
+
+}
 
 
 // =====================================================
 // Back to Payments
 // =====================================================
 
-backButton.addEventListener(
-    "click",
-    function () {
+if (
+    backButton
+) {
 
-        window.location.href =
-            `school-payments.html?id=${encodeURIComponent(
-                institutionId
-            )}`;
+    backButton.addEventListener(
+        "click",
+        function () {
 
-    }
-);
+            window.location.href =
+                `school-payments.html?id=${encodeURIComponent(
+                    institutionId
+                )}`;
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// Initialize
+// =====================================================
+
+loadReceipt();
