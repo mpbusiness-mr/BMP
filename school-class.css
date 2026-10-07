@@ -131,6 +131,20 @@ body {
 }
 
 
+.btn:disabled {
+
+    opacity:
+        0.6;
+
+    cursor:
+        not-allowed;
+
+    transform:
+        none;
+
+}
+
+
 .btn-secondary {
 
     background:
@@ -146,6 +160,25 @@ body {
 
     background:
         #d1d5db;
+
+}
+
+
+.btn-primary {
+
+    background:
+        #2563eb;
+
+    color:
+        white;
+
+}
+
+
+.btn-primary:hover {
+
+    background:
+        #1d4ed8;
 
 }
 
@@ -258,6 +291,123 @@ body {
 
     border-color:
         #2563eb;
+
+}
+
+
+/* =====================================================
+   Filters
+   ===================================================== */
+
+.filters-card {
+
+    display:
+        flex;
+
+    align-items:
+        flex-end;
+
+    gap:
+        15px;
+
+    flex-wrap:
+        wrap;
+
+    background:
+        white;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius:
+        12px;
+
+    padding:
+        18px;
+
+    margin-bottom:
+        20px;
+
+    box-shadow:
+        0 2px 8px rgba(
+            0,
+            0,
+            0,
+            0.04
+        );
+
+}
+
+
+.filter-group {
+
+    min-width:
+        190px;
+
+}
+
+
+.filter-group label {
+
+    display:
+        block;
+
+    margin-bottom:
+        7px;
+
+    color:
+        #6b7280;
+
+    font-size:
+        13px;
+
+    font-weight:
+        600;
+
+}
+
+
+.filter-select {
+
+    width:
+        100%;
+
+    border:
+        1px solid #d1d5db;
+
+    border-radius:
+        8px;
+
+    background:
+        white;
+
+    padding:
+        9px 11px;
+
+    font-size:
+        14px;
+
+    color:
+        #1f2937;
+
+    outline:
+        none;
+
+}
+
+
+.filter-select:focus {
+
+    border-color:
+        #2563eb;
+
+}
+
+
+.filter-actions {
+
+    margin-left:
+        auto;
 
 }
 
@@ -526,6 +676,102 @@ tbody tr:last-child td {
 
 
 /* =====================================================
+   Print Area
+   ===================================================== */
+
+.print-unpaid-area {
+
+    display:
+        none;
+
+}
+
+
+.print-header {
+
+    text-align:
+        center;
+
+    margin-bottom:
+        25px;
+
+}
+
+
+.print-header h1 {
+
+    font-size:
+        24px;
+
+    margin-bottom:
+        8px;
+
+}
+
+
+.print-header h2 {
+
+    font-size:
+        20px;
+
+    margin-bottom:
+        6px;
+
+}
+
+
+.print-header p {
+
+    color:
+        #555;
+
+    font-size:
+        14px;
+
+}
+
+
+.print-table {
+
+    width:
+        100%;
+
+    min-width:
+        0;
+
+    border-collapse:
+        collapse;
+
+}
+
+
+.print-table th,
+.print-table td {
+
+    border:
+        1px solid #999;
+
+    padding:
+        9px;
+
+    text-align:
+        left;
+
+    font-size:
+        12px;
+
+}
+
+
+.print-table th {
+
+    background:
+        #f3f4f6;
+
+}
+
+
+/* =====================================================
    Responsive
    ===================================================== */
 
@@ -540,6 +786,25 @@ tbody tr:last-child td {
                 2,
                 minmax(0, 1fr)
             );
+
+    }
+
+
+    .filter-actions {
+
+        margin-left:
+            0;
+
+        width:
+            100%;
+
+    }
+
+
+    .filter-actions .btn {
+
+        width:
+            100%;
 
     }
 
@@ -589,6 +854,55 @@ tbody tr:last-child td {
 
         grid-template-columns:
             1fr;
+
+    }
+
+
+    .filter-group {
+
+        width:
+            100%;
+
+        min-width:
+            0;
+
+    }
+
+}
+
+
+/* =====================================================
+   Print
+   ===================================================== */
+
+@media print {
+
+    body {
+
+        background:
+            white;
+
+    }
+
+
+    .page-container {
+
+        display:
+            none !important;
+
+    }
+
+
+    .print-unpaid-area {
+
+        display:
+            block !important;
+
+        width:
+            100%;
+
+        padding:
+            20px;
 
     }
 
