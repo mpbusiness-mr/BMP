@@ -1,0 +1,270 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Class Students - BMP</title>
+
+    <link
+        rel="stylesheet"
+        href="classes-students.css">
+
+</head>
+
+<body>
+
+    <div class="page-container">
+
+        <!-- =========================================
+             Header
+             ========================================= -->
+
+        <header class="page-header">
+
+            <div>
+
+                <h1 id="pageTitle">
+                    Class Students
+                </h1>
+
+                <p id="pageSubtitle">
+                    Student payment status
+                </p>
+
+            </div>
+
+            <button
+                id="backButton"
+                class="btn btn-secondary">
+
+                Back to Classes
+
+            </button>
+
+        </header>
+
+
+        <!-- =========================================
+             Class Information
+             ========================================= -->
+
+        <section class="class-summary">
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    Institution ID
+                </span>
+
+                <strong id="institutionId">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    School Name
+                </span>
+
+                <strong id="institutionName">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    Academic Year
+                </span>
+
+                <select
+                    id="academicYearFilter"
+                    class="year-select">
+
+                </select>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    Stage
+                </span>
+
+                <strong id="stageName">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    Class
+                </span>
+
+                <strong id="className">
+                    -
+                </strong>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <span class="summary-label">
+                    Students
+                </span>
+
+                <strong id="studentCount">
+                    0
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             Payment Legend
+             ========================================= -->
+
+        <section class="legend">
+
+            <div class="legend-item">
+
+                <span class="status-badge paid">
+                    Paid
+                </span>
+
+                <span>
+                    Payment recorded
+                </span>
+
+            </div>
+
+
+            <div class="legend-item">
+
+                <span class="status-badge unpaid">
+                    Unpaid
+                </span>
+
+                <span>
+                    No payment recorded
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             Students Table
+             ========================================= -->
+
+        <main class="table-card">
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Student No.
+                            </th>
+
+                            <th>
+                                Student Name
+                            </th>
+
+                            <th>
+                                October
+                            </th>
+
+                            <th>
+                                November
+                            </th>
+
+                            <th>
+                                December
+                            </th>
+
+                            <th>
+                                January
+                            </th>
+
+                            <th>
+                                February
+                            </th>
+
+                            <th>
+                                March
+                            </th>
+
+                            <th>
+                                April
+                            </th>
+
+                            <th>
+                                May
+                            </th>
+
+                            <th>
+                                June
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="studentsTableBody">
+
+                        <tr>
+
+                            <td
+                                colspan="11"
+                                class="empty-state">
+
+                                Loading students...
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <script src="js/auth.js"></script>
+    <script src="js/school-class.js"></script>
+
+</body>
+
+</html>
+```
