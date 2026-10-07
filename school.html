@@ -1,69 +1,64 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>BMP - School Dashboard</title>
+    <title>BMP · لوحة تحكم المدرسة | School Dashboard</title>
+
+    <!-- Google Fonts (same as index.html) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <link rel="stylesheet" href="school.css">
 </head>
 
-<body>
+<body class="lang-ar">
+
+    <!-- Decorative background -->
+    <div class="bg-blob bg-blob-1" aria-hidden="true"></div>
+    <div class="bg-blob bg-blob-2" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <!-- Loading overlay -->
+    <div class="page-loader" id="pageLoader" aria-hidden="true">
+        <div class="loader-spinner"></div>
+        <span class="loader-text"
+              data-ar="جاري التحميل..."
+              data-fr="Chargement..."
+              data-en="Loading...">
+            جاري التحميل...
+        </span>
+    </div>
 
     <div class="page-container">
 
-        <!-- Header -->
+        <!-- ============ HEADER ============ -->
         <header class="page-header">
 
-            <div>
-                <h1 id="schoolName">
-                    School Dashboard
-                </h1>
-
-                <p id="schoolInfo">
-                    Manage school operations
-                </p>
+            <div class="header-brand">
+                <a href="index.html" class="topbar-logo">
+                    <i class="fas fa-cubes"></i> BMP
+                </a>
             </div>
-
 
             <div class="header-actions">
 
-                <div class="language-selector">
-
-                    <label
-                        for="languageSelect"
-                        data-i18n="language">
-                        Language
-                    </label>
-
-                    <select id="languageSelect">
-
-                        <option value="en">
-                            English
-                        </option>
-
-                        <option value="ar">
-                            العربية
-                        </option>
-
-                        <option value="fr">
-                            Français
-                        </option>
-
-                    </select>
-
+                <!-- Language switcher -->
+                <div class="lang-switcher" role="group" aria-label="Language">
+                    <button type="button" class="lang-btn active" data-lang="ar">عربية</button>
+                    <button type="button" class="lang-btn"        data-lang="fr">Français</button>
+                    <button type="button" class="lang-btn"        data-lang="en">English</button>
                 </div>
 
-
-                <button
-                    id="backButton"
-                    class="btn btn-secondary"
-                    data-i18n="back">
-
-                    Back
-
+                <button id="backButton" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i>
+                    <span data-ar="رجوع" data-fr="Retour" data-en="Back">رجوع</span>
                 </button>
 
             </div>
@@ -71,191 +66,143 @@
         </header>
 
 
-        <!-- School Information -->
+        <!-- ============ SCHOOL SUMMARY ============ -->
         <section class="school-summary">
 
             <div class="summary-item">
-
-                <span
-                    class="summary-label"
-                    data-i18n="institutionId">
-
-                    Institution ID
-
+                <span class="summary-label"
+                      data-ar="اسم المدرسة" data-fr="Nom de l'école" data-en="School Name">
+                    اسم المدرسة
                 </span>
-
-                <strong id="institutionId">
-                    -
-                </strong>
-
+                <strong id="schoolName">-</strong>
             </div>
 
-
             <div class="summary-item">
-
-                <span
-                    class="summary-label"
-                    data-i18n="schoolNameLabel">
-
-                    School Name
-
+                <span class="summary-label"
+                      data-ar="رقم المؤسسة" data-fr="ID de l'établissement" data-en="Institution ID">
+                    رقم المؤسسة
                 </span>
-
-                <strong id="institutionName">
-                    -
-                </strong>
-
+                <strong id="institutionId">-</strong>
             </div>
 
-
             <div class="summary-item">
-
-                <span
-                    class="summary-label"
-                    data-i18n="status">
-
-                    Status
-
+                <span class="summary-label"
+                      data-ar="الحالة" data-fr="Statut" data-en="Status">
+                    الحالة
                 </span>
-
-                <strong id="institutionStatus">
-                    -
-                </strong>
-
+                <strong id="institutionStatus">-</strong>
             </div>
 
         </section>
 
 
-        <!-- Dashboard -->
+        <!-- Hidden fields expected by school.js -->
+        <div style="display:none">
+            <span id="schoolInfo"></span>
+            <span id="institutionName"></span>
+        </div>
+
+
+        <!-- ============ DASHBOARD ============ -->
         <main class="dashboard">
 
             <!-- Students -->
-            <button
-                id="studentsButton"
-                class="dashboard-card">
-
-                <h2 data-i18n="students">
-                    Students
-                </h2>
-
-                <p data-i18n="studentsDescription">
-                    Register, search and manage students.
+            <button id="studentsButton" class="dashboard-card">
+                <div class="card-icon"><i class="fas fa-user-graduate"></i></div>
+                <h2 data-ar="الطلاب" data-fr="Élèves" data-en="Students">الطلاب</h2>
+                <p data-ar="تسجيل الطلاب والبحث عنهم وإدارتهم."
+                   data-fr="Inscrire, rechercher et gérer les élèves."
+                   data-en="Register, search and manage students.">
+                    تسجيل الطلاب والبحث عنهم وإدارتهم.
                 </p>
-
+                <span class="card-arrow"><i class="fas fa-arrow-left"></i></span>
             </button>
-
 
             <!-- Payments -->
-            <button
-                id="paymentsButton"
-                class="dashboard-card">
-
-                <h2 data-i18n="payments">
-                    Payments
-                </h2>
-
-                <p data-i18n="paymentsDescription">
-                    Manage monthly student payments.
+            <button id="paymentsButton" class="dashboard-card">
+                <div class="card-icon"><i class="fas fa-money-bill-wave"></i></div>
+                <h2 data-ar="المدفوعات" data-fr="Paiements" data-en="Payments">المدفوعات</h2>
+                <p data-ar="إدارة المدفوعات الشهرية للطلاب."
+                   data-fr="Gérer les paiements mensuels des élèves."
+                   data-en="Manage monthly student payments.">
+                    إدارة المدفوعات الشهرية للطلاب.
                 </p>
-
+                <span class="card-arrow"><i class="fas fa-arrow-left"></i></span>
             </button>
 
-
-            <!-- Receipts -->
-            <button style="display:none"
-                id="receiptsButton"
-                class="dashboard-card">
-
-                <h2 data-i18n="receipts">
-                    Receipts
-                </h2>
-
-                <p data-i18n="receiptsDescription">
-                    View and manage payment receipts.
+            <!-- Receipts (hidden by default, same as before) -->
+            <button id="receiptsButton" class="dashboard-card" style="display:none">
+                <div class="card-icon"><i class="fas fa-receipt"></i></div>
+                <h2 data-ar="الإيصالات" data-fr="Reçus" data-en="Receipts">الإيصالات</h2>
+                <p data-ar="عرض وإدارة إيصالات الدفع."
+                   data-fr="Consulter et gérer les reçus de paiement."
+                   data-en="View and manage payment receipts.">
+                    عرض وإدارة إيصالات الدفع.
                 </p>
-
+                <span class="card-arrow"><i class="fas fa-arrow-left"></i></span>
             </button>
-
 
             <!-- Reports -->
-            <button
-                id="reportsButton"
-                class="dashboard-card">
-
-                <h2 data-i18n="reports">
-                    Reports
-                </h2>
-
-                <p data-i18n="reportsDescription">
-                    View school statistics and reports.
+            <button id="reportsButton" class="dashboard-card">
+                <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                <h2 data-ar="التقارير" data-fr="Rapports" data-en="Reports">التقارير</h2>
+                <p data-ar="عرض إحصائيات وتقارير المدرسة."
+                   data-fr="Consulter les statistiques et rapports de l'école."
+                   data-en="View school statistics and reports.">
+                    عرض إحصائيات وتقارير المدرسة.
                 </p>
-
+                <span class="card-arrow"><i class="fas fa-arrow-left"></i></span>
             </button>
 
-
-            <!-- Classes & Stages -->
-            <button
-                id="classesButton"
-                class="dashboard-card">
-
-                <h2 data-i18n="classesStages">
-                    Classes &amp; Stages
-                </h2>
-
-                <p data-i18n="classesStagesDescription">
-                    Manage academic stages and classes.
+            <!-- Classes -->
+            <button id="classesButton" class="dashboard-card">
+                <div class="card-icon"><i class="fas fa-layer-group"></i></div>
+                <h2 data-ar="المراحل والأقسام" data-fr="Classes et niveaux" data-en="Classes & Stages">المراحل والأقسام</h2>
+                <p data-ar="إدارة المراحل الدراسية والأقسام."
+                   data-fr="Gérer les niveaux scolaires et les classes."
+                   data-en="Manage academic stages and classes.">
+                    إدارة المراحل الدراسية والأقسام.
                 </p>
-
+                <span class="card-arrow"><i class="fas fa-arrow-left"></i></span>
             </button>
 
-
-            <!-- Users -->
-            <button
-                id="usersButton"
-                class="dashboard-card">
-
-                <h2 data-i18n="users">
-                    Users
-                </h2>
-
-                <p data-i18n="usersDescription">
-                    Manage school users and access.
+            <!-- Users (hidden for non-directors by JS) -->
+            <button id="usersButton" class="dashboard-card">
+                <div class="card-icon"><i class="fas fa-users-cog"></i></div>
+                <h2 data-ar="المستخدمون" data-fr="Utilisateurs" data-en="Users">المستخدمون</h2>
+                <p data-ar="إدارة مستخدمي المدرسة والصلاحيات."
+                   data-fr="Gérer les utilisateurs et les accès de l'école."
+                   data-en="Manage school users and access.">
+                    إدارة مستخدمي المدرسة والصلاحيات.
                 </p>
-
+                <span class="card-arrow"><i class="fas fa-arrow-left"></i></span>
             </button>
-
 
             <!-- Settings -->
-            <button
-                id="settingsButton"
-                class="dashboard-card">
-
-                <h2 data-i18n="settings">
-                    Settings
-                </h2>
-
-                <p data-i18n="settingsDescription">
-                    Manage school settings.
+            <button id="settingsButton" class="dashboard-card">
+                <div class="card-icon"><i class="fas fa-cog"></i></div>
+                <h2 data-ar="الإعدادات" data-fr="Paramètres" data-en="Settings">الإعدادات</h2>
+                <p data-ar="إدارة إعدادات المدرسة."
+                   data-fr="Gérer les paramètres de l'école."
+                   data-en="Manage school settings.">
+                    إدارة إعدادات المدرسة.
                 </p>
-
-            </button>
-
-
-            <!-- Logout -->
-            <button
-                id="logoutButton"
-                class="btn btn-danger"
-                data-i18n="logout">
-
-                Logout
-
+                <span class="card-arrow"><i class="fas fa-arrow-left"></i></span>
             </button>
 
         </main>
 
-    </div>
+        <!-- ============ LOGOUT ============ -->
+        <div class="logout-row">
+            <button id="logoutButton" class="btn btn-danger">
+                <i class="fas fa-sign-out-alt"></i>
+                <span data-ar="تسجيل الخروج" data-fr="Déconnexion" data-en="Logout">
+                    تسجيل الخروج
+                </span>
+            </button>
+        </div>
 
+    </div>
 
     <script src="js/auth.js"></script>
     <script src="js/school.js"></script>
