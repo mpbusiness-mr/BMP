@@ -4,6 +4,14 @@
 
 
 // =====================================================
+// API
+// =====================================================
+
+const API_URL =
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+
+
+// =====================================================
 // Authentication
 // =====================================================
 
@@ -11,9 +19,11 @@ const currentUser =
     requireSchoolLogin();
 
 if (!currentUser) {
+
     throw new Error(
         "School login required."
     );
+
 }
 
 
@@ -21,54 +31,23 @@ const institutionId =
     getActiveInstitutionId();
 
 if (!institutionId) {
+
     throw new Error(
         "Institution access denied."
     );
+
 }
 
 
 // =====================================================
-// Storage
+// Data
 // =====================================================
 
-const institutions =
-    JSON.parse(
-        localStorage.getItem("bmpInstitutions")
-    ) || [];
+let students = [];
 
-const students =
-    JSON.parse(
-        localStorage.getItem("bmpStudents")
-    ) || [];
+let payments = [];
 
-const payments =
-    JSON.parse(
-        localStorage.getItem("bmpPayments")
-    ) || [];
-
-
-// =====================================================
-// Find Institution
-// =====================================================
-
-const institution =
-    institutions.find(
-        item =>
-            item.id === institutionId
-    );
-
-
-// =====================================================
-// Check Institution
-// =====================================================
-
-if (!institution) {
-
-    alert("School not found.");
-
-    window.location.href =
-        "institutions.html";
-}
+let institution = null;
 
 
 // =====================================================
@@ -80,60 +59,72 @@ const institutionIdElement =
         "institutionId"
     );
 
+
 const institutionNameElement =
     document.getElementById(
         "institutionName"
     );
+
 
 const academicYearFilter =
     document.getElementById(
         "academicYearFilter"
     );
 
+
 const totalStudentsElement =
     document.getElementById(
         "totalStudents"
     );
+
 
 const totalPaymentsElement =
     document.getElementById(
         "totalPayments"
     );
 
+
 const totalAmountElement =
     document.getElementById(
         "totalAmount"
     );
+
 
 const paidStudentsElement =
     document.getElementById(
         "paidStudents"
     );
 
+
 const unpaidStudentsElement =
     document.getElementById(
         "unpaidStudents"
     );
+
 
 const paidMonthsElement =
     document.getElementById(
         "paidMonths"
     );
 
+
 const paymentReportBody =
     document.getElementById(
         "paymentReportBody"
     );
+
 
 const studentReportBody =
     document.getElementById(
         "studentReportBody"
     );
 
+
 const backButton =
     document.getElementById(
         "backButton"
     );
+
 
 const printButton =
     document.getElementById(
@@ -142,14 +133,168 @@ const printButton =
 
 
 // =====================================================
-// School Information
+// Load Reports From Backend
 // =====================================================
 
-institutionIdElement.textContent =
-    institution.id || "-";
+async function loadReports() {
 
-institutionNameElement.textContent =
-    institution.name || "-";
+    try {
+
+        showLoading();
+
+
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                "getReports",
+
+                            institutionId:
+                                institutionId,
+
+                            username:
+                                currentUser.username
+
+                        })
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to connect to the server."
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Failed to load reports."
+            );
+
+        }
+
+
+        // =============================================
+        // Store Data
+        // =============================================
+
+        students =
+            Array.isArray(
+                result.students
+            )
+                ? result.students
+                : [];
+
+
+        payments =
+            Array.isArray(
+                result.payments
+            )
+                ? result.payments
+                : [];
+
+
+        institution =
+            result.institution ||
+            null;
+
+
+        // =============================================
+        // Institution Information
+        // =============================================
+
+        if (
+            institutionIdElement
+        ) {
+
+            institutionIdElement.textContent =
+                institution &&
+                institution.id
+                    ? institution.id
+                    : institutionId;
+
+        }
+
+
+        if (
+            institutionNameElement
+        ) {
+
+            institutionNameElement.textContent =
+                institution &&
+                institution.name
+                    ? institution.name
+                    : "-";
+
+        }
+
+
+        if (
+            institution &&
+            institution.name
+        ) {
+
+            document.title =
+                `${institution.name} - School Reports`;
+
+        }
+
+
+        // =============================================
+        // Academic Years
+        // =============================================
+
+        loadAcademicYears();
+
+
+        // =============================================
+        // Refresh Report
+        // =============================================
+
+        refreshReports();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Reports loading error:",
+            error
+        );
+
+
+        showError();
+
+
+        alert(
+            error.message ||
+            "Failed to load reports."
+        );
+
+    }
+
+}
 
 
 // =====================================================
@@ -158,24 +303,42 @@ institutionNameElement.textContent =
 
 function getAcademicYears() {
 
-    const years = students
-        .filter(
-            student =>
-                student.institutionId ===
-                institutionId
-        )
-        .map(
-            student =>
-                student.academicYear
-        )
-        .filter(Boolean);
+    const years =
+        students
+            .map(
+                student =>
+                    student.academicYear
+            )
+            .filter(
+                year =>
+                    year !== undefined &&
+                    year !== null &&
+                    String(
+                        year
+                    ).trim() !== ""
+            )
+            .map(
+                year =>
+                    String(
+                        year
+                    ).trim()
+            );
+
 
     return [
-        ...new Set(years)
+        ...new Set(
+            years
+        )
     ].sort(
-        (a, b) =>
-            b.localeCompare(a)
+        (
+            a,
+            b
+        ) =>
+            b.localeCompare(
+                a
+            )
     );
+
 }
 
 
@@ -185,18 +348,36 @@ function getAcademicYears() {
 
 function loadAcademicYears() {
 
+    if (
+        !academicYearFilter
+    ) {
+
+        return;
+
+    }
+
+
     const years =
         getAcademicYears();
 
-    academicYearFilter.innerHTML = "";
+
+    academicYearFilter.innerHTML =
+        "";
+
 
     const allOption =
-        document.createElement("option");
+        document.createElement(
+            "option"
+        );
 
-    allOption.value = "";
+
+    allOption.value =
+        "";
+
 
     allOption.textContent =
         "All Academic Years";
+
 
     academicYearFilter.appendChild(
         allOption
@@ -211,25 +392,35 @@ function loadAcademicYears() {
                     "option"
                 );
 
+
             option.value =
                 year;
+
 
             option.textContent =
                 year;
 
+
             academicYearFilter.appendChild(
                 option
             );
+
         }
     );
 
 
-    // Prefer current academic year
+    // =============================================
+    // Prefer Current Academic Year
+    // =============================================
+
     const currentYear =
         getCurrentAcademicYear();
 
+
     if (
-        years.includes(currentYear)
+        years.includes(
+            currentYear
+        )
     ) {
 
         academicYearFilter.value =
@@ -239,7 +430,9 @@ function loadAcademicYears() {
 
         academicYearFilter.value =
             "";
+
     }
+
 }
 
 
@@ -252,19 +445,30 @@ function getCurrentAcademicYear() {
     const today =
         new Date();
 
+
     const month =
         today.getMonth() + 1;
+
 
     const year =
         today.getFullYear();
 
-    if (month >= 10) {
 
-        return `${year}-${year + 1}`;
+    if (
+        month >= 10
+    ) {
+
+        return (
+            `${year}-${year + 1}`
+        );
 
     }
 
-    return `${year - 1}-${year}`;
+
+    return (
+        `${year - 1}-${year}`
+    );
+
 }
 
 
@@ -274,31 +478,55 @@ function getCurrentAcademicYear() {
 
 function getSelectedStudents() {
 
+    if (
+        !academicYearFilter ||
+        !academicYearFilter.value
+    ) {
+
+        return students
+            .filter(
+                student =>
+                    String(
+                        student.institutionId ||
+                        institutionId
+                    ) ===
+                    institutionId
+            );
+
+    }
+
+
     return students.filter(
         student => {
 
+            const studentInstitutionId =
+                String(
+                    student.institutionId ||
+                    institutionId
+                );
+
+
             if (
-                student.institutionId !==
+                studentInstitutionId !==
                 institutionId
             ) {
 
                 return false;
+
             }
 
 
-            if (
-                academicYearFilter.value &&
-                student.academicYear !==
-                    academicYearFilter.value
-            ) {
+            return (
+                String(
+                    student.academicYear ||
+                    ""
+                ) ===
+                academicYearFilter.value
+            );
 
-                return false;
-            }
-
-
-            return true;
         }
     );
+
 }
 
 
@@ -311,49 +539,78 @@ function getSelectedPayments() {
     const selectedStudents =
         getSelectedStudents();
 
+
     const studentIds =
         new Set(
             selectedStudents.map(
                 student =>
-                    student.id
+                    String(
+                        student.id ||
+                        student.studentId ||
+                        ""
+                    )
             )
         );
+
 
     return payments.filter(
         payment => {
 
+            const paymentInstitutionId =
+                String(
+                    payment.institutionId ||
+                    institutionId
+                );
+
+
             if (
-                payment.institutionId !==
+                paymentInstitutionId !==
                 institutionId
             ) {
 
                 return false;
+
             }
+
+
+            const paymentStudentId =
+                String(
+                    payment.studentId ||
+                    ""
+                );
 
 
             if (
                 !studentIds.has(
-                    payment.studentId
+                    paymentStudentId
                 )
             ) {
 
                 return false;
+
             }
 
 
             if (
+                academicYearFilter &&
                 academicYearFilter.value &&
-                payment.academicYear !==
-                    academicYearFilter.value
+                String(
+                    payment.academicYear ||
+                    ""
+                ) !==
+                academicYearFilter.value
             ) {
 
                 return false;
+
             }
 
 
             return true;
+
         }
     );
+
 }
 
 
@@ -366,36 +623,59 @@ function updateSummary() {
     const selectedStudents =
         getSelectedStudents();
 
+
     const selectedPayments =
         getSelectedPayments();
 
 
     // Total Students
-    totalStudentsElement.textContent =
-        selectedStudents.length;
+    if (
+        totalStudentsElement
+    ) {
+
+        totalStudentsElement.textContent =
+            selectedStudents.length;
+
+    }
 
 
     // Total Payments
-    totalPaymentsElement.textContent =
-        selectedPayments.length;
+    if (
+        totalPaymentsElement
+    ) {
+
+        totalPaymentsElement.textContent =
+            selectedPayments.length;
+
+    }
 
 
     // Total Amount
     const totalAmount =
         selectedPayments.reduce(
-            (sum, payment) =>
+            (
+                sum,
+                payment
+            ) =>
                 sum +
                 Number(
-                    payment.amount
+                    payment.amount || 0
                 ),
 
             0
         );
 
-    totalAmountElement.textContent =
-        formatAmount(
-            totalAmount
-        );
+
+    if (
+        totalAmountElement
+    ) {
+
+        totalAmountElement.textContent =
+            formatAmount(
+                totalAmount
+            );
+
+    }
 
 
     // Students With Payments
@@ -403,26 +683,49 @@ function updateSummary() {
         new Set(
             selectedPayments.map(
                 payment =>
-                    payment.studentId
+                    String(
+                        payment.studentId ||
+                        ""
+                    )
             )
         );
 
-    paidStudentsElement.textContent =
-        paidStudentIds.size;
+
+    if (
+        paidStudentsElement
+    ) {
+
+        paidStudentsElement.textContent =
+            paidStudentIds.size;
+
+    }
 
 
     // Students Without Payments
-    unpaidStudentsElement.textContent =
-        Math.max(
-            0,
-            selectedStudents.length -
-            paidStudentIds.size
-        );
+    if (
+        unpaidStudentsElement
+    ) {
+
+        unpaidStudentsElement.textContent =
+            Math.max(
+                0,
+                selectedStudents.length -
+                paidStudentIds.size
+            );
+
+    }
 
 
     // Paid Months
-    paidMonthsElement.textContent =
-        selectedPayments.length;
+    if (
+        paidMonthsElement
+    ) {
+
+        paidMonthsElement.textContent =
+            selectedPayments.length;
+
+    }
+
 }
 
 
@@ -430,16 +733,27 @@ function updateSummary() {
 // Format Amount
 // =====================================================
 
-function formatAmount(amount) {
+function formatAmount(
+    amount
+) {
 
-    return Number(amount || 0)
-        .toLocaleString(
-            "en-US",
-            {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2
-            }
+    const number =
+        Number(
+            amount || 0
         );
+
+
+    return number.toLocaleString(
+        "en-US",
+        {
+            minimumFractionDigits:
+                0,
+
+            maximumFractionDigits:
+                2
+        }
+    );
+
 }
 
 
@@ -449,11 +763,21 @@ function formatAmount(amount) {
 
 function renderPaymentReport() {
 
+    if (
+        !paymentReportBody
+    ) {
+
+        return;
+
+    }
+
+
     const selectedPayments =
         getSelectedPayments();
 
 
     const months = [
+
         "October",
         "November",
         "December",
@@ -463,10 +787,12 @@ function renderPaymentReport() {
         "April",
         "May",
         "June"
+
     ];
 
 
-    paymentReportBody.innerHTML = "";
+    paymentReportBody.innerHTML =
+        "";
 
 
     months.forEach(
@@ -475,7 +801,10 @@ function renderPaymentReport() {
             const monthPayments =
                 selectedPayments.filter(
                     payment =>
-                        payment.month ===
+                        String(
+                            payment.month ||
+                            ""
+                        ) ===
                         month
                 );
 
@@ -484,17 +813,24 @@ function renderPaymentReport() {
                 new Set(
                     monthPayments.map(
                         payment =>
-                            payment.studentId
+                            String(
+                                payment.studentId ||
+                                ""
+                            )
                     )
                 );
 
 
             const totalAmount =
                 monthPayments.reduce(
-                    (sum, payment) =>
+                    (
+                        sum,
+                        payment
+                    ) =>
                         sum +
                         Number(
-                            payment.amount
+                            payment.amount ||
+                            0
                         ),
 
                     0
@@ -508,7 +844,11 @@ function renderPaymentReport() {
 
 
             row.innerHTML = `
-                <td>${month}</td>
+                <td>
+                    ${escapeHtml(
+                        month
+                    )}
+                </td>
 
                 <td>
                     ${monthPayments.length}
@@ -529,8 +869,10 @@ function renderPaymentReport() {
             paymentReportBody.appendChild(
                 row
             );
+
         }
     );
+
 }
 
 
@@ -540,14 +882,25 @@ function renderPaymentReport() {
 
 function renderStudentReport() {
 
+    if (
+        !studentReportBody
+    ) {
+
+        return;
+
+    }
+
+
     const selectedStudents =
         getSelectedStudents();
+
 
     const selectedPayments =
         getSelectedPayments();
 
 
-    studentReportBody.innerHTML = "";
+    studentReportBody.innerHTML =
+        "";
 
 
     if (
@@ -556,104 +909,142 @@ function renderStudentReport() {
 
         studentReportBody.innerHTML = `
             <tr>
+
                 <td
                     colspan="6"
                     class="empty-state">
+
                     No students available.
+
                 </td>
+
             </tr>
         `;
 
         return;
+
     }
 
 
-    selectedStudents
-        .sort(
-            (a, b) =>
+    const sortedStudents =
+        [...selectedStudents];
+
+
+    sortedStudents.sort(
+        (
+            a,
+            b
+        ) =>
+            String(
+                a.studentNumber ||
+                ""
+            ).localeCompare(
                 String(
-                    a.studentNumber
-                ).localeCompare(
-                    String(
-                        b.studentNumber
-                    ),
-                    undefined,
-                    {
-                        numeric: true
-                    }
-                )
-        )
-        .forEach(
-            student => {
-
-                const studentPayments =
-                    selectedPayments.filter(
-                        payment =>
-                            payment.studentId ===
-                            student.id
-                    );
+                    b.studentNumber ||
+                    ""
+                ),
+                undefined,
+                {
+                    numeric:
+                        true
+                }
+            )
+    );
 
 
-                const totalPaid =
-                    studentPayments.reduce(
-                        (sum, payment) =>
-                            sum +
-                            Number(
-                                payment.amount
-                            ),
+    sortedStudents.forEach(
+        student => {
 
-                        0
-                    );
-
-
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
-
-
-                row.innerHTML = `
-                    <td>
-                        ${escapeHtml(
-                            student.studentNumber
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            student.name
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            student.stage
-                        )}
-                    </td>
-
-                    <td>
-                        ${escapeHtml(
-                            student.className
-                        )}
-                    </td>
-
-                    <td>
-                        ${studentPayments.length}
-                    </td>
-
-                    <td>
-                        ${formatAmount(
-                            totalPaid
-                        )}
-                    </td>
-                `;
-
-
-                studentReportBody.appendChild(
-                    row
+            const studentId =
+                String(
+                    student.id ||
+                    student.studentId ||
+                    ""
                 );
-            }
-        );
+
+
+            const studentPayments =
+                selectedPayments.filter(
+                    payment =>
+                        String(
+                            payment.studentId ||
+                            ""
+                        ) ===
+                        studentId
+                );
+
+
+            const totalPaid =
+                studentPayments.reduce(
+                    (
+                        sum,
+                        payment
+                    ) =>
+                        sum +
+                        Number(
+                            payment.amount ||
+                            0
+                        ),
+
+                    0
+                );
+
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            row.innerHTML = `
+                <td>
+                    ${escapeHtml(
+                        student.studentNumber ||
+                        ""
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        student.name ||
+                        ""
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        student.stage ||
+                        ""
+                    )}
+                </td>
+
+                <td>
+                    ${escapeHtml(
+                        student.className ||
+                        student.class ||
+                        ""
+                    )}
+                </td>
+
+                <td>
+                    ${studentPayments.length}
+                </td>
+
+                <td>
+                    ${formatAmount(
+                        totalPaid
+                    )}
+                </td>
+            `;
+
+
+            studentReportBody.appendChild(
+                row
+            );
+
+        }
+    );
+
 }
 
 
@@ -661,29 +1052,34 @@ function renderStudentReport() {
 // Escape HTML
 // =====================================================
 
-function escapeHtml(value) {
+function escapeHtml(
+    value
+) {
 
-    return String(value ?? "")
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
 }
 
 
@@ -698,6 +1094,159 @@ function refreshReports() {
     renderPaymentReport();
 
     renderStudentReport();
+
+}
+
+
+// =====================================================
+// Loading State
+// =====================================================
+
+function showLoading() {
+
+    if (
+        paymentReportBody
+    ) {
+
+        paymentReportBody.innerHTML = `
+            <tr>
+                <td
+                    colspan="4"
+                    class="empty-state">
+
+                    Loading reports...
+
+                </td>
+            </tr>
+        `;
+
+    }
+
+
+    if (
+        studentReportBody
+    ) {
+
+        studentReportBody.innerHTML = `
+            <tr>
+                <td
+                    colspan="6"
+                    class="empty-state">
+
+                    Loading reports...
+
+                </td>
+            </tr>
+        `;
+
+    }
+
+
+    if (
+        totalStudentsElement
+    ) {
+
+        totalStudentsElement.textContent =
+            "...";
+
+    }
+
+
+    if (
+        totalPaymentsElement
+    ) {
+
+        totalPaymentsElement.textContent =
+            "...";
+
+    }
+
+
+    if (
+        totalAmountElement
+    ) {
+
+        totalAmountElement.textContent =
+            "...";
+
+    }
+
+
+    if (
+        paidStudentsElement
+    ) {
+
+        paidStudentsElement.textContent =
+            "...";
+
+    }
+
+
+    if (
+        unpaidStudentsElement
+    ) {
+
+        unpaidStudentsElement.textContent =
+            "...";
+
+    }
+
+
+    if (
+        paidMonthsElement
+    ) {
+
+        paidMonthsElement.textContent =
+            "...";
+
+    }
+
+}
+
+
+// =====================================================
+// Error State
+// =====================================================
+
+function showError() {
+
+    if (
+        paymentReportBody
+    ) {
+
+        paymentReportBody.innerHTML = `
+            <tr>
+                <td
+                    colspan="4"
+                    class="empty-state">
+
+                    Failed to load reports.
+
+                </td>
+            </tr>
+        `;
+
+    }
+
+
+    if (
+        studentReportBody
+    ) {
+
+        studentReportBody.innerHTML = `
+            <tr>
+                <td
+                    colspan="6"
+                    class="empty-state">
+
+                    Failed to load reports.
+
+                </td>
+            </tr>
+        `;
+
+    }
+
 }
 
 
@@ -705,48 +1254,67 @@ function refreshReports() {
 // Academic Year Change
 // =====================================================
 
-academicYearFilter.addEventListener(
-    "change",
-    function () {
+if (
+    academicYearFilter
+) {
 
-        refreshReports();
-    }
-);
+    academicYearFilter.addEventListener(
+        "change",
+        function () {
+
+            refreshReports();
+
+        }
+    );
+
+}
 
 
 // =====================================================
 // Print / Save PDF
 // =====================================================
 
-printButton.addEventListener(
-    "click",
-    function () {
+if (
+    printButton
+) {
 
-        window.print();
-    }
-);
+    printButton.addEventListener(
+        "click",
+        function () {
+
+            window.print();
+
+        }
+    );
+
+}
 
 
 // =====================================================
 // Back
 // =====================================================
 
-backButton.addEventListener(
-    "click",
-    function () {
+if (
+    backButton
+) {
 
-        window.location.href =
-            `school.html?id=${encodeURIComponent(
-                institutionId
-            )}`;
-    }
-);
+    backButton.addEventListener(
+        "click",
+        function () {
+
+            window.location.href =
+                `school.html?id=${encodeURIComponent(
+                    institutionId
+                )}`;
+
+        }
+    );
+
+}
 
 
 // =====================================================
 // Initialize
 // =====================================================
 
-loadAcademicYears();
-
-refreshReports();
+loadReports();
