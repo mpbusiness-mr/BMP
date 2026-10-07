@@ -17,8 +17,8 @@ const SCHOOL_API_URL =
 // =====================================================
 
 const DEFAULT_LANG = "ar";
-const STORAGE_KEY_LANG = "bmp_lang";
-const STORAGE_KEY_USER = "bmp_user";
+const STORAGE_KEY_LANG = "bmpLanguage";
+const STORAGE_KEY_USER = "bmpCurrentUser";
 
 
 // =====================================================
@@ -115,32 +115,26 @@ function applyLanguage(language) {
     currentLanguage = language;
     localStorage.setItem(STORAGE_KEY_LANG, language);
 
-    // HTML direction
     document.documentElement.lang = language;
     document.documentElement.dir  = (language === "ar") ? "rtl" : "ltr";
 
-    // Body class (for font swap)
     document.body.classList.remove("lang-ar", "lang-fr", "lang-en");
     document.body.classList.add("lang-" + language);
 
-    // Text nodes
     document.querySelectorAll("[data-ar]").forEach(function (el) {
         const value = el.dataset[language];
         if (value !== undefined) el.textContent = value;
     });
 
-    // Placeholders
     document.querySelectorAll("[data-ar-placeholder]").forEach(function (el) {
         const value = el.dataset[language + "Placeholder"];
         if (value !== undefined) el.placeholder = value;
     });
 
-    // Active state on language switcher
     langButtons.forEach(function (btn) {
         btn.classList.toggle("active", btn.dataset.lang === language);
     });
 
-    // Reset button label if it's not currently loading
     if (loginButton && !loginButton.classList.contains("loading")) {
         const label = loginButton.querySelector(".btn-label");
         if (label) label.textContent = translations[language].login;
@@ -240,14 +234,12 @@ loginForm.addEventListener("submit", async function (event) {
 
     errorMessage.textContent = "";
 
-    // Validate fields
     if (!username || !password) {
         errorMessage.textContent =
             translations[currentLanguage].pleaseEnterCredentials;
         return;
     }
 
-    // Disable button + show spinner
     loginButton.disabled = true;
     loginButton.classList.add("loading");
 
@@ -256,7 +248,6 @@ loginForm.addEventListener("submit", async function (event) {
 
     try {
 
-        // ---- Same backend call as before ------------------
         const response = await fetch(SCHOOL_API_URL, {
             method: "POST",
             headers: {
@@ -275,7 +266,6 @@ loginForm.addEventListener("submit", async function (event) {
 
         const result = await response.json();
 
-        // Login failed
         if (!result || !result.success) {
             errorMessage.textContent =
                 (result && result.message)
@@ -288,7 +278,6 @@ loginForm.addEventListener("submit", async function (event) {
             return;
         }
 
-        // Validate user
         if (
             !result.user ||
             !result.user.institutionId ||
@@ -316,7 +305,6 @@ loginForm.addEventListener("submit", async function (event) {
             return;
         }
 
-        // ---- Same session structure as before -------------
         const authenticatedUser = {
             ...result.user,
             role: role,
@@ -328,7 +316,6 @@ loginForm.addEventListener("submit", async function (event) {
             JSON.stringify(authenticatedUser)
         );
 
-        // ---- Same redirect as before ----------------------
         window.location.href =
             "school.html?id=" +
             encodeURIComponent(authenticatedUser.institutionId);
