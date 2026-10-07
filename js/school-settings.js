@@ -1,6 +1,16 @@
 // =====================================================
 // BMP School Settings
 // =====================================================
+
+
+// =====================================================
+// API
+// =====================================================
+
+const API_URL =
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+
+
 // =====================================================
 // Authentication
 // =====================================================
@@ -9,9 +19,11 @@ const currentUser =
     requireSchoolLogin();
 
 if (!currentUser) {
+
     throw new Error(
         "School login required."
     );
+
 }
 
 
@@ -19,50 +31,11 @@ const institutionId =
     getActiveInstitutionId();
 
 if (!institutionId) {
+
     throw new Error(
         "Institution access denied."
     );
 
-// =====================================================
-// Get Institution ID
-// =====================================================
-
-
-
-
-// =====================================================
-// Storage
-// =====================================================
-
-let institutions =
-    JSON.parse(
-        localStorage.getItem(
-            "bmpInstitutions"
-        )
-    ) || [];
-
-
-// =====================================================
-// Find Institution
-// =====================================================
-
-const institution =
-    institutions.find(
-        item =>
-            item.id === institutionId
-    );
-
-
-// =====================================================
-// Check Institution
-// =====================================================
-
-if (!institution) {
-
-    alert("School not found.");
-
-    window.location.href =
-        "institutions.html";
 }
 
 
@@ -75,45 +48,54 @@ const institutionIdInput =
         "institutionId"
     );
 
+
 const schoolNameInput =
     document.getElementById(
         "schoolName"
     );
+
 
 const schoolPhoneInput =
     document.getElementById(
         "schoolPhone"
     );
 
+
 const schoolEmailInput =
     document.getElementById(
         "schoolEmail"
     );
+
 
 const academicYearInput =
     document.getElementById(
         "academicYear"
     );
 
+
 const monthlyFeeInput =
     document.getElementById(
         "monthlyFee"
     );
+
 
 const currencyInput =
     document.getElementById(
         "currency"
     );
 
+
 const saveButton =
     document.getElementById(
         "saveButton"
     );
 
+
 const backButton =
     document.getElementById(
         "backButton"
     );
+
 
 const message =
     document.getElementById(
@@ -130,62 +112,243 @@ function getCurrentAcademicYear() {
     const today =
         new Date();
 
+
     const month =
         today.getMonth() + 1;
+
 
     const year =
         today.getFullYear();
 
 
-    if (month >= 10) {
+    if (
+        month >= 10
+    ) {
 
-        return `${year}-${year + 1}`;
+        return (
+            `${year}-${year + 1}`
+        );
 
     }
 
-    return `${year - 1}-${year}`;
+
+    return (
+        `${year - 1}-${year}`
+    );
+
 }
 
 
 // =====================================================
-// Load Settings
+// Load Settings From Backend
 // =====================================================
 
-function loadSettings() {
+async function loadSettings() {
 
-    institutionIdInput.value =
-        institution.id || "";
+    try {
 
-
-    schoolNameInput.value =
-        institution.name || "";
-
-
-    schoolPhoneInput.value =
-        institution.phone || "";
+        showMessage(
+            "Loading settings...",
+            "info"
+        );
 
 
-    schoolEmailInput.value =
-        institution.email || "";
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                "getSchoolSettings",
+
+                            institutionId:
+                                institutionId,
+
+                            username:
+                                currentUser.username
+
+                        })
+                }
+            );
 
 
-    academicYearInput.value =
-        institution.academicYear ||
-        getCurrentAcademicYear();
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to connect to the server."
+            );
+
+        }
 
 
-    monthlyFeeInput.value =
-        institution.monthlyFee ??
-        "";
+        const result =
+            await response.json();
 
 
-    currencyInput.value =
-        institution.currency ||
-        "MRU";
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Failed to load school settings."
+            );
+
+        }
 
 
-    document.title =
-        `${institution.name} - School Settings`;
+        const settings =
+            result.settings ||
+            {};
+
+
+        // =============================================
+        // Institution ID
+        // =============================================
+
+        if (
+            institutionIdInput
+        ) {
+
+            institutionIdInput.value =
+                settings.institutionId ||
+                institutionId;
+
+        }
+
+
+        // =============================================
+        // School Name
+        // =============================================
+
+        if (
+            schoolNameInput
+        ) {
+
+            schoolNameInput.value =
+                settings.schoolName ||
+                "";
+
+        }
+
+
+        // =============================================
+        // Phone
+        // =============================================
+
+        if (
+            schoolPhoneInput
+        ) {
+
+            schoolPhoneInput.value =
+                settings.schoolPhone ||
+                "";
+
+        }
+
+
+        // =============================================
+        // Email
+        // =============================================
+
+        if (
+            schoolEmailInput
+        ) {
+
+            schoolEmailInput.value =
+                settings.schoolEmail ||
+                "";
+
+        }
+
+
+        // =============================================
+        // Academic Year
+        // =============================================
+
+        if (
+            academicYearInput
+        ) {
+
+            academicYearInput.value =
+                settings.academicYear ||
+                getCurrentAcademicYear();
+
+        }
+
+
+        // =============================================
+        // Monthly Fee
+        // =============================================
+
+        if (
+            monthlyFeeInput
+        ) {
+
+            monthlyFeeInput.value =
+                settings.monthlyFee !==
+                    undefined &&
+                settings.monthlyFee !==
+                    null
+                    ? settings.monthlyFee
+                    : "";
+
+        }
+
+
+        // =============================================
+        // Currency
+        // =============================================
+
+        if (
+            currencyInput
+        ) {
+
+            currencyInput.value =
+                settings.currency ||
+                "MRU";
+
+        }
+
+
+        // =============================================
+        // Browser Title
+        // =============================================
+
+        document.title =
+            `${settings.schoolName || "School"} - School Settings`;
+
+
+        // Clear loading message
+
+        clearMessage();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Settings loading error:",
+            error
+        );
+
+
+        showMessage(
+            error.message ||
+            "Failed to load school settings.",
+            "error"
+        );
+
+    }
+
 }
 
 
@@ -198,87 +361,136 @@ function showMessage(
     type
 ) {
 
+    if (!message) {
+
+        return;
+
+    }
+
+
     message.textContent =
         text;
+
 
     message.className =
         `message ${type}`;
 
 
-    setTimeout(
-        function () {
-
-            message.textContent =
-                "";
-
-            message.className =
-                "message";
-
-        },
-        3000
-    );
 }
 
 
 // =====================================================
-// Save Settings
+// Clear Message
 // =====================================================
 
-saveButton.addEventListener(
-    "click",
-    function () {
+function clearMessage() {
 
-        const schoolName =
-            schoolNameInput.value.trim();
+    if (!message) {
 
-        const schoolPhone =
-            schoolPhoneInput.value.trim();
+        return;
 
-        const schoolEmail =
-            schoolEmailInput.value.trim();
+    }
 
-        const academicYear =
-            academicYearInput.value.trim();
 
-        const monthlyFee =
+    message.textContent =
+        "";
+
+
+    message.className =
+        "message";
+
+}
+
+
+// =====================================================
+// Save Settings To Backend
+// =====================================================
+
+async function saveSettings() {
+
+    const schoolName =
+        schoolNameInput
+            ? schoolNameInput.value.trim()
+            : "";
+
+
+    const schoolPhone =
+        schoolPhoneInput
+            ? schoolPhoneInput.value.trim()
+            : "";
+
+
+    const schoolEmail =
+        schoolEmailInput
+            ? schoolEmailInput.value.trim()
+            : "";
+
+
+    const academicYear =
+        academicYearInput
+            ? academicYearInput.value.trim()
+            : "";
+
+
+    const monthlyFeeText =
+        monthlyFeeInput
+            ? monthlyFeeInput.value.trim()
+            : "";
+
+
+    const currency =
+        currencyInput
+            ? currencyInput.value.trim()
+            : "";
+
+
+    let monthlyFee =
+        0;
+
+
+    // =============================================
+    // Validation
+    // =============================================
+
+    if (!schoolName) {
+
+        showMessage(
+            "School name is required.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (!academicYear) {
+
+        showMessage(
+            "Academic year is required.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        monthlyFeeText !== ""
+    ) {
+
+        monthlyFee =
             Number(
-                monthlyFeeInput.value
+                monthlyFeeText
             );
-
-        const currency =
-            currencyInput.value.trim();
-
-
-        // Validation
-
-        if (!schoolName) {
-
-            showMessage(
-                "School name is required.",
-                "error"
-            );
-
-            return;
-        }
-
-
-        if (!academicYear) {
-
-            showMessage(
-                "Academic year is required.",
-                "error"
-            );
-
-            return;
-        }
 
 
         if (
-            monthlyFeeInput.value !== "" &&
-            (
-                Number.isNaN(monthlyFee) ||
-                monthlyFee < 0
-            )
+            Number.isNaN(
+                monthlyFee
+            ) ||
+            monthlyFee < 0
         ) {
 
             showMessage(
@@ -287,85 +499,297 @@ saveButton.addEventListener(
             );
 
             return;
+
         }
 
-
-        if (!currency) {
-
-            showMessage(
-                "Currency is required.",
-                "error"
-            );
-
-            return;
-        }
+    }
 
 
-        // Update institution
+    if (!currency) {
 
-        institution.name =
-            schoolName;
-
-        institution.phone =
-            schoolPhone;
-
-        institution.email =
-            schoolEmail;
-
-        institution.academicYear =
-            academicYear;
-
-        institution.monthlyFee =
-            monthlyFeeInput.value === ""
-                ? 0
-                : monthlyFee;
-
-        institution.currency =
-            currency;
-
-
-        institution.updatedAt =
-            new Date().toISOString();
-
-
-        // Save
-
-        localStorage.setItem(
-            "bmpInstitutions",
-            JSON.stringify(
-                institutions
-            )
+        showMessage(
+            "Currency is required.",
+            "error"
         );
 
+        return;
 
-        // Update title
+    }
+
+
+    // =============================================
+    // Disable Button
+    // =============================================
+
+    if (
+        saveButton
+    ) {
+
+        saveButton.disabled =
+            true;
+
+    }
+
+
+    showMessage(
+        "Saving settings...",
+        "info"
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                "updateSchoolSettings",
+
+                            institutionId:
+                                institutionId,
+
+                            username:
+                                currentUser.username,
+
+                            schoolName:
+                                schoolName,
+
+                            schoolPhone:
+                                schoolPhone,
+
+                            schoolEmail:
+                                schoolEmail,
+
+                            academicYear:
+                                academicYear,
+
+                            monthlyFee:
+                                monthlyFee,
+
+                            currency:
+                                currency
+
+                        })
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to connect to the server."
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Failed to save settings."
+            );
+
+        }
+
+
+        const settings =
+            result.settings ||
+            {};
+
+
+        // =============================================
+        // Update Fields With Saved Values
+        // =============================================
+
+        if (
+            institutionIdInput
+        ) {
+
+            institutionIdInput.value =
+                settings.institutionId ||
+                institutionId;
+
+        }
+
+
+        if (
+            schoolNameInput
+        ) {
+
+            schoolNameInput.value =
+                settings.schoolName ||
+                schoolName;
+
+        }
+
+
+        if (
+            schoolPhoneInput
+        ) {
+
+            schoolPhoneInput.value =
+                settings.schoolPhone ||
+                schoolPhone;
+
+        }
+
+
+        if (
+            schoolEmailInput
+        ) {
+
+            schoolEmailInput.value =
+                settings.schoolEmail ||
+                schoolEmail;
+
+        }
+
+
+        if (
+            academicYearInput
+        ) {
+
+            academicYearInput.value =
+                settings.academicYear ||
+                academicYear;
+
+        }
+
+
+        if (
+            monthlyFeeInput
+        ) {
+
+            monthlyFeeInput.value =
+                settings.monthlyFee ??
+                monthlyFee;
+
+        }
+
+
+        if (
+            currencyInput
+        ) {
+
+            currencyInput.value =
+                settings.currency ||
+                currency;
+
+        }
+
 
         document.title =
-            `${institution.name} - School Settings`;
+            `${settings.schoolName || schoolName} - School Settings`;
 
 
         showMessage(
+            result.message ||
             "Settings saved successfully.",
             "success"
         );
+
+
+        setTimeout(
+            function () {
+
+                clearMessage();
+
+            },
+            3000
+        );
+
     }
-);
+
+    catch (error) {
+
+        console.error(
+            "Settings save error:",
+            error
+        );
+
+
+        showMessage(
+            error.message ||
+            "Failed to save settings.",
+            "error"
+        );
+
+    }
+
+    finally {
+
+        if (
+            saveButton
+        ) {
+
+            saveButton.disabled =
+                false;
+
+        }
+
+    }
+
+}
+
+
+// =====================================================
+// Save Button
+// =====================================================
+
+if (
+    saveButton
+) {
+
+    saveButton.addEventListener(
+        "click",
+        function () {
+
+            saveSettings();
+
+        }
+    );
+
+}
 
 
 // =====================================================
 // Back
 // =====================================================
 
-backButton.addEventListener(
-    "click",
-    function () {
+if (
+    backButton
+) {
 
-        window.location.href =
-            `school.html?id=${encodeURIComponent(
-                institutionId
-            )}`;
-    }
-);
+    backButton.addEventListener(
+        "click",
+        function () {
+
+            window.location.href =
+                `school.html?id=${encodeURIComponent(
+                    institutionId
+                )}`;
+
+        }
+    );
+
+}
 
 
 // =====================================================
