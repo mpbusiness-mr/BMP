@@ -124,6 +124,9 @@ const TRANSLATIONS = {
         class:
             "Class",
 
+        printReceipt:
+            "Print Receipt",
+
         primary:
             "Primary",
 
@@ -299,6 +302,9 @@ const TRANSLATIONS = {
         class:
             "القسم",
 
+        printReceipt:
+            "طباعة الإيصال",
+
         primary:
             "الابتدائية",
 
@@ -473,6 +479,9 @@ const TRANSLATIONS = {
 
         class:
             "Classe",
+
+        printReceipt:
+            "Imprimer le reçu",
 
         primary:
             "Primaire",
@@ -3592,35 +3601,1141 @@ function showPaymentDetails(
 
         </div>
 
+
+        <div
+            style="
+                margin-top:20px;
+                display:flex;
+                justify-content:center;
+                gap:10px;
+                flex-wrap:wrap;
+            ">
+
+            <button
+                type="button"
+                id="printPaymentReceiptBtn"
+                class="primary-button">
+
+                ${escapeHtml(
+                    t("printReceipt")
+                )}
+
+            </button>
+
+        </div>
+
     `;
 
 
     modal.style.display =
         "block";
 
-}
 
-
-/* =================================
-   Close Modal
-   ================================= */
-
-function closePaymentDetails() {
-
-    const modal =
+    const printButton =
         document.getElementById(
-            "paymentDetailsModal"
+            "printPaymentReceiptBtn"
         );
 
 
     if (
-        modal
+        printButton
     ) {
 
-        modal.style.display =
-            "none";
+        printButton.addEventListener(
+            "click",
+            function () {
+
+                printPaymentReceipt(
+                    payment
+                );
+
+            }
+        );
 
     }
+
+}
+
+
+/* =================================
+   Print Payment Receipt
+   ================================= */
+
+async function printPaymentReceipt(
+    payment
+) {
+
+    try {
+
+        closePaymentDetails();
+
+
+        /*
+         * Read school information.
+         *
+         * If the school settings endpoint
+         * is unavailable, fall back to the
+         * authenticated user session.
+         */
+
+        let schoolSettings = {};
+
+
+        try {
+
+            const settingsResult =
+                await apiRequest(
+                    "getSchoolSettings"
+                );
+
+
+            schoolSettings =
+                settingsResult.settings ||
+                settingsResult.schoolSettings ||
+                settingsResult.institution ||
+                {};
+
+        } catch (error) {
+
+            console.warn(
+                "School settings could not be loaded:",
+                error
+            );
+
+        }
+
+
+        const schoolName =
+            schoolSettings.name ||
+            schoolSettings.schoolName ||
+            currentUser?.institutionName ||
+            currentUser?.schoolName ||
+            institutionId ||
+            "School";
+
+
+        const schoolPhone =
+            schoolSettings.phone ||
+            schoolSettings.phoneNumber ||
+            "";
+
+
+        const schoolAddress =
+            schoolSettings.address ||
+            "";
+
+
+        const schoolEmail =
+            schoolSettings.email ||
+            "";
+
+
+        const schoolLogo =
+            schoolSettings.logo ||
+            schoolSettings.logoUrl ||
+            currentUser?.logo ||
+            "";
+
+
+        const student =
+            findStudentForPayment(
+                payment
+            );
+
+
+        const studentName =
+            getPaymentStudentName(
+                payment
+            ) ||
+            student?.name ||
+            "-";
+
+
+        const studentNumber =
+            getPaymentStudentNumber(
+                payment
+            ) ||
+            student?.studentNumber ||
+            "-";
+
+
+        const academicYear =
+            getPaymentAcademicYear(
+                payment
+            ) ||
+            "-";
+
+
+        const stage =
+            formatStage(
+                getStageForPayment(
+                    payment
+                )
+            );
+
+
+        const className =
+            student?.className ||
+            student?.class ||
+            student?.classNumber ||
+            "-";
+
+
+        const paidMonth =
+            formatMonth(
+                getPaymentMonth(
+                    payment
+                )
+            );
+
+
+        const paymentAmount =
+            getPaymentAmount(
+                payment
+            );
+
+
+        const paidDate =
+            getPaymentDate(
+                payment
+            ) ||
+            "-";
+
+
+        const receiptNumber =
+            getReceiptNumber(
+                payment
+            ) ||
+            "-";
+
+
+        const recordedBy =
+            getRecordedBy(
+                payment
+            ) ||
+            "-";
+
+
+        const notes =
+            String(
+                payment.notes ||
+                ""
+            ).trim();
+
+
+        /*
+         * Remove any previous print
+         * container.
+         */
+
+        const oldPrintArea =
+            document.getElementById(
+                "bmpPrintReceipt"
+            );
+
+
+        if (
+            oldPrintArea
+        ) {
+
+            oldPrintArea.remove();
+
+        }
+
+
+        /*
+         * Create receipt print area.
+         */
+
+        const printArea =
+            document.createElement(
+                "div"
+            );
+
+
+        printArea.id =
+            "bmpPrintReceipt";
+
+
+        printArea.innerHTML = `
+
+            ${
+                schoolLogo
+                    ? `
+                    <div class="bmp-receipt-logo">
+
+                        <img
+                            src="${escapeHtml(
+                                schoolLogo
+                            )}"
+                            alt="School Logo">
+
+                    </div>
+                    `
+                    : ""
+            }
+
+
+            <div class="bmp-receipt-school">
+
+                <h1>
+                    ${escapeHtml(
+                        schoolName
+                    )}
+                </h1>
+
+
+                <div class="bmp-receipt-subtitle">
+
+                    ${escapeHtml(
+                        getReceiptTitle()
+                    )}
+
+                </div>
+
+
+                ${
+                    schoolPhone
+                        ? `
+                        <div class="bmp-receipt-school-detail">
+                            ${escapeHtml(
+                                schoolPhone
+                            )}
+                        </div>
+                        `
+                        : ""
+                }
+
+
+                ${
+                    schoolAddress
+                        ? `
+                        <div class="bmp-receipt-school-detail">
+                            ${escapeHtml(
+                                schoolAddress
+                            )}
+                        </div>
+                        `
+                        : ""
+                }
+
+
+                ${
+                    schoolEmail
+                        ? `
+                        <div class="bmp-receipt-school-detail">
+                            ${escapeHtml(
+                                schoolEmail
+                            )}
+                        </div>
+                        `
+                        : ""
+                }
+
+            </div>
+
+
+            <div class="bmp-receipt-divider">
+                --------------------------------
+            </div>
+
+
+            <div class="bmp-receipt-receipt-number">
+
+                <span>
+                    ${escapeHtml(
+                        t("receiptNumber")
+                    )}
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        receiptNumber
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="bmp-receipt-divider">
+                --------------------------------
+            </div>
+
+
+            <div class="bmp-receipt-row">
+
+                <span>
+                    ${escapeHtml(
+                        t("studentName")
+                    )}
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        studentName
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="bmp-receipt-row">
+
+                <span>
+                    ${escapeHtml(
+                        t("studentNumber")
+                    )}
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        studentNumber
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="bmp-receipt-row">
+
+                <span>
+                    ${escapeHtml(
+                        t("academicYear")
+                    )}
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        academicYear
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="bmp-receipt-row">
+
+                <span>
+                    ${escapeHtml(
+                        t("stage")
+                    )}
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        stage
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="bmp-receipt-row">
+
+                <span>
+                    ${escapeHtml(
+                        t("class")
+                    )}
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        className
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="bmp-receipt-divider">
+                --------------------------------
+            </div>
+
+
+            <div class="bmp-receipt-row">
+
+                <span>
+                    ${escapeHtml(
+                        t("month")
+                    )}
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        paidMonth
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="bmp-receipt-amount">
+
+                <span>
+                    ${escapeHtml(
+                        t("amount")
+                    )}
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        paymentAmount.toLocaleString()
+                    )}
+                    MRU
+                </strong>
+
+            </div>
+
+
+            <div class="bmp-receipt-row">
+
+                <span>
+                    ${escapeHtml(
+                        t("paymentDate")
+                    )}
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        formatReceiptDate(
+                            paidDate
+                        )
+                    )}
+                </strong>
+
+            </div>
+
+
+            <div class="bmp-receipt-row">
+
+                <span>
+                    ${escapeHtml(
+                        t("recordedBy")
+                    )}
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        recordedBy
+                    )}
+                </strong>
+
+            </div>
+
+
+            ${
+                notes
+                    ? `
+                    <div class="bmp-receipt-notes">
+
+                        <strong>
+                            ${escapeHtml(
+                                t("notes")
+                            )}
+                        </strong>
+
+                        <div>
+                            ${escapeHtml(
+                                notes
+                            )}
+                        </div>
+
+                    </div>
+                    `
+                    : ""
+            }
+
+
+            <div class="bmp-receipt-divider">
+                --------------------------------
+            </div>
+
+
+            <div class="bmp-receipt-thanks">
+
+                ${escapeHtml(
+                    getReceiptThankYou()
+                )}
+
+            </div>
+
+
+            <div class="bmp-receipt-footer">
+
+                BMP - Business Management Platform
+
+            </div>
+
+        `;
+
+
+        document.body.appendChild(
+            printArea
+        );
+
+
+        addReceiptPrintStyles();
+
+
+        /*
+         * Remove print area after printing.
+         */
+
+        const cleanupReceipt =
+            function () {
+
+                const currentPrintArea =
+                    document.getElementById(
+                        "bmpPrintReceipt"
+                    );
+
+
+                if (
+                    currentPrintArea
+                ) {
+
+                    currentPrintArea.remove();
+
+                }
+
+            };
+
+
+        window.addEventListener(
+            "afterprint",
+            cleanupReceipt,
+            {
+                once:
+                    true
+            }
+        );
+
+
+        /*
+         * Give the browser a moment to
+         * render the receipt before opening
+         * the print dialog.
+         */
+
+        setTimeout(
+            function () {
+
+                window.print();
+
+            },
+            150
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Receipt printing error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Failed to prepare receipt."
+        );
+
+    }
+
+}
+
+
+/* =================================
+   Receipt Print Styles
+   ================================= */
+
+function addReceiptPrintStyles() {
+
+    let style =
+        document.getElementById(
+            "bmpReceiptPrintStyles"
+        );
+
+
+    if (
+        style
+    ) {
+
+        return;
+
+    }
+
+
+    style =
+        document.createElement(
+            "style"
+        );
+
+
+    style.id =
+        "bmpReceiptPrintStyles";
+
+
+    style.textContent = `
+
+        #bmpPrintReceipt {
+
+            display:
+                none;
+
+        }
+
+
+        @media print {
+
+            @page {
+
+                size:
+                    80mm auto;
+
+                margin:
+                    4mm;
+
+            }
+
+
+            html,
+            body {
+
+                margin:
+                    0 !important;
+
+                padding:
+                    0 !important;
+
+            }
+
+
+            body > * {
+
+                display:
+                    none !important;
+
+            }
+
+
+            #bmpPrintReceipt {
+
+                display:
+                    block !important;
+
+                width:
+                    72mm;
+
+                max-width:
+                    72mm;
+
+                margin:
+                    0 auto;
+
+                padding:
+                    0;
+
+                background:
+                    #ffffff;
+
+                color:
+                    #000000;
+
+                font-family:
+                    Arial,
+                    Helvetica,
+                    sans-serif;
+
+                font-size:
+                    11px;
+
+                line-height:
+                    1.45;
+
+            }
+
+
+            .bmp-receipt-logo {
+
+                text-align:
+                    center;
+
+                margin-bottom:
+                    7px;
+
+            }
+
+
+            .bmp-receipt-logo img {
+
+                max-width:
+                    45mm;
+
+                max-height:
+                    22mm;
+
+                object-fit:
+                    contain;
+
+            }
+
+
+            .bmp-receipt-school {
+
+                text-align:
+                    center;
+
+            }
+
+
+            .bmp-receipt-school h1 {
+
+                margin:
+                    0 0 4px;
+
+                font-size:
+                    17px;
+
+                line-height:
+                    1.2;
+
+            }
+
+
+            .bmp-receipt-subtitle {
+
+                font-size:
+                    12px;
+
+                font-weight:
+                    700;
+
+                margin-bottom:
+                    5px;
+
+            }
+
+
+            .bmp-receipt-school-detail {
+
+                font-size:
+                    9px;
+
+                line-height:
+                    1.35;
+
+                word-break:
+                    break-word;
+
+            }
+
+
+            .bmp-receipt-divider {
+
+                text-align:
+                    center;
+
+                margin:
+                    7px 0;
+
+                font-family:
+                    "Courier New",
+                    monospace;
+
+                white-space:
+                    nowrap;
+
+                overflow:
+                    hidden;
+
+            }
+
+
+            .bmp-receipt-receipt-number {
+
+                display:
+                    flex;
+
+                justify-content:
+                    space-between;
+
+                align-items:
+                    flex-start;
+
+                gap:
+                    8px;
+
+                font-size:
+                    11px;
+
+            }
+
+
+            .bmp-receipt-receipt-number strong {
+
+                text-align:
+                    right;
+
+                max-width:
+                    55%;
+
+                word-break:
+                    break-word;
+
+            }
+
+
+            .bmp-receipt-row {
+
+                display:
+                    flex;
+
+                justify-content:
+                    space-between;
+
+                align-items:
+                    flex-start;
+
+                gap:
+                    10px;
+
+                margin:
+                    4px 0;
+
+            }
+
+
+            .bmp-receipt-row span {
+
+                text-align:
+                    left;
+
+            }
+
+
+            .bmp-receipt-row strong {
+
+                text-align:
+                    right;
+
+                max-width:
+                    52%;
+
+                word-break:
+                    break-word;
+
+            }
+
+
+            .bmp-receipt-amount {
+
+                display:
+                    flex;
+
+                justify-content:
+                    space-between;
+
+                align-items:
+                    center;
+
+                gap:
+                    10px;
+
+                margin:
+                    9px 0;
+
+                padding:
+                    7px 0;
+
+                border-top:
+                    1px solid #000;
+
+                border-bottom:
+                    1px solid #000;
+
+                font-size:
+                    13px;
+
+            }
+
+
+            .bmp-receipt-amount strong {
+
+                font-size:
+                    15px;
+
+                text-align:
+                    right;
+
+            }
+
+
+            .bmp-receipt-notes {
+
+                margin-top:
+                    7px;
+
+                padding-top:
+                    5px;
+
+                border-top:
+                    1px dashed #000;
+
+            }
+
+
+            .bmp-receipt-notes > div {
+
+                margin-top:
+                    3px;
+
+                white-space:
+                    pre-wrap;
+
+                word-break:
+                    break-word;
+
+            }
+
+
+            .bmp-receipt-thanks {
+
+                text-align:
+                    center;
+
+                margin-top:
+                    8px;
+
+                font-weight:
+                    600;
+
+            }
+
+
+            .bmp-receipt-footer {
+
+                text-align:
+                    center;
+
+                margin-top:
+                    8px;
+
+                font-size:
+                    8px;
+
+            }
+
+        }
+
+    `;
+
+
+    document.head.appendChild(
+        style
+    );
+
+}
+
+
+/* =================================
+   Receipt Title
+   ================================= */
+
+function getReceiptTitle() {
+
+    const titles = {
+
+        en:
+            "Official Payment Receipt",
+
+        ar:
+            "إيصال دفع رسمي",
+
+        fr:
+            "Reçu de paiement officiel"
+
+    };
+
+
+    return (
+        titles[currentLanguage] ||
+        titles.en
+    );
+
+}
+
+
+/* =================================
+   Receipt Thank You
+   ================================= */
+
+function getReceiptThankYou() {
+
+    const messages = {
+
+        en:
+            "Thank you for your payment.",
+
+        ar:
+            "شكراً لكم على الدفع.",
+
+        fr:
+            "Merci pour votre paiement."
+
+    };
+
+
+    return (
+        messages[currentLanguage] ||
+        messages.en
+    );
+
+}
+
+
+/* =================================
+   Receipt Date
+   ================================= */
+
+function formatReceiptDate(
+    value
+) {
+
+    if (!value) {
+
+        return "-";
+
+    }
+
+
+    const parsed =
+        new Date(
+            value
+        );
+
+
+    if (
+        Number.isNaN(
+            parsed.getTime()
+        )
+    ) {
+
+        return String(
+            value
+        );
+
+    }
+
+
+    return parsed.toLocaleDateString(
+        currentLanguage === "ar"
+            ? "ar"
+            : currentLanguage === "fr"
+                ? "fr-FR"
+                : "en-GB"
+    );
 
 }
 
