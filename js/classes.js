@@ -1,6 +1,16 @@
 // =====================================================
 // BMP Classes & Stages
 // =====================================================
+
+
+// =====================================================
+// API
+// =====================================================
+
+const API_URL =
+    "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+
+
 // =====================================================
 // Authentication
 // =====================================================
@@ -9,9 +19,11 @@ const currentUser =
     requireSchoolLogin();
 
 if (!currentUser) {
+
     throw new Error(
         "School login required."
     );
+
 }
 
 
@@ -19,44 +31,12 @@ const institutionId =
     getActiveInstitutionId();
 
 if (!institutionId) {
+
     throw new Error(
         "Institution access denied."
     );
 
-// =====================================================
-// Get Institution ID
-// =====================================================
-
-const urlParams =
-    new URLSearchParams(
-        window.location.search
-    );
-
-const institutionId =
-    urlParams.get("id");
-
-
-// =====================================================
-// Get Institutions
-// =====================================================
-
-const institutions =
-    JSON.parse(
-        localStorage.getItem(
-            "bmpInstitutions"
-        )
-    ) || [];
-
-
-// =====================================================
-// Find Institution
-// =====================================================
-
-const institution =
-    institutions.find(
-        item =>
-            item.id === institutionId
-    );
+}
 
 
 // =====================================================
@@ -95,39 +75,165 @@ const backButton =
 
 
 // =====================================================
-// Check Institution
+// Load Classes
 // =====================================================
 
-if (!institution) {
+async function loadClasses() {
 
-    alert("School not found.");
+    try {
 
-    window.location.href =
-        "institutions.html";
+        showLoading(
+            primaryClasses
+        );
 
-} else {
+        showLoading(
+            preparatoryClasses
+        );
 
-    initializeClasses();
-}
-
-
-// =====================================================
-// Initialize
-// =====================================================
-
-function initializeClasses() {
-
-    institutionIdElement.textContent =
-        institution.id || "-";
-
-    institutionNameElement.textContent =
-        institution.name || "-";
-
-    document.title =
-        `${institution.name} - Classes & Stages`;
+        showLoading(
+            secondaryClasses
+        );
 
 
-    renderClasses();
+        const response =
+            await fetch(
+                API_URL,
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            action:
+                                "getClasses",
+
+                            institutionId:
+                                institutionId,
+
+                            username:
+                                currentUser.username
+
+                        })
+                }
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Unable to connect to the server."
+            );
+
+        }
+
+
+        const result =
+            await response.json();
+
+
+        if (!result.success) {
+
+            throw new Error(
+                result.message ||
+                "Failed to load classes."
+            );
+
+        }
+
+
+        // =============================================
+        // Institution
+        // =============================================
+
+        if (
+            institutionIdElement
+        ) {
+
+            institutionIdElement.textContent =
+                result.institution &&
+                result.institution.id
+                    ? result.institution.id
+                    : institutionId;
+
+        }
+
+
+        if (
+            institutionNameElement
+        ) {
+
+            institutionNameElement.textContent =
+                result.institution &&
+                result.institution.name
+                    ? result.institution.name
+                    : "-";
+
+        }
+
+
+        // =============================================
+        // Classes
+        // =============================================
+
+        const classes =
+            Array.isArray(
+                result.classes
+            )
+                ? result.classes
+                : [];
+
+
+        renderClasses(
+            classes
+        );
+
+
+        if (
+            result.institution &&
+            result.institution.name
+        ) {
+
+            document.title =
+                `${result.institution.name} - Classes & Stages`;
+
+        }
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Classes loading error:",
+            error
+        );
+
+
+        showError(
+            primaryClasses
+        );
+
+        showError(
+            preparatoryClasses
+        );
+
+        showError(
+            secondaryClasses
+        );
+
+
+        alert(
+            error.message ||
+            "Failed to load classes."
+        );
+
+    }
+
 }
 
 
@@ -135,30 +241,57 @@ function initializeClasses() {
 // Render Classes
 // =====================================================
 
-function renderClasses() {
+function renderClasses(
+    classes
+) {
+
+    const primary =
+        classes.filter(
+            item =>
+                String(
+                    item.stage || ""
+                ).toLowerCase() ===
+                "primary"
+        );
+
+
+    const preparatory =
+        classes.filter(
+            item =>
+                String(
+                    item.stage || ""
+                ).toLowerCase() ===
+                "preparatory"
+        );
+
+
+    const secondary =
+        classes.filter(
+            item =>
+                String(
+                    item.stage || ""
+                ).toLowerCase() ===
+                "secondary"
+        );
+
 
     renderStageClasses(
         primaryClasses,
-        "A",
-        "Primary Class",
-        6
+        primary
     );
 
 
     renderStageClasses(
         preparatoryClasses,
-        "B",
-        "Preparatory Class",
-        4
+        preparatory
     );
 
 
     renderStageClasses(
         secondaryClasses,
-        "C",
-        "Secondary Class",
-        3
+        secondary
     );
+
 }
 
 
@@ -168,48 +301,36 @@ function renderClasses() {
 
 function renderStageClasses(
     container,
-    stageLetter,
-    classPrefix,
-    numberOfClasses
+    classes
 ) {
 
-    container.innerHTML = "";
+    if (!container) {
+
+        return;
+
+    }
 
 
-    for (
-        let classNumber = 1;
-        classNumber <= numberOfClasses;
-        classNumber++
+    container.innerHTML =
+        "";
+
+
+    if (
+        !classes ||
+        classes.length === 0
     ) {
 
-        const classCode =
-            `${stageLetter}${classNumber}`;
+        container.innerHTML = `
+            <div class="class-item">
 
+                <div class="class-info">
 
-        const classItem =
-            document.createElement(
-                "div"
-            );
+                    <div>
 
-        classItem.className =
-            "class-item";
+                        <div class="class-name">
+                            No classes found.
+                        </div>
 
-
-        classItem.innerHTML = `
-            <div class="class-info">
-
-                <span class="class-number">
-                    ${classNumber}
-                </span>
-
-                <div>
-
-                    <div class="class-name">
-                        ${classPrefix} ${classNumber}
-                    </div>
-
-                    <div class="class-code">
-                        Code: ${classCode}
                     </div>
 
                 </div>
@@ -217,11 +338,203 @@ function renderStageClasses(
             </div>
         `;
 
+        return;
 
-        container.appendChild(
-            classItem
-        );
     }
+
+
+    classes.sort(
+        (
+            a,
+            b
+        ) =>
+            Number(
+                a.classNumber || 0
+            ) -
+            Number(
+                b.classNumber || 0
+            )
+    );
+
+
+    classes.forEach(
+        item => {
+
+            const classNumber =
+                String(
+                    item.classNumber ||
+                    ""
+                );
+
+
+            const className =
+                String(
+                    item.className ||
+                    ""
+                );
+
+
+            const classCode =
+                String(
+                    item.classCode ||
+                    ""
+                );
+
+
+            const classItem =
+                document.createElement(
+                    "div"
+                );
+
+
+            classItem.className =
+                "class-item";
+
+
+            classItem.innerHTML = `
+                <div class="class-info">
+
+                    <span class="class-number">
+                        ${escapeHtml(
+                            classNumber
+                        )}
+                    </span>
+
+                    <div>
+
+                        <div class="class-name">
+                            ${escapeHtml(
+                                className
+                            )}
+                        </div>
+
+                        <div class="class-code">
+                            Code:
+                            ${escapeHtml(
+                                classCode
+                            )}
+                        </div>
+
+                    </div>
+
+                </div>
+            `;
+
+
+            container.appendChild(
+                classItem
+            );
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// Loading
+// =====================================================
+
+function showLoading(
+    container
+) {
+
+    if (!container) {
+
+        return;
+
+    }
+
+
+    container.innerHTML = `
+        <div class="class-item">
+
+            <div class="class-info">
+
+                <div>
+
+                    <div class="class-name">
+                        Loading...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+}
+
+
+// =====================================================
+// Error
+// =====================================================
+
+function showError(
+    container
+) {
+
+    if (!container) {
+
+        return;
+
+    }
+
+
+    container.innerHTML = `
+        <div class="class-item">
+
+            <div class="class-info">
+
+                <div>
+
+                    <div class="class-name">
+                        Failed to load classes.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+}
+
+
+// =====================================================
+// Escape HTML
+// =====================================================
+
+function escapeHtml(
+    value
+) {
+
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
 }
 
 
@@ -229,13 +542,27 @@ function renderStageClasses(
 // Back
 // =====================================================
 
-backButton.addEventListener(
-    "click",
-    function () {
+if (
+    backButton
+) {
 
-        window.location.href =
-            `school.html?id=${encodeURIComponent(
-                institutionId
-            )}`;
-    }
-);
+    backButton.addEventListener(
+        "click",
+        function () {
+
+            window.location.href =
+                `school.html?id=${encodeURIComponent(
+                    institutionId
+                )}`;
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// Initialize
+// =====================================================
+
+loadClasses();
