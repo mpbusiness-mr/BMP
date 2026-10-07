@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BMP · منصة إدارة الأعمال | Business Management Platform</title>
+  <!-- Google Fonts for modern Arabic + Latin typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 (free icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ---------- RESET & GLOBAL ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #0f2b4b;        /* deep navy */
+      --primary-light: #1a3f66;
+      --accent: #00b4d8;         /* vibrant cyan */
+      --accent-soft: #e6f7fd;
+      --gold: #f4c542;
+      --gray-bg: #f9fbfd;
+      --text-dark: #0b1a2a;
+      --text-muted: #3e5a76;
+      --white: #ffffff;
+      --shadow-sm: 0 8px 20px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 16px 40px rgba(0, 20, 40, 0.08);
+      --shadow-lg: 0 30px 60px rgba(0, 30, 60, 0.12);
+      --radius: 24px;
+      --radius-sm: 14px;
+      --transition: all 0.25s ease;
+    }
+
+    body {
+      font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
+      background-color: var(--gray-bg);
+      color: var(--text-dark);
+      line-height: 1.6;
+      font-weight: 400;
+      scroll-behavior: smooth;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    section {
+      padding: 80px 0;
+    }
+
+    /* ---------- TYPOGRAPHY ---------- */
+    h1, h2, h3, h4 {
+      font-weight: 600;
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+    }
+
+    h2.section-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 20px;
+      position: relative;
+      display: inline-block;
+    }
+
+    h2.section-title i {
+      color: var(--accent);
+      margin-left: 8px;
+    }
+
+    .section-subtitle {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 700px;
+      margin-bottom: 48px;
+      font-weight: 400;
+    }
+
+    /* ---------- BUTTONS & BADGES ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--primary);
+      color: var(--white);
+      padding: 14px 34px;
+      border-radius: 60px;
+      font-weight: 600;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: var(--transition);
+      border: 1px solid transparent;
+      box-shadow: var(--shadow-sm);
+      cursor: pointer;
+    }
+
+    .btn i {
+      font-size: 1.1rem;
+    }
+
+    .btn:hover {
+      background: var(--primary-light);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 1.5px solid var(--primary);
+      box-shadow: none;
+    }
+
+    .btn-outline:hover {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: var(--primary);
+      font-weight: 600;
+      font-size: 0.85rem;
+      padding: 6px 16px;
+      border-radius: 40px;
+      letter-spacing: 0.3px;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      border: 1px solid rgba(0, 180, 216, 0.2);
+    }
+
+    /* ---------- HEADER / NAV ---------- */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.02);
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .navbar .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.8rem;
+      letter-spacing: -0.5px;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .logo i {
+      color: var(--accent);
+      font-size: 2rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-dark);
+      font-weight: 500;
+      font-size: 1rem;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      right: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: var(--transition);
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .nav-cta {
+      background: var(--primary);
+      color: var(--white) !important;
+      padding: 10px 24px !important;
+      border-radius: 40px;
+    }
+
+    .nav-cta::after {
+      display: none;
+    }
+
+    /* ---------- HERO ---------- */
+    .hero {
+      padding: 60px 0 80px;
+      background: linear-gradient(145deg, #ffffff 0%, #f2f8fe 100%);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .hero-content h1 {
+      font-size: 3.8rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1.2;
+      margin-bottom: 24px;
+      letter-spacing: -1px;
+    }
+
+    .hero-content h1 span {
+      color: var(--accent);
+      background: linear-gradient(135deg, var(--accent) 0%, #0077b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-content p {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      margin-bottom: 36px;
+      max-width: 550px;
+      font-weight: 400;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 48px;
+      margin-top: 56px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    .stat-item h3 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--primary);
+      line-height: 1.2;
+    }
+
+    .stat-item p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .hero-visual {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 40px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(0, 0, 0, 0.02);
+      transform: perspective(1200px) rotateY(-2deg) rotateX(2deg);
+      transition: var(--transition);
+    }
+
+    .hero-visual:hover {
+      transform: perspective(1200px) rotateY(0deg) rotateX(0deg);
+    }
+
+    .mockup-header {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .mockup-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ddd;
+    }
+
+    .mockup-dot:nth-child(1) { background: #ff5f56; }
+    .mockup-dot:nth-child(2) { background: #ffbd2e; }
+    .mockup-dot:nth-child(3) { background: #27c93f; }
+
+    .mockup-card {
+      background: #f8fafc;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      border-right: 4px solid var(--accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .mockup-card i {
+      font-size: 1.5rem;
+      color: var(--accent);
+      width: 40px;
+    }
+
+    .mockup-card div {
+      flex: 1;
+      padding-right: 14px;
+    }
+
+    .mockup-card h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .mockup-card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    /* ---------- SECTION HEADERS ---------- */
+    .section-header {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 60px;
+    }
+
+    .section-header .section-title {
+      margin-bottom: 16px;
+    }
+
+    .section-header .section-subtitle {
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 0;
+    }
+
+    /* ---------- INDUSTRY CARDS (3 columns) ---------- */
+    .industry-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    .industry-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 44px 32px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      border: 1px solid rgba(0, 0, 0, 0.02);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .industry-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, var(--accent), var(--primary));
+    }
+
+    .industry-card:hover {
+      transform: translateY(-10px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .industry-icon {
+      font-size: 3rem;
+      color: var(--accent);
+      margin-bottom: 28px;
+      line-height: 1;
+    }
+
+    .industry-card h3 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+
+    .industry-card p {
+      color: var(--text-muted);
+      margin-bottom: 28px;
+      font-size: 1rem;
+      line-height: 1.7;
+      flex: 1;
+    }
+
+    .feature-list {
+      list-style: none;
+      margin-bottom: 32px;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 0.98rem;
+      color: var(--text-dark);
+    }
+
+    .feature-list li i {
+      color: var(--accent);
+      font-size: 1.1rem;
+      width: 20px;
+      text-align: center;
+    }
+
+    .industry-card .btn-outline {
+      align-self: flex-start;
+      padding: 10px 28px;
+      font-size: 0.95rem;
+    }
+
+    /* ---------- FEATURES / VALUE PROPS ---------- */
+    .value-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .value-card {
+      background: var(--white);
+      border-radius: var(--radius-sm);
+      padding: 40px 28px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      border: 1px solid rgba(0, 0, 0, 0.02);
+      text-align: center;
+    }
+
+    .value-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .value-icon {
+      width: 70px;
+      height: 70px;
+      background: var(--accent-soft);
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      color: var(--accent);
+      font-size: 1.8rem;
+    }
+
+    .value-card h4 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .value-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* ---------- CTA BANNER ---------- */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--primary) 0%, #0a1e36 100%);
+      border-radius: var(--radius);
+      padding: 70px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      box-shadow: var(--shadow-lg);
+      margin: 40px 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-banner::after {
+      content: '\f0c2';
+      font-family: 'Font Awesome 6 Free';
+      font-weight: 900;
+      position: absolute;
+      left: -20px;
+      bottom: -40px;
+      font-size: 14rem;
+      color: rgba(255, 255, 255, 0.03);
+      pointer-events: none;
+    }
+
+    .cta-content {
+      position: relative;
+      z-index: 2;
+      flex: 2;
+    }
+
+    .cta-content h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+
+    .cta-content p {
+      font-size: 1.15rem;
+      color: rgba(255, 255, 255, 0.8);
+      max-width: 600px;
+    }
+
+    .cta-actions {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .cta-actions .btn {
+      background: var(--white);
+      color: var(--primary);
+      padding: 16px 36px;
+      font-weight: 700;
+    }
+
+    .cta-actions .btn:hover {
+      background: var(--accent-soft);
+      color: var(--primary);
+    }
+
+    .cta-actions .btn i {
+      color: var(--accent);
+    }
+
+    /* ---------- CONTACT / FOOTER ---------- */
+    .contact-section {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 60px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0, 0, 0, 0.02);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .contact-info h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 16px;
+    }
+
+    .contact-info > p {
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      font-size: 1.05rem;
+    }
+
+    .contact-method {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+
+    .contact-method i {
+      width: 52px;
+      height: 52px;
+      background: var(--accent-soft);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .contact-method div h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .contact-method div a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 1rem;
+      transition: var(--transition);
+      direction: ltr;
+      display: inline-block;
+    }
+
+    .contact-method div a:hover {
+      color: var(--accent);
+    }
+
+    .contact-method div p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin: 0;
+      direction: ltr;
+      text-align: left;
+    }
+
+    .contact-cta {
+      background: var(--gray-bg);
+      border-radius: var(--radius-sm);
+      padding: 40px;
+      text-align: center;
+      border: 1px solid rgba(0, 0, 0, 0.03);
+    }
+
+    .contact-cta i {
+      font-size: 3.5rem;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .contact-cta h3 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .contact-cta p {
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 50px 0 40px;
+      border-top: 1px solid rgba(0, 0, 0, 0.04);
+      margin-top: 40px;
+    }
+
+    .footer .logo {
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    .footer p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+    }
+
+    .footer .tagline {
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 1.1rem;
+      margin-top: 12px;
+      letter-spacing: -0.2px;
+    }
+
+    /* ---------- RESPONSIVE ---------- */
+    @media (max-width: 1024px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+      .hero-content p {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .hero-actions {
+        justify-content: center;
+      }
+      .hero-stats {
+        justify-content: center;
+      }
+      .hero-visual {
+        transform: none;
+        max-width: 500px;
+        margin: 0 auto;
+      }
+      .industry-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .value-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .cta-banner {
+        flex-direction: column;
+        text-align: center;
+        padding: 50px 30px;
+      }
+      .cta-content p {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .contact-section {
+        grid-template-columns: 1fr;
+        padding: 40px;
+      }
+      .nav-links {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-content h1 {
+        font-size: 2.6rem;
+      }
+      .hero-stats {
+        flex-direction: column;
+        gap: 24px;
+        align-items: center;
+      }
+      .industry-grid,
+      .value-grid {
+        grid-template-columns: 1fr;
+      }
+      .section-title {
+        font-size: 2rem !important;
+      }
+      .cta-content h2 {
+        font-size: 1.9rem;
+      }
+      .contact-section {
+        padding: 30px 24px;
+      }
+      .contact-cta {
+        padding: 30px 20px;
+      }
+      .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      .hero-actions .btn {
+        width: auto;
+      }
+      section {
+        padding: 60px 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero-content h1 {
+        font-size: 2.1rem;
+      }
+      .hero-content p {
+        font-size: 1.05rem;
+      }
+      .logo {
+        font-size: 1.5rem;
+      }
+      .logo i {
+        font-size: 1.7rem;
+      }
+    }
+
+    /* subtle animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-up {
+      animation: fadeUp 0.7s ease forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+
+    /* utility */
+    .text-center { text-align: center; }
+    .mt-2 { margin-top: 8px; }
+    .mt-4 { margin-top: 16px; }
+    .mb-0 { margin-bottom: 0; }
+  </style>
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <header class="navbar">
+    <div class="container">
+      <a href="#" class="logo">
+        <i class="fas fa-cubes"></i> BMP
+      </a>
+      <nav class="nav-links">
+        <a href="#schools">للمدارس</a>
+        <a href="#restaurants">للمطاعم</a>
+        <a href="#retail">للمتاجر</a>
+        <a href="#why">لماذا BMP</a>
+        <a href="#contact" class="nav-cta">تواصل معنا</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ========== HERO ========== -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="hero-content fade-up">
+            <span class="badge"><i class="fas fa-rocket"></i> منصة إدارية متكاملة</span>
+            <h1>
+              إدارة مؤسستك أصبحت <span>أسهل، أسرع</span> وأكثر احترافية
+            </h1>
+            <p>
+              BMP هي منصة إدارية حديثة تساعد المؤسسات على تنظيم عملياتها اليومية، إدارة البيانات والمستخدمين، متابعة المدفوعات والمبيعات، وإنشاء التقارير — كل ذلك من خلال نظام واحد منظم وقابل للتوسع.
+            </p>
+            <div class="hero-actions">
+              <a href="#contact" class="btn"><i class="fas fa-headset"></i> اطلب تجربة</a>
+              <a href="#why" class="btn btn-outline"><i class="fas fa-arrow-left"></i> اكتشف المزيد</a>
+            </div>
+            <div class="hero-stats">
+              <div class="stat-item">
+                <h3>3+</h3>
+                <p>قطاعات رئيسية</p>
+              </div>
+              <div class="stat-item">
+                <h3>∞</h3>
+                <p>مؤسسات مستقلة</p>
+              </div>
+              <div class="stat-item">
+                <h3>100%</h3>
+                <p>بيانات منفصلة</p>
+              </div>
+            </div>
+          </div>
+          <div class="hero-visual fade-up delay-1">
+            <div class="mockup-header">
+              <span class="mockup-dot"></span>
+              <span class="mockup-dot"></span>
+              <span class="mockup-dot"></span>
+            </div>
+            <div class="mockup-card">
+              <i class="fas fa-user-graduate"></i>
+              <div>
+                <h4>إدارة الطلاب</h4>
+                <p>تسجيل · أرقام تلقائية · ملف كامل</p>
+              </div>
+            </div>
+            <div class="mockup-card">
+              <i class="fas fa-receipt"></i>
+              <div>
+                <h4>الإيصالات</h4>
+                <p>طباعة PDF · رقم فريد · تلقائي</p>
+              </div>
+            </div>
+            <div class="mockup-card">
+              <i class="fas fa-chart-pie"></i>
+              <div>
+                <h4>التقارير</h4>
+                <p>إحصائيات دقيقة · متابعة مالية</p>
+              </div>
+            </div>
+            <div class="mockup-card" style="border-right-color: var(--gold);">
+              <i class="fas fa-shield-alt" style="color: var(--gold);"></i>
+              <div>
+                <h4>سجل العمليات</h4>
+                <p>تتبع كامل · أمان وشفافية</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== INDUSTRIES ========== -->
+    <section id="schools">
+      <div class="container">
+        <div class="section-header fade-up">
+          <span class="badge"><i class="fas fa-building"></i> حلول مخصصة</span>
+          <h2 class="section-title">🏫 BMP للمدارس</h2>
+          <p class="section-subtitle">نظام متكامل لإدارة المدرسة — حوّل إدارة مدرستك إلى تجربة أكثر تنظيمًا واحترافية.</p>
+        </div>
+        <div class="industry-grid">
+          <!-- school card -->
+          <div class="industry-card fade-up">
+            <div class="industry-icon"><i class="fas fa-school"></i></div>
+            <h3>إدارة الطلاب</h3>
+            <p>تسجيل الطلاب بسهولة، إنشاء أرقام تلقائية، البحث بالاسم أو الرقم، وعرض الملف الكامل مع السجل الدراسي السنوي.</p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check-circle"></i> تسجيل سريع ومنظم</li>
+              <li><i class="fas fa-check-circle"></i> أرقام طلاب تلقائية</li>
+              <li><i class="fas fa-check-circle"></i> بحث فوري بالاسم/الرقم</li>
+            </ul>
+            <a href="#contact" class="btn btn-outline">اطلب عرضًا <i class="fas fa-arrow-left"></i></a>
+          </div>
+          <!-- payments card -->
+          <div class="industry-card fade-up delay-1">
+            <div class="industry-icon"><i class="fas fa-money-bill-wave"></i></div>
+            <h3>المدفوعات والإيصالات</h3>
+            <p>تسجيل دفعات الطلاب، متابعة الأشهر المدفوعة وغير المدفوعة، وإنشاء إيصال دفع تلقائي برقم فريد قابل للطباعة.</p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check-circle"></i> منع تكرار الدفعة</li>
+              <li><i class="fas fa-check-circle"></i> إيصال PDF تلقائي</li>
+              <li><i class="fas fa-check-circle"></i> متابعة الوضع المالي</li>
+            </ul>
+            <a href="#contact" class="btn btn-outline">اطلب عرضًا <i class="fas fa-arrow-left"></i></a>
+          </div>
+          <!-- reports + users card -->
+          <div class="industry-card fade-up delay-2">
+            <div class="industry-icon"><i class="fas fa-chart-line"></i></div>
+            <h3>التقارير والصلاحيات</h3>
+            <p>إحصائيات دقيقة لعدد الطلاب، إجمالي المدفوعات، المتأخرين، مع إدارة كاملة للمستخدمين والصلاحيات وسجل العمليات.</p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check-circle"></i> تقارير حسب السنة الدراسية</li>
+              <li><i class="fas fa-check-circle"></i> صلاحيات مدير ومستخدمين</li>
+              <li><i class="fas fa-check-circle"></i> سجل عمليات كامل</li>
+            </ul>
+            <a href="#contact" class="btn btn-outline">اطلب عرضًا <i class="fas fa-arrow-left"></i></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== RESTAURANTS ========== -->
+    <section id="restaurants" style="background: #f5f9ff;">
+      <div class="container">
+        <div class="section-header fade-up">
+          <span class="badge"><i class="fas fa-utensils"></i> قطاع المطاعم</span>
+          <h2 class="section-title">🍽️ BMP للمطاعم</h2>
+          <p class="section-subtitle">إدارة مطعمك من مكان واحد — تنظيم العمليات اليومية ومتابعة الأداء المالي والإداري.</p>
+        </div>
+        <div class="industry-grid">
+          <div class="industry-card fade-up">
+            <div class="industry-icon"><i class="fas fa-cash-register"></i></div>
+            <h3>المدفوعات والعمليات المالية</h3>
+            <p>متابعة وتنظيم كامل للعمليات المالية اليومية، تسجيل منظم للمدفوعات، وتقارير مالية دقيقة.</p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check-circle"></i> متابعة المدفوعات</li>
+              <li><i class="fas fa-check-circle"></i> تنظيم العمليات المالية</li>
+              <li><i class="fas fa-check-circle"></i> تسجيل منظم</li>
+            </ul>
+          </div>
+          <div class="industry-card fade-up delay-1">
+            <div class="industry-icon"><i class="fas fa-chart-bar"></i></div>
+            <h3>التقارير والإحصائيات</h3>
+            <p>متابعة المبيعات، التقارير المالية، الإحصائيات، ومراقبة أداء النشاط بشكل لحظي.</p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check-circle"></i> متابعة المبيعات</li>
+              <li><i class="fas fa-check-circle"></i> تقارير مالية شاملة</li>
+              <li><i class="fas fa-check-circle"></i> إحصائيات دقيقة</li>
+            </ul>
+          </div>
+          <div class="industry-card fade-up delay-2">
+            <div class="industry-icon"><i class="fas fa-user-shield"></i></div>
+            <h3>المستخدمون والصلاحيات</h3>
+            <p>حساب مدير، إضافة مستخدمين، تفعيل وتعطيل الحسابات، ومتابعة مسؤولية كل مستخدم عن العمليات.</p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check-circle"></i> إدارة الصلاحيات</li>
+              <li><i class="fas fa-check-circle"></i> تفعيل/تعطيل الحسابات</li>
+              <li><i class="fas fa-check-circle"></i> سجل عمليات</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== RETAIL ========== -->
+    <section id="retail">
+      <div class="container">
+        <div class="section-header fade-up">
+          <span class="badge"><i class="fas fa-store"></i> المتاجر الكبرى</span>
+          <h2 class="section-title">🛒 BMP للمتاجر الكبرى والسوبرماركت</h2>
+          <p class="section-subtitle">إدارة متجرك بكفاءة أكبر — منتجات، مخزون، مبيعات، مدفوعات وتقارير من نظام واحد.</p>
+        </div>
+        <div class="industry-grid">
+          <div class="industry-card fade-up">
+            <div class="industry-icon"><i class="fas fa-boxes"></i></div>
+            <h3>إدارة المخزون</h3>
+            <p>إضافة وإدارة المنتجات، متابعة الكميات المتوفرة، حركة المخزون، وتنظيم المنتجات بذكاء.</p>
+            <ul class="feature-list">
+              <li><i class="fas fa-check-circle"></i> إدارة المنتجات</li>
+              <li><i class="fas fa-check-circle"></i> متابعة الكميات</li>
+              <li><i class="fas fa-check-circle"></i> حالة المخزون</li>
+            </ul>
+          </div>
+          <div class="industry-card fade-up delay-1">
+            <div class="industry-icon"><i class="fas fa-shopping-cart"></i></div>
+            <h3>المبيعات والمدفوع
