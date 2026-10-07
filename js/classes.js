@@ -391,6 +391,10 @@ function renderStageClasses(
                 "class-item";
 
 
+            classItem.style.cursor =
+                "pointer";
+
+
             classItem.innerHTML = `
                 <div class="class-info">
 
@@ -419,6 +423,25 @@ function renderStageClasses(
 
                 </div>
             `;
+
+
+            // =========================================
+            // Open Class Students Page
+            // =========================================
+
+            classItem.addEventListener(
+                "click",
+                function () {
+
+                    window.location.href =
+                        `school-class.html?stage=${encodeURIComponent(
+                            item.stage
+                        )}&class=${encodeURIComponent(
+                            item.classNumber
+                        )}`;
+
+                }
+            );
 
 
             container.appendChild(
