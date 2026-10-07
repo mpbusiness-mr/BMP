@@ -1,5 +1,12 @@
 /* =================================
    School Record Payment - BMP
+   Multilingual:
+   English / Arabic / French
+   ================================= */
+
+
+/* =================================
+   API
    ================================= */
 
 const API_URL =
@@ -13,9 +20,1719 @@ const API_URL =
 let currentUser = null;
 let institutionId = null;
 let institution = null;
+
 let students = [];
 let selectedStudent = null;
+
 let pageInitialized = false;
+
+let currentLanguage = "en";
+
+
+/* =================================
+   Translations
+   ================================= */
+
+const TRANSLATIONS = {
+
+    en: {
+
+        pageTitle:
+            "Record School Payment",
+
+        pageSubtitle:
+            "Register a monthly student payment",
+
+        back:
+            "Back",
+
+        schoolInformation:
+            "School Information",
+
+        institutionId:
+            "Institution ID",
+
+        schoolName:
+            "School Name",
+
+        paymentInformation:
+            "Payment Information",
+
+        academicYear:
+            "Academic Year",
+
+        selectAcademicYear:
+            "Select Academic Year",
+
+        studentNumber:
+            "Student Number",
+
+        enterStudentNumber:
+            "Enter student number",
+
+        search:
+            "Search",
+
+        studentName:
+            "Student Name",
+
+        searchForStudent:
+            "Search for a student",
+
+        stage:
+            "Stage",
+
+        class:
+            "Class",
+
+        month:
+            "Month",
+
+        selectMonth:
+            "Select Month",
+
+        amount:
+            "Amount",
+
+        enterAmount:
+            "Enter amount",
+
+        paymentDate:
+            "Payment Date",
+
+        receiptNumber:
+            "Receipt Number",
+
+        generatedAfterSaving:
+            "Generated after saving",
+
+        recordedBy:
+            "Recorded By",
+
+        currentUser:
+            "Current user",
+
+        notes:
+            "Notes",
+
+        optionalNotes:
+            "Optional notes",
+
+        cancel:
+            "Cancel",
+
+        recordPayment:
+            "Record Payment",
+
+        recording:
+            "Recording...",
+
+        loadingStudents:
+            "Loading students...",
+
+        paymentRecorded:
+            "Payment recorded successfully.",
+
+        receipt:
+            "Receipt",
+
+        studentFound:
+            "Student found",
+
+        studentNotFound:
+            "Student not found for this academic year.",
+
+        duplicateStudentNumber:
+            "More than one student has this student number. Please contact the administrator.",
+
+        selectAcademicYearFirst:
+            "Please select an academic year first.",
+
+        enterStudentNumberFirst:
+            "Please enter the student number.",
+
+        validStudent:
+            "Please search and select a valid student first.",
+
+        selectMonthError:
+            "Please select a month.",
+
+        validAmount:
+            "Please enter a valid payment amount.",
+
+        selectPaymentDate:
+            "Please select the payment date.",
+
+        studentNotFoundSelectedYear:
+            "Student not found for the selected academic year.",
+
+        authenticationFailed:
+            "School authentication failed. Please log in again.",
+
+        noStudents:
+            "No students were found for this school.",
+
+        institutionMissing:
+            "Institution ID is missing.",
+
+        userMissing:
+            "Current user is missing.",
+
+        connectionError:
+            "Could not connect to the BMP server. Please check the Apps Script Web App URL and your internet connection.",
+
+        invalidResponse:
+            "The server returned an invalid response.",
+
+        requestFailed:
+            "The request failed.",
+
+        paymentFailed:
+            "Failed to record payment.",
+
+        language:
+            "Language",
+
+        unknown:
+            "-",
+
+        primary:
+            "Primary",
+
+        preparatory:
+            "Preparatory",
+
+        secondary:
+            "Secondary",
+
+        months: {
+
+            October:
+                "October",
+
+            November:
+                "November",
+
+            December:
+                "December",
+
+            January:
+                "January",
+
+            February:
+                "February",
+
+            March:
+                "March",
+
+            April:
+                "April",
+
+            May:
+                "May",
+
+            June:
+                "June"
+
+        }
+
+    },
+
+
+    ar: {
+
+        pageTitle:
+            "تسجيل دفعة مدرسية",
+
+        pageSubtitle:
+            "تسجيل دفعة شهرية للطالب",
+
+        back:
+            "رجوع",
+
+        schoolInformation:
+            "معلومات المدرسة",
+
+        institutionId:
+            "معرّف المؤسسة",
+
+        schoolName:
+            "اسم المدرسة",
+
+        paymentInformation:
+            "معلومات الدفع",
+
+        academicYear:
+            "السنة الدراسية",
+
+        selectAcademicYear:
+            "اختر السنة الدراسية",
+
+        studentNumber:
+            "رقم الطالب",
+
+        enterStudentNumber:
+            "أدخل رقم الطالب",
+
+        search:
+            "بحث",
+
+        studentName:
+            "اسم الطالب",
+
+        searchForStudent:
+            "ابحث عن طالب",
+
+        stage:
+            "المرحلة",
+
+        class:
+            "القسم",
+
+        month:
+            "الشهر",
+
+        selectMonth:
+            "اختر الشهر",
+
+        amount:
+            "المبلغ",
+
+        enterAmount:
+            "أدخل المبلغ",
+
+        paymentDate:
+            "تاريخ الدفع",
+
+        receiptNumber:
+            "رقم الإيصال",
+
+        generatedAfterSaving:
+            "يتم إنشاؤه بعد الحفظ",
+
+        recordedBy:
+            "سجلها المستخدم",
+
+        currentUser:
+            "المستخدم الحالي",
+
+        notes:
+            "ملاحظات",
+
+        optionalNotes:
+            "ملاحظات اختيارية",
+
+        cancel:
+            "إلغاء",
+
+        recordPayment:
+            "تسجيل الدفعة",
+
+        recording:
+            "جارٍ تسجيل الدفعة...",
+
+        loadingStudents:
+            "جارٍ تحميل الطلاب...",
+
+        paymentRecorded:
+            "تم تسجيل الدفعة بنجاح.",
+
+        receipt:
+            "الإيصال",
+
+        studentFound:
+            "تم العثور على الطالب",
+
+        studentNotFound:
+            "لم يتم العثور على الطالب في هذه السنة الدراسية.",
+
+        duplicateStudentNumber:
+            "يوجد أكثر من طالب يحمل رقم الطالب هذا. يرجى الاتصال بالمسؤول.",
+
+        selectAcademicYearFirst:
+            "يرجى اختيار السنة الدراسية أولاً.",
+
+        enterStudentNumberFirst:
+            "يرجى إدخال رقم الطالب.",
+
+        validStudent:
+            "يرجى البحث عن طالب صالح واختياره أولاً.",
+
+        selectMonthError:
+            "يرجى اختيار الشهر.",
+
+        validAmount:
+            "يرجى إدخال مبلغ دفع صحيح.",
+
+        selectPaymentDate:
+            "يرجى اختيار تاريخ الدفع.",
+
+        studentNotFoundSelectedYear:
+            "لم يتم العثور على الطالب في السنة الدراسية المحددة.",
+
+        authenticationFailed:
+            "فشل تسجيل دخول المدرسة. يرجى تسجيل الدخول مرة أخرى.",
+
+        noStudents:
+            "لم يتم العثور على طلاب لهذه المدرسة.",
+
+        institutionMissing:
+            "معرّف المؤسسة غير موجود.",
+
+        userMissing:
+            "المستخدم الحالي غير موجود.",
+
+        connectionError:
+            "تعذر الاتصال بخادم النظام. يرجى التحقق من رابط النظام واتصال الإنترنت.",
+
+        invalidResponse:
+            "أعاد الخادم استجابة غير صالحة.",
+
+        requestFailed:
+            "فشل تنفيذ الطلب.",
+
+        paymentFailed:
+            "فشل تسجيل الدفعة.",
+
+        language:
+            "اللغة",
+
+        unknown:
+            "-",
+
+        primary:
+            "الابتدائية",
+
+        preparatory:
+            "الإعدادية",
+
+        secondary:
+            "الثانوية",
+
+        months: {
+
+            October:
+                "أكتوبر",
+
+            November:
+                "نوفمبر",
+
+            December:
+                "ديسمبر",
+
+            January:
+                "يناير",
+
+            February:
+                "فبراير",
+
+            March:
+                "مارس",
+
+            April:
+                "أبريل",
+
+            May:
+                "مايو",
+
+            June:
+                "يونيو"
+
+        }
+
+    },
+
+
+    fr: {
+
+        pageTitle:
+            "Enregistrer un paiement scolaire",
+
+        pageSubtitle:
+            "Enregistrer un paiement mensuel de l'élève",
+
+        back:
+            "Retour",
+
+        schoolInformation:
+            "Informations sur l'établissement",
+
+        institutionId:
+            "Identifiant de l'établissement",
+
+        schoolName:
+            "Nom de l'établissement",
+
+        paymentInformation:
+            "Informations de paiement",
+
+        academicYear:
+            "Année scolaire",
+
+        selectAcademicYear:
+            "Sélectionner l'année scolaire",
+
+        studentNumber:
+            "Numéro de l'élève",
+
+        enterStudentNumber:
+            "Entrer le numéro de l'élève",
+
+        search:
+            "Rechercher",
+
+        studentName:
+            "Nom de l'élève",
+
+        searchForStudent:
+            "Rechercher un élève",
+
+        stage:
+            "Cycle",
+
+        class:
+            "Classe",
+
+        month:
+            "Mois",
+
+        selectMonth:
+            "Sélectionner le mois",
+
+        amount:
+            "Montant",
+
+        enterAmount:
+            "Entrer le montant",
+
+        paymentDate:
+            "Date du paiement",
+
+        receiptNumber:
+            "Numéro du reçu",
+
+        generatedAfterSaving:
+            "Généré après l'enregistrement",
+
+        recordedBy:
+            "Enregistré par",
+
+        currentUser:
+            "Utilisateur actuel",
+
+        notes:
+            "Notes",
+
+        optionalNotes:
+            "Notes facultatives",
+
+        cancel:
+            "Annuler",
+
+        recordPayment:
+            "Enregistrer le paiement",
+
+        recording:
+            "Enregistrement...",
+
+        loadingStudents:
+            "Chargement des élèves...",
+
+        paymentRecorded:
+            "Paiement enregistré avec succès.",
+
+        receipt:
+            "Reçu",
+
+        studentFound:
+            "Élève trouvé",
+
+        studentNotFound:
+            "Aucun élève trouvé pour cette année scolaire.",
+
+        duplicateStudentNumber:
+            "Plusieurs élèves portent ce numéro. Veuillez contacter l'administrateur.",
+
+        selectAcademicYearFirst:
+            "Veuillez d'abord sélectionner une année scolaire.",
+
+        enterStudentNumberFirst:
+            "Veuillez entrer le numéro de l'élève.",
+
+        validStudent:
+            "Veuillez rechercher et sélectionner un élève valide.",
+
+        selectMonthError:
+            "Veuillez sélectionner un mois.",
+
+        validAmount:
+            "Veuillez entrer un montant valide.",
+
+        selectPaymentDate:
+            "Veuillez sélectionner la date du paiement.",
+
+        studentNotFoundSelectedYear:
+            "Élève introuvable pour l'année scolaire sélectionnée.",
+
+        authenticationFailed:
+            "L'authentification de l'école a échoué. Veuillez vous reconnecter.",
+
+        noStudents:
+            "Aucun élève n'a été trouvé pour cet établissement.",
+
+        institutionMissing:
+            "L'identifiant de l'établissement est manquant.",
+
+        userMissing:
+            "L'utilisateur actuel est introuvable.",
+
+        connectionError:
+            "Impossible de se connecter au serveur BMP. Vérifiez l'URL de l'application et votre connexion Internet.",
+
+        invalidResponse:
+            "Le serveur a renvoyé une réponse invalide.",
+
+        requestFailed:
+            "La requête a échoué.",
+
+        paymentFailed:
+            "Échec de l'enregistrement du paiement.",
+
+        language:
+            "Langue",
+
+        unknown:
+            "-",
+
+        primary:
+            "Primaire",
+
+        preparatory:
+            "Collège",
+
+        secondary:
+            "Secondaire",
+
+        months: {
+
+            October:
+                "Octobre",
+
+            November:
+                "Novembre",
+
+            December:
+                "Décembre",
+
+            January:
+                "Janvier",
+
+            February:
+                "Février",
+
+            March:
+                "Mars",
+
+            April:
+                "Avril",
+
+            May:
+                "Mai",
+
+            June:
+                "Juin"
+
+        }
+
+    }
+
+};
+
+
+/* =================================
+   Translation Helper
+   ================================= */
+
+function t(key) {
+
+    const language =
+        TRANSLATIONS[currentLanguage] ||
+        TRANSLATIONS.en;
+
+
+    const parts =
+        String(key)
+            .split(".");
+
+
+    let value =
+        language;
+
+
+    for (
+        const part of parts
+    ) {
+
+        if (
+            value &&
+            Object.prototype.hasOwnProperty.call(
+                value,
+                part
+            )
+        ) {
+
+            value =
+                value[part];
+
+        } else {
+
+            return key;
+
+        }
+
+    }
+
+
+    return value;
+
+}
+
+
+/* =================================
+   Language
+   ================================= */
+
+function getSavedLanguage() {
+
+    const keys = [
+        "bmpLanguage",
+        "language",
+        "selectedLanguage",
+        "appLanguage"
+    ];
+
+
+    for (
+        const key of keys
+    ) {
+
+        const value =
+            localStorage.getItem(
+                key
+            );
+
+
+        if (
+            value &&
+            [
+                "en",
+                "ar",
+                "fr"
+            ].includes(
+                value
+                    .toLowerCase()
+                    .trim()
+            )
+        ) {
+
+            return value
+                .toLowerCase()
+                .trim();
+
+        }
+
+    }
+
+
+    const htmlLanguage =
+        String(
+            document.documentElement.lang ||
+            ""
+        )
+        .toLowerCase()
+        .trim();
+
+
+    if (
+        htmlLanguage.startsWith("ar")
+    ) {
+
+        return "ar";
+
+    }
+
+
+    if (
+        htmlLanguage.startsWith("fr")
+    ) {
+
+        return "fr";
+
+    }
+
+
+    return "en";
+
+}
+
+
+function setLanguage(language) {
+
+    language =
+        String(
+            language || "en"
+        )
+        .toLowerCase()
+        .trim();
+
+
+    if (
+        !TRANSLATIONS[language]
+    ) {
+
+        language =
+            "en";
+
+    }
+
+
+    currentLanguage =
+        language;
+
+
+    localStorage.setItem(
+        "bmpLanguage",
+        currentLanguage
+    );
+
+
+    applyLanguage();
+
+
+    window.dispatchEvent(
+        new CustomEvent(
+            "bmpLanguageChanged",
+            {
+                detail: {
+                    language:
+                        currentLanguage
+                }
+            }
+        )
+    );
+
+}
+
+
+/* =================================
+   Language Selector
+   ================================= */
+
+function ensureLanguageSelector() {
+
+    const headerActions =
+        document.querySelector(
+            ".header-actions"
+        );
+
+
+    if (
+        !headerActions
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        document.getElementById(
+            "bmpLanguageSelector"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const wrapper =
+        document.createElement(
+            "div"
+        );
+
+
+    wrapper.id =
+        "bmpLanguageWrapper";
+
+
+    wrapper.style.display =
+        "flex";
+
+    wrapper.style.alignItems =
+        "center";
+
+    wrapper.style.gap =
+        "7px";
+
+
+    const label =
+        document.createElement(
+            "span"
+        );
+
+
+    label.id =
+        "bmpLanguageLabel";
+
+
+    label.style.fontSize =
+        "13px";
+
+    label.style.fontWeight =
+        "600";
+
+
+    const select =
+        document.createElement(
+            "select"
+        );
+
+
+    select.id =
+        "bmpLanguageSelector";
+
+
+    select.innerHTML = `
+
+        <option value="en">
+            English
+        </option>
+
+        <option value="ar">
+            العربية
+        </option>
+
+        <option value="fr">
+            Français
+        </option>
+
+    `;
+
+
+    select.style.height =
+        "38px";
+
+    select.style.padding =
+        "0 10px";
+
+    select.style.borderRadius =
+        "7px";
+
+    select.style.border =
+        "1px solid #d1d5db";
+
+    select.style.background =
+        "#ffffff";
+
+    select.style.cursor =
+        "pointer";
+
+
+    select.addEventListener(
+        "change",
+        function () {
+
+            setLanguage(
+                this.value
+            );
+
+        }
+    );
+
+
+    wrapper.appendChild(
+        label
+    );
+
+    wrapper.appendChild(
+        select
+    );
+
+
+    headerActions.prepend(
+        wrapper
+    );
+
+}
+
+
+/* =================================
+   Apply Language
+   ================================= */
+
+function applyLanguage() {
+
+    document.documentElement.lang =
+        currentLanguage;
+
+
+    document.documentElement.dir =
+        currentLanguage === "ar"
+            ? "rtl"
+            : "ltr";
+
+
+    document.title =
+        `${t("pageTitle")} - BMP`;
+
+
+    /* Header */
+
+    const pageTitle =
+        document.querySelector(
+            ".page-header h1"
+        );
+
+
+    const pageSubtitle =
+        document.querySelector(
+            ".page-header p"
+        );
+
+
+    const backButton =
+        document.getElementById(
+            "backButton"
+        );
+
+
+    if (pageTitle) {
+
+        pageTitle.textContent =
+            t("pageTitle");
+
+    }
+
+
+    if (pageSubtitle) {
+
+        pageSubtitle.textContent =
+            t("pageSubtitle");
+
+    }
+
+
+    if (backButton) {
+
+        backButton.textContent =
+            t("back");
+
+    }
+
+
+    /* Section titles */
+
+    const sectionTitles =
+        document.querySelectorAll(
+            ".card h2"
+        );
+
+
+    if (
+        sectionTitles.length >= 2
+    ) {
+
+        sectionTitles[0].textContent =
+            t("schoolInformation");
+
+        sectionTitles[1].textContent =
+            t("paymentInformation");
+
+    }
+
+
+    /* Labels */
+
+    const labelMap = {
+
+        academicYear:
+            "academicYear",
+
+        studentNumberSearch:
+            "studentNumber",
+
+        studentName:
+            "studentName",
+
+        studentNumber:
+            "studentNumber",
+
+        stage:
+            "stage",
+
+        className:
+            "class",
+
+        month:
+            "month",
+
+        amount:
+            "amount",
+
+        paymentDate:
+            "paymentDate",
+
+        receiptNumber:
+            "receiptNumber",
+
+        recordedBy:
+            "recordedBy",
+
+        notes:
+            "notes"
+
+    };
+
+
+    Object.keys(
+        labelMap
+    ).forEach(
+        fieldId => {
+
+            const label =
+                document.querySelector(
+                    `label[for="${fieldId}"]`
+                );
+
+
+            if (label) {
+
+                label.textContent =
+                    t(
+                        labelMap[fieldId]
+                    );
+
+            }
+
+        }
+    );
+
+
+    /* School information labels */
+
+    const infoItems =
+        document.querySelectorAll(
+            ".info-item span"
+        );
+
+
+    if (
+        infoItems.length >= 2
+    ) {
+
+        infoItems[0].textContent =
+            t("institutionId");
+
+        infoItems[1].textContent =
+            t("schoolName");
+
+    }
+
+
+    /* Student search */
+
+    const searchInput =
+        document.getElementById(
+            "studentNumberSearch"
+        );
+
+
+    if (searchInput) {
+
+        searchInput.placeholder =
+            t("enterStudentNumber");
+
+    }
+
+
+    const searchButton =
+        document.getElementById(
+            "searchStudentButton"
+        );
+
+
+    if (searchButton) {
+
+        searchButton.textContent =
+            t("search");
+
+    }
+
+
+    /* Read-only placeholders */
+
+    const studentName =
+        document.getElementById(
+            "studentName"
+        );
+
+
+    if (
+        studentName &&
+        !studentName.value
+    ) {
+
+        studentName.placeholder =
+            t("searchForStudent");
+
+    }
+
+
+    const studentNumber =
+        document.getElementById(
+            "studentNumber"
+        );
+
+
+    if (
+        studentNumber &&
+        !studentNumber.value
+    ) {
+
+        studentNumber.placeholder =
+            t("studentNumber");
+
+    }
+
+
+    const stage =
+        document.getElementById(
+            "stage"
+        );
+
+
+    if (
+        stage &&
+        !stage.value
+    ) {
+
+        stage.placeholder =
+            t("stage");
+
+    }
+
+
+    const className =
+        document.getElementById(
+            "className"
+        );
+
+
+    if (
+        className &&
+        !className.value
+    ) {
+
+        className.placeholder =
+            t("class");
+
+    }
+
+
+    /* Month options */
+
+    updateMonthOptions();
+
+
+    /* Academic year first option */
+
+    updateAcademicYearOption();
+
+
+    /* Amount placeholder */
+
+    const amount =
+        document.getElementById(
+            "amount"
+        );
+
+
+    if (amount) {
+
+        amount.placeholder =
+            t("enterAmount");
+
+    }
+
+
+    /* Receipt */
+
+    const receiptNumber =
+        document.getElementById(
+            "receiptNumber"
+        );
+
+
+    if (
+        receiptNumber &&
+        !receiptNumber.value
+    ) {
+
+        receiptNumber.placeholder =
+            t("generatedAfterSaving");
+
+    }
+
+
+    /* Recorded by */
+
+    const recordedBy =
+        document.getElementById(
+            "recordedBy"
+        );
+
+
+    if (
+        recordedBy &&
+        !recordedBy.value
+    ) {
+
+        recordedBy.placeholder =
+            t("currentUser");
+
+    }
+
+
+    /* Notes */
+
+    const notes =
+        document.getElementById(
+            "notes"
+        );
+
+
+    if (notes) {
+
+        notes.placeholder =
+            t("optionalNotes");
+
+    }
+
+
+    /* Buttons */
+
+    const cancelButton =
+        document.getElementById(
+            "cancelButton"
+        );
+
+
+    const recordPaymentButton =
+        document.getElementById(
+            "recordPaymentButton"
+        );
+
+
+    if (cancelButton) {
+
+        cancelButton.textContent =
+            t("cancel");
+
+    }
+
+
+    if (
+        recordPaymentButton &&
+        !recordPaymentButton.disabled
+    ) {
+
+        recordPaymentButton.textContent =
+            t("recordPayment");
+
+    }
+
+
+    /* Language selector */
+
+    const selector =
+        document.getElementById(
+            "bmpLanguageSelector"
+        );
+
+
+    const languageLabel =
+        document.getElementById(
+            "bmpLanguageLabel"
+        );
+
+
+    if (selector) {
+
+        selector.value =
+            currentLanguage;
+
+    }
+
+
+    if (languageLabel) {
+
+        languageLabel.textContent =
+            t("language");
+
+    }
+
+}
+
+
+/* =================================
+   Academic Year Option
+   ================================= */
+
+function updateAcademicYearOption() {
+
+    const select =
+        document.getElementById(
+            "academicYear"
+        );
+
+
+    if (!select) {
+
+        return;
+
+    }
+
+
+    const firstOption =
+        select.querySelector(
+            'option[value=""]'
+        );
+
+
+    if (firstOption) {
+
+        firstOption.textContent =
+            t("selectAcademicYear");
+
+    }
+
+}
+
+
+/* =================================
+   Month Options
+   ================================= */
+
+function updateMonthOptions() {
+
+    const select =
+        document.getElementById(
+            "month"
+        );
+
+
+    if (!select) {
+
+        return;
+
+    }
+
+
+    select.querySelectorAll(
+        "option"
+    ).forEach(
+        option => {
+
+            if (
+                !option.value
+            ) {
+
+                option.textContent =
+                    t("selectMonth");
+
+                return;
+
+            }
+
+
+            if (
+                TRANSLATIONS.en.months[
+                    option.value
+                ]
+            ) {
+
+                option.textContent =
+                    t(
+                        `months.${option.value}`
+                    );
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =================================
+   API Request
+   ================================= */
+
+async function apiRequest(
+    action,
+    data = {}
+) {
+
+    if (!institutionId) {
+
+        throw new Error(
+            t("institutionMissing")
+        );
+
+    }
+
+
+    const username =
+        getCurrentUsername();
+
+
+    if (!username) {
+
+        throw new Error(
+            t("userMissing")
+        );
+
+    }
+
+
+    const payload = {
+
+        action:
+            action,
+
+        institutionId:
+            institutionId,
+
+        username:
+            username,
+
+        ...data
+
+    };
+
+
+    console.log(
+        "BMP API request:",
+        payload
+    );
+
+
+    let response;
+
+
+    try {
+
+        response =
+            await fetch(
+                API_URL,
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+                    },
+
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
+                }
+            );
+
+    } catch (error) {
+
+        throw new Error(
+            t("connectionError")
+        );
+
+    }
+
+
+    const responseText =
+        await response.text();
+
+
+    console.log(
+        "BMP API response:",
+        responseText
+    );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            `Server error: ${response.status}`
+        );
+
+    }
+
+
+    let result;
+
+
+    try {
+
+        result =
+            JSON.parse(
+                responseText
+            );
+
+    } catch (error) {
+
+        throw new Error(
+            t("invalidResponse") +
+            " " +
+            responseText.substring(
+                0,
+                300
+            )
+        );
+
+    }
+
+
+    if (!result.success) {
+
+        throw new Error(
+            translateBackendError(
+                result.message
+            )
+        );
+
+    }
+
+
+    return result;
+
+}
+
+
+/* =================================
+   Backend Error Translation
+   ================================= */
+
+function translateBackendError(
+    message
+) {
+
+    if (!message) {
+
+        return t("requestFailed");
+
+    }
+
+
+    const text =
+        String(
+            message
+        );
+
+
+    const lower =
+        text.toLowerCase();
+
+
+    const knownErrors = [
+
+        {
+            keys: [
+                "institution id is missing",
+                "institution is missing"
+            ],
+
+            key:
+                "institutionMissing"
+
+        },
+
+        {
+            keys: [
+                "current user is missing"
+            ],
+
+            key:
+                "userMissing"
+
+        },
+
+        {
+            keys: [
+                "authentication failed",
+                "school authentication failed"
+            ],
+
+            key:
+                "authenticationFailed"
+
+        },
+
+        {
+            keys: [
+                "could not connect"
+            ],
+
+            key:
+                "connectionError"
+
+        },
+
+        {
+            keys: [
+                "invalid response"
+            ],
+
+            key:
+                "invalidResponse"
+
+        }
+
+    ];
+
+
+    for (
+        const item of knownErrors
+    ) {
+
+        if (
+            item.keys.some(
+                key =>
+                    lower.includes(
+                        key
+                    )
+            )
+        ) {
+
+            return t(
+                item.key
+            );
+
+        }
+
+    }
+
+
+    /*
+     * Keep unknown backend errors
+     * because they may be important
+     * for diagnosis.
+     */
+
+    return text;
+
+}
 
 
 /* =================================
@@ -26,9 +1743,13 @@ function initializeAuthentication() {
 
     try {
 
-        if (typeof requireSchoolLogin === "function") {
+        if (
+            typeof requireSchoolLogin ===
+            "function"
+        ) {
 
-            currentUser = requireSchoolLogin();
+            currentUser =
+                requireSchoolLogin();
 
         }
 
@@ -60,7 +1781,8 @@ function initializeAuthentication() {
                 error
             );
 
-            currentUser = null;
+            currentUser =
+                null;
 
         }
 
@@ -74,13 +1796,12 @@ function initializeAuthentication() {
     }
 
 
-    /*
-     * Resolve institution ID.
-     */
-
     try {
 
-        if (typeof getActiveInstitutionId === "function") {
+        if (
+            typeof getActiveInstitutionId ===
+            "function"
+        ) {
 
             institutionId =
                 getActiveInstitutionId();
@@ -104,9 +1825,14 @@ function initializeAuthentication() {
                 window.location.search
             );
 
+
         institutionId =
-            params.get("institutionId") ||
-            params.get("id") ||
+            params.get(
+                "institutionId"
+            ) ||
+            params.get(
+                "id"
+            ) ||
             "";
 
     }
@@ -123,7 +1849,8 @@ function initializeAuthentication() {
 
     institutionId =
         String(
-            institutionId || ""
+            institutionId ||
+            ""
         ).trim();
 
 
@@ -182,146 +1909,6 @@ function getCurrentUsername() {
 
 
 /* =================================
-   Backend Request
-   ================================= */
-
-async function apiRequest(
-    action,
-    data = {}
-) {
-
-    if (!institutionId) {
-
-        throw new Error(
-            "Institution ID is missing."
-        );
-
-    }
-
-
-    const username =
-        getCurrentUsername();
-
-
-    if (!username) {
-
-        throw new Error(
-            "Current user is missing."
-        );
-
-    }
-
-
-    const payload = {
-
-        action:
-            action,
-
-        institutionId:
-            institutionId,
-
-        username:
-            username,
-
-        ...data
-
-    };
-
-
-    console.log(
-        "BMP API request:",
-        payload
-    );
-
-
-    let response;
-
-
-    try {
-
-        response =
-            await fetch(
-                API_URL,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "text/plain;charset=utf-8"
-                    },
-
-                    body:
-                        JSON.stringify(
-                            payload
-                        )
-                }
-            );
-
-    } catch (error) {
-
-        throw new Error(
-            "Could not connect to the school server. " +
-            "Please check the Apps Script Web App URL and your internet connection."
-        );
-
-    }
-
-
-    const responseText =
-        await response.text();
-
-
-    console.log(
-        "BMP API response:",
-        responseText
-    );
-
-
-    if (!response.ok) {
-
-        throw new Error(
-            `Server error: ${response.status}`
-        );
-
-    }
-
-
-    let result;
-
-
-    try {
-
-        result =
-            JSON.parse(
-                responseText
-            );
-
-    } catch (error) {
-
-        throw new Error(
-            "The server returned an invalid response: " +
-            responseText.substring(0, 300)
-        );
-
-    }
-
-
-    if (!result.success) {
-
-        throw new Error(
-            result.message ||
-            "Request failed."
-        );
-
-    }
-
-
-    return result;
-
-}
-
-
-/* =================================
    Institution
    ================================= */
 
@@ -353,18 +1940,24 @@ function loadInstitution() {
         );
 
 
-    if (institutionIdElement) {
+    if (
+        institutionIdElement
+    ) {
 
         institutionIdElement.textContent =
-            institution.id || "-";
+            institution.id ||
+            t("unknown");
 
     }
 
 
-    if (institutionNameElement) {
+    if (
+        institutionNameElement
+    ) {
 
         institutionNameElement.textContent =
-            institution.name || "-";
+            institution.name ||
+            t("unknown");
 
     }
 
@@ -380,15 +1973,18 @@ function getCurrentAcademicYear() {
     const now =
         new Date();
 
+
     let year =
         now.getFullYear();
 
 
     /*
-     * October -> June
+     * October -> June.
      */
 
-    if (now.getMonth() < 9) {
+    if (
+        now.getMonth() < 9
+    ) {
 
         year--;
 
@@ -409,7 +2005,9 @@ function getAvailableAcademicYears() {
     students.forEach(
         student => {
 
-            if (student.academicYear) {
+            if (
+                student.academicYear
+            ) {
 
                 years.add(
                     String(
@@ -423,12 +2021,8 @@ function getAvailableAcademicYears() {
     );
 
 
-    const currentYear =
-        getCurrentAcademicYear();
-
-
     years.add(
-        currentYear
+        getCurrentAcademicYear()
     );
 
 
@@ -456,12 +2050,34 @@ function loadAcademicYears() {
     }
 
 
+    const currentValue =
+        select.value;
+
+
     const years =
         getAvailableAcademicYears();
 
 
     select.innerHTML =
-        `<option value="">Select Academic Year</option>`;
+        "";
+
+
+    const firstOption =
+        document.createElement(
+            "option"
+        );
+
+
+    firstOption.value =
+        "";
+
+    firstOption.textContent =
+        t("selectAcademicYear");
+
+
+    select.appendChild(
+        firstOption
+    );
 
 
     years.forEach(
@@ -491,6 +2107,16 @@ function loadAcademicYears() {
 
 
     if (
+        currentValue &&
+        years.includes(
+            currentValue
+        )
+    ) {
+
+        select.value =
+            currentValue;
+
+    } else if (
         years.includes(
             currentYear
         )
@@ -568,7 +2194,7 @@ async function loadStudentsFromBackend() {
 
         showError(
             error.message ||
-            "Failed to load students."
+            t("requestFailed")
         );
 
 
@@ -583,7 +2209,9 @@ async function loadStudentsFromBackend() {
    Student Helpers
    ================================= */
 
-function getStudentId(student) {
+function getStudentId(
+    student
+) {
 
     return String(
         student.studentId ||
@@ -621,7 +2249,9 @@ function getInstitutionStudents() {
 }
 
 
-function normalizeStudentNumber(value) {
+function normalizeStudentNumber(
+    value
+) {
 
     return String(
         value || ""
@@ -656,7 +2286,8 @@ function searchStudentByNumber() {
     const academicYear =
         academicYearElement
             ? String(
-                academicYearElement.value || ""
+                academicYearElement.value ||
+                ""
             ).trim()
             : "";
 
@@ -674,7 +2305,7 @@ function searchStudentByNumber() {
         clearStudentInformation();
 
         showError(
-            "Please select an academic year first."
+            t("selectAcademicYearFirst")
         );
 
         return;
@@ -687,7 +2318,7 @@ function searchStudentByNumber() {
         clearStudentInformation();
 
         showError(
-            "Please enter the student number."
+            t("enterStudentNumberFirst")
         );
 
         return;
@@ -724,34 +2355,42 @@ function searchStudentByNumber() {
             );
 
 
-    if (matches.length === 0) {
+    if (
+        matches.length === 0
+    ) {
 
         selectedStudent =
             null;
 
         clearStudentInformation();
 
+
         showStudentSearchResult(
-            "Student not found for this academic year.",
+            t("studentNotFound"),
             true
         );
+
 
         return;
 
     }
 
 
-    if (matches.length > 1) {
+    if (
+        matches.length > 1
+    ) {
 
         selectedStudent =
             null;
 
         clearStudentInformation();
 
+
         showStudentSearchResult(
-            "More than one student has this student number.",
+            t("duplicateStudentNumber"),
             true
         );
+
 
         return;
 
@@ -771,20 +2410,24 @@ function searchStudentByNumber() {
             "studentId"
         );
 
+
     const studentNameElement =
         document.getElementById(
             "studentName"
         );
+
 
     const studentNumberElement =
         document.getElementById(
             "studentNumber"
         );
 
+
     const stageElement =
         document.getElementById(
             "stage"
         );
+
 
     const classNameElement =
         document.getElementById(
@@ -792,7 +2435,9 @@ function searchStudentByNumber() {
         );
 
 
-    if (studentIdElement) {
+    if (
+        studentIdElement
+    ) {
 
         studentIdElement.value =
             getStudentId(
@@ -802,7 +2447,9 @@ function searchStudentByNumber() {
     }
 
 
-    if (studentNameElement) {
+    if (
+        studentNameElement
+    ) {
 
         studentNameElement.value =
             student.name ||
@@ -811,7 +2458,9 @@ function searchStudentByNumber() {
     }
 
 
-    if (studentNumberElement) {
+    if (
+        studentNumberElement
+    ) {
 
         studentNumberElement.value =
             student.studentNumber ||
@@ -820,7 +2469,9 @@ function searchStudentByNumber() {
     }
 
 
-    if (stageElement) {
+    if (
+        stageElement
+    ) {
 
         stageElement.value =
             formatStage(
@@ -830,7 +2481,9 @@ function searchStudentByNumber() {
     }
 
 
-    if (classNameElement) {
+    if (
+        classNameElement
+    ) {
 
         classNameElement.value =
             student.className ||
@@ -842,7 +2495,7 @@ function searchStudentByNumber() {
 
 
     showStudentSearchResult(
-        `Student found: ${student.name || "-"}`
+        `${t("studentFound")}: ${student.name || t("unknown")}`
     );
 
 }
@@ -876,7 +2529,9 @@ function showStudentSearchResult(
 
     element.classList.toggle(
         "error",
-        Boolean(isError)
+        Boolean(
+            isError
+        )
     );
 
 
@@ -925,11 +2580,13 @@ function clearStudentInformation() {
 
 
     const ids = [
+
         "studentId",
         "studentName",
         "studentNumber",
         "stage",
         "className"
+
     ];
 
 
@@ -940,6 +2597,7 @@ function clearStudentInformation() {
                 document.getElementById(
                     id
                 );
+
 
             if (element) {
 
@@ -961,11 +2619,13 @@ function clearStudentInformation() {
    Stage
    ================================= */
 
-function formatStage(stage) {
+function formatStage(
+    stage
+) {
 
     if (!stage) {
 
-        return "-";
+        return t("unknown");
 
     }
 
@@ -981,13 +2641,13 @@ function formatStage(stage) {
     const stages = {
 
         primary:
-            "Primary",
+            t("primary"),
 
         preparatory:
-            "Preparatory",
+            t("preparatory"),
 
         secondary:
-            "Secondary"
+            t("secondary")
 
     };
 
@@ -1016,7 +2676,7 @@ function loadCurrentUser() {
 
         recordedBy.value =
             getCurrentUsername() ||
-            "Unknown User";
+            t("unknown");
 
     }
 
@@ -1046,7 +2706,15 @@ function setReceiptNumber(
 
     element.value =
         receiptNumber ||
-        "Generated after saving";
+        "";
+
+
+    if (!receiptNumber) {
+
+        element.placeholder =
+            t("generatedAfterSaving");
+
+    }
 
 }
 
@@ -1076,12 +2744,15 @@ function clearError() {
 }
 
 
-function showError(message) {
+function showError(
+    message
+) {
 
     const error =
         document.getElementById(
             "errorMessage"
         );
+
 
     const success =
         document.getElementById(
@@ -1089,20 +2760,27 @@ function showError(message) {
         );
 
 
-    if (success) {
+    if (
+        success
+    ) {
 
         success.style.display =
             "none";
 
+        success.textContent =
+            "";
+
     }
 
 
-    if (error) {
+    if (
+        error
+    ) {
 
         error.textContent =
             String(
                 message ||
-                "An error occurred."
+                t("requestFailed")
             );
 
         error.style.display =
@@ -1119,12 +2797,15 @@ function showError(message) {
 }
 
 
-function showSuccess(message) {
+function showSuccess(
+    message
+) {
 
     const error =
         document.getElementById(
             "errorMessage"
         );
+
 
     const success =
         document.getElementById(
@@ -1132,15 +2813,22 @@ function showSuccess(message) {
         );
 
 
-    if (error) {
+    if (
+        error
+    ) {
 
         error.style.display =
             "none";
 
+        error.textContent =
+            "";
+
     }
 
 
-    if (success) {
+    if (
+        success
+    ) {
 
         success.textContent =
             String(
@@ -1159,7 +2847,9 @@ function showSuccess(message) {
    Save Payment
    ================================= */
 
-async function savePayment(event) {
+async function savePayment(
+    event
+) {
 
     event.preventDefault();
 
@@ -1201,7 +2891,8 @@ async function savePayment(event) {
     const notes =
         document.getElementById(
             "notes"
-        )?.value.trim() || "";
+        )?.value.trim() ||
+        "";
 
 
     /* Validation */
@@ -1209,7 +2900,7 @@ async function savePayment(event) {
     if (!academicYear) {
 
         showError(
-            "Please select an academic year."
+            t("selectAcademicYearFirst")
         );
 
         return;
@@ -1223,7 +2914,7 @@ async function savePayment(event) {
     ) {
 
         showError(
-            "Please search and select a valid student first."
+            t("validStudent")
         );
 
         return;
@@ -1234,7 +2925,7 @@ async function savePayment(event) {
     if (!month) {
 
         showError(
-            "Please select a month."
+            t("selectMonthError")
         );
 
         return;
@@ -1243,12 +2934,14 @@ async function savePayment(event) {
 
 
     if (
-        !Number.isFinite(amount) ||
+        !Number.isFinite(
+            amount
+        ) ||
         amount <= 0
     ) {
 
         showError(
-            "Please enter a valid payment amount."
+            t("validAmount")
         );
 
         return;
@@ -1259,7 +2952,7 @@ async function savePayment(event) {
     if (!paymentDate) {
 
         showError(
-            "Please select the payment date."
+            t("selectPaymentDate")
         );
 
         return;
@@ -1272,8 +2965,11 @@ async function savePayment(event) {
             item => {
 
                 return (
-                    getStudentId(item) ===
+                    getStudentId(
+                        item
+                    ) ===
                     studentId &&
+
                     String(
                         item.academicYear ||
                         ""
@@ -1288,7 +2984,7 @@ async function savePayment(event) {
     if (!student) {
 
         showError(
-            "Student not found for the selected academic year."
+            t("studentNotFoundSelectedYear")
         );
 
         return;
@@ -1308,7 +3004,7 @@ async function savePayment(event) {
             true;
 
         button.textContent =
-            "Recording...";
+            t("recording");
 
     }
 
@@ -1353,7 +3049,9 @@ async function savePayment(event) {
             "";
 
 
-        if (receiptNumber) {
+        if (
+            receiptNumber
+        ) {
 
             setReceiptNumber(
                 receiptNumber
@@ -1362,15 +3060,29 @@ async function savePayment(event) {
         }
 
 
+        let successMessage =
+            t("paymentRecorded");
+
+
+        if (
+            receiptNumber
+        ) {
+
+            successMessage +=
+                ` ${t("receipt")}: ${receiptNumber}`;
+
+        }
+
+
         showSuccess(
-            "Payment recorded successfully." +
-            (
-                receiptNumber
-                    ? ` Receipt: ${receiptNumber}`
-                    : ""
-            )
+            successMessage
         );
 
+
+        /*
+         * Give the user time to see
+         * the success message.
+         */
 
         setTimeout(
             () => {
@@ -1382,7 +3094,7 @@ async function savePayment(event) {
                     );
 
             },
-            1000
+            1200
         );
 
 
@@ -1396,7 +3108,7 @@ async function savePayment(event) {
 
         showError(
             error.message ||
-            "Failed to record payment."
+            t("paymentFailed")
         );
 
 
@@ -1406,7 +3118,7 @@ async function savePayment(event) {
                 false;
 
             button.textContent =
-                "Record Payment";
+                t("recordPayment");
 
         }
 
@@ -1464,13 +3176,16 @@ function setupEventListeners() {
         );
 
 
-    if (academicYear) {
+    if (
+        academicYear
+    ) {
 
         academicYear.addEventListener(
             "change",
             () => {
 
                 clearStudentInformation();
+
                 clearError();
 
             }
@@ -1485,7 +3200,9 @@ function setupEventListeners() {
         );
 
 
-    if (searchButton) {
+    if (
+        searchButton
+    ) {
 
         searchButton.addEventListener(
             "click",
@@ -1501,7 +3218,9 @@ function setupEventListeners() {
         );
 
 
-    if (studentSearch) {
+    if (
+        studentSearch
+    ) {
 
         studentSearch.addEventListener(
             "keydown",
@@ -1530,7 +3249,9 @@ function setupEventListeners() {
         );
 
 
-    if (paymentForm) {
+    if (
+        paymentForm
+    ) {
 
         paymentForm.addEventListener(
             "submit",
@@ -1546,7 +3267,9 @@ function setupEventListeners() {
         );
 
 
-    if (backButton) {
+    if (
+        backButton
+    ) {
 
         backButton.addEventListener(
             "click",
@@ -1562,7 +3285,9 @@ function setupEventListeners() {
         );
 
 
-    if (cancelButton) {
+    if (
+        cancelButton
+    ) {
 
         cancelButton.addEventListener(
             "click",
@@ -1575,12 +3300,65 @@ function setupEventListeners() {
 
 
 /* =================================
+   Language Initialization
+   ================================= */
+
+function initializeLanguage() {
+
+    currentLanguage =
+        getSavedLanguage();
+
+
+    ensureLanguageSelector();
+
+    applyLanguage();
+
+
+    /*
+     * Allows another page/component
+     * to synchronize the language.
+     */
+
+    window.addEventListener(
+        "bmpLanguageChanged",
+        event => {
+
+            const language =
+                event.detail?.language;
+
+
+            if (
+                language &&
+                TRANSLATIONS[language]
+            ) {
+
+                currentLanguage =
+                    language;
+
+                localStorage.setItem(
+                    "bmpLanguage",
+                    currentLanguage
+                );
+
+                applyLanguage();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =================================
    Initialize
    ================================= */
 
 async function initializePage() {
 
-    if (pageInitialized) {
+    if (
+        pageInitialized
+    ) {
 
         return;
 
@@ -1598,7 +3376,7 @@ async function initializePage() {
     if (!authenticated) {
 
         showError(
-            "School authentication failed. Please log in again."
+            t("authenticationFailed")
         );
 
         return;
@@ -1617,7 +3395,10 @@ async function initializePage() {
         );
 
 
-    if (paymentDate) {
+    if (
+        paymentDate &&
+        !paymentDate.value
+    ) {
 
         paymentDate.value =
             new Date()
@@ -1631,7 +3412,7 @@ async function initializePage() {
 
 
     showSuccess(
-        "Loading students..."
+        t("loadingStudents")
     );
 
 
@@ -1646,10 +3427,12 @@ async function initializePage() {
     }
 
 
-    if (!students.length) {
+    if (
+        !students.length
+    ) {
 
         showError(
-            "No students were found for this school."
+            t("noStudents")
         );
 
         return;
@@ -1661,6 +3444,8 @@ async function initializePage() {
 
     clearError();
 
+    applyLanguage();
+
 }
 
 
@@ -1671,6 +3456,8 @@ async function initializePage() {
 document.addEventListener(
     "DOMContentLoaded",
     () => {
+
+        initializeLanguage();
 
         setupEventListeners();
 
