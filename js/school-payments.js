@@ -1,5 +1,7 @@
 /* =================================
    School Payments - BMP
+   Multilingual:
+   English / Arabic / French
    ================================= */
 
 
@@ -23,6 +25,1664 @@ let allStudents = [];
 
 let pageInitialized = false;
 let paymentsLoaded = false;
+
+let currentLanguage = "en";
+
+
+/* =================================
+   Language System
+   ================================= */
+
+const TRANSLATIONS = {
+
+    en: {
+
+        pageTitle:
+            "Payments",
+
+        pageSubtitle:
+            "View and manage student payments",
+
+        back:
+            "Back",
+
+        recordPayment:
+            "Record Payment",
+
+        academicYear:
+            "Academic Year",
+
+        all:
+            "All",
+
+        month:
+            "Month",
+
+        stage:
+            "Stage",
+
+        search:
+            "Search",
+
+        searchStudent:
+            "Student name or number",
+
+        reset:
+            "Reset",
+
+        totalPayments:
+            "Total Payments",
+
+        totalAmount:
+            "Total Amount",
+
+        displayedPayments:
+            "Displayed Payments",
+
+        loadingPayments:
+            "Loading payments...",
+
+        loading:
+            "Loading...",
+
+        errorLoading:
+            "An error occurred while loading payments.",
+
+        retry:
+            "Retry",
+
+        noPayments:
+            "No Payments",
+
+        noPaymentsDescription:
+            "No payments matching your search were found.",
+
+        paymentDetails:
+            "Payment Details",
+
+        studentNumber:
+            "Student Number",
+
+        studentName:
+            "Student Name",
+
+        paymentDate:
+            "Payment Date",
+
+        receiptNumber:
+            "Receipt Number",
+
+        recordedBy:
+            "Recorded By",
+
+        amount:
+            "Amount",
+
+        notes:
+            "Notes",
+
+        class:
+            "Class",
+
+        primary:
+            "Primary",
+
+        preparatory:
+            "Preparatory",
+
+        secondary:
+            "Secondary",
+
+        close:
+            "Close",
+
+        unknown:
+            "-",
+
+        language:
+            "Language",
+
+        english:
+            "English",
+
+        arabic:
+            "Arabic",
+
+        french:
+            "French",
+
+        months: {
+
+            October:
+                "October",
+
+            November:
+                "November",
+
+            December:
+                "December",
+
+            January:
+                "January",
+
+            February:
+                "February",
+
+            March:
+                "March",
+
+            April:
+                "April",
+
+            May:
+                "May",
+
+            June:
+                "June"
+
+        },
+
+        errors: {
+
+            institutionMissing:
+                "Institution ID is missing.",
+
+            userMissing:
+                "Current user is missing.",
+
+            connection:
+                "Could not connect to the BMP server.",
+
+            invalidResponse:
+                "The server returned an invalid response.",
+
+            authentication:
+                "School authentication failed. Please log in again.",
+
+            unknownRequest:
+                "The request failed.",
+
+            failedPayments:
+                "Failed to load payments."
+
+        }
+
+    },
+
+
+    ar: {
+
+        pageTitle:
+            "المدفوعات",
+
+        pageSubtitle:
+            "عرض وإدارة مدفوعات الطلاب",
+
+        back:
+            "رجوع",
+
+        recordPayment:
+            "تسجيل دفعة",
+
+        academicYear:
+            "السنة الدراسية",
+
+        all:
+            "الكل",
+
+        month:
+            "الشهر",
+
+        stage:
+            "المرحلة",
+
+        search:
+            "بحث",
+
+        searchStudent:
+            "اسم الطالب أو رقمه",
+
+        reset:
+            "إعادة تعيين",
+
+        totalPayments:
+            "إجمالي المدفوعات",
+
+        totalAmount:
+            "إجمالي المبلغ",
+
+        displayedPayments:
+            "المدفوعات المعروضة",
+
+        loadingPayments:
+            "جارٍ تحميل المدفوعات...",
+
+        loading:
+            "جارٍ التحميل...",
+
+        errorLoading:
+            "حدث خطأ أثناء تحميل المدفوعات.",
+
+        retry:
+            "إعادة المحاولة",
+
+        noPayments:
+            "لا توجد مدفوعات",
+
+        noPaymentsDescription:
+            "لم يتم العثور على مدفوعات مطابقة لبحثك.",
+
+        paymentDetails:
+            "تفاصيل الدفعة",
+
+        studentNumber:
+            "رقم الطالب",
+
+        studentName:
+            "اسم الطالب",
+
+        paymentDate:
+            "تاريخ الدفع",
+
+        receiptNumber:
+            "رقم الإيصال",
+
+        recordedBy:
+            "سجلها المستخدم",
+
+        amount:
+            "المبلغ",
+
+        notes:
+            "ملاحظات",
+
+        class:
+            "القسم",
+
+        primary:
+            "الابتدائية",
+
+        preparatory:
+            "الإعدادية",
+
+        secondary:
+            "الثانوية",
+
+        close:
+            "إغلاق",
+
+        unknown:
+            "-",
+
+        language:
+            "اللغة",
+
+        english:
+            "الإنجليزية",
+
+        arabic:
+            "العربية",
+
+        french:
+            "الفرنسية",
+
+        months: {
+
+            October:
+                "أكتوبر",
+
+            November:
+                "نوفمبر",
+
+            December:
+                "ديسمبر",
+
+            January:
+                "يناير",
+
+            February:
+                "فبراير",
+
+            March:
+                "مارس",
+
+            April:
+                "أبريل",
+
+            May:
+                "مايو",
+
+            June:
+                "يونيو"
+
+        },
+
+        errors: {
+
+            institutionMissing:
+                "معرّف المؤسسة غير موجود.",
+
+            userMissing:
+                "المستخدم الحالي غير موجود.",
+
+            connection:
+                "تعذر الاتصال بخادم النظام.",
+
+            invalidResponse:
+                "أعاد الخادم استجابة غير صالحة.",
+
+            authentication:
+                "فشل تسجيل دخول المدرسة. يرجى تسجيل الدخول مرة أخرى.",
+
+            unknownRequest:
+                "فشل تنفيذ الطلب.",
+
+            failedPayments:
+                "فشل تحميل المدفوعات."
+
+        }
+
+    },
+
+
+    fr: {
+
+        pageTitle:
+            "Paiements",
+
+        pageSubtitle:
+            "Consulter et gérer les paiements des élèves",
+
+        back:
+            "Retour",
+
+        recordPayment:
+            "Enregistrer un paiement",
+
+        academicYear:
+            "Année scolaire",
+
+        all:
+            "Tous",
+
+        month:
+            "Mois",
+
+        stage:
+            "Cycle",
+
+        search:
+            "Rechercher",
+
+        searchStudent:
+            "Nom ou numéro de l'élève",
+
+        reset:
+            "Réinitialiser",
+
+        totalPayments:
+            "Total des paiements",
+
+        totalAmount:
+            "Montant total",
+
+        displayedPayments:
+            "Paiements affichés",
+
+        loadingPayments:
+            "Chargement des paiements...",
+
+        loading:
+            "Chargement...",
+
+        errorLoading:
+            "Une erreur s'est produite lors du chargement des paiements.",
+
+        retry:
+            "Réessayer",
+
+        noPayments:
+            "Aucun paiement",
+
+        noPaymentsDescription:
+            "Aucun paiement correspondant à votre recherche n'a été trouvé.",
+
+        paymentDetails:
+            "Détails du paiement",
+
+        studentNumber:
+            "Numéro de l'élève",
+
+        studentName:
+            "Nom de l'élève",
+
+        paymentDate:
+            "Date du paiement",
+
+        receiptNumber:
+            "Numéro du reçu",
+
+        recordedBy:
+            "Enregistré par",
+
+        amount:
+            "Montant",
+
+        notes:
+            "Notes",
+
+        class:
+            "Classe",
+
+        primary:
+            "Primaire",
+
+        preparatory:
+            "Collège",
+
+        secondary:
+            "Secondaire",
+
+        close:
+            "Fermer",
+
+        unknown:
+            "-",
+
+        language:
+            "Langue",
+
+        english:
+            "Anglais",
+
+        arabic:
+            "Arabe",
+
+        french:
+            "Français",
+
+        months: {
+
+            October:
+                "Octobre",
+
+            November:
+                "Novembre",
+
+            December:
+                "Décembre",
+
+            January:
+                "Janvier",
+
+            February:
+                "Février",
+
+            March:
+                "Mars",
+
+            April:
+                "Avril",
+
+            May:
+                "Mai",
+
+            June:
+                "Juin"
+
+        },
+
+        errors: {
+
+            institutionMissing:
+                "L'identifiant de l'établissement est manquant.",
+
+            userMissing:
+                "L'utilisateur actuel est introuvable.",
+
+            connection:
+                "Impossible de se connecter au serveur BMP.",
+
+            invalidResponse:
+                "Le serveur a renvoyé une réponse invalide.",
+
+            authentication:
+                "L'authentification de l'école a échoué. Veuillez vous reconnecter.",
+
+            unknownRequest:
+                "La requête a échoué.",
+
+            failedPayments:
+                "Échec du chargement des paiements."
+
+        }
+
+    }
+
+};
+
+
+/* =================================
+   Translation Helper
+   ================================= */
+
+function t(key) {
+
+    const language =
+        TRANSLATIONS[currentLanguage] ||
+        TRANSLATIONS.en;
+
+
+    const parts =
+        String(key)
+            .split(".");
+
+
+    let value =
+        language;
+
+
+    for (
+        const part of parts
+    ) {
+
+        if (
+            value &&
+            Object.prototype.hasOwnProperty.call(
+                value,
+                part
+            )
+        ) {
+
+            value =
+                value[part];
+
+        } else {
+
+            return key;
+
+        }
+
+    }
+
+
+    return value;
+
+}
+
+
+/* =================================
+   Language Detection
+   ================================= */
+
+function getSavedLanguage() {
+
+    const possibleKeys = [
+
+        "bmpLanguage",
+        "language",
+        "selectedLanguage",
+        "appLanguage"
+
+    ];
+
+
+    for (
+        const key of possibleKeys
+    ) {
+
+        const value =
+            localStorage.getItem(
+                key
+            );
+
+
+        if (
+            value &&
+            [
+                "en",
+                "ar",
+                "fr"
+            ].includes(
+                value
+                    .toLowerCase()
+                    .trim()
+            )
+        ) {
+
+            return value
+                .toLowerCase()
+                .trim();
+
+        }
+
+    }
+
+
+    const htmlLanguage =
+        String(
+            document.documentElement.lang ||
+            ""
+        )
+        .toLowerCase()
+        .trim();
+
+
+    if (
+        htmlLanguage.startsWith("ar")
+    ) {
+
+        return "ar";
+
+    }
+
+
+    if (
+        htmlLanguage.startsWith("fr")
+    ) {
+
+        return "fr";
+
+    }
+
+
+    return "en";
+
+}
+
+
+/* =================================
+   Set Language
+   ================================= */
+
+function setLanguage(
+    language
+) {
+
+    language =
+        String(
+            language ||
+            "en"
+        )
+        .toLowerCase()
+        .trim();
+
+
+    if (
+        !TRANSLATIONS[language]
+    ) {
+
+        language =
+            "en";
+
+    }
+
+
+    currentLanguage =
+        language;
+
+
+    localStorage.setItem(
+        "bmpLanguage",
+        currentLanguage
+    );
+
+
+    applyLanguage();
+
+}
+
+
+/* =================================
+   Apply Language
+   ================================= */
+
+function applyLanguage() {
+
+    const language =
+        currentLanguage;
+
+
+    document.documentElement.lang =
+        language;
+
+
+    document.documentElement.dir =
+        language === "ar"
+            ? "rtl"
+            : "ltr";
+
+
+    /*
+     * Page title.
+     */
+
+    document.title =
+        `${t("pageTitle")} - BMP`;
+
+
+    /*
+     * Header.
+     */
+
+    const backButton =
+        document.getElementById(
+            "backButton"
+        );
+
+    const pageTitle =
+        document.querySelector(
+            ".page-title h1"
+        );
+
+    const pageSubtitle =
+        document.querySelector(
+            ".page-title p"
+        );
+
+    const recordPaymentButton =
+        document.getElementById(
+            "recordPaymentPageBtn"
+        );
+
+
+    if (backButton) {
+
+        backButton.textContent =
+            t("back");
+
+    }
+
+
+    if (pageTitle) {
+
+        pageTitle.textContent =
+            t("pageTitle");
+
+    }
+
+
+    if (pageSubtitle) {
+
+        pageSubtitle.textContent =
+            t("pageSubtitle");
+
+    }
+
+
+    if (recordPaymentButton) {
+
+        recordPaymentButton.textContent =
+            t("recordPayment");
+
+    }
+
+
+    /*
+     * Filter labels.
+     */
+
+    const academicYearLabel =
+        document.querySelector(
+            'label[for="academicYear"]'
+        );
+
+    const paymentMonthLabel =
+        document.querySelector(
+            'label[for="paymentMonth"]'
+        );
+
+    const stageLabel =
+        document.querySelector(
+            'label[for="stageFilter"]'
+        );
+
+    const searchLabel =
+        document.querySelector(
+            'label[for="studentSearch"]'
+        );
+
+
+    if (academicYearLabel) {
+
+        academicYearLabel.textContent =
+            t("academicYear");
+
+    }
+
+
+    if (paymentMonthLabel) {
+
+        paymentMonthLabel.textContent =
+            t("month");
+
+    }
+
+
+    if (stageLabel) {
+
+        stageLabel.textContent =
+            t("stage");
+
+    }
+
+
+    if (searchLabel) {
+
+        searchLabel.textContent =
+            t("search");
+
+    }
+
+
+    /*
+     * Search input.
+     */
+
+    const searchInput =
+        document.getElementById(
+            "studentSearch"
+        );
+
+
+    if (searchInput) {
+
+        searchInput.placeholder =
+            t("searchStudent");
+
+    }
+
+
+    /*
+     * Filter buttons.
+     */
+
+    const applyFiltersButton =
+        document.getElementById(
+            "applyFiltersBtn"
+        );
+
+    const resetFiltersButton =
+        document.getElementById(
+            "resetFiltersBtn"
+        );
+
+
+    if (applyFiltersButton) {
+
+        applyFiltersButton.textContent =
+            t("search");
+
+    }
+
+
+    if (resetFiltersButton) {
+
+        resetFiltersButton.textContent =
+            t("reset");
+
+    }
+
+
+    /*
+     * Summary.
+     */
+
+    const summaryLabels =
+        document.querySelectorAll(
+            ".summary-label"
+        );
+
+
+    if (
+        summaryLabels.length >= 3
+    ) {
+
+        summaryLabels[0].textContent =
+            t("totalPayments");
+
+        summaryLabels[1].textContent =
+            t("totalAmount");
+
+        summaryLabels[2].textContent =
+            t("displayedPayments");
+
+    }
+
+
+    /*
+     * Loading.
+     */
+
+    const loadingMessage =
+        document.getElementById(
+            "loadingMessage"
+        );
+
+
+    if (loadingMessage) {
+
+        loadingMessage.textContent =
+            t("loadingPayments");
+
+    }
+
+
+    /*
+     * Retry.
+     */
+
+    const retryButton =
+        document.getElementById(
+            "retryBtn"
+        );
+
+
+    if (retryButton) {
+
+        retryButton.textContent =
+            t("retry");
+
+    }
+
+
+    /*
+     * Empty state.
+     */
+
+    const emptyTitle =
+        document.querySelector(
+            "#emptyState h3"
+        );
+
+    const emptyDescription =
+        document.querySelector(
+            "#emptyState p"
+        );
+
+
+    if (emptyTitle) {
+
+        emptyTitle.textContent =
+            t("noPayments");
+
+    }
+
+
+    if (emptyDescription) {
+
+        emptyDescription.textContent =
+            t("noPaymentsDescription");
+
+    }
+
+
+    /*
+     * Modal title.
+     */
+
+    const modalTitle =
+        document.querySelector(
+            "#paymentDetailsModal .modal-header h2"
+        );
+
+
+    if (modalTitle) {
+
+        modalTitle.textContent =
+            t("paymentDetails");
+
+    }
+
+
+    /*
+     * Table headers.
+     */
+
+    const headers =
+        document.querySelectorAll(
+            "#paymentsTable thead th"
+        );
+
+
+    const headerTranslations = [
+
+        "studentNumber",
+        "studentName",
+        "academicYear",
+        "month",
+        "amount",
+        "paymentDate",
+        "receiptNumber",
+        "recordedBy"
+
+    ];
+
+
+    headers.forEach(
+        (
+            header,
+            index
+        ) => {
+
+            if (
+                headerTranslations[index]
+            ) {
+
+                header.textContent =
+                    t(
+                        headerTranslations[index]
+                    );
+
+            }
+
+        }
+    );
+
+
+    /*
+     * Filter options.
+     */
+
+    updateFilterOptions();
+
+
+    /*
+     * Language selector.
+     */
+
+    updateLanguageSelector();
+
+
+    /*
+     * Re-render current table
+     * using translated values.
+     */
+
+    if (paymentsLoaded) {
+
+        renderPayments(
+            getFilteredPayments()
+        );
+
+    }
+
+}
+
+
+/* =================================
+   Filter Option Translations
+   ================================= */
+
+function updateFilterOptions() {
+
+    const academicYear =
+        document.getElementById(
+            "academicYear"
+        );
+
+
+    if (academicYear) {
+
+        const currentValue =
+            academicYear.value;
+
+
+        const firstOption =
+            academicYear.querySelector(
+                'option[value=""]'
+            );
+
+
+        if (firstOption) {
+
+            firstOption.textContent =
+                t("all");
+
+        }
+
+
+        /*
+         * Academic years themselves
+         * must remain unchanged.
+         */
+
+        if (
+            currentValue
+        ) {
+
+            academicYear.value =
+                currentValue;
+
+        }
+
+    }
+
+
+    const paymentMonth =
+        document.getElementById(
+            "paymentMonth"
+        );
+
+
+    if (paymentMonth) {
+
+        const allOption =
+            paymentMonth.querySelector(
+                'option[value=""]'
+            );
+
+
+        if (allOption) {
+
+            allOption.textContent =
+                t("all");
+
+        }
+
+
+        paymentMonth
+            .querySelectorAll(
+                "option"
+            )
+            .forEach(
+                option => {
+
+                    if (
+                        option.value &&
+                        TRANSLATIONS.en.months[
+                            option.value
+                        ]
+                    ) {
+
+                        option.textContent =
+                            t(
+                                `months.${option.value}`
+                            );
+
+                    }
+
+                }
+            );
+
+    }
+
+
+    const stageFilter =
+        document.getElementById(
+            "stageFilter"
+        );
+
+
+    if (stageFilter) {
+
+        stageFilter
+            .querySelectorAll(
+                "option"
+            )
+            .forEach(
+                option => {
+
+                    if (
+                        !option.value
+                    ) {
+
+                        option.textContent =
+                            t("all");
+
+                        return;
+
+                    }
+
+
+                    const stageKey =
+                        String(
+                            option.value
+                        )
+                        .trim()
+                        .toLowerCase();
+
+
+                    if (
+                        TRANSLATIONS[
+                            "en"
+                        ][stageKey]
+                    ) {
+
+                        option.textContent =
+                            t(
+                                stageKey
+                            );
+
+                    }
+
+                }
+            );
+
+    }
+
+}
+
+
+/* =================================
+   Language Selector
+   ================================= */
+
+function ensureLanguageSelector() {
+
+    const headerActions =
+        document.querySelector(
+            ".header-actions"
+        );
+
+
+    if (
+        !headerActions
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        document.getElementById(
+            "bmpLanguageSelector"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const wrapper =
+        document.createElement(
+            "div"
+        );
+
+
+    wrapper.id =
+        "bmpLanguageWrapper";
+
+
+    wrapper.style.display =
+        "flex";
+
+    wrapper.style.alignItems =
+        "center";
+
+    wrapper.style.gap =
+        "7px";
+
+
+    const label =
+        document.createElement(
+            "span"
+        );
+
+
+    label.id =
+        "bmpLanguageLabel";
+
+
+    label.style.fontSize =
+        "13px";
+
+    label.style.fontWeight =
+        "600";
+
+
+    const select =
+        document.createElement(
+            "select"
+        );
+
+
+    select.id =
+        "bmpLanguageSelector";
+
+
+    select.innerHTML = `
+
+        <option value="en">
+            English
+        </option>
+
+        <option value="ar">
+            العربية
+        </option>
+
+        <option value="fr">
+            Français
+        </option>
+
+    `;
+
+
+    select.style.height =
+        "38px";
+
+    select.style.padding =
+        "0 10px";
+
+    select.style.borderRadius =
+        "7px";
+
+    select.style.border =
+        "1px solid #d1d5db";
+
+    select.style.background =
+        "#ffffff";
+
+    select.style.cursor =
+        "pointer";
+
+
+    select.addEventListener(
+        "change",
+        function () {
+
+            setLanguage(
+                this.value
+            );
+
+        }
+    );
+
+
+    wrapper.appendChild(
+        label
+    );
+
+    wrapper.appendChild(
+        select
+    );
+
+
+    headerActions.prepend(
+        wrapper
+    );
+
+}
+
+
+/* =================================
+   Update Language Selector
+   ================================= */
+
+function updateLanguageSelector() {
+
+    const selector =
+        document.getElementById(
+            "bmpLanguageSelector"
+        );
+
+
+    const label =
+        document.getElementById(
+            "bmpLanguageLabel"
+        );
+
+
+    if (selector) {
+
+        selector.value =
+            currentLanguage;
+
+    }
+
+
+    if (label) {
+
+        label.textContent =
+            t("language");
+
+    }
+
+}
+
+
+/* =================================
+   API Request
+   ================================= */
+
+async function apiRequest(
+    action,
+    data = {}
+) {
+
+    if (!institutionId) {
+
+        throw new Error(
+            t(
+                "errors.institutionMissing"
+            )
+        );
+
+    }
+
+
+    const username =
+        getCurrentUsername();
+
+
+    if (!username) {
+
+        throw new Error(
+            t(
+                "errors.userMissing"
+            )
+        );
+
+    }
+
+
+    const payload = {
+
+        action:
+            action,
+
+        institutionId:
+            institutionId,
+
+        username:
+            username,
+
+        ...data
+
+    };
+
+
+    console.log(
+        "BMP API request:",
+        payload
+    );
+
+
+    let response;
+
+
+    try {
+
+        response =
+            await fetch(
+                API_URL,
+                {
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            payload
+                        )
+
+                }
+            );
+
+    } catch (error) {
+
+        throw new Error(
+            t(
+                "errors.connection"
+            )
+        );
+
+    }
+
+
+    const responseText =
+        await response.text();
+
+
+    console.log(
+        "BMP API response:",
+        responseText
+    );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            `Server error: ${response.status}`
+        );
+
+    }
+
+
+    let result;
+
+
+    try {
+
+        result =
+            JSON.parse(
+                responseText
+            );
+
+    } catch (error) {
+
+        throw new Error(
+            t(
+                "errors.invalidResponse"
+            )
+        );
+
+    }
+
+
+    if (!result.success) {
+
+        throw new Error(
+            translateBackendError(
+                result.message
+            )
+        );
+
+    }
+
+
+    return result;
+
+}
+
+
+/* =================================
+   Backend Error Translation
+   ================================= */
+
+function translateBackendError(
+    message
+) {
+
+    if (!message) {
+
+        return t(
+            "errors.unknownRequest"
+        );
+
+    }
+
+
+    const text =
+        String(
+            message
+        );
+
+
+    const lower =
+        text.toLowerCase();
+
+
+    const knownErrors = [
+
+        {
+            keys: [
+                "institution id is missing",
+                "institution is missing"
+            ],
+            translation:
+                "errors.institutionMissing"
+        },
+
+        {
+            keys: [
+                "current user is missing"
+            ],
+            translation:
+                "errors.userMissing"
+        },
+
+        {
+            keys: [
+                "authentication failed",
+                "school authentication failed"
+            ],
+            translation:
+                "errors.authentication"
+        }
+
+    ];
+
+
+    for (
+        const item of knownErrors
+    ) {
+
+        if (
+            item.keys.some(
+                key =>
+                    lower.includes(
+                        key
+                    )
+            )
+        ) {
+
+            return t(
+                item.translation
+            );
+
+        }
+
+    }
+
+
+    /*
+     * Unknown backend errors are kept
+     * because they may contain useful
+     * diagnostic information.
+     */
+
+    return text;
+
+}
 
 
 /* =================================
@@ -71,7 +1731,8 @@ function initializeAuthentication() {
                 error
             );
 
-            currentUser = null;
+            currentUser =
+                null;
 
         }
 
@@ -84,11 +1745,6 @@ function initializeAuthentication() {
 
     }
 
-
-    /*
-     * First try the authenticated
-     * institution helper.
-     */
 
     try {
 
@@ -112,16 +1768,13 @@ function initializeAuthentication() {
     }
 
 
-    /*
-     * Then URL.
-     */
-
     if (!institutionId) {
 
         const params =
             new URLSearchParams(
                 window.location.search
             );
+
 
         institutionId =
             params.get(
@@ -134,10 +1787,6 @@ function initializeAuthentication() {
 
     }
 
-
-    /*
-     * Finally stored user.
-     */
 
     if (!institutionId) {
 
@@ -210,144 +1859,6 @@ function getCurrentUsername() {
 
 
 /* =================================
-   API Request
-   ================================= */
-
-async function apiRequest(
-    action,
-    data = {}
-) {
-
-    if (!institutionId) {
-
-        throw new Error(
-            "Institution ID is missing."
-        );
-
-    }
-
-
-    const username =
-        getCurrentUsername();
-
-
-    if (!username) {
-
-        throw new Error(
-            "Current user is missing."
-        );
-
-    }
-
-
-    const payload = {
-
-        action:
-            action,
-
-        institutionId:
-            institutionId,
-
-        username:
-            username,
-
-        ...data
-
-    };
-
-
-    console.log(
-        "BMP API request:",
-        payload
-    );
-
-
-    let response;
-
-
-    try {
-
-        response =
-            await fetch(
-                API_URL,
-                {
-                    method:
-                        "POST",
-
-                    headers: {
-                        "Content-Type":
-                            "text/plain;charset=utf-8"
-                    },
-
-                    body:
-                        JSON.stringify(
-                            payload
-                        )
-                }
-            );
-
-    } catch (error) {
-
-        throw new Error(
-            "Could not connect to the BMP server."
-        );
-
-    }
-
-
-    const responseText =
-        await response.text();
-
-
-    console.log(
-        "BMP API response:",
-        responseText
-    );
-
-
-    if (!response.ok) {
-
-        throw new Error(
-            `Server error: ${response.status}`
-        );
-
-    }
-
-
-    let result;
-
-    try {
-
-        result =
-            JSON.parse(
-                responseText
-            );
-
-    } catch (error) {
-
-        throw new Error(
-            "The server returned an invalid response."
-        );
-
-    }
-
-
-    if (!result.success) {
-
-        throw new Error(
-            result.message ||
-            "The request failed."
-        );
-
-    }
-
-
-    return result;
-
-}
-
-
-/* =================================
    Current Academic Year
    ================================= */
 
@@ -360,10 +1871,6 @@ function getCurrentAcademicYear() {
     let year =
         now.getFullYear();
 
-
-    /*
-     * October -> June
-     */
 
     if (
         now.getMonth() < 9
@@ -435,18 +1942,14 @@ async function loadStudents() {
 
     } catch (error) {
 
-        /*
-         * Student loading should NOT
-         * prevent payment loading.
-         */
-
         console.error(
             "Students could not be loaded:",
             error
         );
 
 
-        allStudents = [];
+        allStudents =
+            [];
 
 
         return false;
@@ -460,7 +1963,9 @@ async function loadStudents() {
    Payment Helpers
    ================================= */
 
-function getPaymentStudentId(payment) {
+function getPaymentStudentId(
+    payment
+) {
 
     return String(
         payment.studentId ||
@@ -472,7 +1977,9 @@ function getPaymentStudentId(payment) {
 }
 
 
-function getPaymentStudentNumber(payment) {
+function getPaymentStudentNumber(
+    payment
+) {
 
     return String(
         payment.studentNumber ||
@@ -483,7 +1990,9 @@ function getPaymentStudentNumber(payment) {
 }
 
 
-function getPaymentStudentName(payment) {
+function getPaymentStudentName(
+    payment
+) {
 
     return String(
         payment.studentName ||
@@ -494,7 +2003,9 @@ function getPaymentStudentName(payment) {
 }
 
 
-function getPaymentAcademicYear(payment) {
+function getPaymentAcademicYear(
+    payment
+) {
 
     return String(
         payment.academicYear ||
@@ -505,7 +2016,9 @@ function getPaymentAcademicYear(payment) {
 }
 
 
-function getPaymentMonth(payment) {
+function getPaymentMonth(
+    payment
+) {
 
     return String(
         payment.month ||
@@ -515,7 +2028,9 @@ function getPaymentMonth(payment) {
 }
 
 
-function getPaymentAmount(payment) {
+function getPaymentAmount(
+    payment
+) {
 
     const value =
         Number(
@@ -532,7 +2047,9 @@ function getPaymentAmount(payment) {
 }
 
 
-function getPaymentDate(payment) {
+function getPaymentDate(
+    payment
+) {
 
     return String(
         payment.paymentDate ||
@@ -543,7 +2060,9 @@ function getPaymentDate(payment) {
 }
 
 
-function getReceiptNumber(payment) {
+function getReceiptNumber(
+    payment
+) {
 
     return String(
         payment.receiptNumber ||
@@ -554,7 +2073,9 @@ function getReceiptNumber(payment) {
 }
 
 
-function getRecordedBy(payment) {
+function getRecordedBy(
+    payment
+) {
 
     return String(
         payment.recordedBy ||
@@ -569,7 +2090,9 @@ function getRecordedBy(payment) {
    Student Lookup
    ================================= */
 
-function findStudentForPayment(payment) {
+function findStudentForPayment(
+    payment
+) {
 
     const studentId =
         getPaymentStudentId(
@@ -582,10 +2105,6 @@ function findStudentForPayment(payment) {
             payment
         );
 
-
-    /*
-     * Prefer student ID.
-     */
 
     if (studentId) {
 
@@ -609,10 +2128,6 @@ function findStudentForPayment(payment) {
 
     }
 
-
-    /*
-     * Fallback to student number.
-     */
 
     if (studentNumber) {
 
@@ -652,7 +2167,9 @@ function findStudentForPayment(payment) {
    Stage
    ================================= */
 
-function normalizeStage(stage) {
+function normalizeStage(
+    stage
+) {
 
     return String(
         stage ||
@@ -664,14 +2181,13 @@ function normalizeStage(stage) {
 }
 
 
-function getStageForPayment(payment) {
+function getStageForPayment(
+    payment
+) {
 
-    /*
-     * In case the backend already
-     * sends the stage.
-     */
-
-    if (payment.stage) {
+    if (
+        payment.stage
+    ) {
 
         return normalizeStage(
             payment.stage
@@ -700,7 +2216,9 @@ function getStageForPayment(payment) {
 }
 
 
-function formatStage(stage) {
+function formatStage(
+    stage
+) {
 
     const value =
         normalizeStage(
@@ -711,13 +2229,13 @@ function formatStage(stage) {
     const stages = {
 
         primary:
-            "Primary",
+            t("primary"),
 
         preparatory:
-            "Preparatory",
+            t("preparatory"),
 
         secondary:
-            "Secondary"
+            t("secondary")
 
     };
 
@@ -725,8 +2243,47 @@ function formatStage(stage) {
     return (
         stages[value] ||
         stage ||
-        "-"
+        t("unknown")
     );
+
+}
+
+
+/* =================================
+   Display Month
+   ================================= */
+
+function formatMonth(
+    month
+) {
+
+    if (!month) {
+
+        return t("unknown");
+
+    }
+
+
+    const monthKey =
+        String(
+            month
+        ).trim();
+
+
+    if (
+        TRANSLATIONS.en.months[
+            monthKey
+        ]
+    ) {
+
+        return t(
+            `months.${monthKey}`
+        );
+
+    }
+
+
+    return monthKey;
 
 }
 
@@ -738,8 +2295,9 @@ function formatStage(stage) {
 async function loadPayments() {
 
     hideError();
+
     showLoading(
-        "Loading payments..."
+        t("loadingPayments")
     );
 
 
@@ -750,14 +2308,6 @@ async function loadPayments() {
                 "getPayments"
             );
 
-
-        /*
-         * Support the normal:
-         * result.payments
-         *
-         * and fallback:
-         * result.data
-         */
 
         if (
             Array.isArray(
@@ -779,7 +2329,8 @@ async function loadPayments() {
 
         } else {
 
-            allPayments = [];
+            allPayments =
+                [];
 
         }
 
@@ -820,7 +2371,7 @@ async function loadPayments() {
 
         showError(
             error.message ||
-            "Failed to load payments."
+            t("errors.failedPayments")
         );
 
 
@@ -914,7 +2465,9 @@ function loadAcademicYears() {
 
 
     select.innerHTML =
-        `<option value="">All</option>`;
+        `<option value="">${escapeHtml(
+            t("all")
+        )}</option>`;
 
 
     Array
@@ -1076,13 +2629,17 @@ function getFilteredPayments() {
             if (search) {
 
                 const matchesSearch =
-                    paymentStudentNumber
-                        .includes(search) ||
-                    paymentStudentName
-                        .includes(search);
+                    paymentStudentNumber.includes(
+                        search
+                    ) ||
+                    paymentStudentName.includes(
+                        search
+                    );
 
 
-                if (!matchesSearch) {
+                if (
+                    !matchesSearch
+                ) {
 
                     return false;
 
@@ -1103,7 +2660,9 @@ function getFilteredPayments() {
    Sorting
    ================================= */
 
-function sortPayments(payments) {
+function sortPayments(
+    payments
+) {
 
     return [
         ...payments
@@ -1146,7 +2705,9 @@ function sortPayments(payments) {
    HTML Escape
    ================================= */
 
-function escapeHtml(value) {
+function escapeHtml(
+    value
+) {
 
     return String(
         value ??
@@ -1181,7 +2742,8 @@ function escapeHtml(value) {
    ================================= */
 
 function renderPayments(
-    payments = getFilteredPayments()
+    payments =
+        getFilteredPayments()
 ) {
 
     const tbody =
@@ -1266,7 +2828,7 @@ function renderPayments(
                     findStudentForPayment(
                         payment
                     )?.name ||
-                    "-"
+                    t("unknown")
                 );
 
 
@@ -1311,55 +2873,58 @@ function renderPayments(
                 <td>
                     ${escapeHtml(
                         studentNumber ||
-                        "-"
+                        t("unknown")
                     )}
                 </td>
 
                 <td>
                     ${escapeHtml(
                         studentName ||
-                        "-"
+                        t("unknown")
                     )}
                 </td>
 
                 <td>
                     ${escapeHtml(
                         academicYear ||
-                        "-"
+                        t("unknown")
                     )}
                 </td>
 
                 <td>
                     ${escapeHtml(
-                        month ||
-                        "-"
+                        formatMonth(
+                            month
+                        )
                     )}
                 </td>
 
                 <td>
                     ${escapeHtml(
-                        amount.toFixed(2)
+                        amount.toFixed(
+                            2
+                        )
                     )}
                 </td>
 
                 <td>
                     ${escapeHtml(
                         paymentDate ||
-                        "-"
+                        t("unknown")
                     )}
                 </td>
 
                 <td>
                     ${escapeHtml(
                         receiptNumber ||
-                        "-"
+                        t("unknown")
                     )}
                 </td>
 
                 <td>
                     ${escapeHtml(
                         recordedBy ||
-                        "-"
+                        t("unknown")
                     )}
                 </td>
 
@@ -1459,7 +3024,9 @@ function updateSummary(
     ) {
 
         totalAmountElement.textContent =
-            totalAmount.toFixed(2);
+            totalAmount.toFixed(
+                2
+            );
 
     }
 
@@ -1484,7 +3051,9 @@ function updateSummary(
 
 function applyFilters() {
 
-    if (!paymentsLoaded) {
+    if (
+        !paymentsLoaded
+    ) {
 
         return;
 
@@ -1574,7 +3143,8 @@ function resetFilters() {
    ================================= */
 
 function showLoading(
-    message = "Loading..."
+    message =
+        "Loading..."
 ) {
 
     const loading =
@@ -1589,7 +3159,9 @@ function showLoading(
         );
 
 
-    if (messageElement) {
+    if (
+        messageElement
+    ) {
 
         messageElement.textContent =
             message;
@@ -1597,7 +3169,9 @@ function showLoading(
     }
 
 
-    if (loading) {
+    if (
+        loading
+    ) {
 
         loading.style.display =
             "block";
@@ -1615,7 +3189,9 @@ function hideLoading() {
         );
 
 
-    if (loading) {
+    if (
+        loading
+    ) {
 
         loading.style.display =
             "none";
@@ -1629,7 +3205,9 @@ function hideLoading() {
    Error
    ================================= */
 
-function showError(message) {
+function showError(
+    message
+) {
 
     const errorState =
         document.getElementById(
@@ -1643,18 +3221,24 @@ function showError(message) {
         );
 
 
-    if (errorMessage) {
+    if (
+        errorMessage
+    ) {
 
         errorMessage.textContent =
             String(
                 message ||
-                "An error occurred."
+                t(
+                    "errorLoading"
+                )
             );
 
     }
 
 
-    if (errorState) {
+    if (
+        errorState
+    ) {
 
         errorState.style.display =
             "block";
@@ -1678,7 +3262,9 @@ function hideError() {
         );
 
 
-    if (errorState) {
+    if (
+        errorState
+    ) {
 
         errorState.style.display =
             "none";
@@ -1729,7 +3315,7 @@ function showPaymentDetails(
             payment
         ) ||
         student?.name ||
-        "-";
+        t("unknown");
 
 
     const stage =
@@ -1742,7 +3328,7 @@ function showPaymentDetails(
         student?.className ||
         student?.class ||
         student?.classNumber ||
-        "-";
+        t("unknown");
 
 
     const studentNumber =
@@ -1750,13 +3336,14 @@ function showPaymentDetails(
             payment
         ) ||
         student?.studentNumber ||
-        "-";
+        t("unknown");
 
 
     const academicYear =
         getPaymentAcademicYear(
             payment
-        );
+        ) ||
+        t("unknown");
 
 
     const month =
@@ -1774,19 +3361,22 @@ function showPaymentDetails(
     const paymentDate =
         getPaymentDate(
             payment
-        );
+        ) ||
+        t("unknown");
 
 
     const receiptNumber =
         getReceiptNumber(
             payment
-        );
+        ) ||
+        t("unknown");
 
 
     const recordedBy =
         getRecordedBy(
             payment
-        );
+        ) ||
+        t("unknown");
 
 
     const notes =
@@ -1801,34 +3391,64 @@ function showPaymentDetails(
         <div class="info-grid">
 
             <div class="info-item">
-                <span>Student Name</span>
+
+                <span>
+                    ${escapeHtml(
+                        t("studentName")
+                    )}
+                </span>
+
                 <strong>
                     ${escapeHtml(
                         studentName
                     )}
                 </strong>
+
             </div>
 
+
             <div class="info-item">
-                <span>Student Number</span>
+
+                <span>
+                    ${escapeHtml(
+                        t("studentNumber")
+                    )}
+                </span>
+
                 <strong>
                     ${escapeHtml(
                         studentNumber
                     )}
                 </strong>
+
             </div>
 
+
             <div class="info-item">
-                <span>Academic Year</span>
+
+                <span>
+                    ${escapeHtml(
+                        t("academicYear")
+                    )}
+                </span>
+
                 <strong>
                     ${escapeHtml(
                         academicYear
                     )}
                 </strong>
+
             </div>
 
+
             <div class="info-item">
-                <span>Stage</span>
+
+                <span>
+                    ${escapeHtml(
+                        t("stage")
+                    )}
+                </span>
+
                 <strong>
                     ${escapeHtml(
                         formatStage(
@@ -1836,63 +3456,115 @@ function showPaymentDetails(
                         )
                     )}
                 </strong>
+
             </div>
 
+
             <div class="info-item">
-                <span>Class</span>
+
+                <span>
+                    ${escapeHtml(
+                        t("class")
+                    )}
+                </span>
+
                 <strong>
                     ${escapeHtml(
                         className
                     )}
                 </strong>
+
             </div>
 
+
             <div class="info-item">
-                <span>Month</span>
+
+                <span>
+                    ${escapeHtml(
+                        t("month")
+                    )}
+                </span>
+
                 <strong>
                     ${escapeHtml(
-                        month
+                        formatMonth(
+                            month
+                        )
                     )}
                 </strong>
+
             </div>
 
+
             <div class="info-item">
-                <span>Amount</span>
+
+                <span>
+                    ${escapeHtml(
+                        t("amount")
+                    )}
+                </span>
+
                 <strong>
                     ${escapeHtml(
-                        amount.toFixed(2)
+                        amount.toFixed(
+                            2
+                        )
                     )}
                 </strong>
+
             </div>
 
+
             <div class="info-item">
-                <span>Payment Date</span>
+
+                <span>
+                    ${escapeHtml(
+                        t("paymentDate")
+                    )}
+                </span>
+
                 <strong>
                     ${escapeHtml(
                         paymentDate
                     )}
                 </strong>
+
             </div>
 
-            <div class="info-item">
-                <span>Receipt Number</span>
-                <strong>
-                    ${escapeHtml(
-                        receiptNumber ||
-                        "-"
-                    )}
-                </strong>
-            </div>
 
             <div class="info-item">
-                <span>Recorded By</span>
+
+                <span>
+                    ${escapeHtml(
+                        t("receiptNumber")
+                    )}
+                </span>
+
                 <strong>
                     ${escapeHtml(
-                        recordedBy ||
-                        "-"
+                        receiptNumber
                     )}
                 </strong>
+
             </div>
+
+
+            <div class="info-item">
+
+                <span>
+                    ${escapeHtml(
+                        t("recordedBy")
+                    )}
+                </span>
+
+                <strong>
+                    ${escapeHtml(
+                        recordedBy
+                    )}
+                </strong>
+
+            </div>
+
 
             ${
                 notes
@@ -1900,12 +3572,19 @@ function showPaymentDetails(
                     <div
                         class="info-item"
                         style="grid-column: 1 / -1;">
-                        <span>Notes</span>
+
+                        <span>
+                            ${escapeHtml(
+                                t("notes")
+                            )}
+                        </span>
+
                         <strong>
                             ${escapeHtml(
                                 notes
                             )}
                         </strong>
+
                     </div>
                     `
                     : ""
@@ -1934,7 +3613,9 @@ function closePaymentDetails() {
         );
 
 
-    if (modal) {
+    if (
+        modal
+    ) {
 
         modal.style.display =
             "none";
@@ -1950,7 +3631,9 @@ function closePaymentDetails() {
 
 function getNavigationInstitutionId() {
 
-    if (institutionId) {
+    if (
+        institutionId
+    ) {
 
         return institutionId;
 
@@ -2118,7 +3801,9 @@ function setupEventListeners() {
     }
 
 
-    if (recordPaymentButton) {
+    if (
+        recordPaymentButton
+    ) {
 
         recordPaymentButton.addEventListener(
             "click",
@@ -2128,7 +3813,9 @@ function setupEventListeners() {
     }
 
 
-    if (applyFiltersButton) {
+    if (
+        applyFiltersButton
+    ) {
 
         applyFiltersButton.addEventListener(
             "click",
@@ -2138,7 +3825,9 @@ function setupEventListeners() {
     }
 
 
-    if (resetFiltersButton) {
+    if (
+        resetFiltersButton
+    ) {
 
         resetFiltersButton.addEventListener(
             "click",
@@ -2148,7 +3837,9 @@ function setupEventListeners() {
     }
 
 
-    if (retryButton) {
+    if (
+        retryButton
+    ) {
 
         retryButton.addEventListener(
             "click",
@@ -2158,7 +3849,9 @@ function setupEventListeners() {
     }
 
 
-    if (searchInput) {
+    if (
+        searchInput
+    ) {
 
         searchInput.addEventListener(
             "keydown",
@@ -2181,7 +3874,9 @@ function setupEventListeners() {
     }
 
 
-    if (academicYear) {
+    if (
+        academicYear
+    ) {
 
         academicYear.addEventListener(
             "change",
@@ -2191,7 +3886,9 @@ function setupEventListeners() {
     }
 
 
-    if (paymentMonth) {
+    if (
+        paymentMonth
+    ) {
 
         paymentMonth.addEventListener(
             "change",
@@ -2201,7 +3898,9 @@ function setupEventListeners() {
     }
 
 
-    if (stageFilter) {
+    if (
+        stageFilter
+    ) {
 
         stageFilter.addEventListener(
             "change",
@@ -2211,7 +3910,9 @@ function setupEventListeners() {
     }
 
 
-    if (modalCloseButton) {
+    if (
+        modalCloseButton
+    ) {
 
         modalCloseButton.addEventListener(
             "click",
@@ -2221,7 +3922,9 @@ function setupEventListeners() {
     }
 
 
-    if (modalOverlay) {
+    if (
+        modalOverlay
+    ) {
 
         modalOverlay.addEventListener(
             "click",
@@ -2241,6 +3944,50 @@ function setupEventListeners() {
             ) {
 
                 closePaymentDetails();
+
+            }
+
+        }
+    );
+
+}
+
+
+/* =================================
+   Language Initialization
+   ================================= */
+
+function initializeLanguage() {
+
+    currentLanguage =
+        getSavedLanguage();
+
+
+    ensureLanguageSelector();
+
+    applyLanguage();
+
+
+    /*
+     * Allow another page/component
+     * to change the language.
+     */
+
+    window.addEventListener(
+        "bmpLanguageChanged",
+        event => {
+
+            const language =
+                event.detail?.language;
+
+
+            if (
+                language
+            ) {
+
+                setLanguage(
+                    language
+                );
 
             }
 
@@ -2280,7 +4027,9 @@ async function initializePage() {
     if (!authenticated) {
 
         showError(
-            "School authentication failed. Please log in again."
+            t(
+                "errors.authentication"
+            )
         );
 
         return;
@@ -2294,21 +4043,9 @@ async function initializePage() {
     );
 
 
-    /*
-     * Load payments first.
-     *
-     * This is intentionally independent
-     * from student loading.
-     */
-
     const paymentsResult =
         await loadPayments();
 
-
-    /*
-     * Student data is only needed for
-     * stage/class/name fallbacks.
-     */
 
     await loadStudents();
 
@@ -2316,7 +4053,12 @@ async function initializePage() {
     loadAcademicYears();
 
 
-    if (paymentsResult) {
+    applyLanguage();
+
+
+    if (
+        paymentsResult
+    ) {
 
         applyFilters();
 
@@ -2332,6 +4074,8 @@ async function initializePage() {
 document.addEventListener(
     "DOMContentLoaded",
     () => {
+
+        initializeLanguage();
 
         setupEventListeners();
 
