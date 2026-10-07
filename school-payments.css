@@ -569,3 +569,197 @@ tbody tr:hover {
     }
 
 }
+
+
+
+
+/* =========================================
+   Payment Receipt - Print System
+   ========================================= */
+
+/* Receipt is completely hidden on normal screen */
+#bmpPrintReceipt {
+    display: none;
+}
+
+
+/* =========================================
+   Print Mode
+   ========================================= */
+
+@media print {
+
+    /* Hide the entire application */
+    body * {
+        visibility: hidden !important;
+    }
+
+    /* Show ONLY the receipt */
+    #bmpPrintReceipt,
+    #bmpPrintReceipt * {
+        visibility: visible !important;
+    }
+
+    #bmpPrintReceipt {
+        display: block !important;
+
+        position: absolute !important;
+
+        left: 50% !important;
+        top: 0 !important;
+
+        transform: translateX(-50%) !important;
+
+        width: 80mm !important;
+        max-width: 80mm !important;
+
+        min-height: 0 !important;
+
+        margin: 0 !important;
+        padding: 4mm !important;
+
+        background: #ffffff !important;
+
+        color: #000000 !important;
+
+        font-family: Arial, Helvetica, sans-serif !important;
+
+        font-size: 12px !important;
+
+        line-height: 1.4 !important;
+
+        box-shadow: none !important;
+
+        border: none !important;
+
+        overflow: visible !important;
+    }
+
+
+    /* Receipt title */
+    #bmpPrintReceipt .bmp-receipt-title {
+        text-align: center !important;
+
+        font-size: 17px !important;
+
+        font-weight: 700 !important;
+
+        margin-bottom: 5mm !important;
+
+        color: #000000 !important;
+    }
+
+
+    /* Receipt number */
+    #bmpPrintReceipt .bmp-receipt-number {
+        text-align: center !important;
+
+        font-size: 11px !important;
+
+        margin-bottom: 4mm !important;
+
+        padding-bottom: 3mm !important;
+
+        border-bottom: 1px dashed #000000 !important;
+    }
+
+
+    /* Individual payment information row */
+    #bmpPrintReceipt .bmp-receipt-row {
+        display: flex !important;
+
+        justify-content: space-between !important;
+
+        align-items: flex-start !important;
+
+        gap: 8px !important;
+
+        padding: 2.2mm 0 !important;
+
+        border-bottom: 1px solid #eeeeee !important;
+
+        font-size: 12px !important;
+    }
+
+
+    #bmpPrintReceipt .bmp-receipt-row:last-child {
+        border-bottom: none !important;
+    }
+
+
+    /* Label */
+    #bmpPrintReceipt .bmp-receipt-row strong {
+        flex: 0 0 42% !important;
+
+        font-weight: 700 !important;
+
+        color: #000000 !important;
+
+        text-align: left !important;
+    }
+
+
+    /* Value */
+    #bmpPrintReceipt .bmp-receipt-row span {
+        flex: 1 !important;
+
+        color: #000000 !important;
+
+        text-align: right !important;
+
+        word-break: break-word !important;
+    }
+
+
+    /* Arabic */
+    #bmpPrintReceipt[dir="rtl"] .bmp-receipt-row strong {
+        text-align: right !important;
+    }
+
+
+    #bmpPrintReceipt[dir="rtl"] .bmp-receipt-row span {
+        text-align: left !important;
+    }
+
+
+    /* Amount */
+    #bmpPrintReceipt .bmp-receipt-amount {
+        font-size: 15px !important;
+
+        font-weight: 700 !important;
+    }
+
+
+    /* Notes */
+    #bmpPrintReceipt .bmp-receipt-notes {
+        margin-top: 3mm !important;
+
+        padding-top: 3mm !important;
+
+        border-top: 1px dashed #000000 !important;
+
+        font-size: 11px !important;
+
+        word-break: break-word !important;
+    }
+
+
+    /* Do not print modal, page, buttons, etc. */
+    .modal,
+    .page-container,
+    .filters-section,
+    .summary-section,
+    .table-section,
+    .page-header,
+    button {
+        display: none !important;
+    }
+
+
+    /* Browser print page */
+    @page {
+        size: auto;
+
+        margin: 8mm;
+    }
+}
