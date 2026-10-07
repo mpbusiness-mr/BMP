@@ -11,7 +11,7 @@
   <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    /* ========== PRINT-OPTIMIZED RESET ========== */
+    /* ========== RESET ========== */
     * {
       margin: 0;
       padding: 0;
@@ -35,28 +35,28 @@
       --radius-sm: 10px;
     }
 
+    /* ========== BODY (screen) ========== */
     body {
       font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
       background: #eef2f7;
       color: var(--text);
       line-height: 1.55;
       font-weight: 400;
-      padding: 30px 20px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
+      margin: 0;
+      padding: 0;
       min-height: 100vh;
     }
 
     /* ========== A4 PAGE CONTAINER ========== */
     .page {
       width: 210mm;
-      min-height: 297mm;
+      max-width: 100%;
+      min-height: auto;
       background: var(--bg);
+      margin: 24px auto;
       border-radius: 12px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
       overflow: hidden;
-      position: relative;
       display: flex;
       flex-direction: column;
     }
@@ -99,6 +99,8 @@
       align-items: flex-start;
       position: relative;
       z-index: 2;
+      gap: 16px;
+      flex-wrap: wrap;
     }
 
     .logo-block {
@@ -118,6 +120,7 @@
       font-size: 1.8rem;
       color: var(--accent);
       border: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
     }
 
     .logo-block h1 {
@@ -149,7 +152,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      backdrop-filter: blur(4px);
+      white-space: nowrap;
     }
 
     .header-badge i {
@@ -167,7 +170,7 @@
       font-size: 2.6rem;
       font-weight: 700;
       line-height: 1.25;
-      max-width: 600px;
+      max-width: 620px;
       letter-spacing: -0.8px;
     }
 
@@ -241,6 +244,7 @@
       align-items: center;
       gap: 12px;
       margin-bottom: 18px;
+      flex-wrap: wrap;
     }
 
     .section-label .line {
@@ -284,7 +288,6 @@
       border-radius: var(--radius);
       padding: 24px 20px;
       border: 1px solid var(--border);
-      transition: none;
       position: relative;
       overflow: hidden;
     }
@@ -337,8 +340,9 @@
 
     .ind-card ul li i {
       color: var(--accent);
-      font-size: 0.7rem;
+      font-size: 0.55rem;
       width: 14px;
+      flex-shrink: 0;
     }
 
     /* ========== FEATURES ROW ========== */
@@ -427,6 +431,7 @@
       flex-shrink: 0;
       position: relative;
       overflow: hidden;
+      flex-wrap: wrap;
     }
 
     .cta-footer::before {
@@ -443,6 +448,7 @@
     .cta-text {
       position: relative;
       z-index: 2;
+      flex: 1 1 280px;
     }
 
     .cta-text h3 {
@@ -462,10 +468,10 @@
 
     .cta-contacts {
       display: flex;
-      gap: 28px;
+      gap: 24px;
       position: relative;
       z-index: 2;
-      flex-shrink: 0;
+      flex-wrap: wrap;
     }
 
     .cta-contact-item {
@@ -514,6 +520,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
       font-size: 0.72rem;
       color: var(--text-muted);
       border-top: 1px solid var(--border);
@@ -533,21 +541,126 @@
       color: var(--text-muted);
     }
 
-    /* ========== PRINT MEDIA ========== */
+    /* ========== RESPONSIVE (screen only) ========== */
+    @media screen and (max-width: 900px) {
+      .page {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .header {
+        padding: 28px 24px;
+      }
+      .header-main h2 {
+        font-size: 1.9rem;
+      }
+      .header-main p {
+        font-size: 0.95rem;
+      }
+      .content {
+        padding: 26px 24px;
+        gap: 26px;
+      }
+      .stats-bar {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .stat-item:nth-child(2) {
+        border-left: none;
+      }
+      .stat-item:nth-child(1),
+      .stat-item:nth-child(2) {
+        border-bottom: 1px solid var(--border);
+      }
+      .industry-grid {
+        grid-template-columns: 1fr;
+      }
+      .features-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .why-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .cta-footer {
+        padding: 24px 24px;
+      }
+      .footer-strip {
+        padding: 12px 24px;
+      }
+    }
+
+    @media screen and (max-width: 560px) {
+      .header {
+        padding: 22px 18px;
+      }
+      .header-top {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .header-main h2 {
+        font-size: 1.5rem;
+      }
+      .header-badge {
+        font-size: 0.7rem;
+        padding: 6px 14px;
+      }
+      .content {
+        padding: 20px 16px;
+        gap: 22px;
+      }
+      .features-row {
+        grid-template-columns: 1fr;
+      }
+      .why-grid {
+        grid-template-columns: 1fr;
+      }
+      .cta-contacts {
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+      }
+      .cta-footer {
+        padding: 20px 16px;
+      }
+      .cta-text h3 {
+        font-size: 1.15rem;
+      }
+      .footer-strip {
+        padding: 10px 16px;
+        flex-direction: column;
+        text-align: center;
+      }
+      .logo-block h1 {
+        font-size: 1.6rem;
+      }
+      .logo-block .icon {
+        width: 44px;
+        height: 44px;
+        font-size: 1.5rem;
+      }
+    }
+
+    /* ========== PRINT (A4 flyer) ========== */
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
     @media print {
       body {
         background: white;
+        margin: 0;
         padding: 0;
-        display: block;
       }
 
       .page {
         width: 100%;
-        min-height: 100vh;
+        max-width: 100%;
+        margin: 0;
         border-radius: 0;
         box-shadow: none;
-        margin: 0;
-        page-break-after: avoid;
+        min-height: 100vh;
       }
 
       .header {
@@ -561,11 +674,6 @@
       .content {
         padding: 26px 32px 22px;
         gap: 24px;
-      }
-
-      .stats-bar {
-        -webkit-print-color-adjust: exact;
-        print-color-adjust: exact;
       }
 
       .cta-footer {
@@ -588,82 +696,6 @@
       .why-grid {
         break-inside: avoid;
         page-break-inside: avoid;
-      }
-    }
-
-    @page {
-      size: A4;
-      margin: 0;
-    }
-
-    /* ========== RESPONSIVE FALLBACK ========== */
-    @media screen and (max-width: 900px) {
-      .page {
-        width: 100%;
-        min-height: auto;
-      }
-      .header-main h2 {
-        font-size: 2rem;
-      }
-      .industry-grid,
-      .features-row,
-      .why-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-      .cta-footer {
-        flex-direction: column;
-        text-align: center;
-        gap: 20px;
-      }
-      .cta-contacts {
-        flex-direction: column;
-        gap: 12px;
-        align-items: center;
-      }
-      .stats-bar {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .stat-item:nth-child(2) {
-        border-left: none;
-      }
-      .stat-item:nth-child(1),
-      .stat-item:nth-child(2) {
-        border-bottom: 1px solid var(--border);
-      }
-    }
-
-    @media screen and (max-width: 600px) {
-      .header {
-        padding: 24px 20px;
-      }
-      .header-main h2 {
-        font-size: 1.6rem;
-      }
-      .header-top {
-        flex-direction: column;
-        gap: 16px;
-      }
-      .content {
-        padding: 20px;
-      }
-      .industry-grid,
-      .features-row,
-      .why-grid {
-        grid-template-columns: 1fr;
-      }
-      .stats-bar {
-        grid-template-columns: 1fr 1fr;
-      }
-      .footer-strip {
-        flex-direction: column;
-        gap: 6px;
-        text-align: center;
-      }
-      .cta-footer {
-        padding: 24px 20px;
-      }
-      .cta-text h3 {
-        font-size: 1.2rem;
       }
     }
   </style>
@@ -882,7 +914,7 @@
           <i class="fas fa-globe"></i>
           <div>
             <div class="lbl">موقع</div>
-            <div class="val">mpbusiness-mr.github.io/BMP/school</div>
+            <div class="val">mpbusiness-mr.github.io/BMP</div>
           </div>
         </div>
       </div>
@@ -892,7 +924,7 @@
     <div class="footer-strip">
       <span class="tagline">BMP · Business Management Platform</span>
       <span>إدارة أكثر ذكاءً. تنظيم أفضل. مستقبل أقوى.</span>
-      <span class="url">mpbusiness-mr.github.io/BMP/school</span>
+      <span class="url">mpbusiness-mr.github.io/BMP</span>
     </div>
 
   </div>
