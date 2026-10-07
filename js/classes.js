@@ -1,3 +1,4 @@
+```javascript
 // =====================================================
 // BMP Classes & Stages
 // =====================================================
@@ -364,21 +365,28 @@ function renderStageClasses(
                 String(
                     item.classNumber ||
                     ""
-                );
+                ).trim();
 
 
             const className =
                 String(
                     item.className ||
                     ""
-                );
+                ).trim();
 
 
             const classCode =
                 String(
                     item.classCode ||
                     ""
-                );
+                ).trim();
+
+
+            const stage =
+                String(
+                    item.stage ||
+                    ""
+                ).trim();
 
 
             const classItem =
@@ -391,8 +399,22 @@ function renderStageClasses(
                 "class-item";
 
 
+            // Make the whole class card clickable
+
             classItem.style.cursor =
                 "pointer";
+
+
+            classItem.setAttribute(
+                "role",
+                "button"
+            );
+
+
+            classItem.setAttribute(
+                "tabindex",
+                "0"
+            );
 
 
             classItem.innerHTML = `
@@ -429,16 +451,70 @@ function renderStageClasses(
             // Open Class Students Page
             // =========================================
 
+            function openClassPage() {
+
+                const targetUrl =
+                    new URL(
+                        "school-class.html",
+                        window.location.href
+                    );
+
+
+                targetUrl.searchParams.set(
+                    "stage",
+                    stage
+                );
+
+
+                targetUrl.searchParams.set(
+                    "class",
+                    classNumber
+                );
+
+
+                targetUrl.searchParams.set(
+                    "institutionId",
+                    institutionId
+                );
+
+
+                console.log(
+                    "Opening class page:",
+                    targetUrl.href
+                );
+
+
+                window.location.assign(
+                    targetUrl.href
+                );
+
+            }
+
+
             classItem.addEventListener(
                 "click",
                 function () {
 
-                    window.location.href =
-                        `school-class.html?stage=${encodeURIComponent(
-                            item.stage
-                        )}&class=${encodeURIComponent(
-                            item.classNumber
-                        )}`;
+                    openClassPage();
+
+                }
+            );
+
+
+            classItem.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        event.key === "Enter" ||
+                        event.key === " "
+                    ) {
+
+                        event.preventDefault();
+
+                        openClassPage();
+
+                    }
 
                 }
             );
@@ -589,3 +665,4 @@ if (
 // =====================================================
 
 loadClasses();
+```
