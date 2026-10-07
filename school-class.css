@@ -1,6 +1,5 @@
-
 /* =====================================================
-   BMP Class Students
+   BMP School Class Students
    ===================================================== */
 
 * {
@@ -9,214 +8,107 @@
     padding: 0;
 }
 
-
 body {
-
     font-family:
         Arial,
         Helvetica,
         sans-serif;
 
-    background:
-        #f5f7fb;
-
-    color:
-        #1f2937;
-
+    background: #f5f7fb;
+    color: #1f2937;
 }
-
-
-/* =====================================================
-   Container
-   ===================================================== */
 
 .page-container {
-
     width: 100%;
-
-    max-width:
-        1500px;
-
-    margin:
-        0 auto;
-
-    padding:
-        30px;
-
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 30px;
 }
-
 
 /* =====================================================
    Header
    ===================================================== */
 
 .page-header {
-
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        center;
-
-    gap:
-        20px;
-
-    margin-bottom:
-        25px;
-
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
 }
-
 
 .page-header h1 {
-
-    font-size:
-        30px;
-
-    margin-bottom:
-        7px;
-
+    font-size: 30px;
+    margin-bottom: 7px;
 }
-
 
 .page-header p {
-
-    color:
-        #6b7280;
-
-    font-size:
-        15px;
-
+    color: #6b7280;
+    font-size: 15px;
 }
-
 
 /* =====================================================
    Buttons
    ===================================================== */
 
 .btn {
-
-    border:
-        none;
-
-    border-radius:
-        8px;
-
-    padding:
-        11px 18px;
-
-    font-size:
-        14px;
-
-    font-weight:
-        600;
-
-    cursor:
-        pointer;
-
+    border: none;
+    border-radius: 8px;
+    padding: 11px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
     transition:
         background 0.2s ease,
         transform 0.2s ease;
-
 }
-
 
 .btn:hover {
-
-    transform:
-        translateY(-1px);
-
+    transform: translateY(-1px);
 }
-
 
 .btn:disabled {
-
-    opacity:
-        0.6;
-
-    cursor:
-        not-allowed;
-
-    transform:
-        none;
-
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }
-
 
 .btn-secondary {
-
-    background:
-        #e5e7eb;
-
-    color:
-        #374151;
-
+    background: #e5e7eb;
+    color: #374151;
 }
-
 
 .btn-secondary:hover {
-
-    background:
-        #d1d5db;
-
+    background: #d1d5db;
 }
-
 
 .btn-primary {
-
-    background:
-        #2563eb;
-
-    color:
-        white;
-
+    background: #2563eb;
+    color: white;
 }
-
 
 .btn-primary:hover {
-
-    background:
-        #1d4ed8;
-
+    background: #1d4ed8;
 }
-
 
 /* =====================================================
    Summary
    ===================================================== */
 
 .class-summary {
-
-    display:
-        grid;
-
+    display: grid;
     grid-template-columns:
         repeat(3, minmax(0, 1fr));
 
-    gap:
-        18px;
-
-    margin-bottom:
-        20px;
-
+    gap: 18px;
+    margin-bottom: 20px;
 }
 
-
 .summary-item {
-
-    background:
-        white;
-
-    border:
-        1px solid #e5e7eb;
-
-    border-radius:
-        12px;
-
-    padding:
-        18px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 18px;
 
     box-shadow:
         0 2px 8px rgba(
@@ -225,108 +117,50 @@ body {
             0,
             0.04
         );
-
 }
-
 
 .summary-label {
-
-    display:
-        block;
-
-    color:
-        #6b7280;
-
-    font-size:
-        13px;
-
-    margin-bottom:
-        7px;
-
+    display: block;
+    color: #6b7280;
+    font-size: 13px;
+    margin-bottom: 7px;
 }
-
 
 .summary-item strong {
-
-    font-size:
-        16px;
-
+    font-size: 16px;
 }
-
-
-/* =====================================================
-   Year Select
-   ===================================================== */
 
 .year-select {
-
-    width:
-        100%;
-
-    border:
-        1px solid #d1d5db;
-
-    border-radius:
-        8px;
-
-    background:
-        white;
-
-    padding:
-        8px 10px;
-
-    font-size:
-        14px;
-
-    color:
-        #1f2937;
-
-    outline:
-        none;
-
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    padding: 8px 10px;
+    font-size: 14px;
+    color: #1f2937;
+    outline: none;
 }
-
 
 .year-select:focus {
-
-    border-color:
-        #2563eb;
-
+    border-color: #2563eb;
 }
-
 
 /* =====================================================
    Filters
    ===================================================== */
 
 .filters-card {
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+    flex-wrap: wrap;
 
-    display:
-        flex;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
 
-    align-items:
-        flex-end;
-
-    gap:
-        15px;
-
-    flex-wrap:
-        wrap;
-
-    background:
-        white;
-
-    border:
-        1px solid #e5e7eb;
-
-    border-radius:
-        12px;
-
-    padding:
-        18px;
-
-    margin-bottom:
-        20px;
+    padding: 18px;
+    margin-bottom: 20px;
 
     box-shadow:
         0 2px 8px rgba(
@@ -335,141 +169,69 @@ body {
             0,
             0.04
         );
-
 }
-
 
 .filter-group {
-
-    min-width:
-        190px;
-
+    min-width: 190px;
 }
-
 
 .filter-group label {
-
-    display:
-        block;
-
-    margin-bottom:
-        7px;
-
-    color:
-        #6b7280;
-
-    font-size:
-        13px;
-
-    font-weight:
-        600;
-
+    display: block;
+    margin-bottom: 7px;
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 600;
 }
-
 
 .filter-select {
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    padding: 9px 11px;
 
-    width:
-        100%;
-
-    border:
-        1px solid #d1d5db;
-
-    border-radius:
-        8px;
-
-    background:
-        white;
-
-    padding:
-        9px 11px;
-
-    font-size:
-        14px;
-
-    color:
-        #1f2937;
-
-    outline:
-        none;
-
+    font-size: 14px;
+    color: #1f2937;
+    outline: none;
 }
-
 
 .filter-select:focus {
-
-    border-color:
-        #2563eb;
-
+    border-color: #2563eb;
 }
-
 
 .filter-actions {
-
-    margin-left:
-        auto;
-
+    margin-left: auto;
 }
-
 
 /* =====================================================
    Legend
    ===================================================== */
 
 .legend {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        20px;
-
-    flex-wrap:
-        wrap;
-
-    margin-bottom:
-        20px;
-
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
 }
-
 
 .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    gap:
-        8px;
-
-    font-size:
-        13px;
-
-    color:
-        #6b7280;
-
+    font-size: 13px;
+    color: #6b7280;
 }
 
-
 /* =====================================================
-   Table Card
+   Table
    ===================================================== */
 
 .table-card {
-
-    background:
-        white;
-
-    border:
-        1px solid #e5e7eb;
-
-    border-radius:
-        14px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
 
     box-shadow:
         0 2px 8px rgba(
@@ -479,397 +241,201 @@ body {
             0.04
         );
 
-    overflow:
-        hidden;
-
+    overflow: hidden;
 }
-
 
 .table-wrapper {
-
-    width:
-        100%;
-
-    overflow-x:
-        auto;
-
+    width: 100%;
+    overflow-x: auto;
 }
-
-
-/* =====================================================
-   Table
-   ===================================================== */
 
 table {
-
-    width:
-        100%;
-
-    min-width:
-        1100px;
-
-    border-collapse:
-        collapse;
-
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: collapse;
 }
-
 
 thead {
-
-    background:
-        #f9fafb;
-
+    background: #f9fafb;
 }
-
 
 th {
+    padding: 14px 12px;
+    text-align: center;
 
-    padding:
-        14px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #374151;
 
-    text-align:
-        center;
-
-    font-size:
-        13px;
-
-    font-weight:
-        700;
-
-    color:
-        #374151;
-
-    border-bottom:
-        1px solid #e5e7eb;
-
-    white-space:
-        nowrap;
-
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
 }
-
 
 th:first-child,
 th:nth-child(2) {
-
-    text-align:
-        left;
-
+    text-align: left;
 }
 
-
 td {
-
-    padding:
-        13px 12px;
+    padding: 13px 12px;
 
     border-bottom:
         1px solid #f0f1f3;
 
-    font-size:
-        13px;
-
-    text-align:
-        center;
-
-    white-space:
-        nowrap;
-
+    font-size: 13px;
+    text-align: center;
+    white-space: nowrap;
 }
-
 
 td:first-child,
 td:nth-child(2) {
-
-    text-align:
-        left;
-
+    text-align: left;
 }
-
 
 tbody tr:hover {
-
-    background:
-        #fafafa;
-
+    background: #fafafa;
 }
-
 
 tbody tr:last-child td {
-
-    border-bottom:
-        none;
-
+    border-bottom: none;
 }
 
-
 /* =====================================================
-   Status Badges
+   Status
    ===================================================== */
 
 .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 
-    display:
-        inline-flex;
+    min-width: 60px;
+    padding: 5px 9px;
 
-    align-items:
-        center;
+    border-radius: 999px;
 
-    justify-content:
-        center;
-
-    min-width:
-        60px;
-
-    padding:
-        5px 9px;
-
-    border-radius:
-        999px;
-
-    font-size:
-        11px;
-
-    font-weight:
-        700;
-
+    font-size: 11px;
+    font-weight: 700;
 }
-
 
 .status-badge.paid {
-
-    background:
-        #dcfce7;
-
-    color:
-        #166534;
-
+    background: #dcfce7;
+    color: #166534;
 }
-
 
 .status-badge.unpaid {
-
-    background:
-        #fee2e2;
-
-    color:
-        #991b1b;
-
+    background: #fee2e2;
+    color: #991b1b;
 }
-
 
 /* =====================================================
    Empty State
    ===================================================== */
 
 .empty-state {
-
-    text-align:
-        center !important;
-
-    color:
-        #6b7280;
-
-    padding:
-        40px 20px;
-
+    text-align: center !important;
+    color: #6b7280;
+    padding: 40px 20px;
 }
 
-
 /* =====================================================
-   Print Area
+   Printable Unpaid List
    ===================================================== */
 
 .print-unpaid-area {
-
-    display:
-        none;
-
+    display: none;
 }
-
 
 .print-header {
-
-    text-align:
-        center;
-
-    margin-bottom:
-        25px;
-
+    text-align: center;
+    margin-bottom: 25px;
 }
-
 
 .print-header h1 {
-
-    font-size:
-        24px;
-
-    margin-bottom:
-        8px;
-
+    font-size: 24px;
+    margin-bottom: 8px;
 }
-
 
 .print-header h2 {
-
-    font-size:
-        20px;
-
-    margin-bottom:
-        6px;
-
+    font-size: 20px;
+    margin-bottom: 6px;
 }
-
 
 .print-header p {
-
-    color:
-        #555;
-
-    font-size:
-        14px;
-
+    color: #555;
+    font-size: 14px;
 }
-
 
 .print-table {
-
-    width:
-        100%;
-
-    min-width:
-        0;
-
-    border-collapse:
-        collapse;
-
+    width: 100%;
+    min-width: 0;
+    border-collapse: collapse;
 }
-
 
 .print-table th,
 .print-table td {
-
-    border:
-        1px solid #999;
-
-    padding:
-        9px;
-
-    text-align:
-        left;
-
-    font-size:
-        12px;
-
+    border: 1px solid #999;
+    padding: 9px;
+    text-align: left;
+    font-size: 12px;
 }
-
 
 .print-table th {
-
-    background:
-        #f3f4f6;
-
+    background: #f3f4f6;
 }
-
 
 /* =====================================================
    Responsive
    ===================================================== */
 
-@media (
-    max-width: 900px
-) {
+@media (max-width: 900px) {
 
     .class-summary {
-
         grid-template-columns:
             repeat(
                 2,
                 minmax(0, 1fr)
             );
-
     }
-
 
     .filter-actions {
-
-        margin-left:
-            0;
-
-        width:
-            100%;
-
+        margin-left: 0;
+        width: 100%;
     }
-
 
     .filter-actions .btn {
-
-        width:
-            100%;
-
+        width: 100%;
     }
-
 }
 
-
-@media (
-    max-width: 600px
-) {
+@media (max-width: 600px) {
 
     .page-container {
-
-        padding:
-            15px;
-
+        padding: 15px;
     }
-
 
     .page-header {
-
-        flex-direction:
-            column;
-
-        align-items:
-            stretch;
-
+        flex-direction: column;
+        align-items: stretch;
     }
-
 
     .page-header h1 {
-
-        font-size:
-            25px;
-
+        font-size: 25px;
     }
-
 
     .page-header .btn {
-
-        width:
-            100%;
-
+        width: 100%;
     }
-
 
     .class-summary {
-
-        grid-template-columns:
-            1fr;
-
+        grid-template-columns: 1fr;
     }
-
 
     .filter-group {
-
-        width:
-            100%;
-
-        min-width:
-            0;
-
+        width: 100%;
+        min-width: 0;
     }
-
 }
-
 
 /* =====================================================
    Print
@@ -878,32 +444,16 @@ tbody tr:last-child td {
 @media print {
 
     body {
-
-        background:
-            white;
-
+        background: white;
     }
-
 
     .page-container {
-
-        display:
-            none !important;
-
+        display: none !important;
     }
-
 
     .print-unpaid-area {
-
-        display:
-            block !important;
-
-        width:
-            100%;
-
-        padding:
-            20px;
-
+        display: block !important;
+        width: 100%;
+        padding: 20px;
     }
-
 }
