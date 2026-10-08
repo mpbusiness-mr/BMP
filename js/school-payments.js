@@ -942,7 +942,7 @@ function renderPayments(payments) {
             "<td>" + escapeHtml(studentName) + "</td>" +
             "<td>" + escapeHtml(academicYear || t("unknown")) + "</td>" +
             "<td>" + escapeHtml(formatMonth(month)) + "</td>" +
-            "<td>" + escapeHtml(amount.toFixed(2)) + "</td>" +
+            "<td>" + escapeHtml(amount.toFixed(2)) + " MRU</td>" +
             "<td>" + escapeHtml(paymentDate || t("unknown")) + "</td>" +
             "<td>" + escapeHtml(receiptNumber || t("unknown")) + "</td>" +
             "<td>" + escapeHtml(recordedBy || t("unknown")) + "</td>";
@@ -974,7 +974,7 @@ function updateSummary(displayedPayments) {
     }, 0);
 
     if (totalPaymentsElement) totalPaymentsElement.textContent = String(allPayments.length);
-    if (totalAmountElement) totalAmountElement.textContent = totalAmount.toFixed(2);
+    if (totalAmountElement) totalAmountElement.textContent = totalAmount.toFixed(2) + " MRU";
     if (displayedPaymentsElement) displayedPaymentsElement.textContent = String(displayedPayments.length);
 }
 
@@ -1088,7 +1088,7 @@ function showPaymentDetails(payment) {
             '<div class="info-item"><span>' + escapeHtml(t("stage")) + '</span><strong>' + escapeHtml(formatStage(stage)) + '</strong></div>' +
             '<div class="info-item"><span>' + escapeHtml(t("class")) + '</span><strong>' + escapeHtml(className) + '</strong></div>' +
             '<div class="info-item"><span>' + escapeHtml(t("month")) + '</span><strong>' + escapeHtml(formatMonth(month)) + '</strong></div>' +
-            '<div class="info-item"><span>' + escapeHtml(t("amount")) + '</span><strong>' + escapeHtml(amount.toFixed(2)) + '</strong></div>' +
+            '<div class="info-item"><span>' + escapeHtml(t("amount")) + '</span><strong>' + escapeHtml(amount.toFixed(2)) + ' MRU</strong></div>' +
             '<div class="info-item"><span>' + escapeHtml(t("paymentDate")) + '</span><strong>' + escapeHtml(paymentDate) + '</strong></div>' +
             '<div class="info-item"><span>' + escapeHtml(t("receiptNumber")) + '</span><strong>' + escapeHtml(receiptNumber) + '</strong></div>' +
             '<div class="info-item"><span>' + escapeHtml(t("recordedBy")) + '</span><strong>' + escapeHtml(recordedBy) + '</strong></div>' +
