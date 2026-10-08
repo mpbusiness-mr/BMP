@@ -1,417 +1,189 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <title>BMP · طلاب القسم | Class Students</title>
 
-    <title>Class Students - BMP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link
-        rel="stylesheet"
-        href="school-class.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+    <link rel="stylesheet" href="school-class.css">
 </head>
 
-<body>
+<body class="lang-ar">
+
+    <div class="bg-blob bg-blob-1" aria-hidden="true"></div>
+    <div class="bg-blob bg-blob-2" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <div class="page-loader" id="pageLoader" aria-hidden="true">
+        <div class="loader-spinner"></div>
+        <span class="loader-text" data-i18n="loading">Loading...</span>
+    </div>
 
     <div class="page-container">
 
         <header class="page-header">
 
-            <div>
-
-                <h1 id="pageTitle">
-                    Class Students
-                </h1>
-
-                <p id="pageSubtitle">
-                    Student payment status
-                </p>
-
+            <div class="header-brand">
+                <a href="classes.html" class="topbar-logo">
+                    <i class="fas fa-cubes"></i> BMP
+                </a>
+                <div>
+                    <h1 id="pageTitle" data-i18n="pageTitle">Class Students</h1>
+                    <p id="pageSubtitle" data-i18n="pageSubtitle">Student payment status</p>
+                </div>
             </div>
 
-            <button
-                id="backButton"
-                class="btn btn-secondary">
-
-                Back to Classes
-
-            </button>
-
-        </header>
-
-
-        <section class="class-summary">
-
-            <div class="summary-item">
-
-                <span class="summary-label">
-                    Institution ID
-                </span>
-
-                <strong id="institutionId">
-                    -
-                </strong>
-
-            </div>
-
-
-            <div class="summary-item">
-
-                <span class="summary-label">
-                    School Name
-                </span>
-
-                <strong id="institutionName">
-                    -
-                </strong>
-
-            </div>
-
-
-            <div class="summary-item">
-
-                <span class="summary-label">
-                    Academic Year
-                </span>
-
-                <select
-                    id="academicYearFilter"
-                    class="year-select">
-                </select>
-
-            </div>
-
-
-            <div class="summary-item">
-
-                <span class="summary-label">
-                    Stage
-                </span>
-
-                <strong id="stageName">
-                    -
-                </strong>
-
-            </div>
-
-
-            <div class="summary-item">
-
-                <span class="summary-label">
-                    Class
-                </span>
-
-                <strong id="className">
-                    -
-                </strong>
-
-            </div>
-
-
-            <div class="summary-item">
-
-                <span class="summary-label">
-                    Students
-                </span>
-
-                <strong id="studentCount">
-                    0
-                </strong>
-
-            </div>
-
-        </section>
-
-
-        <!-- Filters -->
-
-        <section class="filters-card">
-
-            <div class="filter-group">
-
-                <label for="monthFilter">
-                    Month
-                </label>
-
-                <select
-                    id="monthFilter"
-                    class="filter-select">
-
-                    <option value="">
-                        All Months
-                    </option>
-
-                    <option value="October">
-                        October
-                    </option>
-
-                    <option value="November">
-                        November
-                    </option>
-
-                    <option value="December">
-                        December
-                    </option>
-
-                    <option value="January">
-                        January
-                    </option>
-
-                    <option value="February">
-                        February
-                    </option>
-
-                    <option value="March">
-                        March
-                    </option>
-
-                    <option value="April">
-                        April
-                    </option>
-
-                    <option value="May">
-                        May
-                    </option>
-
-                    <option value="June">
-                        June
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <div class="filter-group">
-
-                <label for="paymentStatusFilter">
-                    Payment Status
-                </label>
-
-                <select
-                    id="paymentStatusFilter"
-                    class="filter-select">
-
-                    <option value="">
-                        All Students
-                    </option>
-
-                    <option value="paid">
-                        Paid
-                    </option>
-
-                    <option value="unpaid">
-                        Unpaid
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <div class="filter-actions">
-
-                <button
-                    id="printUnpaidButton"
-                    class="btn btn-primary">
-
-                    Print Unpaid List
-
+            <div class="header-actions">
+
+                <div class="lang-switcher" role="group" aria-label="Language">
+                    <button type="button" class="lang-btn active" data-lang="ar">عربية</button>
+                    <button type="button" class="lang-btn"        data-lang="fr">Français</button>
+                    <button type="button" class="lang-btn"        data-lang="en">English</button>
+                </div>
+
+                <button id="backButton" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i>
+                    <span data-i18n="backToClasses">Back to Classes</span>
                 </button>
 
             </div>
 
+        </header>
+
+        <!-- Summary -->
+        <section class="class-summary">
+
+            <div class="summary-item">
+                <span class="summary-label" data-i18n="institutionId">Institution ID</span>
+                <strong id="institutionId">-</strong>
+            </div>
+
+            <div class="summary-item">
+                <span class="summary-label" data-i18n="schoolName">School Name</span>
+                <strong id="institutionName">-</strong>
+            </div>
+
+            <div class="summary-item">
+                <span class="summary-label" data-i18n="academicYear">Academic Year</span>
+                <select id="academicYearFilter" class="year-select"></select>
+            </div>
+
+            <div class="summary-item">
+                <span class="summary-label" data-i18n="stage">Stage</span>
+                <strong id="stageName">-</strong>
+            </div>
+
+            <div class="summary-item">
+                <span class="summary-label" data-i18n="class">Class</span>
+                <strong id="className">-</strong>
+            </div>
+
+            <div class="summary-item">
+                <span class="summary-label" data-i18n="students">Students</span>
+                <strong id="studentCount">0</strong>
+            </div>
+
         </section>
 
+        <!-- Filters -->
+        <section class="filters-card">
+
+            <div class="filter-group">
+                <label for="monthFilter" data-i18n="month">Month</label>
+                <select id="monthFilter" class="filter-select"></select>
+            </div>
+
+            <div class="filter-group">
+                <label for="paymentStatusFilter" data-i18n="paymentStatus">Payment Status</label>
+                <select id="paymentStatusFilter" class="filter-select">
+                    <option value="" data-i18n="allStudents">All Students</option>
+                    <option value="paid" data-i18n="paid">Paid</option>
+                    <option value="unpaid" data-i18n="unpaid">Unpaid</option>
+                </select>
+            </div>
+
+            <div class="filter-actions">
+                <button id="printUnpaidButton" class="btn btn-primary">
+                    <i class="fas fa-print"></i>
+                    <span data-i18n="printUnpaidList">Print Unpaid List</span>
+                </button>
+            </div>
+
+        </section>
 
         <!-- Legend -->
-
         <section class="legend">
 
             <div class="legend-item">
-
-                <span class="status-badge paid">
-                    Paid
-                </span>
-
-                <span>
-                    Payment recorded
-                </span>
-
+                <span class="status-badge paid" data-i18n="paid">Paid</span>
+                <span data-i18n="paidLegend">Payment recorded</span>
             </div>
 
-
             <div class="legend-item">
-
-                <span class="status-badge unpaid">
-                    Unpaid
-                </span>
-
-                <span>
-                    No payment recorded
-                </span>
-
+                <span class="status-badge unpaid" data-i18n="unpaid">Unpaid</span>
+                <span data-i18n="unpaidLegend">No payment recorded</span>
             </div>
 
         </section>
 
-
-        <!-- Students Table -->
-
+        <!-- Table -->
         <main class="table-card">
 
             <div class="table-wrapper">
-
                 <table>
-
                     <thead>
-
-                        <tr>
-
-                            <th>
-                                Student No.
-                            </th>
-
-                            <th>
-                                Student Name
-                            </th>
-
-                            <th>
-                                October
-                            </th>
-
-                            <th>
-                                November
-                            </th>
-
-                            <th>
-                                December
-                            </th>
-
-                            <th>
-                                January
-                            </th>
-
-                            <th>
-                                February
-                            </th>
-
-                            <th>
-                                March
-                            </th>
-
-                            <th>
-                                April
-                            </th>
-
-                            <th>
-                                May
-                            </th>
-
-                            <th>
-                                June
-                            </th>
-
+                        <tr id="tableHeaderRow">
+                            <th data-i18n="studentNumber">Student No.</th>
+                            <th data-i18n="studentName">Student Name</th>
+                            <!-- Month columns added by JS -->
                         </tr>
-
                     </thead>
-
-
                     <tbody id="studentsTableBody">
-
                         <tr>
-
-                            <td
-                                colspan="11"
-                                class="empty-state">
-
+                            <td colspan="11" class="empty-state" data-i18n="loadingStudents">
                                 Loading students...
-
                             </td>
-
                         </tr>
-
                     </tbody>
-
                 </table>
-
             </div>
 
         </main>
 
     </div>
 
-
     <!-- Printable unpaid list -->
-
-    <div
-        id="printUnpaidArea"
-        class="print-unpaid-area">
+    <div id="printUnpaidArea" class="print-unpaid-area">
 
         <div class="print-header">
-
-            <h1 id="printSchoolName">
-                School
-            </h1>
-
-            <h2 id="printClassTitle">
-                Unpaid Students
-            </h2>
-
-            <p id="printPeriod">
-                -
-            </p>
-
+            <h1 id="printSchoolName">School</h1>
+            <h2 id="printClassTitle">Unpaid Students</h2>
+            <p id="printPeriod">-</p>
         </div>
 
-
         <table class="print-table">
-
             <thead>
-
                 <tr>
-
-                    <th>
-                        Student No.
-                    </th>
-
-                    <th>
-                        Student Name
-                    </th>
-
-                    <th>
-                        Class
-                    </th>
-
-                    <th>
-                        Academic Year
-                    </th>
-
-                    <th>
-                        Month
-                    </th>
-
-                    <th>
-                        Status
-                    </th>
-
+                    <th data-i18n="studentNumber">Student No.</th>
+                    <th data-i18n="studentName">Student Name</th>
+                    <th data-i18n="class">Class</th>
+                    <th data-i18n="academicYear">Academic Year</th>
+                    <th data-i18n="month">Month</th>
+                    <th data-i18n="status">Status</th>
                 </tr>
-
             </thead>
-
-            <tbody id="printUnpaidBody">
-            </tbody>
-
+            <tbody id="printUnpaidBody"></tbody>
         </table>
 
     </div>
-
 
     <script src="js/auth.js"></script>
     <script src="js/school-class.js"></script>
