@@ -45,6 +45,8 @@ const TRANSLATIONS = {
         schoolInformationSubtitle: "Basic information about this school.",
         academicSettings: "Academic Settings",
         academicSettingsSubtitle: "Configure the current academic year.",
+        paymentSettings: "Payment Settings",
+        paymentSettingsSubtitle: "Configure basic school payment information.",
         passwordSettings: "Change Password",
         passwordSettingsSubtitle: "Update your account password.",
 
@@ -58,6 +60,9 @@ const TRANSLATIONS = {
 
         currentAcademicYear: "Current Academic Year",
         academicYearPlaceholder: "2026-27",
+
+        monthlyFee: "Default Monthly Fee",
+        currency: "Currency",
 
         currentPassword: "Current Password",
         currentPasswordPlaceholder: "Enter current password",
@@ -88,6 +93,8 @@ const TRANSLATIONS = {
         schoolInformationSubtitle: "المعلومات الأساسية لهذه المدرسة.",
         academicSettings: "الإعدادات الدراسية",
         academicSettingsSubtitle: "ضبط السنة الدراسية الحالية.",
+        paymentSettings: "إعدادات الدفع",
+        paymentSettingsSubtitle: "ضبط معلومات الدفع الأساسية للمدرسة.",
         passwordSettings: "تغيير كلمة المرور",
         passwordSettingsSubtitle: "تحديث كلمة مرور حسابك.",
 
@@ -101,6 +108,9 @@ const TRANSLATIONS = {
 
         currentAcademicYear: "السنة الدراسية الحالية",
         academicYearPlaceholder: "2026-27",
+
+        monthlyFee: "الرسم الشهري الافتراضي",
+        currency: "العملة",
 
         currentPassword: "كلمة المرور الحالية",
         currentPasswordPlaceholder: "أدخل كلمة المرور الحالية",
@@ -131,6 +141,8 @@ const TRANSLATIONS = {
         schoolInformationSubtitle: "Informations de base sur cette école.",
         academicSettings: "Paramètres académiques",
         academicSettingsSubtitle: "Configurer l'année scolaire actuelle.",
+        paymentSettings: "Paramètres de paiement",
+        paymentSettingsSubtitle: "Configurer les informations de paiement.",
         passwordSettings: "Changer le mot de passe",
         passwordSettingsSubtitle: "Mettre à jour votre mot de passe.",
 
@@ -144,6 +156,9 @@ const TRANSLATIONS = {
 
         currentAcademicYear: "Année scolaire actuelle",
         academicYearPlaceholder: "2026-27",
+
+        monthlyFee: "Frais mensuels par défaut",
+        currency: "Devise",
 
         currentPassword: "Mot de passe actuel",
         currentPasswordPlaceholder: "Entrez le mot de passe actuel",
@@ -314,12 +329,6 @@ function writeCache(data) {
     } catch (e) {}
 }
 
-function clearSettingsCache() {
-    try {
-        sessionStorage.removeItem(getCacheKey());
-    } catch (e) {}
-}
-
 
 // =====================================================
 // API request
@@ -376,7 +385,9 @@ const institutionIdInput = document.getElementById("institutionId");
 const schoolNameInput    = document.getElementById("schoolName");
 const schoolPhoneInput   = document.getElementById("schoolPhone");
 const schoolEmailInput   = document.getElementById("schoolEmail");
-const academicYearInput  = document.getElementById("academicYear");   // hidden field
+const academicYearInput  = document.getElementById("academicYear");
+const monthlyFeeInput    = document.getElementById("monthlyFee");
+const currencyInput      = document.getElementById("currency");
 const saveButton         = document.getElementById("saveButton");
 const backButton         = document.getElementById("backButton");
 const message            = document.getElementById("message");
@@ -400,18 +411,16 @@ function clearMessage() {
 
 
 // =====================================================
-// Get stored academic year (from hidden field, cache, or clock)
+// Helper: academic year with fallback
 // =====================================================
 
 function getStoredAcademicYear() {
 
-    // 1) Hidden input (populated from settings load)
     if (academicYearInput && academicYearInput.value) {
         const v = academicYearInput.value.trim();
         if (/^\d{4}-\d{2}$/.test(v)) return v;
     }
 
-    // 2) Cached settings
     try {
         const raw = sessionStorage.getItem(getCacheKey());
         if (raw) {
@@ -423,8 +432,59 @@ function getStoredAcademicYear() {
         }
     } catch (e) {}
 
-    // 3) Fallback — clock
     return getCurrentAcademicYear();
+}
+
+
+// =====================================================
+// Helper: currency with fallback
+// =====================================================
+
+function getStoredCurrency() {
+
+    if (currencyInput && currencyInput.value) {
+        const v = currencyInput.value.trim();
+        if (v) return v;
+    }
+
+    try {
+        const raw = sessionStorage.getItem(getCacheKey());
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.data && parsed.data.currency) {
+                const v = String(parsed.data.currency).trim();
+                if (v) return v;
+            }
+        }
+    } catch (e) {}
+
+    return "MRU";
+}
+
+
+// =====================================================
+// Helper: monthly fee with fallback
+// =====================================================
+
+function getStoredMonthlyFee() {
+
+    if (monthlyFeeInput && monthlyFeeInput.value !== "") {
+        const n = Number(monthlyFeeInput.value);
+        if (!isNaN(n) && n >= 0) return n;
+    }
+
+    try {
+        const raw = sessionStorage.getItem(getCacheKey());
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.data && parsed.data.monthlyFee != null) {
+                const n = Number(parsed.data.monthlyFee);
+                if (!isNaN(n) && n >= 0) return n;
+            }
+        }
+    } catch (e) {}
+
+    return 0;
 }
 
 
@@ -447,9 +507,15 @@ function applySettingsToForm(settings) {
         schoolEmailInput.value = settings.schoolEmail || "";
     }
 
-    // Hidden academic year field — needed for the save request
+    // Hidden fields — needed by the save request
     if (academicYearInput) {
         academicYearInput.value = settings.academicYear || getCurrentAcademicYear();
+    }
+    if (monthlyFeeInput) {
+        monthlyFeeInput.value = settings.monthlyFee != null ? settings.monthlyFee : 0;
+    }
+    if (currencyInput) {
+        currencyInput.value = settings.currency || "MRU";
     }
 
     if (settings.schoolName) {
@@ -464,7 +530,6 @@ function applySettingsToForm(settings) {
 
 function loadSettings() {
 
-    // 1) Cache-first
     const cached = readCache(CACHE_TTL);
 
     if (cached.data) {
@@ -472,13 +537,12 @@ function loadSettings() {
         settingsLoaded = true;
 
         if (cached.fresh) {
-            return;   // done, no network
+            return;
         }
     } else {
         showMessage(t("loadingSettings"), "info");
     }
 
-    // 2) Fetch in background
     apiRequest("getSchoolSettings", {})
         .then(function (result) {
 
@@ -531,7 +595,9 @@ function saveSettings() {
         schoolName:   schoolName,
         schoolPhone:  schoolPhone,
         schoolEmail:  schoolEmail,
-        academicYear: getStoredAcademicYear()   // hidden but required by backend
+        academicYear: getStoredAcademicYear(),
+        monthlyFee:   getStoredMonthlyFee(),
+        currency:     getStoredCurrency()
     })
     .then(function (result) {
 
@@ -541,7 +607,7 @@ function saveSettings() {
         writeCache(settings);
         settingsLoaded = true;
 
-        // Update the session user so other pages see the new values
+        // Keep session user in sync
         try {
             const stored = JSON.parse(localStorage.getItem("bmpCurrentUser") || "null");
             if (stored) {
