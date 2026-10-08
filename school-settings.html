@@ -59,19 +59,22 @@
 
                 <div class="form-group">
                     <label for="schoolName" data-i18n="schoolName">School Name</label>
-                    <input type="text" id="schoolName" data-i18n-placeholder="schoolNamePlaceholder"
+                    <input type="text" id="schoolName"
+                           data-i18n-placeholder="schoolNamePlaceholder"
                            placeholder="School name">
                 </div>
 
                 <div class="form-group">
                     <label for="schoolPhone" data-i18n="phone">Phone</label>
-                    <input type="text" id="schoolPhone" data-i18n-placeholder="phonePlaceholder"
+                    <input type="text" id="schoolPhone"
+                           data-i18n-placeholder="phonePlaceholder"
                            placeholder="School phone">
                 </div>
 
                 <div class="form-group">
                     <label for="schoolEmail" data-i18n="email">Email</label>
-                    <input type="email" id="schoolEmail" data-i18n-placeholder="emailPlaceholder"
+                    <input type="email" id="schoolEmail"
+                           data-i18n-placeholder="emailPlaceholder"
                            placeholder="School email">
                 </div>
 
@@ -80,8 +83,8 @@
         </section>
 
 
-        <!-- Academic Settings -->
-        <section class="settings-card">
+        <!-- Academic Settings (hidden — will be re-enabled later) -->
+        <section class="settings-card" id="academicSettingsSection" style="display: none;">
 
             <div class="card-header">
                 <h2 data-i18n="academicSettings">Academic Settings</h2>
@@ -89,12 +92,46 @@
             </div>
 
             <div class="form-grid">
-
                 <div class="form-group">
                     <label for="academicYear" data-i18n="currentAcademicYear">Current Academic Year</label>
                     <input type="text" id="academicYear"
                            data-i18n-placeholder="academicYearPlaceholder"
                            placeholder="2026-27">
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- Password Change (hidden — will be built later) -->
+        <section class="settings-card" id="passwordSettingsSection" style="display: none;">
+
+            <div class="card-header">
+                <h2 data-i18n="passwordSettings">Change Password</h2>
+                <p data-i18n="passwordSettingsSubtitle">Update your account password.</p>
+            </div>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="currentPassword" data-i18n="currentPassword">Current Password</label>
+                    <input type="password" id="currentPassword" autocomplete="current-password"
+                           data-i18n-placeholder="currentPasswordPlaceholder"
+                           placeholder="Enter current password">
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword" data-i18n="newPassword">New Password</label>
+                    <input type="password" id="newPassword" autocomplete="new-password"
+                           data-i18n-placeholder="newPasswordPlaceholder"
+                           placeholder="Enter new password">
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword" data-i18n="confirmPassword">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" autocomplete="new-password"
+                           data-i18n-placeholder="confirmPasswordPlaceholder"
+                           placeholder="Confirm new password">
                 </div>
 
             </div>
@@ -105,6 +142,7 @@
         <!-- Save -->
         <div class="actions">
             <button id="saveButton" class="btn btn-primary">
+                <span class="btn-spinner" aria-hidden="true"></span>
                 <span class="btn-label" data-i18n="saveSettings">Save Settings</span>
             </button>
         </div>
