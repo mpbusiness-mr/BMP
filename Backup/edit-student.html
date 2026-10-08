@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>BMP - Edit Student</title>
+
+    <link
+        rel="stylesheet"
+        href="edit-student.css">
+</head>
+
+<body>
+
+<div class="page-container">
+
+    <!-- =========================
+         Header
+    ========================== -->
+
+    <header class="page-header">
+
+        <div class="header-left">
+
+            <h1 data-i18n="pageTitle">
+                Edit Student
+            </h1>
+
+            <p data-i18n="pageSubtitle">
+                Update student information
+            </p>
+
+        </div>
+
+        <div class="header-right">
+
+            <select
+                id="languageSelect"
+                aria-label="Language">
+
+                <option value="en">
+                    English
+                </option>
+
+                <option value="ar">
+                    العربية
+                </option>
+
+                <option value="fr">
+                    Français
+                </option>
+
+            </select>
+
+            <button
+                type="button"
+                id="backButton"
+                class="btn btn-secondary"
+                data-i18n="back">
+
+                Back
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================
+         School Information
+    ========================== -->
+
+    <section class="card">
+
+        <h2 data-i18n="schoolInformation">
+            School Information
+        </h2>
+
+        <div class="info-grid">
+
+            <div class="info-item">
+
+                <span data-i18n="institutionId">
+                    Institution ID
+                </span>
+
+                <strong id="institutionId">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="info-item">
+
+                <span data-i18n="institutionName">
+                    School Name
+                </span>
+
+                <strong id="institutionName">
+                    —
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         Student Information
+    ========================== -->
+
+    <section class="card">
+
+        <h2 data-i18n="studentInformation">
+            Student Information
+        </h2>
+
+
+        <form id="editStudentForm">
+
+            <div class="form-grid">
+
+
+                <!-- Academic Year -->
+
+                <div class="form-group">
+
+                    <label
+                        for="academicYear"
+                        data-i18n="academicYear">
+
+                        Academic Year
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="academicYear"
+                        readonly>
+
+                    <small
+                        data-i18n="academicYearReadonly">
+
+                        The academic year cannot be
+                        changed after registration.
+
+                    </small>
+
+                </div>
+
+
+                <!-- Student Number -->
+
+                <div class="form-group">
+
+                    <label
+                        for="studentNumber"
+                        data-i18n="studentNumber">
+
+                        Student Number
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="studentNumber"
+                        readonly>
+
+                    <small
+                        data-i18n="studentNumberReadonly">
+
+                        The student number cannot be
+                        changed.
+
+                    </small>
+
+                </div>
+
+
+                <!-- Student Name -->
+
+                <div class="form-group">
+
+                    <label
+                        for="studentName"
+                        data-i18n="studentName">
+
+                        Student Name
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="studentName"
+                        autocomplete="off"
+                        placeholder="Enter student name"
+                        data-i18n-placeholder="enterStudentName"
+                        required>
+
+                </div>
+
+
+                <!-- Stage -->
+
+                <div class="form-group">
+
+                    <label
+                        for="stage"
+                        data-i18n="stage">
+
+                        Stage
+
+                    </label>
+
+                    <select
+                        id="stage"
+                        required>
+
+                        <option
+                            value=""
+                            data-i18n="selectStage">
+
+                            Select stage
+
+                        </option>
+
+                        <option
+                            value="primary"
+                            data-i18n="primary">
+
+                            Primary
+
+                        </option>
+
+                        <option
+                            value="preparatory"
+                            data-i18n="preparatory">
+
+                            Preparatory
+
+                        </option>
+
+                        <option
+                            value="secondary"
+                            data-i18n="secondary">
+
+                            Secondary
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Class -->
+
+                <div class="form-group">
+
+                    <label
+                        for="className"
+                        data-i18n="class">
+
+                        Class
+
+                    </label>
+
+                    <select
+                        id="className"
+                        required>
+
+                        <option
+                            value=""
+                            data-i18n="selectClass">
+
+                            Select class
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Registration Date -->
+
+                <div class="form-group">
+
+                    <label
+                        for="registrationDate"
+                        data-i18n="registrationDate">
+
+                        Registration Date
+
+                    </label>
+
+                    <input
+                        type="date"
+                        id="registrationDate"
+                        required>
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 Actions
+            ========================== -->
+
+            <div class="form-actions">
+
+                <button
+                    type="button"
+                    id="cancelButton"
+                    class="btn btn-secondary"
+                    data-i18n="cancel">
+
+                    Cancel
+
+                </button>
+
+
+                <button
+                    type="submit"
+                    id="saveButton"
+                    class="btn btn-primary"
+                    data-i18n="saveChanges">
+
+                    Save Changes
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</div>
+
+
+<script src="js/auth.js"></script>
+<script src="js/activity-log.js"></script>
+<script src="js/edit-student.js"></script>
+
+</body>
+
+</html>
