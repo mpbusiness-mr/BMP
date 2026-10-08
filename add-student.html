@@ -13,7 +13,6 @@
 
     <link rel="stylesheet" href="add-student.css">
 
-    <!-- Preload the students page so the redirect feels instant -->
     <link rel="prefetch" href="students.html">
 </head>
 <body class="lang-ar">
@@ -128,6 +127,27 @@
                         </label>
                         <input type="date" id="registrationDate" required>
                         <span class="field-error" data-error-for="registrationDate"></span>
+                    </div>
+
+                    <!-- NEW: Guardian fields -->
+                    <div class="form-group">
+                        <label for="guardianName" data-i18n="guardianName">
+                            Guardian Name
+                        </label>
+                        <input type="text" id="guardianName" autocomplete="off"
+                               placeholder="Enter guardian name"
+                               data-i18n-placeholder="enterGuardianName">
+                        <span class="field-error" data-error-for="guardianName"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="guardianPhone" data-i18n="guardianPhone">
+                            Guardian Phone
+                        </label>
+                        <input type="tel" id="guardianPhone" autocomplete="off"
+                               placeholder="Enter guardian phone"
+                               data-i18n-placeholder="enterGuardianPhone">
+                        <span class="field-error" data-error-for="guardianPhone"></span>
                     </div>
 
                 </div>
