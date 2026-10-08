@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Institution Users - BMP Admin</title>
+
+    <link rel="stylesheet" href="users.css">
+</head>
+
+<body>
+
+    <div class="page-container">
+
+        <header class="page-header">
+
+            <div>
+                <h1 id="pageTitle">Institution Users</h1>
+
+                <p id="institutionTitle">
+                    Manage users for this institution
+                </p>
+            </div>
+
+            <button
+                id="backButton"
+                class="btn btn-secondary">
+                Back
+            </button>
+
+        </header>
+
+
+        <main class="content-container">
+
+            <section class="institution-summary">
+
+                <div class="summary-item">
+                    <span
+                        class="summary-label"
+                        id="labelInstitutionId">
+                        Institution ID
+                    </span>
+
+                    <span
+                        id="institutionId"
+                        class="summary-value">
+                        -
+                    </span>
+                </div>
+
+
+                <div class="summary-item">
+                    <span
+                        class="summary-label"
+                        id="labelInstitutionName">
+                        Institution Name
+                    </span>
+
+                    <span
+                        id="institutionName"
+                        class="summary-value">
+                        -
+                    </span>
+                </div>
+
+
+                <div class="summary-item">
+                    <span
+                        class="summary-label"
+                        id="labelType">
+                        Type
+                    </span>
+
+                    <span
+                        id="institutionType"
+                        class="summary-value">
+                        -
+                    </span>
+                </div>
+
+            </section>
+
+
+            <section class="users-section">
+
+                <div class="section-header">
+
+                    <div>
+                        <h2 id="usersTitle">Users</h2>
+
+                        <p id="usersDescription">
+                            Manage accounts and user access
+                        </p>
+                    </div>
+
+                    <button
+                        id="addUserButton"
+                        class="btn btn-primary">
+                        + Add User
+                    </button>
+
+                </div>
+
+
+                <div class="search-container">
+
+                    <input
+                        type="text"
+                        id="searchUser"
+                        placeholder="Search by username..."
+                    >
+
+                    <select id="userStatusFilter">
+
+                        <option value="all">
+                            All Statuses
+                        </option>
+
+                        <option value="active">
+                            Active
+                        </option>
+
+                        <option value="disabled">
+                            Disabled
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+
+                                <th id="thUsername">
+                                    Username
+                                </th>
+
+                                <th id="thRole">
+                                    Role
+                                </th>
+
+                                <th id="thStatus">
+                                    Status
+                                </th>
+
+                                <th id="thCreated">
+                                    Created
+                                </th>
+
+                                <th id="thActions">
+                                    Actions
+                                </th>
+
+                            </tr>
+                        </thead>
+
+
+                        <tbody id="usersTableBody">
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div
+                    id="emptyState"
+                    class="empty-state">
+
+                    <h3 id="emptyTitle">
+                        No Users Found
+                    </h3>
+
+                    <p id="emptyDescription">
+                        There are no users matching your search.
+                    </p>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="js/activity-log.js"></script>
+    <script src="js/users.js"></script>
+
+</body>
+</html>
