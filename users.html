@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
- 
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
     <link rel="stylesheet" href="users.css">
 </head>
 
@@ -18,16 +20,38 @@
 
     <div class="page-container">
 
-        <div class="header-brand">
-            <a href="school.html" class="topbar-logo">
-                <i class="fas fa-cubes"></i>
-                <span>BMP</span>
-            </a>
-            <div class="page-title-block">
-                <h1 id="pageTitle" data-i18n="institutionUsers">Institution Users</h1>
-                <p id="institutionTitle" data-i18n="manageUsers">Manage users for this institution</p>
+        <header class="page-header">
+
+            <div class="header-brand">
+
+                <a href="school.html" class="topbar-logo">
+                    <i class="fas fa-cubes"></i>
+                    <span>BMP</span>
+                </a>
+
+                <div class="page-title-block">
+                    <h1 id="pageTitle" data-i18n="institutionUsers">Institution Users</h1>
+                    <p id="institutionTitle" data-i18n="manageUsers">Manage users for this institution</p>
+                </div>
+
             </div>
-        </div>
+
+            <div class="header-actions">
+
+                <div class="lang-switcher" role="group" aria-label="Language">
+                    <button type="button" class="lang-btn active" data-lang="ar" onclick="setLanguage('ar')">عربية</button>
+                    <button type="button" class="lang-btn"        data-lang="fr" onclick="setLanguage('fr')">Français</button>
+                    <button type="button" class="lang-btn"        data-lang="en" onclick="setLanguage('en')">English</button>
+                </div>
+
+                <button id="backButton" class="btn btn-secondary" data-i18n="back">
+                    Back
+                </button>
+
+            </div>
+
+        </header>
+
 
         <main class="content-container">
 
