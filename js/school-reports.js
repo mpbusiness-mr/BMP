@@ -17,11 +17,6 @@ const API_URL =
 
 const CACHE_TTL = 2 * 60 * 1000;   // 2 minutes
 
-
-// =====================================================
-// Months
-// =====================================================
-
 const MONTHS = [
     "October", "November", "December",
     "January", "February", "March",
@@ -33,18 +28,16 @@ const MONTHS = [
 // State
 // =====================================================
 
-let currentUser   = null;
-let institutionId = null;
+let currentUser    = null;
+let institutionId  = null;
 
 let currentLanguage = "ar";
 
-let students   = [];
-let payments   = [];
+let students    = [];
+let payments    = [];
 let institution = null;
 
 let dataLoaded = false;
-
-const CACHE_KEY_REPORTS = () => "bmp_reports_" + institutionId + "_" + getCurrentAcademicYear();
 
 
 // =====================================================
@@ -57,7 +50,6 @@ const TRANSLATIONS = {
         pageTitle: "School Reports",
         pageSubtitle: "View school statistics and payment reports.",
         back: "Back",
-        loading: "Loading...",
         loadingReports: "Loading reports...",
 
         institutionId: "Institution ID",
@@ -92,6 +84,7 @@ const TRANSLATIONS = {
         totalPaid: "Total Paid",
 
         noStudents: "No students available.",
+        failedToLoad: "Failed to load reports.",
 
         primary: "Primary",
         preparatory: "Preparatory",
@@ -114,7 +107,6 @@ const TRANSLATIONS = {
         pageTitle: "تقارير المدرسة",
         pageSubtitle: "عرض إحصائيات المدرسة وتقارير الدفع.",
         back: "رجوع",
-        loading: "جارٍ التحميل...",
         loadingReports: "جارٍ تحميل التقارير...",
 
         institutionId: "معرّف المؤسسة",
@@ -149,6 +141,7 @@ const TRANSLATIONS = {
         totalPaid: "إجمالي المدفوع",
 
         noStudents: "لا يوجد طلاب.",
+        failedToLoad: "فشل تحميل التقارير.",
 
         primary: "الابتدائية",
         preparatory: "الإعدادية",
@@ -171,7 +164,6 @@ const TRANSLATIONS = {
         pageTitle: "Rapports scolaires",
         pageSubtitle: "Consulter les statistiques et rapports de paiement.",
         back: "Retour",
-        loading: "Chargement...",
         loadingReports: "Chargement des rapports...",
 
         institutionId: "ID de l'établissement",
@@ -206,6 +198,7 @@ const TRANSLATIONS = {
         totalPaid: "Total payé",
 
         noStudents: "Aucun élève disponible.",
+        failedToLoad: "Échec du chargement des rapports.",
 
         primary: "Primaire",
         preparatory: "Collège",
@@ -232,19 +225,71 @@ const TRANSLATIONS = {
 // =====================================================
 
 function t(key) {
-    const language = TRANSLATIONS[currentLanguage] || TRANSLATIONS.en;
+    const lang = TRANSLATIONS[currentLanguage] || TRANSLATIONS.en;
     const parts = String(key).split(".");
-    let value = language;
+    let value = lang;
 
-    for (const part of parts) {
-        if (value && Object.prototype.hasOwnProperty.call(value, part)) {
-            value = value[part];
+    for (let i = 0; i < parts.length; i++) {
+        if (value && Object.prototype.hasOwnProperty.call(value, parts[i])) {
+            value = value[parts[i]];
         } else {
             return key;
         }
     }
 
     return value;
+}
+
+
+// =====================================================
+// Language
+// =====================================================
+
+function getSavedLanguage() {
+    const v = localStorage.getItem("bmpLanguage");
+    if (v && ["en", "ar", "fr"].indexOf(v.toLowerCase()) !== -1) {
+        return v.toLowerCase();
+    }
+    return "ar";
+}
+
+function setLanguage(language) {
+    language = String(language || "ar").toLowerCase().trim();
+    if (!TRANSLATIONS[language]) language = "ar";
+
+    currentLanguage = language;
+    try { localStorage.setItem("bmpLanguage", language); } catch (e) {}
+
+    applyLanguage();
+}
+
+function applyLanguage() {
+
+    document.documentElement.lang = currentLanguage;
+    document.documentElement.dir  = currentLanguage === "ar" ? "rtl" : "ltr";
+
+    document.body.classList.remove("lang-ar", "lang-fr", "lang-en");
+    document.body.classList.add("lang-" + currentLanguage);
+
+    document.title = t("pageTitle") + " - BMP";
+
+    // Static text
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+        const key = el.getAttribute("data-i18n");
+        const value = TRANSLATIONS[currentLanguage][key];
+        if (value !== undefined) el.textContent = value;
+    });
+
+    // Active button
+    document.querySelectorAll(".lang-btn").forEach(function (btn) {
+        btn.classList.toggle("active", btn.dataset.lang === currentLanguage);
+    });
+
+    // Rebuild dynamic text (academic year dropdown + tables)
+    if (dataLoaded) {
+        loadAcademicYears();
+        refreshReports();
+    }
 }
 
 
@@ -271,81 +316,13 @@ function writeCache(key, data) {
     } catch (e) {}
 }
 
-
-// =====================================================
-// Loader
-// =====================================================
-
-function showLoader() {
-    const loader = document.getElementById("pageLoader");
-    if (loader) loader.classList.remove("hidden");
-}
-
-function hideLoaderAfterPaint() {
-    requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-            const loader = document.getElementById("pageLoader");
-            if (loader) loader.classList.add("hidden");
-        });
-    });
+function getCacheKey() {
+    return "bmp_reports_" + institutionId + "_" + getCurrentAcademicYear();
 }
 
 
 // =====================================================
-// Language
-// =====================================================
-
-function getSavedLanguage() {
-    const value = localStorage.getItem("bmpLanguage");
-    if (value && ["en", "ar", "fr"].includes(value.toLowerCase())) {
-        return value.toLowerCase();
-    }
-    return "ar";
-}
-
-function setLanguage(language) {
-    language = String(language || "ar").toLowerCase().trim();
-    if (!TRANSLATIONS[language]) language = "ar";
-
-    currentLanguage = language;
-    localStorage.setItem("bmpLanguage", language);
-    applyLanguage();
-}
-
-function applyLanguage() {
-
-    document.documentElement.lang = currentLanguage;
-    document.documentElement.dir  = currentLanguage === "ar" ? "rtl" : "ltr";
-
-    document.body.classList.remove("lang-ar", "lang-fr", "lang-en");
-    document.body.classList.add("lang-" + currentLanguage);
-
-    document.title = t("pageTitle") + " - BMP";
-
-    document.querySelectorAll("[data-i18n]").forEach(function (el) {
-        const key = el.getAttribute("data-i18n");
-        const value = TRANSLATIONS[currentLanguage][key];
-        if (value !== undefined) el.textContent = value;
-    });
-
-    document.querySelectorAll(".lang-btn").forEach(function (btn) {
-        btn.classList.toggle("active", btn.dataset.lang === currentLanguage);
-    });
-
-    // Rebuild academic year dropdown labels
-    buildAcademicYearFilter();
-
-    // Re-render tables with new month names
-    if (dataLoaded) {
-        updateSummary();
-        renderPaymentReport();
-        renderStudentReport();
-    }
-}
-
-
-// =====================================================
-// Authentication
+// Authentication — session only
 // =====================================================
 
 function initializeAuthentication() {
@@ -375,13 +352,13 @@ function initializeAuthentication() {
 function getCurrentUsername() {
     if (currentUser && currentUser.username) return String(currentUser.username).trim();
     if (currentUser && currentUser.userName) return String(currentUser.userName).trim();
-    if (currentUser && currentUser.name) return String(currentUser.name).trim();
+    if (currentUser && currentUser.name)     return String(currentUser.name).trim();
     return "";
 }
 
 
 // =====================================================
-// Academic year — YYYY-YY
+// Current academic year — YYYY-YY
 // =====================================================
 
 function getCurrentAcademicYear() {
@@ -396,64 +373,46 @@ function getCurrentAcademicYear() {
 // API request — timeout + retry
 // =====================================================
 
-async function apiRequest(action, data, attempt) {
+function apiRequest(action, data) {
+    return new Promise(function (resolve, reject) {
 
-    data = data || {};
-    attempt = attempt || 1;
+        if (!institutionId) return reject(new Error("Institution missing"));
+        const username = getCurrentUsername();
+        if (!username) return reject(new Error("User missing"));
 
-    if (!institutionId) throw new Error("Institution missing");
-    const username = getCurrentUsername();
-    if (!username) throw new Error("User missing");
+        const payload = Object.assign({
+            action: action,
+            institutionId: institutionId,
+            username: username
+        }, data || {});
 
-    const payload = Object.assign({
-        action: action,
-        institutionId: institutionId,
-        username: username
-    }, data);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(function () { controller.abort(); }, 12000);
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(function () { controller.abort(); }, 12000);
-
-    let response;
-    try {
-        response = await fetch(API_URL, {
+        fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify(payload),
             signal: controller.signal
+        })
+        .then(function (response) {
+            clearTimeout(timeoutId);
+            if (!response.ok) throw new Error("Server error: " + response.status);
+            return response.text();
+        })
+        .then(function (text) {
+            let result;
+            try { result = JSON.parse(text); }
+            catch (e) { throw new Error("Invalid response"); }
+            if (!result.success) throw new Error(result.message || "Request failed");
+            resolve(result);
+        })
+        .catch(function (error) {
+            clearTimeout(timeoutId);
+            reject(error);
         });
-        clearTimeout(timeoutId);
-    } catch (error) {
-        clearTimeout(timeoutId);
-        if (attempt < 2) {
-            await new Promise(function (r) { setTimeout(r, 800); });
-            return apiRequest(action, data, attempt + 1);
-        }
-        throw new Error("Connection error");
-    }
 
-    const text = await response.text();
-
-    if (!response.ok) {
-        if (attempt < 2 && response.status >= 500) {
-            await new Promise(function (r) { setTimeout(r, 800); });
-            return apiRequest(action, data, attempt + 1);
-        }
-        throw new Error("Server error: " + response.status);
-    }
-
-    let result;
-    try {
-        result = JSON.parse(text);
-    } catch (error) {
-        throw new Error("Invalid response");
-    }
-
-    if (!result.success) {
-        throw new Error(result.message || "Request failed");
-    }
-
-    return result;
+    });
 }
 
 
@@ -472,7 +431,7 @@ function escapeHtml(value) {
 
 
 // =====================================================
-// Element refs
+// Elements
 // =====================================================
 
 const institutionIdElement   = document.getElementById("institutionId");
@@ -509,31 +468,40 @@ function formatStage(stage) {
 
 function formatAmount(amount) {
     const number = Number(amount || 0);
-    return number.toLocaleString(
-        currentLanguage === "ar" ? "ar" : currentLanguage === "fr" ? "fr-FR" : "en-US",
-        { minimumFractionDigits: 0, maximumFractionDigits: 2 }
-    );
+    const locale =
+        currentLanguage === "ar" ? "ar" :
+        currentLanguage === "fr" ? "fr-FR" : "en-US";
+    return number.toLocaleString(locale, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
 }
 
 
 // =====================================================
-// Academic year filter
+// Academic Year dropdown
 // =====================================================
 
-function buildAcademicYearFilter() {
+function getAcademicYears() {
+    const years = [];
+    students.forEach(function (s) {
+        const y = String(s.academicYear || "").trim();
+        if (y && years.indexOf(y) === -1) years.push(y);
+    });
+
+    const currentYear = getCurrentAcademicYear();
+    if (years.indexOf(currentYear) === -1) years.push(currentYear);
+
+    years.sort(function (a, b) { return b.localeCompare(a); });
+    return years;
+}
+
+function loadAcademicYears() {
 
     if (!academicYearFilter) return;
 
-    const years = [...new Set(
-        students
-            .map(s => String(s.academicYear || "").trim())
-            .filter(Boolean)
-    )].sort((a, b) => b.localeCompare(a));
-
-    const currentYear = getCurrentAcademicYear();
-    if (!years.includes(currentYear)) years.unshift(currentYear);
-
-    const previousValue = academicYearFilter.value;
+    const years = getAcademicYears();
+    const previous = academicYearFilter.value;
 
     academicYearFilter.innerHTML = "";
 
@@ -549,9 +517,11 @@ function buildAcademicYearFilter() {
         academicYearFilter.appendChild(opt);
     });
 
-    if (previousValue && years.includes(previousValue)) {
-        academicYearFilter.value = previousValue;
-    } else if (years.includes(currentYear)) {
+    const currentYear = getCurrentAcademicYear();
+
+    if (previous && years.indexOf(previous) !== -1) {
+        academicYearFilter.value = previous;
+    } else if (years.indexOf(currentYear) !== -1) {
         academicYearFilter.value = currentYear;
     } else {
         academicYearFilter.value = "";
@@ -560,45 +530,44 @@ function buildAcademicYearFilter() {
 
 
 // =====================================================
-// Filtered data
+// Data filters
 // =====================================================
 
 function getSelectedStudents() {
 
-    const institutionMatch = s => String(s.institutionId || institutionId) === institutionId;
-
-    if (!academicYearFilter || !academicYearFilter.value) {
-        return students.filter(institutionMatch);
-    }
-
     return students.filter(function (s) {
-        if (!institutionMatch(s)) return false;
-        return String(s.academicYear || "") === academicYearFilter.value;
+
+        const sInstitution = String(s.institutionId || institutionId);
+        if (sInstitution !== institutionId) return false;
+
+        if (academicYearFilter && academicYearFilter.value) {
+            if (String(s.academicYear || "") !== academicYearFilter.value) return false;
+        }
+
+        return true;
     });
 }
-
 
 function getSelectedPayments() {
 
     const selectedStudents = getSelectedStudents();
+    const studentIds = {};
 
-    const studentIds = new Set(
-        selectedStudents.map(s => String(s.studentId || s.id || ""))
-    );
+    selectedStudents.forEach(function (s) {
+        const id = String(s.studentId || s.id || "");
+        if (id) studentIds[id] = true;
+    });
 
     return payments.filter(function (p) {
 
-        const institutionMatch =
-            String(p.institutionId || institutionId) === institutionId;
-        if (!institutionMatch) return false;
+        const pInstitution = String(p.institutionId || institutionId);
+        if (pInstitution !== institutionId) return false;
 
         const sid = String(p.studentId || "");
-        if (!studentIds.has(sid)) return false;
+        if (!sid || !studentIds[sid]) return false;
 
         if (academicYearFilter && academicYearFilter.value) {
-            if (String(p.academicYear || "") !== academicYearFilter.value) {
-                return false;
-            }
+            if (String(p.academicYear || "") !== academicYearFilter.value) return false;
         }
 
         return true;
@@ -618,18 +587,21 @@ function updateSummary() {
     if (totalStudentsElement) totalStudentsElement.textContent = String(selectedStudents.length);
     if (totalPaymentsElement) totalPaymentsElement.textContent = String(selectedPayments.length);
 
-    const totalAmount = selectedPayments.reduce(
-        (sum, p) => sum + Number(p.amount || 0), 0
-    );
+    let totalAmount = 0;
+    selectedPayments.forEach(function (p) { totalAmount += Number(p.amount || 0); });
+
     if (totalAmountElement) totalAmountElement.textContent = formatAmount(totalAmount);
 
-    const paidIds = new Set(
-        selectedPayments.map(p => String(p.studentId || ""))
-    );
+    const paidIds = {};
+    selectedPayments.forEach(function (p) {
+        const sid = String(p.studentId || "");
+        if (sid) paidIds[sid] = true;
+    });
+    const paidCount = Object.keys(paidIds).length;
 
-    if (paidStudentsElement)   paidStudentsElement.textContent   = String(paidIds.size);
+    if (paidStudentsElement)   paidStudentsElement.textContent   = String(paidCount);
     if (unpaidStudentsElement) unpaidStudentsElement.textContent =
-        String(Math.max(0, selectedStudents.length - paidIds.size));
+        String(Math.max(0, selectedStudents.length - paidCount));
 
     if (paidMonthsElement) paidMonthsElement.textContent = String(selectedPayments.length);
 }
@@ -648,29 +620,30 @@ function renderPaymentReport() {
 
     MONTHS.forEach(function (month) {
 
-        const monthPayments = selectedPayments.filter(
-            p => String(p.month || "") === month
-        );
+        let count = 0;
+        let total = 0;
+        const studentIds = {};
 
-        const studentIds = new Set(
-            monthPayments.map(p => String(p.studentId || ""))
-        );
-
-        const totalAmount = monthPayments.reduce(
-            (sum, p) => sum + Number(p.amount || 0), 0
-        );
+        selectedPayments.forEach(function (p) {
+            if (String(p.month || "") !== month) return;
+            count++;
+            total += Number(p.amount || 0);
+            const sid = String(p.studentId || "");
+            if (sid) studentIds[sid] = true;
+        });
 
         const row = document.createElement("tr");
         row.innerHTML =
             "<td>" + escapeHtml(t("months." + month)) + "</td>" +
-            "<td>" + monthPayments.length + "</td>" +
-            "<td>" + studentIds.size + "</td>" +
-            "<td>" + escapeHtml(formatAmount(totalAmount)) + "</td>";
+            "<td>" + count + "</td>" +
+            "<td>" + Object.keys(studentIds).length + "</td>" +
+            "<td>" + escapeHtml(formatAmount(total)) + "</td>";
 
         fragment.appendChild(row);
     });
 
-    paymentReportBody.replaceChildren(fragment);
+    paymentReportBody.innerHTML = "";
+    paymentReportBody.appendChild(fragment);
 }
 
 
@@ -685,6 +658,8 @@ function renderStudentReport() {
     const selectedStudents = getSelectedStudents();
     const selectedPayments = getSelectedPayments();
 
+    studentReportBody.innerHTML = "";
+
     if (selectedStudents.length === 0) {
         studentReportBody.innerHTML =
             '<tr><td colspan="6" class="empty-state">' +
@@ -693,7 +668,7 @@ function renderStudentReport() {
         return;
     }
 
-    const sortedStudents = [...selectedStudents].sort(function (a, b) {
+    const sortedStudents = selectedStudents.slice().sort(function (a, b) {
         return String(a.studentNumber || "").localeCompare(
             String(b.studentNumber || ""),
             undefined,
@@ -707,13 +682,14 @@ function renderStudentReport() {
 
         const studentId = String(student.studentId || student.id || "");
 
-        const studentPayments = selectedPayments.filter(
-            p => String(p.studentId || "") === studentId
-        );
+        let paidCount = 0;
+        let totalPaid = 0;
 
-        const totalPaid = studentPayments.reduce(
-            (sum, p) => sum + Number(p.amount || 0), 0
-        );
+        selectedPayments.forEach(function (p) {
+            if (String(p.studentId || "") !== studentId) return;
+            paidCount++;
+            totalPaid += Number(p.amount || 0);
+        });
 
         const row = document.createElement("tr");
         row.innerHTML =
@@ -721,18 +697,18 @@ function renderStudentReport() {
             "<td>" + escapeHtml(student.name || "") + "</td>" +
             "<td>" + escapeHtml(formatStage(student.stage)) + "</td>" +
             "<td>" + escapeHtml(student.className || student.class || "") + "</td>" +
-            "<td>" + studentPayments.length + "</td>" +
+            "<td>" + paidCount + "</td>" +
             "<td>" + escapeHtml(formatAmount(totalPaid)) + "</td>";
 
         fragment.appendChild(row);
     });
 
-    studentReportBody.replaceChildren(fragment);
+    studentReportBody.appendChild(fragment);
 }
 
 
 // =====================================================
-// Refresh all reports
+// Refresh all
 // =====================================================
 
 function refreshReports() {
@@ -743,126 +719,84 @@ function refreshReports() {
 
 
 // =====================================================
-// Skeleton
+// Update header
 // =====================================================
-
-function showSkeletons() {
-
-    const skeletonRow4 =
-        '<tr><td colspan="4"><span class="skeleton-line"></span></td></tr>' +
-        '<tr><td colspan="4"><span class="skeleton-line" style="width:70%;"></span></td></tr>' +
-        '<tr><td colspan="4"><span class="skeleton-line" style="width:50%;"></span></td></tr>';
-
-    const skeletonRow6 =
-        '<tr><td colspan="6"><span class="skeleton-line"></span></td></tr>' +
-        '<tr><td colspan="6"><span class="skeleton-line" style="width:70%;"></span></td></tr>' +
-        '<tr><td colspan="6"><span class="skeleton-line" style="width:50%;"></span></td></tr>';
-
-    if (paymentReportBody) paymentReportBody.innerHTML = skeletonRow4;
-    if (studentReportBody) studentReportBody.innerHTML = skeletonRow6;
-
-    ["totalStudents", "totalPayments", "totalAmount",
-     "paidStudents", "unpaidStudents", "paidMonths"].forEach(function (id) {
-        const el = document.getElementById(id);
-        if (el) el.textContent = "…";
-    });
-}
-
-
-// =====================================================
-// Load data
-// =====================================================
-
-async function loadReports() {
-
-    // ---- Cache first ----
-    const cached = readCache(CACHE_KEY_REPORTS(), CACHE_TTL);
-
-    if (cached.data) {
-        students    = cached.data.students   || [];
-        payments    = cached.data.payments   || [];
-        institution = cached.data.institution || null;
-        dataLoaded  = true;
-
-        updateInstitutionInfo();
-        buildAcademicYearFilter();
-        refreshReports();
-        hideLoaderAfterPaint();
-
-        // If fresh, skip network
-        if (cached.fresh) {
-            return;
-        }
-
-        // Otherwise refresh in background — silently
-        refreshFromNetwork();
-        return;
-    }
-
-    // ---- Cold start ----
-    showLoader();
-    showSkeletons();
-
-    await refreshFromNetwork();
-
-    hideLoaderAfterPaint();
-}
-
-
-async function refreshFromNetwork() {
-    try {
-
-        const result = await apiRequest("getReports");
-
-        students    = Array.isArray(result.students)   ? result.students   : [];
-        payments    = Array.isArray(result.payments)   ? result.payments   : [];
-        institution = result.institution || null;
-        dataLoaded  = true;
-
-        writeCache(CACHE_KEY_REPORTS(), {
-            students: students,
-            payments: payments,
-            institution: institution
-        });
-
-        updateInstitutionInfo();
-        buildAcademicYearFilter();
-        refreshReports();
-
-    } catch (error) {
-        console.error("Reports loading error:", error);
-
-        if (!dataLoaded) {
-            if (paymentReportBody) {
-                paymentReportBody.innerHTML =
-                    '<tr><td colspan="4" class="empty-state">Failed to load reports.</td></tr>';
-            }
-            if (studentReportBody) {
-                studentReportBody.innerHTML =
-                    '<tr><td colspan="6" class="empty-state">Failed to load reports.</td></tr>';
-            }
-        }
-    }
-}
-
 
 function updateInstitutionInfo() {
-
     if (institutionIdElement) {
         institutionIdElement.textContent =
             (institution && institution.id) || institutionId || "-";
     }
-
     if (institutionNameElement) {
         institutionNameElement.textContent =
             (institution && institution.name) ||
             (currentUser && currentUser.institutionName) ||
             "-";
     }
+}
 
-    if (institution && institution.name) {
-        document.title = institution.name + " · " + t("pageTitle") + " - BMP";
+
+// =====================================================
+// Load — cache-first, non-blocking
+// =====================================================
+
+function loadReports() {
+
+    // 1) Cache-first
+    const cached = readCache(getCacheKey(), CACHE_TTL);
+
+    if (cached.data) {
+        students    = cached.data.students    || [];
+        payments    = cached.data.payments    || [];
+        institution = cached.data.institution || null;
+        dataLoaded  = true;
+
+        updateInstitutionInfo();
+        loadAcademicYears();
+        refreshReports();
+
+        if (cached.fresh) {
+            return;   // done, no network
+        }
     }
+
+    // 2) Fetch in background
+    apiRequest("getReports", {})
+        .then(function (result) {
+
+            students    = Array.isArray(result.students) ? result.students : [];
+            payments    = Array.isArray(result.payments) ? result.payments : [];
+            institution = result.institution || null;
+            dataLoaded  = true;
+
+            writeCache(getCacheKey(), {
+                students: students,
+                payments: payments,
+                institution: institution
+            });
+
+            updateInstitutionInfo();
+            loadAcademicYears();
+            refreshReports();
+        })
+        .catch(function (error) {
+            console.error("Reports loading error:", error);
+
+            if (!dataLoaded) {
+                if (paymentReportBody) {
+                    paymentReportBody.innerHTML =
+                        '<tr><td colspan="4" class="empty-state">' +
+                        escapeHtml(t("failedToLoad")) +
+                        '</td></tr>';
+                }
+                if (studentReportBody) {
+                    studentReportBody.innerHTML =
+                        '<tr><td colspan="6" class="empty-state">' +
+                        escapeHtml(t("failedToLoad")) +
+                        '</td></tr>';
+                }
+            }
+        });
 }
 
 
@@ -872,19 +806,29 @@ function updateInstitutionInfo() {
 
 function setupEventListeners() {
 
-    academicYearFilter?.addEventListener("change", refreshReports);
+    if (academicYearFilter) {
+        academicYearFilter.addEventListener("change", function () {
+            refreshReports();
+        });
+    }
 
-    printButton?.addEventListener("click", function () {
-        window.print();
-    });
+    if (printButton) {
+        printButton.addEventListener("click", function () {
+            window.print();
+        });
+    }
 
-    backButton?.addEventListener("click", function () {
-        window.location.href = "school.html?id=" + encodeURIComponent(institutionId);
-    });
+    if (backButton) {
+        backButton.addEventListener("click", function () {
+            window.location.href = "school.html?id=" + encodeURIComponent(institutionId);
+        });
+    }
 
+    // Language switcher — buttons are wired with onclick in HTML,
+    // but also bind here as a fallback
     document.querySelectorAll(".lang-btn").forEach(function (btn) {
         btn.addEventListener("click", function () {
-            setLanguage(btn.dataset.lang);
+            setLanguage(btn.dataset.lang || "ar");
         });
     });
 }
@@ -894,22 +838,15 @@ function setupEventListeners() {
 // Initialize
 // =====================================================
 
-async function initializePage() {
+function initializePage() {
 
     const authenticated = initializeAuthentication();
-    if (!authenticated) {
-        hideLoaderAfterPaint();
-        return;
-    }
+    if (!authenticated) return;
 
     updateInstitutionInfo();
-    await loadReports();
+    loadReports();
 }
 
-
-// =====================================================
-// Start
-// =====================================================
 
 document.addEventListener("DOMContentLoaded", function () {
     currentLanguage = getSavedLanguage();
