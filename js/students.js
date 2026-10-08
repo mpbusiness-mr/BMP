@@ -45,7 +45,7 @@ const translations = {
         registrationDate: "Registration Date",
         guardian: "Guardian",
         actions: "Actions",
-        view: "View",
+        //view: "View",
         edit: "Edit",
         noStudentsFound: "No Students Found",
         noStudentsDescription: "There are no students matching your search or filters.",
