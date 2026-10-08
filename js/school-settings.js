@@ -12,6 +12,13 @@ const API_URL =
 
 
 // =====================================================
+// Config
+// =====================================================
+
+const CACHE_TTL = 5 * 60 * 1000;   // 5 minutes
+
+
+// =====================================================
 // State
 // =====================================================
 
@@ -19,6 +26,8 @@ let currentUser    = null;
 let institutionId  = null;
 
 let currentLanguage = "ar";
+
+let settingsLoaded  = false;
 
 
 // =====================================================
@@ -36,6 +45,8 @@ const TRANSLATIONS = {
         schoolInformationSubtitle: "Basic information about this school.",
         academicSettings: "Academic Settings",
         academicSettingsSubtitle: "Configure the current academic year.",
+        passwordSettings: "Change Password",
+        passwordSettingsSubtitle: "Update your account password.",
 
         institutionId: "Institution ID",
         schoolName: "School Name",
@@ -48,13 +59,19 @@ const TRANSLATIONS = {
         currentAcademicYear: "Current Academic Year",
         academicYearPlaceholder: "2026-27",
 
+        currentPassword: "Current Password",
+        currentPasswordPlaceholder: "Enter current password",
+        newPassword: "New Password",
+        newPasswordPlaceholder: "Enter new password",
+        confirmPassword: "Confirm New Password",
+        confirmPasswordPlaceholder: "Confirm new password",
+
         saveSettings: "Save Settings",
         saving: "Saving...",
 
         loadingSettings: "Loading settings...",
 
         schoolNameRequired: "School name is required.",
-        academicYearRequired: "Academic year is required.",
 
         settingsSaved: "Settings saved successfully.",
         settingsFailed: "Failed to save settings.",
@@ -71,6 +88,8 @@ const TRANSLATIONS = {
         schoolInformationSubtitle: "المعلومات الأساسية لهذه المدرسة.",
         academicSettings: "الإعدادات الدراسية",
         academicSettingsSubtitle: "ضبط السنة الدراسية الحالية.",
+        passwordSettings: "تغيير كلمة المرور",
+        passwordSettingsSubtitle: "تحديث كلمة مرور حسابك.",
 
         institutionId: "معرّف المؤسسة",
         schoolName: "اسم المدرسة",
@@ -83,13 +102,19 @@ const TRANSLATIONS = {
         currentAcademicYear: "السنة الدراسية الحالية",
         academicYearPlaceholder: "2026-27",
 
+        currentPassword: "كلمة المرور الحالية",
+        currentPasswordPlaceholder: "أدخل كلمة المرور الحالية",
+        newPassword: "كلمة المرور الجديدة",
+        newPasswordPlaceholder: "أدخل كلمة المرور الجديدة",
+        confirmPassword: "تأكيد كلمة المرور الجديدة",
+        confirmPasswordPlaceholder: "أعد إدخال كلمة المرور الجديدة",
+
         saveSettings: "حفظ الإعدادات",
         saving: "جارٍ الحفظ...",
 
         loadingSettings: "جارٍ تحميل الإعدادات...",
 
         schoolNameRequired: "اسم المدرسة مطلوب.",
-        academicYearRequired: "السنة الدراسية مطلوبة.",
 
         settingsSaved: "تم حفظ الإعدادات بنجاح.",
         settingsFailed: "تعذر حفظ الإعدادات.",
@@ -106,6 +131,8 @@ const TRANSLATIONS = {
         schoolInformationSubtitle: "Informations de base sur cette école.",
         academicSettings: "Paramètres académiques",
         academicSettingsSubtitle: "Configurer l'année scolaire actuelle.",
+        passwordSettings: "Changer le mot de passe",
+        passwordSettingsSubtitle: "Mettre à jour votre mot de passe.",
 
         institutionId: "ID de l'établissement",
         schoolName: "Nom de l'école",
@@ -118,13 +145,19 @@ const TRANSLATIONS = {
         currentAcademicYear: "Année scolaire actuelle",
         academicYearPlaceholder: "2026-27",
 
+        currentPassword: "Mot de passe actuel",
+        currentPasswordPlaceholder: "Entrez le mot de passe actuel",
+        newPassword: "Nouveau mot de passe",
+        newPasswordPlaceholder: "Entrez le nouveau mot de passe",
+        confirmPassword: "Confirmer le mot de passe",
+        confirmPasswordPlaceholder: "Confirmez le nouveau mot de passe",
+
         saveSettings: "Enregistrer",
         saving: "Enregistrement...",
 
         loadingSettings: "Chargement des paramètres...",
 
         schoolNameRequired: "Le nom de l'école est requis.",
-        academicYearRequired: "L'année scolaire est requise.",
 
         settingsSaved: "Paramètres enregistrés avec succès.",
         settingsFailed: "Échec de l'enregistrement.",
@@ -207,7 +240,7 @@ function applyLanguage() {
 
 
 // =====================================================
-// Authentication — session only
+// Authentication
 // =====================================================
 
 function initializeAuthentication() {
@@ -243,14 +276,36 @@ function getCurrentUsername() {
 
 
 // =====================================================
-// Current academic year — YYYY-YY
+// Cache helpers
 // =====================================================
 
-function getCurrentAcademicYear() {
-    const now = new Date();
-    let startYear = now.getFullYear();
-    if (now.getMonth() < 9) startYear--;
-    return startYear + "-" + String(startYear + 1).slice(-2);
+function getCacheKey() {
+    return "bmp_settings_" + institutionId;
+}
+
+function readCache(ttl) {
+    try {
+        const raw = sessionStorage.getItem(getCacheKey());
+        if (!raw) return { data: null, fresh: false };
+        const parsed = JSON.parse(raw);
+        if (!parsed || parsed.data === undefined) return { data: null, fresh: false };
+        const age = Date.now() - (parsed.ts || 0);
+        return { data: parsed.data, fresh: age < ttl };
+    } catch (e) {
+        return { data: null, fresh: false };
+    }
+}
+
+function writeCache(data) {
+    try {
+        sessionStorage.setItem(getCacheKey(), JSON.stringify({ ts: Date.now(), data: data }));
+    } catch (e) {}
+}
+
+function clearSettingsCache() {
+    try {
+        sessionStorage.removeItem(getCacheKey());
+    } catch (e) {}
 }
 
 
@@ -309,7 +364,6 @@ const institutionIdInput = document.getElementById("institutionId");
 const schoolNameInput    = document.getElementById("schoolName");
 const schoolPhoneInput   = document.getElementById("schoolPhone");
 const schoolEmailInput   = document.getElementById("schoolEmail");
-const academicYearInput  = document.getElementById("academicYear");
 const saveButton         = document.getElementById("saveButton");
 const backButton         = document.getElementById("backButton");
 const message            = document.getElementById("message");
@@ -333,41 +387,70 @@ function clearMessage() {
 
 
 // =====================================================
-// Load settings
+// Apply settings to form
+// =====================================================
+
+function applySettingsToForm(settings) {
+
+    if (institutionIdInput) {
+        institutionIdInput.value = settings.institutionId || institutionId;
+    }
+    if (schoolNameInput) {
+        schoolNameInput.value = settings.schoolName || "";
+    }
+    if (schoolPhoneInput) {
+        schoolPhoneInput.value = settings.schoolPhone || "";
+    }
+    if (schoolEmailInput) {
+        schoolEmailInput.value = settings.schoolEmail || "";
+    }
+
+    if (settings.schoolName) {
+        document.title = settings.schoolName + " · " + t("pageTitle") + " - BMP";
+    }
+}
+
+
+// =====================================================
+// Load settings — cache-first
 // =====================================================
 
 function loadSettings() {
 
-    showMessage(t("loadingSettings"), "info");
+    // 1) Cache-first
+    const cached = readCache(CACHE_TTL);
 
+    if (cached.data) {
+        applySettingsToForm(cached.data);
+        settingsLoaded = true;
+
+        if (cached.fresh) {
+            return;   // done, no network
+        }
+    } else {
+        showMessage(t("loadingSettings"), "info");
+    }
+
+    // 2) Fetch in background
     apiRequest("getSchoolSettings", {})
         .then(function (result) {
 
             const settings = result.settings || {};
 
-            if (institutionIdInput) {
-                institutionIdInput.value = settings.institutionId || institutionId;
-            }
-            if (schoolNameInput) {
-                schoolNameInput.value = settings.schoolName || "";
-            }
-            if (schoolPhoneInput) {
-                schoolPhoneInput.value = settings.schoolPhone || "";
-            }
-            if (schoolEmailInput) {
-                schoolEmailInput.value = settings.schoolEmail || "";
-            }
-            if (academicYearInput) {
-                academicYearInput.value = settings.academicYear || getCurrentAcademicYear();
-            }
+            applySettingsToForm(settings);
+            writeCache(settings);
+            settingsLoaded = true;
 
-            document.title = (settings.schoolName || "School") + " · " + t("pageTitle") + " - BMP";
-
-            clearMessage();
+            if (!cached.data) {
+                clearMessage();
+            }
         })
         .catch(function (error) {
             console.error("Settings loading error:", error);
-            showMessage(error.message || t("loadFailed"), "error");
+
+            if (!cached.data) {
+                showMessage(error.message || t("loadFailed"), "error");
+            }
         });
 }
 
@@ -378,25 +461,19 @@ function loadSettings() {
 
 function saveSettings() {
 
-    const schoolName   = schoolNameInput ? schoolNameInput.value.trim() : "";
-    const schoolPhone  = schoolPhoneInput ? schoolPhoneInput.value.trim() : "";
-    const schoolEmail  = schoolEmailInput ? schoolEmailInput.value.trim() : "";
-    const academicYear = academicYearInput ? academicYearInput.value.trim() : "";
+    const schoolName  = schoolNameInput ? schoolNameInput.value.trim() : "";
+    const schoolPhone = schoolPhoneInput ? schoolPhoneInput.value.trim() : "";
+    const schoolEmail = schoolEmailInput ? schoolEmailInput.value.trim() : "";
 
     if (!schoolName) {
         showMessage(t("schoolNameRequired"), "error");
-        schoolNameInput && schoolNameInput.focus();
-        return;
-    }
-
-    if (!academicYear) {
-        showMessage(t("academicYearRequired"), "error");
-        academicYearInput && academicYearInput.focus();
+        if (schoolNameInput) schoolNameInput.focus();
         return;
     }
 
     if (saveButton) {
         saveButton.disabled = true;
+        saveButton.classList.add("loading");
         const label = saveButton.querySelector(".btn-label");
         if (label) label.textContent = t("saving");
     }
@@ -404,48 +481,30 @@ function saveSettings() {
     showMessage(t("saving"), "info");
 
     apiRequest("updateSchoolSettings", {
-        schoolName: schoolName,
+        schoolName:  schoolName,
         schoolPhone: schoolPhone,
-        schoolEmail: schoolEmail,
-        academicYear: academicYear
+        schoolEmail: schoolEmail
     })
     .then(function (result) {
 
         const settings = result.settings || {};
 
-        if (institutionIdInput) institutionIdInput.value = settings.institutionId || institutionId;
-        if (schoolNameInput)    schoolNameInput.value    = settings.schoolName || schoolName;
-        if (schoolPhoneInput)   schoolPhoneInput.value   = settings.schoolPhone || schoolPhone;
-        if (schoolEmailInput)   schoolEmailInput.value   = settings.schoolEmail || schoolEmail;
-        if (academicYearInput)  academicYearInput.value  = settings.academicYear || academicYear;
+        applySettingsToForm(settings);
+        writeCache(settings);
+        settingsLoaded = true;
 
-        document.title = (settings.schoolName || schoolName) + " · " + t("pageTitle") + " - BMP";
-
-        // Clear caches so other pages see the new values
-        try {
-            Object.keys(sessionStorage).forEach(function (key) {
-                if (key.indexOf("bmp_") === 0 &&
-                    key.indexOf(institutionId) !== -1) {
-                    sessionStorage.removeItem(key);
-                }
-            });
-            // Also clear the current academic year value
-            sessionStorage.removeItem("bmp_reports_" + institutionId + "_" + getCurrentAcademicYear());
-        } catch (e) {}
-
-        // Update session user so other pages see new school name
+        // Also update the session user so other pages see the new values
         try {
             const stored = JSON.parse(localStorage.getItem("bmpCurrentUser") || "null");
             if (stored) {
-                stored.institutionName = schoolName;
-                stored.institutionPhone = schoolPhone;
-                stored.institutionEmail = schoolEmail;
+                stored.institutionName  = settings.schoolName  || schoolName;
+                stored.institutionPhone = settings.schoolPhone || schoolPhone;
+                stored.institutionEmail = settings.schoolEmail || schoolEmail;
                 localStorage.setItem("bmpCurrentUser", JSON.stringify(stored));
             }
         } catch (e) {}
 
         showMessage(result.message || t("settingsSaved"), "success");
-
         setTimeout(clearMessage, 3000);
     })
     .catch(function (error) {
@@ -455,6 +514,7 @@ function saveSettings() {
     .then(function () {
         if (saveButton) {
             saveButton.disabled = false;
+            saveButton.classList.remove("loading");
             const label = saveButton.querySelector(".btn-label");
             if (label) label.textContent = t("saveSettings");
         }
