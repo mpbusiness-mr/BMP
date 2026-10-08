@@ -1,5 +1,5 @@
 // =====================================================
-// BMP · Classes & Stages — Speed-optimized
+// BMP · Classes & Stages — Fastest
 // =====================================================
 
 
@@ -15,7 +15,12 @@ const API_URL =
 // Config
 // =====================================================
 
-const CACHE_TTL = 2 * 60 * 1000;   // 2 minutes
+// Classes: rarely change → 5-minute cache
+const CLASSES_TTL = 5 * 60 * 1000;
+
+// Students: change often → 30-second cache
+// Long enough to be reused across pages, short enough to stay fresh
+const STUDENTS_TTL = 30 * 1000;
 
 
 // =====================================================
@@ -29,6 +34,9 @@ let currentLanguage = "ar";
 
 let allStudents = [];
 let allClasses  = [];
+
+let studentCountMap = {};
+let studentsLoaded  = false;
 
 const CACHE_KEY_STUDENTS = () => "bmp_students_" + institutionId;
 const CACHE_KEY_CLASSES  = () => "bmp_classes_"  + institutionId;
@@ -125,7 +133,7 @@ function t(key) {
 
 
 // =====================================================
-// Cache helpers — TTL aware, wrap data with timestamp
+// Cache helpers — TTL aware
 // =====================================================
 
 function readCache(key, ttl) {
@@ -134,10 +142,10 @@ function readCache(key, ttl) {
         if (!raw) return { data: null, fresh: false };
 
         const parsed = JSON.parse(raw);
-        if (!parsed || !parsed.data) return { data: null, fresh: false };
+        if (!parsed || parsed.data === undefined) return { data: null, fresh: false };
 
         const age = Date.now() - (parsed.ts || 0);
-        const fresh = ttl ? age < ttl : true;
+        const fresh = age < ttl;
 
         return { data: parsed.data, fresh: fresh };
     } catch (e) {
@@ -212,7 +220,6 @@ function applyLanguage() {
         btn.classList.toggle("active", btn.dataset.lang === currentLanguage);
     });
 
-    // Re-render with new language labels
     renderAll();
 }
 
@@ -370,10 +377,8 @@ function displayInstitution() {
 
 
 // =====================================================
-// Student counts
+// Student count map
 // =====================================================
-
-let studentCountMap = {};
 
 function buildStudentCountMap() {
 
@@ -396,7 +401,6 @@ function buildStudentCountMap() {
     }
 
     studentCountMap = map;
-    return map;
 }
 
 function getStudentCount(stage, classNumber) {
@@ -404,34 +408,39 @@ function getStudentCount(stage, classNumber) {
     return studentCountMap[key] || 0;
 }
 
+
+// =====================================================
+// Stage totals
+// =====================================================
+
 function updateStageTotals() {
 
-    const primaryTotalEl     = document.getElementById("primaryTotalStudents");
-    const preparatoryTotalEl = document.getElementById("preparatoryTotalStudents");
-    const secondaryTotalEl   = document.getElementById("secondaryTotalStudents");
+    const primaryEl     = document.getElementById("primaryTotalStudents");
+    const preparatoryEl = document.getElementById("preparatoryTotalStudents");
+    const secondaryEl   = document.getElementById("secondaryTotalStudents");
 
     const totals = { primary: 0, preparatory: 0, secondary: 0 };
 
     Object.keys(studentCountMap).forEach(function (key) {
-        const parts = key.split("|");
-        const stage = parts[0];
+        const stage = key.split("|")[0];
         if (totals.hasOwnProperty(stage)) {
             totals[stage] += studentCountMap[key];
         }
     });
 
-    if (primaryTotalEl)     primaryTotalEl.textContent     = String(totals.primary);
-    if (preparatoryTotalEl) preparatoryTotalEl.textContent = String(totals.preparatory);
-    if (secondaryTotalEl)   secondaryTotalEl.textContent   = String(totals.secondary);
+    const unknown = studentsLoaded ? "0" : "…";
+
+    if (primaryEl)     primaryEl.textContent     = studentsLoaded ? String(totals.primary)     : unknown;
+    if (preparatoryEl) preparatoryEl.textContent = studentsLoaded ? String(totals.preparatory) : unknown;
+    if (secondaryEl)   secondaryEl.textContent   = studentsLoaded ? String(totals.secondary)   : unknown;
 }
 
 
 // =====================================================
-// Render — single source of truth
+// Render
 // =====================================================
 
 function renderAll() {
-
     if (allClasses.length > 0) {
         renderClasses(allClasses);
     } else {
@@ -485,8 +494,6 @@ function renderStageClasses(container, classes) {
         const classCode   = String(item.classCode || "");
         const stage       = String(item.stage || "");
 
-        const count = getStudentCount(stage, classNumber);
-
         const classItem = document.createElement("div");
         classItem.className = "class-item";
 
@@ -498,10 +505,7 @@ function renderStageClasses(container, classes) {
                     '<div class="class-code">' + escapeHtml(t("codeLabel")) + ': ' + escapeHtml(classCode) + '</div>' +
                 '</div>' +
             '</div>' +
-            '<span class="class-students' + (count === 0 ? " empty" : "") + '">' +
-                '<i class="fas fa-user"></i>' +
-                '<span>' + count + ' ' + escapeHtml(t("studentsWord")) + '</span>' +
-            '</span>';
+            buildCountBadgeHtml(stage, classNumber);
 
         attachClassClick(classItem, stage, classNumber);
         fragment.appendChild(classItem);
@@ -531,8 +535,6 @@ function renderDefaultStageClasses(container, stage, stageLetter, numberOfClasse
 
     for (let classNumber = 1; classNumber <= numberOfClasses; classNumber++) {
 
-        const count = getStudentCount(stage, String(classNumber));
-
         const classItem = document.createElement("div");
         classItem.className = "class-item";
 
@@ -549,10 +551,7 @@ function renderDefaultStageClasses(container, stage, stageLetter, numberOfClasse
                     '</div>' +
                 '</div>' +
             '</div>' +
-            '<span class="class-students' + (count === 0 ? " empty" : "") + '">' +
-                '<i class="fas fa-user"></i>' +
-                '<span>' + count + ' ' + escapeHtml(t("studentsWord")) + '</span>' +
-            '</span>';
+            buildCountBadgeHtml(stage, String(classNumber));
 
         attachClassClick(classItem, stage, classNumber);
         fragment.appendChild(classItem);
@@ -563,10 +562,33 @@ function renderDefaultStageClasses(container, stage, stageLetter, numberOfClasse
 
 
 // =====================================================
-// Update only the count badges (fast partial update)
+// Count badge — skeleton while loading, real count when loaded
 // =====================================================
 
-function updateCountBadgesOnly() {
+function buildCountBadgeHtml(stage, classNumber) {
+
+    if (!studentsLoaded) {
+        // Skeleton
+        return '<span class="class-students loading">' +
+            '<span class="skeleton-pill"></span>' +
+        '</span>';
+    }
+
+    const count = getStudentCount(stage, classNumber);
+    const empty = count === 0;
+
+    return '<span class="class-students' + (empty ? " empty" : "") + '">' +
+        '<i class="fas fa-user"></i>' +
+        '<span>' + count + ' ' + escapeHtml(t("studentsWord")) + '</span>' +
+    '</span>';
+}
+
+
+// =====================================================
+// Patch count badges only — no full re-render
+// =====================================================
+
+function patchCountBadges() {
 
     buildStudentCountMap();
 
@@ -575,9 +597,7 @@ function updateCountBadgesOnly() {
         const codeEl = item.querySelector(".class-code");
         if (!codeEl) return;
 
-        // Extract classCode from "Code: A1"
-        const codeText = codeEl.textContent || "";
-        const match = codeText.match(/:\s*([A-Z])(\d+)/);
+        const match = (codeEl.textContent || "").match(/:\s*([A-Z])(\d+)/);
         if (!match) return;
 
         const stageLetter = match[1];
@@ -589,13 +609,12 @@ function updateCountBadgesOnly() {
 
         const count = getStudentCount(stage, classNumber);
 
-        const badge = item.querySelector(".class-students");
-        if (!badge) return;
-
-        badge.classList.toggle("empty", count === 0);
-        const badgeText = badge.querySelector("span");
-        if (badgeText) {
-            badgeText.textContent = count + " " + t("studentsWord");
+        const oldBadge = item.querySelector(".class-students");
+        if (oldBadge) {
+            const newHtml = buildCountBadgeHtml(stage, classNumber);
+            const temp = document.createElement("span");
+            temp.innerHTML = newHtml.trim();
+            oldBadge.replaceWith(temp.firstChild);
         }
     });
 
@@ -619,37 +638,46 @@ function attachClassClick(classItem, stage, classNumber) {
 
 
 // =====================================================
-// Loading placeholder
+// Skeleton placeholder for the class list itself
 // =====================================================
 
-function showLoadingPlaceholders() {
-    const skeletonHtml =
+function showClassListSkeletons() {
+
+    const skeletonItem =
         '<div class="class-item">' +
-            '<div class="class-info"><div>' +
-                '<div class="class-name">' +
-                    '<span style="display:inline-block;width:120px;height:14px;background:rgba(15,43,75,0.08);border-radius:6px;"></span>' +
+            '<div class="class-info">' +
+                '<span class="class-number skeleton-pill-small"></span>' +
+                '<div>' +
+                    '<div class="class-name">' +
+                        '<span class="skeleton-line"></span>' +
+                    '</div>' +
+                    '<div class="class-code">' +
+                        '<span class="skeleton-line skeleton-line-sm"></span>' +
+                    '</div>' +
                 '</div>' +
-            '</div></div>' +
+            '</div>' +
+            '<span class="class-students loading"><span class="skeleton-pill"></span></span>' +
         '</div>';
 
-    if (primaryClasses)     primaryClasses.innerHTML     = skeletonHtml;
-    if (preparatoryClasses) preparatoryClasses.innerHTML = skeletonHtml;
-    if (secondaryClasses)   secondaryClasses.innerHTML   = skeletonHtml;
+    const block =
+        skeletonItem + skeletonItem + skeletonItem + skeletonItem + skeletonItem;
+
+    if (primaryClasses)     primaryClasses.innerHTML     = block;
+    if (preparatoryClasses) preparatoryClasses.innerHTML = block;
+    if (secondaryClasses)   secondaryClasses.innerHTML   = block;
 }
 
 
 // =====================================================
-// Background fetchers — do not block render
+// Background fetchers
 // =====================================================
 
 async function refreshClassesInBackground() {
 
     try {
-
         const result = await apiRequest("getClasses");
         const newClasses = Array.isArray(result.classes) ? result.classes : [];
 
-        // Institution info
         if (result.institution) {
             const idEl   = document.getElementById("institutionId");
             const nameEl = document.getElementById("institutionName");
@@ -660,18 +688,15 @@ async function refreshClassesInBackground() {
             }
         }
 
-        // Only re-render if the classes actually changed
         const changed = JSON.stringify(newClasses) !== JSON.stringify(allClasses);
 
         allClasses = newClasses;
         writeCache(CACHE_KEY_CLASSES(), allClasses);
 
-        if (changed && allClasses.length > 0) {
-            renderClasses(allClasses);
-        } else if (changed && allClasses.length === 0) {
-            renderDefaultClasses();
+        if (changed) {
+            if (allClasses.length > 0) renderClasses(allClasses);
+            else renderDefaultClasses();
         }
-
     } catch (error) {
         console.error("Classes refresh failed:", error);
     }
@@ -681,22 +706,22 @@ async function refreshClassesInBackground() {
 async function refreshStudentsInBackground() {
 
     try {
-
         const result = await apiRequest("getStudents");
         const newStudents = Array.isArray(result.students) ? result.students : [];
 
-        const changed = JSON.stringify(newStudents) !== JSON.stringify(allStudents);
-
         allStudents = newStudents;
+        studentsLoaded = true;
         writeCache(CACHE_KEY_STUDENTS(), allStudents);
 
-        if (changed) {
-            // Only patch count badges — no full re-render
-            updateCountBadgesOnly();
-        }
+        // Only patch the count badges — no full re-render
+        patchCountBadges();
 
     } catch (error) {
         console.error("Students refresh failed:", error);
+
+        // On failure, still mark as loaded so skeletons don't shimmer forever
+        studentsLoaded = true;
+        patchCountBadges();
     }
 }
 
@@ -720,12 +745,11 @@ function setupEventListeners() {
 
 
 // =====================================================
-// Initialize — cache-first, non-blocking refresh
+// Initialize — fastest possible
 // =====================================================
 
 async function initializePage() {
 
-    // Authenticate
     const authenticated = initializeAuthentication();
     if (!authenticated) {
         hideLoaderAfterPaint();
@@ -734,55 +758,49 @@ async function initializePage() {
 
     displayInstitution();
 
-    // ---- STEP 1: Read both caches (fast, synchronous) ----
-    const classesCache  = readCache(CACHE_KEY_CLASSES(), CACHE_TTL);
-    const studentsCache = readCache(CACHE_KEY_STUDENTS(), CACHE_TTL);
+    // ---- STEP 1: Read caches (fast, synchronous) ----
+    const classesCache  = readCache(CACHE_KEY_CLASSES(), CLASSES_TTL);
+    const studentsCache = readCache(CACHE_KEY_STUDENTS(), STUDENTS_TTL);
 
     const hasClasses  = Array.isArray(classesCache.data) && classesCache.data.length > 0;
-    const hasStudents = Array.isArray(studentsCache.data) && studentsCache.data.length > 0;
+    const hasFreshStudents = Array.isArray(studentsCache.data) && studentsCache.fresh;
 
-    // Reuse the students cache written by other pages (students.html, school-payments.html, etc.)
-    if (hasStudents) {
+    // If we have fresh students (from this page or another page < 30s ago) → use them
+    if (hasFreshStudents) {
         allStudents = studentsCache.data;
+        studentsLoaded = true;
+    } else if (Array.isArray(studentsCache.data) && studentsCache.data.length > 0) {
+        // Stale but present — render with it now, refresh below
+        allStudents = studentsCache.data;
+        studentsLoaded = true;
     }
 
-    // ---- STEP 2: Render as fast as possible ----
+    // ---- STEP 2: Immediate render ----
     if (hasClasses) {
-        // Classes already known → paint immediately with counts if we have students
+        // Full fast path — render everything from cache
         allClasses = classesCache.data;
-        buildStudentCountMap();
         renderClasses(allClasses);
         hideLoaderAfterPaint();
-    } else if (hasStudents) {
-        // No classes cached yet, but we have students → draw default classes with counts
-        buildStudentCountMap();
-        renderDefaultClasses();
-        hideLoaderAfterPaint();
     } else {
-        // Cold start → show loader + placeholders
+        // No classes cache — show class list skeletons
         showLoader();
-        showLoadingPlaceholders();
+        showClassListSkeletons();
     }
 
-    // ---- STEP 3: Network refresh (non-blocking) ----
+    // ---- STEP 3: Background refresh ----
 
-    const classesStale  = !classesCache.fresh;
-    const studentsStale = !studentsCache.fresh;
+    const classesPromise = classesCache.fresh
+        ? Promise.resolve()
+        : refreshClassesInBackground();
 
-    // Fetch classes only if stale OR missing
-    const classesPromise = classesStale
-        ? refreshClassesInBackground()
-        : Promise.resolve();
-
-    // Fetch students only if stale AND we don't already have a fresh copy from another page
-    const studentsPromise = studentsStale
-        ? refreshStudentsInBackground()
-        : Promise.resolve();
+    const studentsPromise = studentsCache.fresh
+        ? Promise.resolve()
+        : refreshStudentsInBackground();
 
     await Promise.all([classesPromise, studentsPromise]);
 
-    // Cold start — first fetch just completed → now hide loader
-    if (!hasClasses && !hasStudents) {
+    // Cold start: nothing was cached → first fetch is done → hide loader
+    if (!hasClasses) {
         hideLoaderAfterPaint();
     }
 }
