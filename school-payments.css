@@ -749,7 +749,6 @@ tbody tr:last-child td {
 
 /* =====================================================
    RECEIPT PRINT STYLES — 80mm thermal
-   Unchanged from your original
    ===================================================== */
 
 #bmpPrintReceipt {
@@ -792,9 +791,40 @@ tbody tr:last-child td {
         overflow: visible !important;
     }
 
-    .bmp-receipt-header { text-align: center !important; margin-bottom: 4mm !important; }
-    .bmp-receipt-title { margin: 0 !important; padding: 0 !important; font-size: 17px !important; font-weight: 700 !important; color: #111111 !important; }
-    .bmp-receipt-divider { border-top: 1px dashed #000000 !important; margin: 3mm 0 !important; }
+    .bmp-receipt-header {
+        text-align: center !important;
+        margin-bottom: 4mm !important;
+    }
+
+    /* ---- LOGO (used when logo URL is available) ---- */
+    .bmp-receipt-logo-wrap {
+        text-align: center !important;
+        margin-bottom: 3mm !important;
+        line-height: 0 !important;
+    }
+
+    .bmp-receipt-logo {
+        display: inline-block !important;
+        max-width: 32mm !important;
+        max-height: 22mm !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
+    }
+
+    .bmp-receipt-title {
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 17px !important;
+        font-weight: 700 !important;
+        color: #111111 !important;
+        letter-spacing: 0.2px !important;
+    }
+
+    .bmp-receipt-divider {
+        border-top: 1px dashed #000000 !important;
+        margin: 3mm 0 !important;
+    }
 
     .bmp-receipt-number {
         display: flex !important;
