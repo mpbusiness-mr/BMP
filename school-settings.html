@@ -1,37 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>School Settings - BMP</title>
+    <title>BMP · إعدادات المدرسة | School Settings</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="school-settings.css">
 </head>
 
-<body>
+<body class="lang-ar">
 
     <div class="page-container">
 
-        <!-- Header -->
         <header class="page-header">
 
-            <div>
-                <h1>
-                    School Settings
-                </h1>
-
-                <p>
-                    Manage school information and settings.
-                </p>
+            <div class="header-brand">
+                <h1 data-i18n="pageTitle">School Settings</h1>
+                <p data-i18n="pageSubtitle">Manage school information and settings.</p>
             </div>
 
-            <button
-                id="backButton"
-                class="btn btn-secondary">
-                Back
-            </button>
+            <div class="header-actions">
+
+                <div class="lang-switcher" role="group" aria-label="Language">
+                    <button type="button" class="lang-btn active" data-lang="ar" onclick="setLanguage('ar')">عربية</button>
+                    <button type="button" class="lang-btn"        data-lang="fr" onclick="setLanguage('fr')">Français</button>
+                    <button type="button" class="lang-btn"        data-lang="en" onclick="setLanguage('en')">English</button>
+                </div>
+
+                <button id="backButton" class="btn btn-secondary" data-i18n="back">
+                    Back
+                </button>
+
+            </div>
 
         </header>
 
@@ -40,73 +46,33 @@
         <section class="settings-card">
 
             <div class="card-header">
-
-                <h2>
-                    School Information
-                </h2>
-
-                <p>
-                    Basic information about this school.
-                </p>
-
+                <h2 data-i18n="schoolInformation">School Information</h2>
+                <p data-i18n="schoolInformationSubtitle">Basic information about this school.</p>
             </div>
-
 
             <div class="form-grid">
 
                 <div class="form-group">
-
-                    <label>
-                        Institution ID
-                    </label>
-
-                    <input
-                        type="text"
-                        id="institutionId"
-                        readonly>
-
+                    <label for="institutionId" data-i18n="institutionId">Institution ID</label>
+                    <input type="text" id="institutionId" readonly>
                 </div>
 
-
                 <div class="form-group">
-
-                    <label>
-                        School Name
-                    </label>
-
-                    <input
-                        type="text"
-                        id="schoolName"
-                        placeholder="School name">
-
+                    <label for="schoolName" data-i18n="schoolName">School Name</label>
+                    <input type="text" id="schoolName" data-i18n-placeholder="schoolNamePlaceholder"
+                           placeholder="School name">
                 </div>
 
-
                 <div class="form-group">
-
-                    <label>
-                        Phone
-                    </label>
-
-                    <input
-                        type="text"
-                        id="schoolPhone"
-                        placeholder="School phone">
-
+                    <label for="schoolPhone" data-i18n="phone">Phone</label>
+                    <input type="text" id="schoolPhone" data-i18n-placeholder="phonePlaceholder"
+                           placeholder="School phone">
                 </div>
 
-
                 <div class="form-group">
-
-                    <label>
-                        Email
-                    </label>
-
-                    <input
-                        type="email"
-                        id="schoolEmail"
-                        placeholder="School email">
-
+                    <label for="schoolEmail" data-i18n="email">Email</label>
+                    <input type="email" id="schoolEmail" data-i18n-placeholder="emailPlaceholder"
+                           placeholder="School email">
                 </div>
 
             </div>
@@ -118,83 +84,17 @@
         <section class="settings-card">
 
             <div class="card-header">
-
-                <h2>
-                    Academic Settings
-                </h2>
-
-                <p>
-                    Configure the current academic year.
-                </p>
-
+                <h2 data-i18n="academicSettings">Academic Settings</h2>
+                <p data-i18n="academicSettingsSubtitle">Configure the current academic year.</p>
             </div>
-
 
             <div class="form-grid">
 
                 <div class="form-group">
-
-                    <label>
-                        Current Academic Year
-                    </label>
-
-                    <input
-                        type="text"
-                        id="academicYear"
-                        placeholder="2026-2027">
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- Payment Settings -->
-        <section class="settings-card">
-
-            <div class="card-header">
-
-                <h2>
-                    Payment Settings
-                </h2>
-
-                <p>
-                    Configure basic school payment information.
-                </p>
-
-            </div>
-
-
-            <div class="form-grid">
-
-                <div class="form-group">
-
-                    <label>
-                        Default Monthly Fee
-                    </label>
-
-                    <input
-                        type="number"
-                        id="monthlyFee"
-                        min="0"
-                        step="0.01"
-                        placeholder="0">
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>
-                        Currency
-                    </label>
-
-                    <input
-                        type="text"
-                        id="currency"
-                        placeholder="MRU">
-
+                    <label for="academicYear" data-i18n="currentAcademicYear">Current Academic Year</label>
+                    <input type="text" id="academicYear"
+                           data-i18n-placeholder="academicYearPlaceholder"
+                           placeholder="2026-27">
                 </div>
 
             </div>
@@ -204,20 +104,12 @@
 
         <!-- Save -->
         <div class="actions">
-
-            <button
-                id="saveButton"
-                class="btn btn-primary">
-                Save Settings
+            <button id="saveButton" class="btn btn-primary">
+                <span class="btn-label" data-i18n="saveSettings">Save Settings</span>
             </button>
-
         </div>
 
-
-        <div
-            id="message"
-            class="message">
-        </div>
+        <div id="message" class="message"></div>
 
     </div>
 
