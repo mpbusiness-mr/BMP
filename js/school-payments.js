@@ -756,7 +756,8 @@ function loadAcademicYears() {
         if (student.academicYear) years.add(String(student.academicYear).trim());
     });
 
-    years.add(getCurrentAcademicYear());
+    const currentYear = getCurrentAcademicYear();
+    years.add(currentYear);
 
     const currentValue = select.value;
     select.innerHTML = '<option value="">' + escapeHtml(t("all")) + '</option>';
@@ -768,8 +769,6 @@ function loadAcademicYears() {
         select.appendChild(option);
     });
 
-    const currentYear = getCurrentAcademicYear();
-
     // Priority: previously-selected → current academic year → all
     if (currentValue && years.has(currentValue)) {
         select.value = currentValue;
@@ -778,6 +777,11 @@ function loadAcademicYears() {
     } else {
         select.value = "";
     }
+
+    // Debug — remove once confirmed working
+    console.log("[BMP Payments] Years in data:", Array.from(years).sort());
+    console.log("[BMP Payments] Current year:", currentYear);
+    console.log("[BMP Payments] Selected:", select.value);
 }
 
 
@@ -936,15 +940,27 @@ function applyFilters() {
 
 
 // =====================================================
-// Reset filters
+// Reset filters — keeps current academic year
 // =====================================================
 
 function resetFilters() {
 
-    ["academicYear", "paymentMonth", "stageFilter", "studentSearch"].forEach(function (id) {
-        const el = document.getElementById(id);
-        if (el) el.value = "";
-    });
+    const currentYear = getCurrentAcademicYear();
+
+    document.getElementById("paymentMonth").value = "";
+    document.getElementById("stageFilter").value = "";
+    document.getElementById("studentSearch").value = "";
+
+    // Reset academic year to current year (if present in options)
+    const academicYearSelect = document.getElementById("academicYear");
+    if (academicYearSelect) {
+        const option = academicYearSelect.querySelector('option[value="' + currentYear + '"]');
+        if (option) {
+            academicYearSelect.value = currentYear;
+        } else {
+            academicYearSelect.value = "";
+        }
+    }
 
     applyFilters();
 }
@@ -1277,7 +1293,7 @@ async function initializePage() {
 
     // 1) Instant paint from cache
     const hadPaymentsCache = loadPaymentsFromCache();
-    const hadStudentsCache = loadStudentsFromCache();
+    loadStudentsFromCache();
 
     if (hadPaymentsCache) {
         loadAcademicYears();
