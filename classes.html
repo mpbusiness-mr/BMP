@@ -1,168 +1,120 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Classes & Stages - BMP</title>
+    <title>BMP · المراحل والأقسام | Classes & Stages</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <link rel="stylesheet" href="classes.css">
 </head>
 
-<body>
+<body class="lang-ar">
+
+    <div class="bg-blob bg-blob-1" aria-hidden="true"></div>
+    <div class="bg-blob bg-blob-2" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <div class="page-loader" id="pageLoader" aria-hidden="true">
+        <div class="loader-spinner"></div>
+        <span class="loader-text" data-i18n="loading">Loading...</span>
+    </div>
 
     <div class="page-container">
 
-        <!-- Header -->
         <header class="page-header">
 
-            <div>
-                <h1>
-                    Classes &amp; Stages
-                </h1>
-
-                <p>
-                    Manage academic stages and classes.
-                </p>
+            <div class="header-brand">
+                <a href="school.html" class="topbar-logo">
+                    <i class="fas fa-cubes"></i> BMP
+                </a>
+                <div>
+                    <h1 data-i18n="pageTitle">Classes &amp; Stages</h1>
+                    <p data-i18n="pageSubtitle">Manage academic stages and classes.</p>
+                </div>
             </div>
 
-            <button
-                id="backButton"
-                class="btn btn-secondary">
-                Back
-            </button>
+            <div class="header-actions">
+
+                <div class="lang-switcher" role="group" aria-label="Language">
+                    <button type="button" class="lang-btn active" data-lang="ar">عربية</button>
+                    <button type="button" class="lang-btn"        data-lang="fr">Français</button>
+                    <button type="button" class="lang-btn"        data-lang="en">English</button>
+                </div>
+
+                <button id="backButton" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i>
+                    <span data-i18n="back">Back</span>
+                </button>
+
+            </div>
 
         </header>
 
-
-        <!-- School Information -->
         <section class="school-summary">
-
             <div class="summary-item">
-
-                <span class="summary-label">
-                    Institution ID
-                </span>
-
-                <strong id="institutionId">
-                    -
-                </strong>
-
+                <span class="summary-label" data-i18n="institutionId">Institution ID</span>
+                <strong id="institutionId">-</strong>
             </div>
-
-
             <div class="summary-item">
-
-                <span class="summary-label">
-                    School Name
-                </span>
-
-                <strong id="institutionName">
-                    -
-                </strong>
-
+                <span class="summary-label" data-i18n="schoolName">School Name</span>
+                <strong id="institutionName">-</strong>
             </div>
-
+            <div class="summary-item">
+                <span class="summary-label" data-i18n="academicYearLabel">Academic Year</span>
+                <strong id="academicYearValue">-</strong>
+            </div>
         </section>
 
-
-        <!-- Academic Stages -->
         <main class="stages-container">
 
             <!-- Primary -->
             <section class="stage-card">
-
                 <div class="stage-header">
-
                     <div>
-                        <span class="stage-code">
-                            A
-                        </span>
-
+                        <span class="stage-code">A</span>
                         <div>
-                            <h2>
-                                Primary Education
-                            </h2>
-
-                            <p>
-                                6 Classes
-                            </p>
+                            <h2 data-i18n="primaryEducation">Primary Education</h2>
+                            <p><span data-i18n="sixClasses">6 Classes</span> · <span id="primaryTotalStudents">0</span> <span data-i18n="studentsWord">students</span></p>
                         </div>
                     </div>
-
                 </div>
-
-
-                <div
-                    id="primaryClasses"
-                    class="classes-list">
-                </div>
-
+                <div id="primaryClasses" class="classes-list"></div>
             </section>
-
 
             <!-- Preparatory -->
             <section class="stage-card">
-
                 <div class="stage-header">
-
                     <div>
-                        <span class="stage-code">
-                            B
-                        </span>
-
+                        <span class="stage-code">B</span>
                         <div>
-                            <h2>
-                                Preparatory Education
-                            </h2>
-
-                            <p>
-                                4 Classes
-                            </p>
+                            <h2 data-i18n="preparatoryEducation">Preparatory Education</h2>
+                            <p><span data-i18n="fourClasses">4 Classes</span> · <span id="preparatoryTotalStudents">0</span> <span data-i18n="studentsWord">students</span></p>
                         </div>
                     </div>
-
                 </div>
-
-
-                <div
-                    id="preparatoryClasses"
-                    class="classes-list">
-                </div>
-
+                <div id="preparatoryClasses" class="classes-list"></div>
             </section>
-
 
             <!-- Secondary -->
             <section class="stage-card">
-
                 <div class="stage-header">
-
                     <div>
-                        <span class="stage-code">
-                            C
-                        </span>
-
+                        <span class="stage-code">C</span>
                         <div>
-                            <h2>
-                                Secondary Education
-                            </h2>
-
-                            <p>
-                                3 Classes
-                            </p>
+                            <h2 data-i18n="secondaryEducation">Secondary Education</h2>
+                            <p><span data-i18n="threeClasses">3 Classes</span> · <span id="secondaryTotalStudents">0</span> <span data-i18n="studentsWord">students</span></p>
                         </div>
                     </div>
-
                 </div>
-
-
-                <div
-                    id="secondaryClasses"
-                    class="classes-list">
-                </div>
-
+                <div id="secondaryClasses" class="classes-list"></div>
             </section>
 
         </main>
