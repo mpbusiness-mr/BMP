@@ -1453,6 +1453,20 @@ function addStudent(data) {
             data.registrationDate || ""
         ).trim();
 
+    // ---------------------------------------------
+    // NEW: Guardian fields
+    // ---------------------------------------------
+
+    const guardianName =
+        String(
+            data.guardianName || ""
+        ).trim();
+
+    const guardianPhone =
+        String(
+            data.guardianPhone || ""
+        ).trim();
+
 
     if (!institutionId) {
 
@@ -1669,22 +1683,24 @@ function addStudent(data) {
                 "stage",
                 "class",
                 "registrationDate",
-                "createdAt"
+                "createdAt",
+                "guardianName",
+                "guardianPhone"
 
             ]);
 
         }
 
 
+        // ---------------------------------------------
+        // Ensure all required columns exist
+        // (handles both old sheets and new ones)
+        // ---------------------------------------------
+
         let headers =
-            studentsSheet
-                .getRange(
-                    1,
-                    1,
-                    1,
-                    studentsSheet.getLastColumn()
-                )
-                .getValues()[0];
+            ensureStudentHeaders(
+                studentsSheet
+            );
 
 
         if (
@@ -1977,6 +1993,24 @@ function addStudent(data) {
             createdAt
         );
 
+        // ---------------------------------------------
+        // NEW: Guardian fields
+        // ---------------------------------------------
+
+        setColumnValue(
+            newRow,
+            headers,
+            "guardianName",
+            guardianName
+        );
+
+        setColumnValue(
+            newRow,
+            headers,
+            "guardianPhone",
+            guardianPhone
+        );
+
 
         studentsSheet.appendRow(
             newRow
@@ -2032,6 +2066,12 @@ function addStudent(data) {
 
                 registrationDate:
                     registrationDate,
+
+                guardianName:
+                    guardianName,
+
+                guardianPhone:
+                    guardianPhone,
 
                 createdAt:
                     createdAt.toISOString(),
@@ -2095,6 +2135,20 @@ function updateStudent(data) {
             data.classNumber,
             10
         );
+
+    // ---------------------------------------------
+    // NEW: Guardian fields
+    // ---------------------------------------------
+
+    const guardianName =
+        String(
+            data.guardianName || ""
+        ).trim();
+
+    const guardianPhone =
+        String(
+            data.guardianPhone || ""
+        ).trim();
 
 
     if (!institutionId) {
@@ -2289,6 +2343,15 @@ function updateStudent(data) {
             );
 
         }
+
+
+        // ---------------------------------------------
+        // Ensure all required columns exist
+        // ---------------------------------------------
+
+        ensureStudentHeaders(
+            studentsSheet
+        );
 
 
         const lastRow =
@@ -2490,6 +2553,49 @@ function updateStudent(data) {
             );
 
 
+        // ---------------------------------------------
+        // NEW: Update guardian fields (if columns exist)
+        // ---------------------------------------------
+
+        const guardianNameIndex =
+            headers.indexOf(
+                "guardianName"
+            );
+
+        const guardianPhoneIndex =
+            headers.indexOf(
+                "guardianPhone"
+            );
+
+
+        if (guardianNameIndex !== -1) {
+
+            studentsSheet
+                .getRange(
+                    foundRow,
+                    guardianNameIndex + 1
+                )
+                .setValue(
+                    guardianName
+                );
+
+        }
+
+
+        if (guardianPhoneIndex !== -1) {
+
+            studentsSheet
+                .getRange(
+                    foundRow,
+                    guardianPhoneIndex + 1
+                )
+                .setValue(
+                    guardianPhone
+                );
+
+        }
+
+
         logActivityBackend(
             institutionSS,
             {
@@ -2551,6 +2657,12 @@ function updateStudent(data) {
                 registrationDate:
                     registrationDate,
 
+                guardianName:
+                    guardianName,
+
+                guardianPhone:
+                    guardianPhone,
+
                 updatedBy:
                     authenticated.username,
 
@@ -2568,6 +2680,97 @@ function updateStudent(data) {
         lock.releaseLock();
 
     }
+
+}
+
+
+// =====================================================
+// Ensure Student Sheet Headers
+// =====================================================
+
+function ensureStudentHeaders(
+    studentsSheet
+) {
+
+    const requiredHeaders = [
+
+        "studentId",
+        "studentNumber",
+        "academicYear",
+        "name",
+        "stage",
+        "class",
+        "registrationDate",
+        "createdAt",
+        "guardianName",
+        "guardianPhone"
+
+    ];
+
+
+    let lastColumn =
+        studentsSheet.getLastColumn();
+
+
+    if (
+        lastColumn === 0
+    ) {
+
+        studentsSheet.appendRow(
+            requiredHeaders
+        );
+
+        return requiredHeaders;
+
+    }
+
+
+    let headers =
+        studentsSheet
+            .getRange(
+                1,
+                1,
+                1,
+                lastColumn
+            )
+            .getValues()[0]
+            .map(
+                header =>
+                    String(
+                        header
+                    ).trim()
+            );
+
+
+    requiredHeaders.forEach(
+        header => {
+
+            if (
+                headers.indexOf(
+                    header
+                ) === -1
+            ) {
+
+                headers.push(
+                    header
+                );
+
+                studentsSheet
+                    .getRange(
+                        1,
+                        headers.length
+                    )
+                    .setValue(
+                        header
+                    );
+
+            }
+
+        }
+    );
+
+
+    return headers;
 
 }
 
@@ -6356,7 +6559,9 @@ function setupInstitutionSpreadsheet(
         "stage",
         "class",
         "registrationDate",
-        "createdAt"
+        "createdAt",
+        "guardianName",
+        "guardianPhone"
 
     ]);
 
@@ -8414,10 +8619,8 @@ function bmpUpdateInstitutionInfoValue(
     }
 
 
-    /*
-     * Add missing field without changing
-     * the existing rows.
-     */
+    /* Add missing field without changing
+     * the existing rows. */
 
     sheet.appendRow([
 
