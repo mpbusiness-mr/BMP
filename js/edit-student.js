@@ -257,13 +257,14 @@ if (!currentUser) {
 
 
 // =====================================================
-// Institution
+// Institution — use session, ignore URL
 // =====================================================
 
-const institutionId = getActiveInstitutionId();
+const institutionId = String(currentUser.institutionId || "").trim();
 
 if (!institutionId) {
     alert(t("institutionNotFound"));
+    window.location.href = "school-login.html";
     throw new Error("Institution access denied.");
 }
 
