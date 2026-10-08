@@ -630,6 +630,41 @@ function getPaymentId(p) {
 
 
 // =====================================================
+// Date-only formatter — always YYYY-MM-DD
+// =====================================================
+
+function formatPaymentDate(value) {
+
+    if (!value) return "-";
+
+    const str = String(value).trim();
+
+    // Already YYYY-MM-DD → return as-is
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+        return str;
+    }
+
+    // ISO string like "2026-10-08T00:00:00.000Z" → slice date
+    const isoMatch = str.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (isoMatch) {
+        return isoMatch[1];
+    }
+
+    // Try to parse and reformat
+    const date = new Date(str);
+    if (Number.isNaN(date.getTime())) {
+        return str;
+    }
+
+    const y  = date.getFullYear();
+    const mo = String(date.getMonth() + 1).padStart(2, "0");
+    const d  = String(date.getDate()).padStart(2, "0");
+
+    return y + "-" + mo + "-" + d;
+}
+
+
+// =====================================================
 // Student lookup
 // =====================================================
 
@@ -778,7 +813,6 @@ function loadAcademicYears() {
         select.value = "";
     }
 
-    // Debug — remove once confirmed working
     console.log("[BMP Payments] Years in data:", Array.from(years).sort());
     console.log("[BMP Payments] Current year:", currentYear);
     console.log("[BMP Payments] Selected:", select.value);
@@ -794,17 +828,11 @@ function lockStageFilter() {
     const stageFilter = document.getElementById("stageFilter");
     if (!stageFilter) return;
 
-    // Force value to All
     stageFilter.value = "";
-
-    // Disable interaction
     stageFilter.disabled = true;
-
-    // Grey it out
     stageFilter.style.opacity = "0.6";
     stageFilter.style.cursor = "not-allowed";
 
-    // Also grey the label
     const label = document.querySelector('label[for="stageFilter"]');
     if (label) label.style.opacity = "0.6";
 }
@@ -820,7 +848,6 @@ function getFilteredPayments() {
     const month = String(document.getElementById("paymentMonth")?.value || "").trim().toLowerCase();
     const search = String(document.getElementById("studentSearch")?.value || "").trim().toLowerCase();
 
-    // Stage is locked to All → ignore
     return allPayments.filter(function (payment) {
 
         const paymentYear = getPaymentAcademicYear(payment);
@@ -906,7 +933,7 @@ function renderPayments(payments) {
         const academicYear = getPaymentAcademicYear(payment);
         const month = getPaymentMonth(payment);
         const amount = getPaymentAmount(payment);
-        const paymentDate = getPaymentDate(payment);
+        const paymentDate = formatPaymentDate(getPaymentDate(payment));
         const receiptNumber = getReceiptNumber(payment);
         const recordedBy = getRecordedBy(payment);
 
@@ -973,11 +1000,9 @@ function resetFilters() {
     document.getElementById("paymentMonth").value = "";
     document.getElementById("studentSearch").value = "";
 
-    // Stage stays locked to All
     const stageFilter = document.getElementById("stageFilter");
     if (stageFilter) stageFilter.value = "";
 
-    // Reset academic year to current year (if present in options)
     const academicYearSelect = document.getElementById("academicYear");
     if (academicYearSelect) {
         const option = academicYearSelect.querySelector('option[value="' + currentYear + '"]');
@@ -1050,7 +1075,7 @@ function showPaymentDetails(payment) {
     const academicYear = getPaymentAcademicYear(payment) || t("unknown");
     const month = getPaymentMonth(payment);
     const amount = getPaymentAmount(payment);
-    const paymentDate = getPaymentDate(payment) || t("unknown");
+    const paymentDate = formatPaymentDate(getPaymentDate(payment)) || t("unknown");
     const receiptNumber = getReceiptNumber(payment) || t("unknown");
     const recordedBy = getRecordedBy(payment) || t("unknown");
     const notes = String(payment.notes || "").trim();
@@ -1092,19 +1117,6 @@ function showPaymentDetails(payment) {
 function closePaymentDetails() {
     const modal = document.getElementById("paymentDetailsModal");
     if (modal) modal.style.display = "none";
-}
-
-
-// =====================================================
-// Receipt date
-// =====================================================
-
-function formatReceiptDate(value) {
-    if (!value) return "-";
-    const parsed = new Date(value);
-    if (Number.isNaN(parsed.getTime())) return String(value);
-    const locale = currentLanguage === "ar" ? "ar" : currentLanguage === "fr" ? "fr-FR" : "en-GB";
-    return parsed.toLocaleDateString(locale);
 }
 
 
@@ -1166,7 +1178,7 @@ async function printPaymentReceipt(selectedPayment) {
             "-";
         const paidMonth = formatMonth(getPaymentMonth(payment));
         const paymentAmount = getPaymentAmount(payment);
-        const paidDate = getPaymentDate(payment) || "-";
+        const paidDate = formatPaymentDate(getPaymentDate(payment)) || "-";
         const receiptNumber = getReceiptNumber(payment) || "-";
         const recordedBy = getRecordedBy(payment) || "-";
         const notes = String(payment.notes || "").trim();
@@ -1200,7 +1212,7 @@ async function printPaymentReceipt(selectedPayment) {
                 '<span>' + escapeHtml(t("amount")) + '</span>' +
                 '<strong>' + escapeHtml(paymentAmount.toLocaleString(currentLanguage === "ar" ? "ar" : currentLanguage === "fr" ? "fr-FR" : "en-US")) + ' ' + escapeHtml(currency) + '</strong>' +
             '</div>' +
-            '<div class="bmp-receipt-row"><span>' + escapeHtml(t("paymentDate")) + '</span><strong>' + escapeHtml(formatReceiptDate(paidDate)) + '</strong></div>' +
+            '<div class="bmp-receipt-row"><span>' + escapeHtml(t("paymentDate")) + '</span><strong>' + escapeHtml(paidDate) + '</strong></div>' +
             '<div class="bmp-receipt-row"><span>' + escapeHtml(t("recordedBy")) + '</span><strong>' + escapeHtml(recordedBy) + '</strong></div>' +
             (notes
                 ? '<div class="bmp-receipt-notes"><strong>' + escapeHtml(t("notes")) + '</strong><div>' + escapeHtml(notes) + '</div></div>'
@@ -1274,7 +1286,6 @@ function setupEventListeners() {
     document.getElementById("resetFiltersBtn")?.addEventListener("click", resetFilters);
     document.getElementById("retryBtn")?.addEventListener("click", initializePage);
 
-    // Live search — filter as user types (debounced 150ms)
     const searchInput = document.getElementById("studentSearch");
     if (searchInput) {
         searchInput.addEventListener("input", onSearchInput);
@@ -1289,8 +1300,6 @@ function setupEventListeners() {
 
     document.getElementById("academicYear")?.addEventListener("change", applyFilters);
     document.getElementById("paymentMonth")?.addEventListener("change", applyFilters);
-
-    // Stage is locked — no listener needed, but keep it harmless
     document.getElementById("stageFilter")?.addEventListener("change", applyFilters);
 
     document.getElementById("paymentDetailsCloseBtn")?.addEventListener("click", closePaymentDetails);
@@ -1337,7 +1346,7 @@ async function initializePage() {
         return;
     }
 
-    // Lock stage filter to All — always
+    // Lock stage filter to All
     lockStageFilter();
 
     // 1) Instant paint from cache
