@@ -1,33 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Institution Users - BMP Admin</title>
+    <title>BMP · مستخدمو المؤسسة | Institution Users</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="users.css">
 </head>
 
-<body>
+<body class="lang-ar">
 
     <div class="page-container">
 
         <header class="page-header">
 
-            <div>
-                <h1 id="pageTitle">Institution Users</h1>
-
-                <p id="institutionTitle">
-                    Manage users for this institution
-                </p>
+            <div class="header-brand">
+                <a href="school.html" class="topbar-logo">
+                    <i class="fas fa-cubes"></i> BMP
+                </a>
+                <div>
+                    <h1 id="pageTitle" data-i18n="institutionUsers">Institution Users</h1>
+                    <p id="institutionTitle" data-i18n="manageUsers">Manage users for this institution</p>
+                </div>
             </div>
 
-            <button
-                id="backButton"
-                class="btn btn-secondary">
-                Back
-            </button>
+            <div class="header-actions">
+
+                <div class="lang-switcher" role="group" aria-label="Language">
+                    <button type="button" class="lang-btn active" data-lang="ar" onclick="setLanguage('ar')">عربية</button>
+                    <button type="button" class="lang-btn"        data-lang="fr" onclick="setLanguage('fr')">Français</button>
+                    <button type="button" class="lang-btn"        data-lang="en" onclick="setLanguage('en')">English</button>
+                </div>
+
+                <button id="backButton" class="btn btn-secondary" data-i18n="back">
+                    Back
+                </button>
+
+            </div>
 
         </header>
 
@@ -37,47 +52,18 @@
             <section class="institution-summary">
 
                 <div class="summary-item">
-                    <span
-                        class="summary-label"
-                        id="labelInstitutionId">
-                        Institution ID
-                    </span>
-
-                    <span
-                        id="institutionId"
-                        class="summary-value">
-                        -
-                    </span>
+                    <span class="summary-label" data-i18n="institutionId">Institution ID</span>
+                    <span id="institutionId" class="summary-value">-</span>
                 </div>
 
-
                 <div class="summary-item">
-                    <span
-                        class="summary-label"
-                        id="labelInstitutionName">
-                        Institution Name
-                    </span>
-
-                    <span
-                        id="institutionName"
-                        class="summary-value">
-                        -
-                    </span>
+                    <span class="summary-label" data-i18n="institutionName">Institution Name</span>
+                    <span id="institutionName" class="summary-value">-</span>
                 </div>
 
-
                 <div class="summary-item">
-                    <span
-                        class="summary-label"
-                        id="labelType">
-                        Type
-                    </span>
-
-                    <span
-                        id="institutionType"
-                        class="summary-value">
-                        -
-                    </span>
+                    <span class="summary-label" data-i18n="type">Type</span>
+                    <span id="institutionType" class="summary-value">-</span>
                 </div>
 
             </section>
@@ -86,102 +72,58 @@
             <section class="users-section">
 
                 <div class="section-header">
-
                     <div>
-                        <h2 id="usersTitle">Users</h2>
-
-                        <p id="usersDescription">
-                            Manage accounts and user access
-                        </p>
+                        <h2 data-i18n="users">Users</h2>
+                        <p data-i18n="manageAccounts">Manage accounts and user access</p>
                     </div>
 
-                    <button
-                        id="addUserButton"
-                        class="btn btn-primary">
+                    <button id="addUserButton" class="btn btn-primary" data-i18n="addUser">
                         + Add User
                     </button>
-
                 </div>
 
 
                 <div class="search-container">
 
-                    <input
-                        type="text"
-                        id="searchUser"
-                        placeholder="Search by username..."
-                    >
+                    <input type="text" id="searchUser"
+                           data-i18n-placeholder="searchUsername"
+                           placeholder="Search by username...">
 
                     <select id="userStatusFilter">
-
-                        <option value="all">
-                            All Statuses
-                        </option>
-
-                        <option value="active">
-                            Active
-                        </option>
-
-                        <option value="disabled">
-                            Disabled
-                        </option>
-
+                        <option value="all"      data-i18n="allStatuses">All Statuses</option>
+                        <option value="active"   data-i18n="active">Active</option>
+                        <option value="disabled" data-i18n="disabled">Disabled</option>
                     </select>
 
                 </div>
 
 
                 <div class="table-container">
-
                     <table>
-
                         <thead>
                             <tr>
-
-                                <th id="thUsername">
-                                    Username
-                                </th>
-
-                                <th id="thRole">
-                                    Role
-                                </th>
-
-                                <th id="thStatus">
-                                    Status
-                                </th>
-
-                                <th id="thCreated">
-                                    Created
-                                </th>
-
-                                <th id="thActions">
-                                    Actions
-                                </th>
-
+                                <th data-i18n="username">Username</th>
+                                <th data-i18n="role">Role</th>
+                                <th data-i18n="status">Status</th>
+                                <th data-i18n="created">Created</th>
+                                <th data-i18n="actions">Actions</th>
                             </tr>
                         </thead>
 
-
                         <tbody id="usersTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align:center;padding:25px;" data-i18n="loadingUsers">
+                                    Loading users...
+                                </td>
+                            </tr>
                         </tbody>
-
                     </table>
-
                 </div>
 
 
-                <div
-                    id="emptyState"
-                    class="empty-state">
-
-                    <h3 id="emptyTitle">
-                        No Users Found
-                    </h3>
-
-                    <p id="emptyDescription">
-                        There are no users matching your search.
-                    </p>
-
+                <div id="emptyState" class="empty-state" style="display:none;">
+                    <h3 data-i18n="noUsersFound">No Users Found</h3>
+                    <p data-i18n="noUsersMatching">There are no users matching your search.</p>
                 </div>
 
             </section>
@@ -195,4 +137,5 @@
     <script src="js/users.js"></script>
 
 </body>
+
 </html>
