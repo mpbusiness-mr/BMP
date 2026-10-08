@@ -276,6 +276,18 @@ function getCurrentUsername() {
 
 
 // =====================================================
+// Current academic year — YYYY-YY
+// =====================================================
+
+function getCurrentAcademicYear() {
+    const now = new Date();
+    let startYear = now.getFullYear();
+    if (now.getMonth() < 9) startYear--;
+    return startYear + "-" + String(startYear + 1).slice(-2);
+}
+
+
+// =====================================================
 // Cache helpers
 // =====================================================
 
@@ -364,6 +376,7 @@ const institutionIdInput = document.getElementById("institutionId");
 const schoolNameInput    = document.getElementById("schoolName");
 const schoolPhoneInput   = document.getElementById("schoolPhone");
 const schoolEmailInput   = document.getElementById("schoolEmail");
+const academicYearInput  = document.getElementById("academicYear");   // hidden field
 const saveButton         = document.getElementById("saveButton");
 const backButton         = document.getElementById("backButton");
 const message            = document.getElementById("message");
@@ -387,6 +400,35 @@ function clearMessage() {
 
 
 // =====================================================
+// Get stored academic year (from hidden field, cache, or clock)
+// =====================================================
+
+function getStoredAcademicYear() {
+
+    // 1) Hidden input (populated from settings load)
+    if (academicYearInput && academicYearInput.value) {
+        const v = academicYearInput.value.trim();
+        if (/^\d{4}-\d{2}$/.test(v)) return v;
+    }
+
+    // 2) Cached settings
+    try {
+        const raw = sessionStorage.getItem(getCacheKey());
+        if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed && parsed.data && parsed.data.academicYear) {
+                const v = String(parsed.data.academicYear).trim();
+                if (/^\d{4}-\d{2}$/.test(v)) return v;
+            }
+        }
+    } catch (e) {}
+
+    // 3) Fallback — clock
+    return getCurrentAcademicYear();
+}
+
+
+// =====================================================
 // Apply settings to form
 // =====================================================
 
@@ -403,6 +445,11 @@ function applySettingsToForm(settings) {
     }
     if (schoolEmailInput) {
         schoolEmailInput.value = settings.schoolEmail || "";
+    }
+
+    // Hidden academic year field — needed for the save request
+    if (academicYearInput) {
+        academicYearInput.value = settings.academicYear || getCurrentAcademicYear();
     }
 
     if (settings.schoolName) {
@@ -481,9 +528,10 @@ function saveSettings() {
     showMessage(t("saving"), "info");
 
     apiRequest("updateSchoolSettings", {
-        schoolName:  schoolName,
-        schoolPhone: schoolPhone,
-        schoolEmail: schoolEmail
+        schoolName:   schoolName,
+        schoolPhone:  schoolPhone,
+        schoolEmail:  schoolEmail,
+        academicYear: getStoredAcademicYear()   // hidden but required by backend
     })
     .then(function (result) {
 
@@ -493,7 +541,7 @@ function saveSettings() {
         writeCache(settings);
         settingsLoaded = true;
 
-        // Also update the session user so other pages see the new values
+        // Update the session user so other pages see the new values
         try {
             const stored = JSON.parse(localStorage.getItem("bmpCurrentUser") || "null");
             if (stored) {
