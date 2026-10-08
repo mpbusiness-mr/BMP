@@ -1,4834 +1,1305 @@
-/* =================================
-   School Payments - BMP
-   Multilingual:
-   English / Arabic / French
-   ================================= */
+// =====================================================
+// BMP · School Payments
+// =====================================================
 
 
-/* =================================
-   API
-   ================================= */
+// =====================================================
+// API
+// =====================================================
 
 const API_URL =
     "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
 
 
-/* =================================
-   State
-   ================================= */
+// =====================================================
+// State
+// =====================================================
 
-let currentUser = null;
-let institutionId = null;
+let currentUser    = null;
+let institutionId  = null;
 
-let allPayments = [];
-let allStudents = [];
+let allPayments    = [];
+let allStudents    = [];
 
 let pageInitialized = false;
-let paymentsLoaded = false;
+let paymentsLoaded  = false;
 
-let currentLanguage = "en";
+let currentLanguage = "ar";
+
+const CACHE_KEY_PAYMENTS = () => "bmp_payments_" + institutionId;
+const CACHE_KEY_STUDENTS = () => "bmp_students_" + institutionId;
 
 
-/* =================================
-   Language System
-   ================================= */
+// =====================================================
+// Translations
+// =====================================================
 
 const TRANSLATIONS = {
 
     en: {
-
-        pageTitle:
-            "Payments",
-
-        pageSubtitle:
-            "View and manage student payments",
-
-        back:
-            "Back",
-
-        recordPayment:
-            "Record Payment",
-
-        academicYear:
-            "Academic Year",
-
-        all:
-            "All",
-
-        month:
-            "Month",
-
-        stage:
-            "Stage",
-
-        search:
-            "Search",
-
-        searchStudent:
-            "Student name or number",
-
-        reset:
-            "Reset",
-
-        totalPayments:
-            "Total Payments",
-
-        totalAmount:
-            "Total Amount",
-
-        displayedPayments:
-            "Displayed Payments",
-
-        loadingPayments:
-            "Loading payments...",
-
-        loading:
-            "Loading...",
-
-        errorLoading:
-            "An error occurred while loading payments.",
-
-        retry:
-            "Retry",
-
-        noPayments:
-            "No Payments",
-
-        noPaymentsDescription:
-            "No payments matching your search were found.",
-
-        paymentDetails:
-            "Payment Details",
-
-        studentNumber:
-            "Student Number",
-
-        studentName:
-            "Student Name",
-
-        paymentDate:
-            "Payment Date",
-
-        receiptNumber:
-            "Receipt Number",
-
-        recordedBy:
-            "Recorded By",
-
-        amount:
-            "Amount",
-
-        notes:
-            "Notes",
-
-        class:
-            "Class",
-
-        printReceipt:
-            "Print Receipt",
-
-        primary:
-            "Primary",
-
-        preparatory:
-            "Preparatory",
-
-        secondary:
-            "Secondary",
-
-        close:
-            "Close",
-
-        unknown:
-            "-",
-
-        language:
-            "Language",
-
-        english:
-            "English",
-
-        arabic:
-            "Arabic",
-
-        french:
-            "French",
-
+        pageTitle: "Payments",
+        pageSubtitle: "View and manage student payments",
+        back: "Back",
+        recordPayment: "Record Payment",
+        academicYear: "Academic Year",
+        all: "All",
+        month: "Month",
+        stage: "Stage",
+        search: "Search",
+        searchStudent: "Student name or number",
+        reset: "Reset",
+        totalPayments: "Total Payments",
+        totalAmount: "Total Amount",
+        displayedPayments: "Displayed Payments",
+        loadingPayments: "Loading payments...",
+        loading: "Loading...",
+        errorLoading: "An error occurred while loading payments.",
+        retry: "Retry",
+        noPayments: "No Payments",
+        noPaymentsDescription: "No payments matching your search were found.",
+        paymentDetails: "Payment Details",
+        studentNumber: "Student Number",
+        studentName: "Student Name",
+        paymentDate: "Payment Date",
+        receiptNumber: "Receipt Number",
+        recordedBy: "Recorded By",
+        amount: "Amount",
+        notes: "Notes",
+        class: "Class",
+        printReceipt: "Print Receipt",
+        primary: "Primary",
+        preparatory: "Preparatory",
+        secondary: "Secondary",
+        close: "Close",
+        unknown: "-",
+        language: "Language",
+        english: "English",
+        arabic: "Arabic",
+        french: "French",
         months: {
-
-            October:
-                "October",
-
-            November:
-                "November",
-
-            December:
-                "December",
-
-            January:
-                "January",
-
-            February:
-                "February",
-
-            March:
-                "March",
-
-            April:
-                "April",
-
-            May:
-                "May",
-
-            June:
-                "June"
-
+            October: "October",
+            November: "November",
+            December: "December",
+            January: "January",
+            February: "February",
+            March: "March",
+            April: "April",
+            May: "May",
+            June: "June"
         },
-
         errors: {
-
-            institutionMissing:
-                "Institution ID is missing.",
-
-            userMissing:
-                "Current user is missing.",
-
-            connection:
-                "Could not connect to the BMP server.",
-
-            invalidResponse:
-                "The server returned an invalid response.",
-
-            authentication:
-                "School authentication failed. Please log in again.",
-
-            unknownRequest:
-                "The request failed.",
-
-            failedPayments:
-                "Failed to load payments."
-
+            institutionMissing: "Institution ID is missing.",
+            userMissing: "Current user is missing.",
+            connection: "Could not connect to the BMP server.",
+            invalidResponse: "The server returned an invalid response.",
+            authentication: "School authentication failed. Please log in again.",
+            unknownRequest: "The request failed.",
+            failedPayments: "Failed to load payments."
         }
-
     },
-
 
     ar: {
-
-        pageTitle:
-            "المدفوعات",
-
-        pageSubtitle:
-            "عرض وإدارة مدفوعات الطلاب",
-
-        back:
-            "رجوع",
-
-        recordPayment:
-            "تسجيل دفعة",
-
-        academicYear:
-            "السنة الدراسية",
-
-        all:
-            "الكل",
-
-        month:
-            "الشهر",
-
-        stage:
-            "المرحلة",
-
-        search:
-            "بحث",
-
-        searchStudent:
-            "اسم الطالب أو رقمه",
-
-        reset:
-            "إعادة تعيين",
-
-        totalPayments:
-            "إجمالي المدفوعات",
-
-        totalAmount:
-            "إجمالي المبلغ",
-
-        displayedPayments:
-            "المدفوعات المعروضة",
-
-        loadingPayments:
-            "جارٍ تحميل المدفوعات...",
-
-        loading:
-            "جارٍ التحميل...",
-
-        errorLoading:
-            "حدث خطأ أثناء تحميل المدفوعات.",
-
-        retry:
-            "إعادة المحاولة",
-
-        noPayments:
-            "لا توجد مدفوعات",
-
-        noPaymentsDescription:
-            "لم يتم العثور على مدفوعات مطابقة لبحثك.",
-
-        paymentDetails:
-            "تفاصيل الدفعة",
-
-        studentNumber:
-            "رقم الطالب",
-
-        studentName:
-            "اسم الطالب",
-
-        paymentDate:
-            "تاريخ الدفع",
-
-        receiptNumber:
-            "رقم الإيصال",
-
-        recordedBy:
-            "سجلها المستخدم",
-
-        amount:
-            "المبلغ",
-
-        notes:
-            "ملاحظات",
-
-        class:
-            "القسم",
-
-        printReceipt:
-            "طباعة الإيصال",
-
-        primary:
-            "الابتدائية",
-
-        preparatory:
-            "الإعدادية",
-
-        secondary:
-            "الثانوية",
-
-        close:
-            "إغلاق",
-
-        unknown:
-            "-",
-
-        language:
-            "اللغة",
-
-        english:
-            "الإنجليزية",
-
-        arabic:
-            "العربية",
-
-        french:
-            "الفرنسية",
-
+        pageTitle: "المدفوعات",
+        pageSubtitle: "عرض وإدارة مدفوعات الطلاب",
+        back: "رجوع",
+        recordPayment: "تسجيل دفعة",
+        academicYear: "السنة الدراسية",
+        all: "الكل",
+        month: "الشهر",
+        stage: "المرحلة",
+        search: "بحث",
+        searchStudent: "اسم الطالب أو رقمه",
+        reset: "إعادة تعيين",
+        totalPayments: "إجمالي المدفوعات",
+        totalAmount: "إجمالي المبلغ",
+        displayedPayments: "المدفوعات المعروضة",
+        loadingPayments: "جارٍ تحميل المدفوعات...",
+        loading: "جارٍ التحميل...",
+        errorLoading: "حدث خطأ أثناء تحميل المدفوعات.",
+        retry: "إعادة المحاولة",
+        noPayments: "لا توجد مدفوعات",
+        noPaymentsDescription: "لم يتم العثور على مدفوعات مطابقة لبحثك.",
+        paymentDetails: "تفاصيل الدفعة",
+        studentNumber: "رقم الطالب",
+        studentName: "اسم الطالب",
+        paymentDate: "تاريخ الدفع",
+        receiptNumber: "رقم الإيصال",
+        recordedBy: "سجلها المستخدم",
+        amount: "المبلغ",
+        notes: "ملاحظات",
+        class: "القسم",
+        printReceipt: "طباعة الإيصال",
+        primary: "الابتدائية",
+        preparatory: "الإعدادية",
+        secondary: "الثانوية",
+        close: "إغلاق",
+        unknown: "-",
+        language: "اللغة",
+        english: "الإنجليزية",
+        arabic: "العربية",
+        french: "الفرنسية",
         months: {
-
-            October:
-                "أكتوبر",
-
-            November:
-                "نوفمبر",
-
-            December:
-                "ديسمبر",
-
-            January:
-                "يناير",
-
-            February:
-                "فبراير",
-
-            March:
-                "مارس",
-
-            April:
-                "أبريل",
-
-            May:
-                "مايو",
-
-            June:
-                "يونيو"
-
+            October: "أكتوبر",
+            November: "نوفمبر",
+            December: "ديسمبر",
+            January: "يناير",
+            February: "فبراير",
+            March: "مارس",
+            April: "أبريل",
+            May: "مايو",
+            June: "يونيو"
         },
-
         errors: {
-
-            institutionMissing:
-                "معرّف المؤسسة غير موجود.",
-
-            userMissing:
-                "المستخدم الحالي غير موجود.",
-
-            connection:
-                "تعذر الاتصال بخادم النظام.",
-
-            invalidResponse:
-                "أعاد الخادم استجابة غير صالحة.",
-
-            authentication:
-                "فشل تسجيل دخول المدرسة. يرجى تسجيل الدخول مرة أخرى.",
-
-            unknownRequest:
-                "فشل تنفيذ الطلب.",
-
-            failedPayments:
-                "فشل تحميل المدفوعات."
-
+            institutionMissing: "معرّف المؤسسة غير موجود.",
+            userMissing: "المستخدم الحالي غير موجود.",
+            connection: "تعذر الاتصال بخادم النظام.",
+            invalidResponse: "أعاد الخادم استجابة غير صالحة.",
+            authentication: "فشل تسجيل دخول المدرسة. يرجى تسجيل الدخول مرة أخرى.",
+            unknownRequest: "فشل تنفيذ الطلب.",
+            failedPayments: "فشل تحميل المدفوعات."
         }
-
     },
 
-
     fr: {
-
-        pageTitle:
-            "Paiements",
-
-        pageSubtitle:
-            "Consulter et gérer les paiements des élèves",
-
-        back:
-            "Retour",
-
-        recordPayment:
-            "Enregistrer un paiement",
-
-        academicYear:
-            "Année scolaire",
-
-        all:
-            "Tous",
-
-        month:
-            "Mois",
-
-        stage:
-            "Cycle",
-
-        search:
-            "Rechercher",
-
-        searchStudent:
-            "Nom ou numéro de l'élève",
-
-        reset:
-            "Réinitialiser",
-
-        totalPayments:
-            "Total des paiements",
-
-        totalAmount:
-            "Montant total",
-
-        displayedPayments:
-            "Paiements affichés",
-
-        loadingPayments:
-            "Chargement des paiements...",
-
-        loading:
-            "Chargement...",
-
-        errorLoading:
-            "Une erreur s'est produite lors du chargement des paiements.",
-
-        retry:
-            "Réessayer",
-
-        noPayments:
-            "Aucun paiement",
-
-        noPaymentsDescription:
-            "Aucun paiement correspondant à votre recherche n'a été trouvé.",
-
-        paymentDetails:
-            "Détails du paiement",
-
-        studentNumber:
-            "Numéro de l'élève",
-
-        studentName:
-            "Nom de l'élève",
-
-        paymentDate:
-            "Date du paiement",
-
-        receiptNumber:
-            "Numéro du reçu",
-
-        recordedBy:
-            "Enregistré par",
-
-        amount:
-            "Montant",
-
-        notes:
-            "Notes",
-
-        class:
-            "Classe",
-
-        printReceipt:
-            "Imprimer le reçu",
-
-        primary:
-            "Primaire",
-
-        preparatory:
-            "Collège",
-
-        secondary:
-            "Secondaire",
-
-        close:
-            "Fermer",
-
-        unknown:
-            "-",
-
-        language:
-            "Langue",
-
-        english:
-            "Anglais",
-
-        arabic:
-            "Arabe",
-
-        french:
-            "Français",
-
+        pageTitle: "Paiements",
+        pageSubtitle: "Consulter et gérer les paiements des élèves",
+        back: "Retour",
+        recordPayment: "Enregistrer un paiement",
+        academicYear: "Année scolaire",
+        all: "Tous",
+        month: "Mois",
+        stage: "Cycle",
+        search: "Rechercher",
+        searchStudent: "Nom ou numéro de l'élève",
+        reset: "Réinitialiser",
+        totalPayments: "Total des paiements",
+        totalAmount: "Montant total",
+        displayedPayments: "Paiements affichés",
+        loadingPayments: "Chargement des paiements...",
+        loading: "Chargement...",
+        errorLoading: "Une erreur s'est produite lors du chargement des paiements.",
+        retry: "Réessayer",
+        noPayments: "Aucun paiement",
+        noPaymentsDescription: "Aucun paiement correspondant à votre recherche n'a été trouvé.",
+        paymentDetails: "Détails du paiement",
+        studentNumber: "Numéro de l'élève",
+        studentName: "Nom de l'élève",
+        paymentDate: "Date du paiement",
+        receiptNumber: "Numéro du reçu",
+        recordedBy: "Enregistré par",
+        amount: "Montant",
+        notes: "Notes",
+        class: "Classe",
+        printReceipt: "Imprimer le reçu",
+        primary: "Primaire",
+        preparatory: "Collège",
+        secondary: "Secondaire",
+        close: "Fermer",
+        unknown: "-",
+        language: "Langue",
+        english: "Anglais",
+        arabic: "Arabe",
+        french: "Français",
         months: {
-
-            October:
-                "Octobre",
-
-            November:
-                "Novembre",
-
-            December:
-                "Décembre",
-
-            January:
-                "Janvier",
-
-            February:
-                "Février",
-
-            March:
-                "Mars",
-
-            April:
-                "Avril",
-
-            May:
-                "Mai",
-
-            June:
-                "Juin"
-
+            October: "Octobre",
+            November: "Novembre",
+            December: "Décembre",
+            January: "Janvier",
+            February: "Février",
+            March: "Mars",
+            April: "Avril",
+            May: "Mai",
+            June: "Juin"
         },
-
         errors: {
-
-            institutionMissing:
-                "L'identifiant de l'établissement est manquant.",
-
-            userMissing:
-                "L'utilisateur actuel est introuvable.",
-
-            connection:
-                "Impossible de se connecter au serveur BMP.",
-
-            invalidResponse:
-                "Le serveur a renvoyé une réponse invalide.",
-
-            authentication:
-                "L'authentification de l'école a échoué. Veuillez vous reconnecter.",
-
-            unknownRequest:
-                "La requête a échoué.",
-
-            failedPayments:
-                "Échec du chargement des paiements."
-
+            institutionMissing: "L'identifiant de l'établissement est manquant.",
+            userMissing: "L'utilisateur actuel est introuvable.",
+            connection: "Impossible de se connecter au serveur BMP.",
+            invalidResponse: "Le serveur a renvoyé une réponse invalide.",
+            authentication: "L'authentification de l'école a échoué. Veuillez vous reconnecter.",
+            unknownRequest: "La requête a échoué.",
+            failedPayments: "Échec du chargement des paiements."
         }
-
     }
 
 };
 
 
-/* =================================
-   Translation Helper
-   ================================= */
+// =====================================================
+// Translation helper
+// =====================================================
 
 function t(key) {
+    const language = TRANSLATIONS[currentLanguage] || TRANSLATIONS.en;
+    const parts = String(key).split(".");
+    let value = language;
 
-    const language =
-        TRANSLATIONS[currentLanguage] ||
-        TRANSLATIONS.en;
-
-    const parts =
-        String(key).split(".");
-
-    let value =
-        language;
-
-    for (
-        const part of parts
-    ) {
-
-        if (
-            value &&
-            Object.prototype.hasOwnProperty.call(
-                value,
-                part
-            )
-        ) {
-
-            value =
-                value[part];
-
+    for (const part of parts) {
+        if (value && Object.prototype.hasOwnProperty.call(value, part)) {
+            value = value[part];
         } else {
-
             return key;
-
         }
-
     }
 
     return value;
-
 }
 
 
-/* =================================
-   Language Detection
-   ================================= */
+// =====================================================
+// Loader helpers
+// =====================================================
 
-function getSavedLanguage() {
+function showLoader() {
+    const loader = document.getElementById("pageLoader");
+    if (loader) loader.classList.remove("hidden");
+}
 
-    const possibleKeys = [
-
-        "bmpLanguage",
-        "language",
-        "selectedLanguage",
-        "appLanguage"
-
-    ];
-
-    for (
-        const key of possibleKeys
-    ) {
-
-        const value =
-            localStorage.getItem(key);
-
-        if (
-            value &&
-            [
-                "en",
-                "ar",
-                "fr"
-            ].includes(
-                value.toLowerCase().trim()
-            )
-        ) {
-
-            return value
-                .toLowerCase()
-                .trim();
-
-        }
-
-    }
-
-    const htmlLanguage =
-        String(
-            document.documentElement.lang ||
-            ""
-        )
-        .toLowerCase()
-        .trim();
-
-    if (
-        htmlLanguage.startsWith("ar")
-    ) {
-
-        return "ar";
-
-    }
-
-    if (
-        htmlLanguage.startsWith("fr")
-    ) {
-
-        return "fr";
-
-    }
-
-    return "en";
-
+function hideLoaderAfterPaint() {
+    requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+            const loader = document.getElementById("pageLoader");
+            if (loader) loader.classList.add("hidden");
+        });
+    });
 }
 
 
-/* =================================
-   Set Language
-   ================================= */
-
-function setLanguage(
-    language
-) {
-
-    language =
-        String(
-            language || "en"
-        )
-        .toLowerCase()
-        .trim();
-
-    if (
-        !TRANSLATIONS[language]
-    ) {
-
-        language =
-            "en";
-
-    }
-
-    currentLanguage =
-        language;
-
-    localStorage.setItem(
-        "bmpLanguage",
-        currentLanguage
-    );
-
-    applyLanguage();
-
-}
-
-
-/* =================================
-   Apply Language
-   ================================= */
+// =====================================================
+// Apply language
+// =====================================================
 
 function applyLanguage() {
 
-    const language =
-        currentLanguage;
+    document.documentElement.lang = currentLanguage;
+    document.documentElement.dir  = currentLanguage === "ar" ? "rtl" : "ltr";
 
-    document.documentElement.lang =
-        language;
+    document.body.classList.remove("lang-ar", "lang-fr", "lang-en");
+    document.body.classList.add("lang-" + currentLanguage);
 
-    document.documentElement.dir =
-        language === "ar"
-            ? "rtl"
-            : "ltr";
+    document.title = t("pageTitle") + " - BMP";
 
-    document.title =
-        `${t("pageTitle")} - BMP`;
+    const pageTitle = document.getElementById("pageTitle");
+    const pageSubtitle = document.getElementById("pageSubtitle");
+    const backButton = document.getElementById("backButton");
+    const recordPaymentButton = document.getElementById("recordPaymentPageBtn");
 
-    const backButton =
-        document.getElementById(
-            "backButton"
-        );
-
-    const pageTitle =
-        document.querySelector(
-            ".page-title h1"
-        );
-
-    const pageSubtitle =
-        document.querySelector(
-            ".page-title p"
-        );
-
-    const recordPaymentButton =
-        document.getElementById(
-            "recordPaymentPageBtn"
-        );
+    if (pageTitle) pageTitle.textContent = t("pageTitle");
+    if (pageSubtitle) pageSubtitle.textContent = t("pageSubtitle");
 
     if (backButton) {
-
-        backButton.textContent =
-            t("back");
-
-    }
-
-    if (pageTitle) {
-
-        pageTitle.textContent =
-            t("pageTitle");
-
-    }
-
-    if (pageSubtitle) {
-
-        pageSubtitle.textContent =
-            t("pageSubtitle");
-
+        const label = backButton.querySelector("span");
+        if (label) label.textContent = t("back");
     }
 
     if (recordPaymentButton) {
-
-        recordPaymentButton.textContent =
-            t("recordPayment");
-
+        const label = recordPaymentButton.querySelector("span");
+        if (label) label.textContent = t("recordPayment");
     }
 
-    const academicYearLabel =
-        document.querySelector(
-            'label[for="academicYear"]'
-        );
-
-    const paymentMonthLabel =
-        document.querySelector(
-            'label[for="paymentMonth"]'
-        );
-
-    const stageLabel =
-        document.querySelector(
-            'label[for="stageFilter"]'
-        );
-
-    const searchLabel =
-        document.querySelector(
-            'label[for="studentSearch"]'
-        );
-
-    if (academicYearLabel) {
-
-        academicYearLabel.textContent =
-            t("academicYear");
-
-    }
-
-    if (paymentMonthLabel) {
-
-        paymentMonthLabel.textContent =
-            t("month");
-
-    }
-
-    if (stageLabel) {
-
-        stageLabel.textContent =
-            t("stage");
-
-    }
-
-    if (searchLabel) {
-
-        searchLabel.textContent =
-            t("search");
-
-    }
-
-    const searchInput =
-        document.getElementById(
-            "studentSearch"
-        );
-
-    if (searchInput) {
-
-        searchInput.placeholder =
-            t("searchStudent");
-
-    }
-
-    const applyFiltersButton =
-        document.getElementById(
-            "applyFiltersBtn"
-        );
-
-    const resetFiltersButton =
-        document.getElementById(
-            "resetFiltersBtn"
-        );
-
-    if (applyFiltersButton) {
-
-        applyFiltersButton.textContent =
-            t("search");
-
-    }
-
-    if (resetFiltersButton) {
-
-        resetFiltersButton.textContent =
-            t("reset");
-
-    }
-
-    const summaryLabels =
-        document.querySelectorAll(
-            ".summary-label"
-        );
-
-    if (
-        summaryLabels.length >= 3
-    ) {
-
-        summaryLabels[0].textContent =
-            t("totalPayments");
-
-        summaryLabels[1].textContent =
-            t("totalAmount");
-
-        summaryLabels[2].textContent =
-            t("displayedPayments");
-
-    }
-
-    const loadingMessage =
-        document.getElementById(
-            "loadingMessage"
-        );
-
-    if (loadingMessage) {
-
-        loadingMessage.textContent =
-            t("loadingPayments");
-
-    }
-
-    const retryButton =
-        document.getElementById(
-            "retryBtn"
-        );
-
-    if (retryButton) {
-
-        retryButton.textContent =
-            t("retry");
-
-    }
-
-    const emptyTitle =
-        document.querySelector(
-            "#emptyState h3"
-        );
-
-    const emptyDescription =
-        document.querySelector(
-            "#emptyState p"
-        );
-
-    if (emptyTitle) {
-
-        emptyTitle.textContent =
-            t("noPayments");
-
-    }
-
-    if (emptyDescription) {
-
-        emptyDescription.textContent =
-            t("noPaymentsDescription");
-
-    }
-
-    const modalTitle =
-        document.querySelector(
-            "#paymentDetailsModal .modal-header h2"
-        );
-
-    if (modalTitle) {
-
-        modalTitle.textContent =
-            t("paymentDetails");
-
-    }
-
-    const printReceiptButton =
-        document.getElementById(
-            "printPaymentReceiptBtn"
-        );
-
-    if (printReceiptButton) {
-
-        printReceiptButton.textContent =
-            t("printReceipt");
-
-    }
-
-    const headers =
-        document.querySelectorAll(
-            "#paymentsTable thead th"
-        );
-
-    const headerTranslations = [
-
-        "studentNumber",
-        "studentName",
-        "academicYear",
-        "month",
-        "amount",
-        "paymentDate",
-        "receiptNumber",
-        "recordedBy"
-
-    ];
-
-    headers.forEach(
-        (
-            header,
-            index
-        ) => {
-
-            if (
-                headerTranslations[index]
-            ) {
-
-                header.textContent =
-                    t(
-                        headerTranslations[index]
-                    );
-
-            }
-
+    // Filter labels via data-i18n
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+        const key = el.getAttribute("data-i18n");
+        if (TRANSLATIONS[currentLanguage][key]) {
+            el.textContent = TRANSLATIONS[currentLanguage][key];
         }
-    );
+    });
+
+    // Search placeholder
+    const searchInput = document.getElementById("studentSearch");
+    if (searchInput) searchInput.placeholder = t("searchStudent");
+
+    // Loading
+    const loadingMessage = document.getElementById("loadingMessage");
+    if (loadingMessage) loadingMessage.textContent = t("loadingPayments");
+
+    // Retry
+    const retryButton = document.getElementById("retryBtn");
+    if (retryButton) retryButton.textContent = t("retry");
+
+    // Summary labels — already handled by data-i18n
+
+    // Lang buttons active state
+    document.querySelectorAll(".lang-btn").forEach(function (btn) {
+        btn.classList.toggle("active", btn.dataset.lang === currentLanguage);
+    });
 
     updateFilterOptions();
-
-    updateLanguageSelector();
+    updateTableHeaders();
 
     if (paymentsLoaded) {
-
-        renderPayments(
-            getFilteredPayments()
-        );
-
+        renderPayments(getFilteredPayments());
     }
-
 }
 
 
-/* =================================
-   Filter Option Translations
-   ================================= */
+// =====================================================
+// Filter option translations
+// =====================================================
 
 function updateFilterOptions() {
 
-    const academicYear =
-        document.getElementById(
-            "academicYear"
-        );
-
+    const academicYear = document.getElementById("academicYear");
     if (academicYear) {
-
-        const currentValue =
-            academicYear.value;
-
-        const firstOption =
-            academicYear.querySelector(
-                'option[value=""]'
-            );
-
-        if (firstOption) {
-
-            firstOption.textContent =
-                t("all");
-
-        }
-
-        if (
-            currentValue
-        ) {
-
-            academicYear.value =
-                currentValue;
-
-        }
-
+        const currentValue = academicYear.value;
+        const firstOption = academicYear.querySelector('option[value=""]');
+        if (firstOption) firstOption.textContent = t("all");
+        if (currentValue) academicYear.value = currentValue;
     }
 
-    const paymentMonth =
-        document.getElementById(
-            "paymentMonth"
-        );
-
+    const paymentMonth = document.getElementById("paymentMonth");
     if (paymentMonth) {
+        const allOption = paymentMonth.querySelector('option[value=""]');
+        if (allOption) allOption.textContent = t("all");
 
-        const allOption =
-            paymentMonth.querySelector(
-                'option[value=""]'
-            );
-
-        if (allOption) {
-
-            allOption.textContent =
-                t("all");
-
-        }
-
-        paymentMonth
-            .querySelectorAll("option")
-            .forEach(
-                option => {
-
-                    if (
-                        option.value &&
-                        TRANSLATIONS.en.months[
-                            option.value
-                        ]
-                    ) {
-
-                        option.textContent =
-                            t(
-                                `months.${option.value}`
-                            );
-
-                    }
-
-                }
-            );
-
+        paymentMonth.querySelectorAll("option").forEach(function (option) {
+            if (option.value && TRANSLATIONS.en.months[option.value]) {
+                option.textContent = t("months." + option.value);
+            }
+        });
     }
 
-    const stageFilter =
-        document.getElementById(
-            "stageFilter"
-        );
-
+    const stageFilter = document.getElementById("stageFilter");
     if (stageFilter) {
-
-        stageFilter
-            .querySelectorAll("option")
-            .forEach(
-                option => {
-
-                    if (
-                        !option.value
-                    ) {
-
-                        option.textContent =
-                            t("all");
-
-                        return;
-
-                    }
-
-                    const stageKey =
-                        String(
-                            option.value
-                        )
-                        .trim()
-                        .toLowerCase();
-
-                    if (
-                        TRANSLATIONS.en[
-                            stageKey
-                        ]
-                    ) {
-
-                        option.textContent =
-                            t(
-                                stageKey
-                            );
-
-                    }
-
-                }
-            );
-
+        stageFilter.querySelectorAll("option").forEach(function (option) {
+            if (!option.value) {
+                option.textContent = t("all");
+                return;
+            }
+            const stageKey = String(option.value).trim().toLowerCase();
+            if (TRANSLATIONS.en[stageKey]) {
+                option.textContent = t(stageKey);
+            }
+        });
     }
-
 }
 
 
-/* =================================
-   Language Selector
-   ================================= */
+// =====================================================
+// Table headers translation
+// =====================================================
 
-function ensureLanguageSelector() {
-
-    const headerActions =
-        document.querySelector(
-            ".header-actions"
-        );
-
-    if (!headerActions) {
-
-        return;
-
-    }
-
-    if (
-        document.getElementById(
-            "bmpLanguageSelector"
-        )
-    ) {
-
-        return;
-
-    }
-
-    const wrapper =
-        document.createElement(
-            "div"
-        );
-
-    wrapper.id =
-        "bmpLanguageWrapper";
-
-    wrapper.style.display =
-        "flex";
-
-    wrapper.style.alignItems =
-        "center";
-
-    wrapper.style.gap =
-        "7px";
-
-    const label =
-        document.createElement(
-            "span"
-        );
-
-    label.id =
-        "bmpLanguageLabel";
-
-    label.style.fontSize =
-        "13px";
-
-    label.style.fontWeight =
-        "600";
-
-    const select =
-        document.createElement(
-            "select"
-        );
-
-    select.id =
-        "bmpLanguageSelector";
-
-    select.innerHTML = `
-
-        <option value="en">
-            English
-        </option>
-
-        <option value="ar">
-            العربية
-        </option>
-
-        <option value="fr">
-            Français
-        </option>
-
-    `;
-
-    select.style.height =
-        "38px";
-
-    select.style.padding =
-        "0 10px";
-
-    select.style.borderRadius =
-        "7px";
-
-    select.style.border =
-        "1px solid #d1d5db";
-
-    select.style.background =
-        "#ffffff";
-
-    select.style.cursor =
-        "pointer";
-
-    select.addEventListener(
-        "change",
-        function () {
-
-            setLanguage(
-                this.value
-            );
-
-        }
-    );
-
-    wrapper.appendChild(
-        label
-    );
-
-    wrapper.appendChild(
-        select
-    );
-
-    headerActions.prepend(
-        wrapper
-    );
-
+function updateTableHeaders() {
+    // Handled by data-i18n on <th>
 }
 
 
-/* =================================
-   Update Language Selector
-   ================================= */
+// =====================================================
+// API request
+// =====================================================
 
-function updateLanguageSelector() {
+async function apiRequest(action, data) {
 
-    const selector =
-        document.getElementById(
-            "bmpLanguageSelector"
-        );
-
-    const label =
-        document.getElementById(
-            "bmpLanguageLabel"
-        );
-
-    if (selector) {
-
-        selector.value =
-            currentLanguage;
-
-    }
-
-    if (label) {
-
-        label.textContent =
-            t("language");
-
-    }
-
-}
-
-
-/* =================================
-   API Request
-   ================================= */
-
-async function apiRequest(
-    action,
-    data = {}
-) {
+    data = data || {};
 
     if (!institutionId) {
-
-        throw new Error(
-            t(
-                "errors.institutionMissing"
-            )
-        );
-
+        throw new Error(t("errors.institutionMissing"));
     }
 
-    const username =
-        getCurrentUsername();
-
+    const username = getCurrentUsername();
     if (!username) {
-
-        throw new Error(
-            t(
-                "errors.userMissing"
-            )
-        );
-
+        throw new Error(t("errors.userMissing"));
     }
 
-    const payload = {
-
-        action:
-            action,
-
-        institutionId:
-            institutionId,
-
-        username:
-            username,
-
-        ...data
-
-    };
-
-    console.log(
-        "BMP API request:",
-        payload
-    );
+    const payload = Object.assign({
+        action: action,
+        institutionId: institutionId,
+        username: username
+    }, data);
 
     let response;
-
     try {
-
-        response =
-            await fetch(
-                API_URL,
-                {
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "text/plain;charset=utf-8"
-
-                    },
-
-                    body:
-                        JSON.stringify(
-                            payload
-                        )
-
-                }
-            );
-
+        response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+        });
     } catch (error) {
-
-        throw new Error(
-            t(
-                "errors.connection"
-            )
-        );
-
+        throw new Error(t("errors.connection"));
     }
 
-    const responseText =
-        await response.text();
-
-    console.log(
-        "BMP API response:",
-        responseText
-    );
+    const responseText = await response.text();
 
     if (!response.ok) {
-
-        throw new Error(
-            `Server error: ${response.status}`
-        );
-
+        throw new Error("Server error: " + response.status);
     }
 
     let result;
-
     try {
-
-        result =
-            JSON.parse(
-                responseText
-            );
-
+        result = JSON.parse(responseText);
     } catch (error) {
-
-        throw new Error(
-            t(
-                "errors.invalidResponse"
-            )
-        );
-
+        throw new Error(t("errors.invalidResponse"));
     }
 
     if (!result.success) {
-
-        throw new Error(
-            translateBackendError(
-                result.message
-            )
-        );
-
+        throw new Error(translateBackendError(result.message));
     }
 
     return result;
-
 }
 
 
-/* =================================
-   Backend Error Translation
-   ================================= */
+// =====================================================
+// Backend error translation
+// =====================================================
 
-function translateBackendError(
-    message
-) {
+function translateBackendError(message) {
 
-    if (!message) {
+    if (!message) return t("errors.unknownRequest");
 
-        return t(
-            "errors.unknownRequest"
-        );
+    const text = String(message);
+    const lower = text.toLowerCase();
 
-    }
-
-    const text =
-        String(
-            message
-        );
-
-    const lower =
-        text.toLowerCase();
-
-    const knownErrors = [
-
-        {
-            keys: [
-                "institution id is missing",
-                "institution is missing"
-            ],
-            translation:
-                "errors.institutionMissing"
-        },
-
-        {
-            keys: [
-                "current user is missing"
-            ],
-            translation:
-                "errors.userMissing"
-        },
-
-        {
-            keys: [
-                "authentication failed",
-                "school authentication failed"
-            ],
-            translation:
-                "errors.authentication"
-        }
-
+    const known = [
+        { keys: ["institution id is missing", "institution is missing"], translation: "errors.institutionMissing" },
+        { keys: ["current user is missing"], translation: "errors.userMissing" },
+        { keys: ["authentication failed", "school authentication failed"], translation: "errors.authentication" }
     ];
 
-    for (
-        const item of knownErrors
-    ) {
-
-        if (
-            item.keys.some(
-                key =>
-                    lower.includes(
-                        key
-                    )
-            )
-        ) {
-
-            return t(
-                item.translation
-            );
-
+    for (const item of known) {
+        if (item.keys.some(k => lower.includes(k))) {
+            return t(item.translation);
         }
-
     }
 
     return text;
-
 }
 
 
-/* =================================
-   Authentication
-   ================================= */
+// =====================================================
+// Authentication — session-based, no URL detection
+// =====================================================
 
 function initializeAuthentication() {
 
     try {
-
-        if (
-            typeof requireSchoolLogin ===
-            "function"
-        ) {
-
-            currentUser =
-                requireSchoolLogin();
-
+        if (typeof requireSchoolLogin === "function") {
+            currentUser = requireSchoolLogin();
         }
-
     } catch (error) {
-
-        console.error(
-            "Authentication error:",
-            error
-        );
-
+        console.error("Authentication error:", error);
     }
 
     if (!currentUser) {
-
         try {
-
-            currentUser =
-                JSON.parse(
-                    localStorage.getItem(
-                        "bmpCurrentUser"
-                    ) || "null"
-                );
-
+            currentUser = JSON.parse(localStorage.getItem("bmpCurrentUser") || "null");
         } catch (error) {
-
-            console.error(
-                "Invalid stored user:",
-                error
-            );
-
-            currentUser =
-                null;
-
+            currentUser = null;
         }
-
     }
 
-    if (!currentUser) {
+    if (!currentUser) return false;
 
+    institutionId = String(currentUser.institutionId || "").trim();
+
+    if (!institutionId) return false;
+
+    // Optional URL hint check — if mismatch, redirect
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlId = urlParams.get("id") || urlParams.get("institutionId");
+    if (urlId && urlId !== institutionId) {
+        window.location.href =
+            "school-payments.html?id=" + encodeURIComponent(institutionId);
         return false;
-
     }
 
-    try {
-
-        if (
-            typeof getActiveInstitutionId ===
-            "function"
-        ) {
-
-            institutionId =
-                getActiveInstitutionId();
-
-        }
-
-    } catch (error) {
-
-        console.error(
-            "Institution helper error:",
-            error
-        );
-
-    }
-
-    if (!institutionId) {
-
-        const params =
-            new URLSearchParams(
-                window.location.search
-            );
-
-        institutionId =
-            params.get(
-                "institutionId"
-            ) ||
-            params.get(
-                "id"
-            ) ||
-            "";
-
-    }
-
-    if (!institutionId) {
-
-        institutionId =
-            currentUser.institutionId ||
-            "";
-
-    }
-
-    institutionId =
-        String(
-            institutionId || ""
-        ).trim();
-
-    return Boolean(
-        institutionId
-    );
-
+    return true;
 }
 
 
-/* =================================
-   Username
-   ================================= */
+// =====================================================
+// Username
+// =====================================================
 
 function getCurrentUsername() {
-
-    if (
-        currentUser &&
-        currentUser.username
-    ) {
-
-        return String(
-            currentUser.username
-        ).trim();
-
-    }
-
-    if (
-        currentUser &&
-        currentUser.userName
-    ) {
-
-        return String(
-            currentUser.userName
-        ).trim();
-
-    }
-
-    if (
-        currentUser &&
-        currentUser.name
-    ) {
-
-        return String(
-            currentUser.name
-        ).trim();
-
-    }
-
+    if (currentUser && currentUser.username) return String(currentUser.username).trim();
+    if (currentUser && currentUser.userName) return String(currentUser.userName).trim();
+    if (currentUser && currentUser.name) return String(currentUser.name).trim();
     return "";
-
 }
 
 
-/* =================================
-   Current Academic Year
-   ================================= */
+// =====================================================
+// Current academic year
+// =====================================================
 
 function getCurrentAcademicYear() {
-
-    const now =
-        new Date();
-
-    let year =
-        now.getFullYear();
-
-    if (
-        now.getMonth() < 9
-    ) {
-
-        year--;
-
-    }
-
-    return `${year}-${year + 1}`;
-
+    const now = new Date();
+    let year = now.getFullYear();
+    if (now.getMonth() < 9) year--;
+    return year + "-" + (year + 1);
 }
 
 
-/* =================================
-   Students
-   ================================= */
+// =====================================================
+// Students
+// =====================================================
 
 async function loadStudents() {
-
     try {
+        const result = await apiRequest("getStudents");
+        allStudents = Array.isArray(result.students) ? result.students : [];
 
-        const result =
-            await apiRequest(
-                "getStudents"
-            );
+        allStudents = allStudents.filter(function (student) {
+            if (!student.institutionId) return true;
+            return String(student.institutionId) === String(institutionId);
+        });
 
-        allStudents =
-            Array.isArray(
-                result.students
-            )
-                ? result.students
-                : [];
-
-        allStudents =
-            allStudents.filter(
-                student => {
-
-                    if (
-                        !student.institutionId
-                    ) {
-
-                        return true;
-
-                    }
-
-                    return String(
-                        student.institutionId
-                    ) ===
-                    String(
-                        institutionId
-                    );
-
-                }
-            );
-
-        console.log(
-            "Students loaded:",
-            allStudents.length
-        );
+        try {
+            sessionStorage.setItem(CACHE_KEY_STUDENTS(), JSON.stringify(allStudents));
+        } catch (e) {}
 
         return true;
-
     } catch (error) {
-
-        console.error(
-            "Students could not be loaded:",
-            error
-        );
-
-        allStudents =
-            [];
-
+        console.error("Students could not be loaded:", error);
+        allStudents = [];
         return false;
-
     }
+}
 
+function loadStudentsFromCache() {
+    try {
+        const cached = sessionStorage.getItem(CACHE_KEY_STUDENTS());
+        if (!cached) return false;
+        const parsed = JSON.parse(cached);
+        if (!Array.isArray(parsed)) return false;
+        allStudents = parsed;
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
 
 
-/* =================================
-   Payment Helpers
-   ================================= */
+// =====================================================
+// Payment helpers
+// =====================================================
 
-function getPaymentStudentId(
-    payment
-) {
-
-    return String(
-        payment.studentId ||
-        payment.studentID ||
-        payment.student_id ||
-        ""
-    ).trim();
-
+function getPaymentStudentId(p) {
+    return String(p.studentId || p.studentID || p.student_id || "").trim();
+}
+function getPaymentStudentNumber(p) {
+    return String(p.studentNumber || p.student_number || "").trim();
+}
+function getPaymentStudentName(p) {
+    return String(p.studentName || p.student_name || p.name || "").trim();
+}
+function getPaymentAcademicYear(p) {
+    return String(p.academicYear || p.academic_year || p.schoolYear || "").trim();
+}
+function getPaymentMonth(p) {
+    return String(p.month || p.paidMonth || "").trim();
+}
+function getPaymentAmount(p) {
+    const value = Number(p.amount);
+    return Number.isFinite(value) ? value : 0;
+}
+function getPaymentDate(p) {
+    return String(p.paymentDate || p.payment_date || p.date || "").trim();
+}
+function getReceiptNumber(p) {
+    return String(p.receiptNumber || p.receipt_number || "").trim();
+}
+function getRecordedBy(p) {
+    return String(p.recordedBy || p.recorded_by || "").trim();
+}
+function getPaymentId(p) {
+    return String(p.paymentId || p.paymentID || p.payment_id || "").trim();
 }
 
 
-function getPaymentStudentNumber(
-    payment
-) {
+// =====================================================
+// Student lookup
+// =====================================================
 
-    return String(
-        payment.studentNumber ||
-        payment.student_number ||
-        ""
-    ).trim();
+function findStudentForPayment(payment) {
 
-}
-
-
-function getPaymentStudentName(
-    payment
-) {
-
-    return String(
-        payment.studentName ||
-        payment.student_name ||
-        payment.name ||
-        ""
-    ).trim();
-
-}
-
-
-function getPaymentAcademicYear(
-    payment
-) {
-
-    return String(
-        payment.academicYear ||
-        payment.academic_year ||
-        payment.schoolYear ||
-        ""
-    ).trim();
-
-}
-
-
-function getPaymentMonth(
-    payment
-) {
-
-    return String(
-        payment.month ||
-        payment.paidMonth ||
-        ""
-    ).trim();
-
-}
-
-
-function getPaymentAmount(
-    payment
-) {
-
-    const value =
-        Number(
-            payment.amount
-        );
-
-    return Number.isFinite(
-        value
-    )
-        ? value
-        : 0;
-
-}
-
-
-function getPaymentDate(
-    payment
-) {
-
-    return String(
-        payment.paymentDate ||
-        payment.payment_date ||
-        payment.date ||
-        ""
-    ).trim();
-
-}
-
-
-function getReceiptNumber(
-    payment
-) {
-
-    return String(
-        payment.receiptNumber ||
-        payment.receipt_number ||
-        ""
-    ).trim();
-
-}
-
-
-function getRecordedBy(
-    payment
-) {
-
-    return String(
-        payment.recordedBy ||
-        payment.recorded_by ||
-        ""
-    ).trim();
-
-}
-
-
-/* =================================
-   Payment ID
-   ================================= */
-
-function getPaymentId(
-    payment
-) {
-
-    return String(
-        payment.paymentId ||
-        payment.paymentID ||
-        payment.payment_id ||
-        ""
-    ).trim();
-
-}
-
-
-/* =================================
-   Student Lookup
-   ================================= */
-
-function findStudentForPayment(
-    payment
-) {
-
-    const studentId =
-        getPaymentStudentId(
-            payment
-        );
-
-    const studentNumber =
-        getPaymentStudentNumber(
-            payment
-        );
+    const studentId = getPaymentStudentId(payment);
+    const studentNumber = getPaymentStudentNumber(payment);
 
     if (studentId) {
-
-        const byId =
-            allStudents.find(
-                student =>
-                    String(
-                        student.studentId ||
-                        student.id ||
-                        ""
-                    ).trim() ===
-                    studentId
-            );
-
-        if (byId) {
-
-            return byId;
-
-        }
-
+        const byId = allStudents.find(function (s) {
+            return String(s.studentId || s.id || "").trim() === studentId;
+        });
+        if (byId) return byId;
     }
 
     if (studentNumber) {
-
-        const byNumber =
-            allStudents.find(
-                student =>
-                    String(
-                        student.studentNumber ||
-                        ""
-                    ).trim().toLowerCase() ===
-                    studentNumber.toLowerCase() &&
-                    String(
-                        student.academicYear ||
-                        ""
-                    ).trim() ===
-                    getPaymentAcademicYear(
-                        payment
-                    )
-            );
-
-        if (byNumber) {
-
-            return byNumber;
-
-        }
-
+        const byNumber = allStudents.find(function (s) {
+            return String(s.studentNumber || "").trim().toLowerCase() === studentNumber.toLowerCase()
+                && String(s.academicYear || "").trim() === getPaymentAcademicYear(payment);
+        });
+        if (byNumber) return byNumber;
     }
 
     return null;
-
 }
 
 
-/* =================================
-   Stage
-   ================================= */
+// =====================================================
+// Stage
+// =====================================================
 
-function normalizeStage(
-    stage
-) {
-
-    return String(
-        stage || ""
-    )
-        .trim()
-        .toLowerCase();
-
+function normalizeStage(stage) {
+    return String(stage || "").trim().toLowerCase();
 }
 
-
-function getStageForPayment(
-    payment
-) {
-
-    if (
-        payment.stage
-    ) {
-
-        return normalizeStage(
-            payment.stage
-        );
-
-    }
-
-    const student =
-        findStudentForPayment(
-            payment
-        );
-
-    if (!student) {
-
-        return "";
-
-    }
-
-    return normalizeStage(
-        student.stage
-    );
-
+function getStageForPayment(payment) {
+    if (payment.stage) return normalizeStage(payment.stage);
+    const student = findStudentForPayment(payment);
+    if (!student) return "";
+    return normalizeStage(student.stage);
 }
 
-
-function formatStage(
-    stage
-) {
-
-    const value =
-        normalizeStage(
-            stage
-        );
-
+function formatStage(stage) {
+    const value = normalizeStage(stage);
     const stages = {
-
-        primary:
-            t("primary"),
-
-        preparatory:
-            t("preparatory"),
-
-        secondary:
-            t("secondary")
-
+        primary: t("primary"),
+        preparatory: t("preparatory"),
+        secondary: t("secondary")
     };
-
-    return (
-        stages[value] ||
-        stage ||
-        t("unknown")
-    );
-
+    return stages[value] || stage || t("unknown");
 }
 
 
-/* =================================
-   Display Month
-   ================================= */
+// =====================================================
+// Display month
+// =====================================================
 
-function formatMonth(
-    month
-) {
-
-    if (!month) {
-
-        return t("unknown");
-
+function formatMonth(month) {
+    if (!month) return t("unknown");
+    const key = String(month).trim();
+    if (TRANSLATIONS.en.months[key]) {
+        return t("months." + key);
     }
-
-    const monthKey =
-        String(
-            month
-        ).trim();
-
-    if (
-        TRANSLATIONS.en.months[
-            monthKey
-        ]
-    ) {
-
-        return t(
-            `months.${monthKey}`
-        );
-
-    }
-
-    return monthKey;
-
+    return key;
 }
 
 
-/* =================================
-   Load Payments
-   ================================= */
+// =====================================================
+// Load payments
+// =====================================================
 
 async function loadPayments() {
 
-    hideError();
+    const result = await apiRequest("getPayments");
 
-    showLoading(
-        t("loadingPayments")
-    );
-
-    try {
-
-        const result =
-            await apiRequest(
-                "getPayments"
-            );
-
-        if (
-            Array.isArray(
-                result.payments
-            )
-        ) {
-
-            allPayments =
-                result.payments;
-
-        } else if (
-            Array.isArray(
-                result.data
-            )
-        ) {
-
-            allPayments =
-                result.data;
-
-        } else {
-
-            allPayments =
-                [];
-
-        }
-
-        console.log(
-            "Payments loaded:",
-            allPayments.length
-        );
-
-        paymentsLoaded =
-            true;
-
-        hideLoading();
-
-        return true;
-
-    } catch (error) {
-
-        console.error(
-            "Failed to load payments:",
-            error
-        );
-
-        paymentsLoaded =
-            false;
-
-        allPayments =
-            [];
-
-        hideLoading();
-
-        showError(
-            error.message ||
-            t("errors.failedPayments")
-        );
-
-        updateSummary(
-            []
-        );
-
-        renderPayments(
-            []
-        );
-
-        return false;
-
+    if (Array.isArray(result.payments)) {
+        allPayments = result.payments;
+    } else if (Array.isArray(result.data)) {
+        allPayments = result.data;
+    } else {
+        allPayments = [];
     }
 
+    try {
+        sessionStorage.setItem(CACHE_KEY_PAYMENTS(), JSON.stringify(allPayments));
+    } catch (e) {}
+
+    paymentsLoaded = true;
+    return true;
+}
+
+function loadPaymentsFromCache() {
+    try {
+        const cached = sessionStorage.getItem(CACHE_KEY_PAYMENTS());
+        if (!cached) return false;
+        const parsed = JSON.parse(cached);
+        if (!Array.isArray(parsed)) return false;
+        allPayments = parsed;
+        paymentsLoaded = true;
+        return true;
+    } catch (e) {
+        return false;
+    }
 }
 
 
-/* =================================
-   Academic Years
-   ================================= */
+// =====================================================
+// Academic years
+// =====================================================
 
 function loadAcademicYears() {
 
-    const select =
-        document.getElementById(
-            "academicYear"
-        );
+    const select = document.getElementById("academicYear");
+    if (!select) return;
 
-    if (!select) {
+    const years = new Set();
 
-        return;
+    allPayments.forEach(function (payment) {
+        const year = getPaymentAcademicYear(payment);
+        if (year) years.add(year);
+    });
 
+    allStudents.forEach(function (student) {
+        if (student.academicYear) years.add(String(student.academicYear).trim());
+    });
+
+    years.add(getCurrentAcademicYear());
+
+    const currentValue = select.value;
+    select.innerHTML = '<option value="">' + escapeHtml(t("all")) + '</option>';
+
+    Array.from(years).filter(Boolean).sort().reverse().forEach(function (year) {
+        const option = document.createElement("option");
+        option.value = year;
+        option.textContent = year;
+        select.appendChild(option);
+    });
+
+    if (currentValue && years.has(currentValue)) {
+        select.value = currentValue;
     }
-
-    const years =
-        new Set();
-
-    allPayments.forEach(
-        payment => {
-
-            const year =
-                getPaymentAcademicYear(
-                    payment
-                );
-
-            if (year) {
-
-                years.add(
-                    year
-                );
-
-            }
-
-        }
-    );
-
-    allStudents.forEach(
-        student => {
-
-            if (
-                student.academicYear
-            ) {
-
-                years.add(
-                    String(
-                        student.academicYear
-                    ).trim()
-                );
-
-            }
-
-        }
-    );
-
-    years.add(
-        getCurrentAcademicYear()
-    );
-
-    const currentValue =
-        select.value;
-
-    select.innerHTML =
-        `<option value="">${escapeHtml(
-            t("all")
-        )}</option>`;
-
-    Array
-        .from(years)
-        .filter(Boolean)
-        .sort()
-        .reverse()
-        .forEach(
-            year => {
-
-                const option =
-                    document.createElement(
-                        "option"
-                    );
-
-                option.value =
-                    year;
-
-                option.textContent =
-                    year;
-
-                select.appendChild(
-                    option
-                );
-
-            }
-        );
-
-    if (
-        currentValue &&
-        years.has(
-            currentValue
-        )
-    ) {
-
-        select.value =
-            currentValue;
-
-    }
-
 }
 
 
-/* =================================
-   Filtering
-   ================================= */
+// =====================================================
+// Filtering
+// =====================================================
 
 function getFilteredPayments() {
 
-    const academicYear =
-        String(
-            document.getElementById(
-                "academicYear"
-            )?.value ||
-            ""
-        ).trim();
+    const academicYear = String(document.getElementById("academicYear")?.value || "").trim();
+    const month = String(document.getElementById("paymentMonth")?.value || "").trim().toLowerCase();
+    const stage = String(document.getElementById("stageFilter")?.value || "").trim().toLowerCase();
+    const search = String(document.getElementById("studentSearch")?.value || "").trim().toLowerCase();
 
-    const month =
-        String(
-            document.getElementById(
-                "paymentMonth"
-            )?.value ||
-            ""
-        )
-        .trim()
-        .toLowerCase();
+    return allPayments.filter(function (payment) {
 
-    const stage =
-        String(
-            document.getElementById(
-                "stageFilter"
-            )?.value ||
-            ""
-        )
-        .trim()
-        .toLowerCase();
+        const paymentYear = getPaymentAcademicYear(payment);
+        const paymentMonth = getPaymentMonth(payment).toLowerCase();
+        const paymentStudentNumber = getPaymentStudentNumber(payment).toLowerCase();
+        const paymentStudentName = getPaymentStudentName(payment).toLowerCase();
+        const paymentStage = getStageForPayment(payment);
 
-    const search =
-        String(
-            document.getElementById(
-                "studentSearch"
-            )?.value ||
-            ""
-        )
-        .trim()
-        .toLowerCase();
+        if (academicYear && paymentYear !== academicYear) return false;
+        if (month && paymentMonth !== month) return false;
+        if (stage && paymentStage !== stage) return false;
 
-    return allPayments.filter(
-        payment => {
-
-            const paymentYear =
-                getPaymentAcademicYear(
-                    payment
-                );
-
-            const paymentMonth =
-                getPaymentMonth(
-                    payment
-                ).toLowerCase();
-
-            const paymentStudentNumber =
-                getPaymentStudentNumber(
-                    payment
-                ).toLowerCase();
-
-            const paymentStudentName =
-                getPaymentStudentName(
-                    payment
-                ).toLowerCase();
-
-            const paymentStage =
-                getStageForPayment(
-                    payment
-                );
-
-            if (
-                academicYear &&
-                paymentYear !==
-                academicYear
-            ) {
-
-                return false;
-
-            }
-
-            if (
-                month &&
-                paymentMonth !==
-                month
-            ) {
-
-                return false;
-
-            }
-
-            if (
-                stage &&
-                paymentStage !==
-                stage
-            ) {
-
-                return false;
-
-            }
-
-            if (search) {
-
-                const matchesSearch =
-                    paymentStudentNumber.includes(
-                        search
-                    ) ||
-                    paymentStudentName.includes(
-                        search
-                    );
-
-                if (
-                    !matchesSearch
-                ) {
-
-                    return false;
-
-                }
-
-            }
-
-            return true;
-
+        if (search) {
+            const matches =
+                paymentStudentNumber.includes(search) ||
+                paymentStudentName.includes(search);
+            if (!matches) return false;
         }
-    );
 
+        return true;
+    });
 }
 
 
-/* =================================
-   Sorting
-   ================================= */
+// =====================================================
+// Sorting
+// =====================================================
 
-function sortPayments(
-    payments
-) {
-
-    return [
-        ...payments
-    ].sort(
-        (
-            a,
-            b
-        ) => {
-
-            const dateA =
-                new Date(
-                    getPaymentDate(
-                        a
-                    ) || 0
-                ).getTime();
-
-            const dateB =
-                new Date(
-                    getPaymentDate(
-                        b
-                    ) || 0
-                ).getTime();
-
-            return (
-                dateB -
-                dateA
-            );
-
-        }
-    );
-
+function sortPayments(payments) {
+    return [...payments].sort(function (a, b) {
+        const dateA = new Date(getPaymentDate(a) || 0).getTime();
+        const dateB = new Date(getPaymentDate(b) || 0).getTime();
+        return dateB - dateA;
+    });
 }
 
 
-/* =================================
-   HTML Escape
-   ================================= */
+// =====================================================
+// HTML escape
+// =====================================================
 
-function escapeHtml(
-    value
-) {
-
-    return String(
-        value ?? ""
-    )
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
+function escapeHtml(value) {
+    return String(value == null ? "" : value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
 
-/* =================================
-   Render Payments
-   ================================= */
+// =====================================================
+// Render payments
+// =====================================================
 
-function renderPayments(
-    payments =
-        getFilteredPayments()
-) {
+function renderPayments(payments) {
 
-    const tbody =
-        document.getElementById(
-            "paymentsTableBody"
-        );
+    payments = payments || getFilteredPayments();
 
-    const tableSection =
-        document.getElementById(
-            "paymentsTableSection"
-        );
+    const tbody = document.getElementById("paymentsTableBody");
+    const tableSection = document.getElementById("paymentsTableSection");
+    const emptyState = document.getElementById("emptyState");
 
-    const emptyState =
-        document.getElementById(
-            "emptyState"
-        );
+    if (!tbody) return;
 
-    if (!tbody) {
+    tbody.innerHTML = "";
 
-        return;
+    const sorted = sortPayments(payments);
 
-    }
+    if (tableSection) tableSection.style.display = sorted.length ? "block" : "none";
+    if (emptyState) emptyState.style.display = sorted.length ? "none" : "block";
 
-    tbody.innerHTML =
-        "";
+    const fragment = document.createDocumentFragment();
 
-    const sorted =
-        sortPayments(
-            payments
-        );
+    sorted.forEach(function (payment) {
 
-    if (
-        tableSection
-    ) {
+        const row = document.createElement("tr");
 
-        tableSection.style.display =
-            sorted.length
-                ? "block"
-                : "none";
+        const studentNumber = getPaymentStudentNumber(payment);
+        const student = findStudentForPayment(payment);
+        const studentName =
+            getPaymentStudentName(payment) ||
+            (student && (student.name || student.studentName)) ||
+            t("unknown");
+        const academicYear = getPaymentAcademicYear(payment);
+        const month = getPaymentMonth(payment);
+        const amount = getPaymentAmount(payment);
+        const paymentDate = getPaymentDate(payment);
+        const receiptNumber = getReceiptNumber(payment);
+        const recordedBy = getRecordedBy(payment);
 
-    }
+        row.innerHTML =
+            "<td>" + escapeHtml(studentNumber || t("unknown")) + "</td>" +
+            "<td>" + escapeHtml(studentName) + "</td>" +
+            "<td>" + escapeHtml(academicYear || t("unknown")) + "</td>" +
+            "<td>" + escapeHtml(formatMonth(month)) + "</td>" +
+            "<td>" + escapeHtml(amount.toFixed(2)) + "</td>" +
+            "<td>" + escapeHtml(paymentDate || t("unknown")) + "</td>" +
+            "<td>" + escapeHtml(receiptNumber || t("unknown")) + "</td>" +
+            "<td>" + escapeHtml(recordedBy || t("unknown")) + "</td>";
 
-    if (
-        emptyState
-    ) {
+        row.addEventListener("click", function () {
+            showPaymentDetails(payment);
+        });
 
-        emptyState.style.display =
-            sorted.length
-                ? "none"
-                : "block";
+        fragment.appendChild(row);
+    });
 
-    }
-
-    sorted.forEach(
-        payment => {
-
-            const row =
-                document.createElement(
-                    "tr"
-                );
-
-            const studentNumber =
-                getPaymentStudentNumber(
-                    payment
-                );
-
-            const studentName =
-                getPaymentStudentName(
-                    payment
-                ) ||
-                (
-                    findStudentForPayment(
-                        payment
-                    )?.name ||
-                    findStudentForPayment(
-                        payment
-                    )?.studentName ||
-                    t("unknown")
-                );
-
-            const academicYear =
-                getPaymentAcademicYear(
-                    payment
-                );
-
-            const month =
-                getPaymentMonth(
-                    payment
-                );
-
-            const amount =
-                getPaymentAmount(
-                    payment
-                );
-
-            const paymentDate =
-                getPaymentDate(
-                    payment
-                );
-
-            const receiptNumber =
-                getReceiptNumber(
-                    payment
-                );
-
-            const recordedBy =
-                getRecordedBy(
-                    payment
-                );
-
-            row.innerHTML = `
-
-                <td>
-                    ${escapeHtml(
-                        studentNumber ||
-                        t("unknown")
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        studentName ||
-                        t("unknown")
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        academicYear ||
-                        t("unknown")
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        formatMonth(
-                            month
-                        )
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        amount.toFixed(2)
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        paymentDate ||
-                        t("unknown")
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        receiptNumber ||
-                        t("unknown")
-                    )}
-                </td>
-
-                <td>
-                    ${escapeHtml(
-                        recordedBy ||
-                        t("unknown")
-                    )}
-                </td>
-
-            `;
-
-            row.style.cursor =
-                "pointer";
-
-            row.addEventListener(
-                "click",
-                () => {
-
-                    showPaymentDetails(
-                        payment
-                    );
-
-                }
-            );
-
-            tbody.appendChild(
-                row
-            );
-
-        }
-    );
-
-    updateSummary(
-        payments
-    );
-
+    tbody.appendChild(fragment);
+    updateSummary(payments);
 }
 
 
-/* =================================
-   Summary
-   ================================= */
+// =====================================================
+// Summary
+// =====================================================
 
-function updateSummary(
-    displayedPayments
-) {
+function updateSummary(displayedPayments) {
 
-    const totalPaymentsElement =
-        document.getElementById(
-            "totalPayments"
-        );
+    const totalPaymentsElement = document.getElementById("totalPayments");
+    const totalAmountElement = document.getElementById("totalAmount");
+    const displayedPaymentsElement = document.getElementById("displayedPayments");
 
-    const totalAmountElement =
-        document.getElementById(
-            "totalAmount"
-        );
+    const totalAmount = allPayments.reduce(function (sum, payment) {
+        return sum + getPaymentAmount(payment);
+    }, 0);
 
-    const displayedPaymentsElement =
-        document.getElementById(
-            "displayedPayments"
-        );
-
-    const totalAmount =
-        allPayments.reduce(
-            (
-                sum,
-                payment
-            ) => {
-
-                return (
-                    sum +
-                    getPaymentAmount(
-                        payment
-                    )
-                );
-
-            },
-            0
-        );
-
-    if (
-        totalPaymentsElement
-    ) {
-
-        totalPaymentsElement.textContent =
-            String(
-                allPayments.length
-            );
-
-    }
-
-    if (
-        totalAmountElement
-    ) {
-
-        totalAmountElement.textContent =
-            totalAmount.toFixed(
-                2
-            );
-
-    }
-
-    if (
-        displayedPaymentsElement
-    ) {
-
-        displayedPaymentsElement.textContent =
-            String(
-                displayedPayments.length
-            );
-
-    }
-
+    if (totalPaymentsElement) totalPaymentsElement.textContent = String(allPayments.length);
+    if (totalAmountElement) totalAmountElement.textContent = totalAmount.toFixed(2);
+    if (displayedPaymentsElement) displayedPaymentsElement.textContent = String(displayedPayments.length);
 }
 
 
-/* =================================
-   Apply Filters
-   ================================= */
+// =====================================================
+// Apply filters
+// =====================================================
 
 function applyFilters() {
-
-    if (
-        !paymentsLoaded
-    ) {
-
-        return;
-
-    }
-
-    const filtered =
-        getFilteredPayments();
-
-    renderPayments(
-        filtered
-    );
-
+    if (!paymentsLoaded) return;
+    renderPayments(getFilteredPayments());
 }
 
 
-/* =================================
-   Reset Filters
-   ================================= */
+// =====================================================
+// Reset filters
+// =====================================================
 
 function resetFilters() {
 
-    const academicYear =
-        document.getElementById(
-            "academicYear"
-        );
-
-    const paymentMonth =
-        document.getElementById(
-            "paymentMonth"
-        );
-
-    const stageFilter =
-        document.getElementById(
-            "stageFilter"
-        );
-
-    const studentSearch =
-        document.getElementById(
-            "studentSearch"
-        );
-
-    if (academicYear) {
-
-        academicYear.value =
-            "";
-
-    }
-
-    if (paymentMonth) {
-
-        paymentMonth.value =
-            "";
-
-    }
-
-    if (stageFilter) {
-
-        stageFilter.value =
-            "";
-
-    }
-
-    if (studentSearch) {
-
-        studentSearch.value =
-            "";
-
-    }
+    ["academicYear", "paymentMonth", "stageFilter", "studentSearch"].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+    });
 
     applyFilters();
-
 }
 
 
-/* =================================
-   Loading
-   ================================= */
+// =====================================================
+// Loading / error states
+// =====================================================
 
-function showLoading(
-    message =
-        "Loading..."
-) {
-
-    const loading =
-        document.getElementById(
-            "loadingState"
-        );
-
-    const messageElement =
-        document.getElementById(
-            "loadingMessage"
-        );
-
-    if (
-        messageElement
-    ) {
-
-        messageElement.textContent =
-            message;
-
-    }
-
-    if (
-        loading
-    ) {
-
-        loading.style.display =
-            "block";
-
-    }
-
+function showLoading(message) {
+    const loading = document.getElementById("loadingState");
+    const messageEl = document.getElementById("loadingMessage");
+    if (messageEl) messageEl.textContent = message || t("loading");
+    if (loading) loading.style.display = "block";
 }
-
 
 function hideLoading() {
-
-    const loading =
-        document.getElementById(
-            "loadingState"
-        );
-
-    if (
-        loading
-    ) {
-
-        loading.style.display =
-            "none";
-
-    }
-
+    const loading = document.getElementById("loadingState");
+    if (loading) loading.style.display = "none";
 }
 
-
-/* =================================
-   Error
-   ================================= */
-
-function showError(
-    message
-) {
-
-    const errorState =
-        document.getElementById(
-            "errorState"
-        );
-
-    const errorMessage =
-        document.getElementById(
-            "errorMessage"
-        );
-
-    if (
-        errorMessage
-    ) {
-
-        errorMessage.textContent =
-            String(
-                message ||
-                t("errorLoading")
-            );
-
-    }
-
-    if (
-        errorState
-    ) {
-
-        errorState.style.display =
-            "block";
-
-    }
-
-    console.error(
-        "BMP Payments Error:",
-        message
-    );
-
+function showError(message) {
+    const errorState = document.getElementById("errorState");
+    const errorMessage = document.getElementById("errorMessage");
+    if (errorMessage) errorMessage.textContent = message || t("errorLoading");
+    if (errorState) errorState.style.display = "block";
+    console.error("BMP Payments Error:", message);
 }
-
 
 function hideError() {
-
-    const errorState =
-        document.getElementById(
-            "errorState"
-        );
-
-    if (
-        errorState
-    ) {
-
-        errorState.style.display =
-            "none";
-
-    }
-
+    const errorState = document.getElementById("errorState");
+    if (errorState) errorState.style.display = "none";
 }
 
 
-/* =================================
-   Payment Details
-   ================================= */
+// =====================================================
+// Payment details modal
+// =====================================================
 
-function showPaymentDetails(
-    payment
-) {
+function showPaymentDetails(payment) {
 
-    const modal =
-        document.getElementById(
-            "paymentDetailsModal"
-        );
+    const modal = document.getElementById("paymentDetailsModal");
+    const content = document.getElementById("paymentDetailsContent");
+    if (!modal || !content) return;
 
-    const content =
-        document.getElementById(
-            "paymentDetailsContent"
-        );
-
-    if (
-        !modal ||
-        !content
-    ) {
-
-        return;
-
-    }
-
-    const student =
-        findStudentForPayment(
-            payment
-        );
-
+    const student = findStudentForPayment(payment);
     const studentName =
-        getPaymentStudentName(
-            payment
-        ) ||
-        student?.name ||
-        student?.studentName ||
+        getPaymentStudentName(payment) ||
+        (student && (student.name || student.studentName)) ||
         t("unknown");
-
-    const stage =
-        getStageForPayment(
-            payment
-        );
-
+    const stage = getStageForPayment(payment);
     const className =
-        student?.className ||
-        student?.class ||
-        student?.classNumber ||
-        student?.class_name ||
+        (student && (student.className || student.class || student.classNumber || student.class_name)) ||
         payment.className ||
         payment.class ||
         t("unknown");
-
     const studentNumber =
-        getPaymentStudentNumber(
-            payment
-        ) ||
-        student?.studentNumber ||
+        getPaymentStudentNumber(payment) ||
+        (student && student.studentNumber) ||
         t("unknown");
-
-    const academicYear =
-        getPaymentAcademicYear(
-            payment
-        ) ||
-        t("unknown");
-
-    const month =
-        getPaymentMonth(
-            payment
-        );
-
-    const amount =
-        getPaymentAmount(
-            payment
-        );
-
-    const paymentDate =
-        getPaymentDate(
-            payment
-        ) ||
-        t("unknown");
-
-    const receiptNumber =
-        getReceiptNumber(
-            payment
-        ) ||
-        t("unknown");
-
-    const recordedBy =
-        getRecordedBy(
-            payment
-        ) ||
-        t("unknown");
-
-    const notes =
-        String(
-            payment.notes ||
-            ""
-        ).trim();
-
-    content.innerHTML = `
-
-        <div class="info-grid">
-
-            <div class="info-item">
-
-                <span>
-                    ${escapeHtml(
-                        t("studentName")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        studentName
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span>
-                    ${escapeHtml(
-                        t("studentNumber")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        studentNumber
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span>
-                    ${escapeHtml(
-                        t("academicYear")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        academicYear
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span>
-                    ${escapeHtml(
-                        t("stage")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        formatStage(
-                            stage
-                        )
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span>
-                    ${escapeHtml(
-                        t("class")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        className
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span>
-                    ${escapeHtml(
-                        t("month")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        formatMonth(
-                            month
-                        )
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span>
-                    ${escapeHtml(
-                        t("amount")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        amount.toFixed(2)
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span>
-                    ${escapeHtml(
-                        t("paymentDate")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        paymentDate
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span>
-                    ${escapeHtml(
-                        t("receiptNumber")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        receiptNumber
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="info-item">
-
-                <span>
-                    ${escapeHtml(
-                        t("recordedBy")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        recordedBy
-                    )}
-                </strong>
-
-            </div>
-
-
-            ${
-                notes
-                    ? `
-                    <div
-                        class="info-item"
-                        style="grid-column: 1 / -1;">
-
-                        <span>
-                            ${escapeHtml(
-                                t("notes")
-                            )}
-                        </span>
-
-                        <strong>
-                            ${escapeHtml(
-                                notes
-                            )}
-                        </strong>
-
-                    </div>
-                    `
-                    : ""
-            }
-
-        </div>
-
-
-        <div
-            class="payment-detail-actions">
-
-            <button
-                type="button"
-                id="printPaymentReceiptBtn"
-                class="primary-button">
-
-                ${escapeHtml(
-                    t("printReceipt")
-                )}
-
-            </button>
-
-        </div>
-
-    `;
-
-    modal.style.display =
-        "flex";
-
-    const printPaymentReceiptButton =
-        document.getElementById(
-            "printPaymentReceiptBtn"
-        );
-
-    if (
-        printPaymentReceiptButton
-    ) {
-
-        printPaymentReceiptButton.addEventListener(
-            "click",
-            function () {
-
-                printPaymentReceipt(
-                    payment
-                );
-
-            }
-        );
-
+    const academicYear = getPaymentAcademicYear(payment) || t("unknown");
+    const month = getPaymentMonth(payment);
+    const amount = getPaymentAmount(payment);
+    const paymentDate = getPaymentDate(payment) || t("unknown");
+    const receiptNumber = getReceiptNumber(payment) || t("unknown");
+    const recordedBy = getRecordedBy(payment) || t("unknown");
+    const notes = String(payment.notes || "").trim();
+
+    content.innerHTML =
+        '<div class="info-grid">' +
+            '<div class="info-item"><span>' + escapeHtml(t("studentName")) + '</span><strong>' + escapeHtml(studentName) + '</strong></div>' +
+            '<div class="info-item"><span>' + escapeHtml(t("studentNumber")) + '</span><strong>' + escapeHtml(studentNumber) + '</strong></div>' +
+            '<div class="info-item"><span>' + escapeHtml(t("academicYear")) + '</span><strong>' + escapeHtml(academicYear) + '</strong></div>' +
+            '<div class="info-item"><span>' + escapeHtml(t("stage")) + '</span><strong>' + escapeHtml(formatStage(stage)) + '</strong></div>' +
+            '<div class="info-item"><span>' + escapeHtml(t("class")) + '</span><strong>' + escapeHtml(className) + '</strong></div>' +
+            '<div class="info-item"><span>' + escapeHtml(t("month")) + '</span><strong>' + escapeHtml(formatMonth(month)) + '</strong></div>' +
+            '<div class="info-item"><span>' + escapeHtml(t("amount")) + '</span><strong>' + escapeHtml(amount.toFixed(2)) + '</strong></div>' +
+            '<div class="info-item"><span>' + escapeHtml(t("paymentDate")) + '</span><strong>' + escapeHtml(paymentDate) + '</strong></div>' +
+            '<div class="info-item"><span>' + escapeHtml(t("receiptNumber")) + '</span><strong>' + escapeHtml(receiptNumber) + '</strong></div>' +
+            '<div class="info-item"><span>' + escapeHtml(t("recordedBy")) + '</span><strong>' + escapeHtml(recordedBy) + '</strong></div>' +
+            (notes
+                ? '<div class="info-item" style="grid-column: 1 / -1;"><span>' + escapeHtml(t("notes")) + '</span><strong>' + escapeHtml(notes) + '</strong></div>'
+                : "") +
+        '</div>' +
+        '<div class="payment-detail-actions">' +
+            '<button type="button" id="printPaymentReceiptBtn" class="btn btn-primary">' +
+                '<i class="fas fa-print"></i> ' +
+                escapeHtml(t("printReceipt")) +
+            '</button>' +
+        '</div>';
+
+    modal.style.display = "flex";
+
+    const printBtn = document.getElementById("printPaymentReceiptBtn");
+    if (printBtn) {
+        printBtn.addEventListener("click", function () {
+            printPaymentReceipt(payment);
+        });
     }
-
 }
 
-
-/* =================================
-   Close Modal
-   ================================= */
 
 function closePaymentDetails() {
-
-    const modal =
-        document.getElementById(
-            "paymentDetailsModal"
-        );
-
-    if (
-        modal
-    ) {
-
-        modal.style.display =
-            "none";
-
-    }
-
+    const modal = document.getElementById("paymentDetailsModal");
+    if (modal) modal.style.display = "none";
 }
 
 
-/* =================================
-   Receipt Title
-   ================================= */
+// =====================================================
+// Receipt title / date
+// =====================================================
 
 function getReceiptTitle() {
-
     const titles = {
-
-        en:
-            "Official Payment Receipt",
-
-        ar:
-            "إيصال دفع رسمي",
-
-        fr:
-            "Reçu de paiement officiel"
-
+        en: "Official Payment Receipt",
+        ar: "إيصال دفع رسمي",
+        fr: "Reçu de paiement officiel"
     };
+    return titles[currentLanguage] || titles.en;
+}
 
-    return (
-        titles[currentLanguage] ||
-        titles.en
-    );
-
+function formatReceiptDate(value) {
+    if (!value) return "-";
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return String(value);
+    const locale = currentLanguage === "ar" ? "ar" : currentLanguage === "fr" ? "fr-FR" : "en-GB";
+    return parsed.toLocaleDateString(locale);
 }
 
 
-/* =================================
-   Receipt Date
-   ================================= */
-
-function formatReceiptDate(
-    value
-) {
-
-    if (!value) {
-
-        return "-";
-
-    }
-
-    const parsed =
-        new Date(
-            value
-        );
-
-    if (
-        Number.isNaN(
-            parsed.getTime()
-        )
-    ) {
-
-        return String(
-            value
-        );
-
-    }
-
-    const locale =
-        currentLanguage === "ar"
-            ? "ar"
-            : currentLanguage === "fr"
-                ? "fr-FR"
-                : "en-GB";
-
-    return parsed.toLocaleDateString(
-        locale
-    );
-
-}
-
-
-/* =================================
-   Receipt Print Styles
-   ================================= */
-
-function ensureReceiptPrintStyles() {
-
-    const existingStyles =
-        document.getElementById(
-            "bmpReceiptPrintStyles"
-        );
-
-    if (
-        existingStyles
-    ) {
-
-        return;
-
-    }
-
-    const style =
-        document.createElement(
-            "style"
-        );
-
-    style.id =
-        "bmpReceiptPrintStyles";
-
-    style.textContent = `
-
-        #bmpPrintReceipt {
-            display: none;
-        }
-
-
-        @media print {
-
-            @page {
-                size: auto;
-                margin: 8mm;
-            }
-
-
-            html,
-            body {
-                background: #ffffff !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-
-
-            /*
-             * Hide the complete webpage.
-             */
-
-            body * {
-                visibility: hidden !important;
-            }
-
-
-            /*
-             * Show ONLY the temporary
-             * payment receipt.
-             */
-
-            #bmpPrintReceipt,
-            #bmpPrintReceipt * {
-                visibility: visible !important;
-            }
-
-
-            /*
-             * 80mm thermal receipt.
-             */
-
-            #bmpPrintReceipt {
-
-                display: block !important;
-
-                position: absolute !important;
-
-                left: 50% !important;
-                top: 0 !important;
-
-                transform:
-                    translateX(-50%) !important;
-
-                width: 80mm !important;
-                max-width: 80mm !important;
-
-                margin: 0 !important;
-
-                padding: 4mm !important;
-
-                box-sizing:
-                    border-box !important;
-
-                background:
-                    #ffffff !important;
-
-                color:
-                    #000000 !important;
-
-                font-family:
-                    Arial,
-                    Helvetica,
-                    sans-serif !important;
-
-                font-size:
-                    11px !important;
-
-                line-height:
-                    1.45 !important;
-
-            }
-
-
-            /*
-             * Receipt title.
-             */
-
-            .bmp-receipt-header {
-                text-align:
-                    center !important;
-            }
-
-
-            .bmp-receipt-title {
-                font-size:
-                    16px !important;
-
-                font-weight:
-                    700 !important;
-
-                margin:
-                    0 !important;
-            }
-
-
-            /*
-             * Divider.
-             */
-
-            .bmp-receipt-divider {
-                border-top:
-                    1px dashed #000000 !important;
-
-                margin:
-                    8px 0 !important;
-            }
-
-
-            /*
-             * Receipt number.
-             */
-
-            .bmp-receipt-number {
-
-                display:
-                    flex !important;
-
-                justify-content:
-                    space-between !important;
-
-                align-items:
-                    flex-start !important;
-
-                gap:
-                    8px !important;
-
-                font-size:
-                    10px !important;
-
-            }
-
-
-            /*
-             * Student name label.
-             */
-
-            .bmp-receipt-section-title {
-
-                text-align:
-                    center !important;
-
-                font-size:
-                    9px !important;
-
-                font-weight:
-                    700 !important;
-
-                margin-bottom:
-                    3px !important;
-
-            }
-
-
-            /*
-             * Student name.
-             */
-
-            .bmp-receipt-main-name {
-
-                text-align:
-                    center !important;
-
-                font-size:
-                    15px !important;
-
-                font-weight:
-                    700 !important;
-
-                margin-bottom:
-                    6px !important;
-
-                word-break:
-                    break-word !important;
-
-            }
-
-
-            /*
-             * Information rows.
-             */
-
-            .bmp-receipt-row {
-
-                display:
-                    flex !important;
-
-                justify-content:
-                    space-between !important;
-
-                align-items:
-                    flex-start !important;
-
-                gap:
-                    8px !important;
-
-                padding:
-                    3px 0 !important;
-
-            }
-
-
-            .bmp-receipt-row span {
-
-                flex:
-                    0 0 auto !important;
-
-            }
-
-
-            .bmp-receipt-row strong {
-
-                text-align:
-                    right !important;
-
-                word-break:
-                    break-word !important;
-
-            }
-
-
-            /*
-             * RTL value alignment.
-             */
-
-            #bmpPrintReceipt[dir="rtl"]
-            .bmp-receipt-row strong {
-
-                text-align:
-                    left !important;
-
-            }
-
-
-            #bmpPrintReceipt[dir="rtl"]
-            .bmp-receipt-number strong {
-
-                text-align:
-                    left !important;
-
-            }
-
-
-            /*
-             * Amount.
-             */
-
-            .bmp-receipt-amount {
-
-                display:
-                    flex !important;
-
-                justify-content:
-                    space-between !important;
-
-                align-items:
-                    flex-start !important;
-
-                gap:
-                    8px !important;
-
-                border-top:
-                    1px solid #000000 !important;
-
-                border-bottom:
-                    1px solid #000000 !important;
-
-                margin:
-                    7px 0 !important;
-
-                padding:
-                    7px 0 !important;
-
-                font-size:
-                    13px !important;
-
-                font-weight:
-                    700 !important;
-
-            }
-
-
-            /*
-             * Notes.
-             */
-
-            .bmp-receipt-notes {
-
-                margin-top:
-                    7px !important;
-
-                padding-top:
-                    6px !important;
-
-                border-top:
-                    1px dashed #000000 !important;
-
-                word-break:
-                    break-word !important;
-
-            }
-
-
-            .bmp-receipt-notes strong {
-
-                display:
-                    block !important;
-
-                margin-bottom:
-                    3px !important;
-
-            }
-
-        }
-
-    `;
-
-    document.head.appendChild(
-        style
-    );
-
-}
-
-
-/* =================================
-   Print Payment Receipt
-   ================================= */
-
-async function printPaymentReceipt(
-    selectedPayment
-) {
+// =====================================================
+// Print payment receipt
+// =====================================================
+
+async function printPaymentReceipt(selectedPayment) {
 
     try {
 
-        ensureReceiptPrintStyles();
+        if (!selectedPayment) throw new Error("Payment not found.");
 
-
-        if (
-            !selectedPayment
-        ) {
-
-            throw new Error(
-                "Payment not found."
-            );
-
-        }
-
-
-        /*
-         * Keep the exact payment that
-         * the user selected.
-         */
-
-        let payment = {
-            ...selectedPayment
-        };
-
-
-        let student =
-            findStudentForPayment(
-                selectedPayment
-            );
-
-
-        /*
-         * Institution is used ONLY for
-         * currency. No school information
-         * is printed.
-         */
-
+        let payment = Object.assign({}, selectedPayment);
+        let student = findStudentForPayment(selectedPayment);
         let institution = {};
 
+        const selectedPaymentId = getPaymentId(selectedPayment);
 
-        const selectedPaymentId =
-            getPaymentId(
-                selectedPayment
-            );
-
-
-        /*
-         * Get the complete selected receipt
-         * from the backend when possible.
-         */
-
-        if (
-            selectedPaymentId
-        ) {
-
+        if (selectedPaymentId) {
             try {
+                const receiptResult = await apiRequest("getReceipt", { paymentId: selectedPaymentId });
 
-                const receiptResult =
-                    await apiRequest(
-                        "getReceipt",
-                        {
-                            paymentId:
-                                selectedPaymentId
-                        }
-                    );
-
-
-                /*
-                 * Merge instead of replacing.
-                 * This prevents missing fields
-                 * when getReceipt returns partial
-                 * information.
-                 */
-
-                if (
-                    receiptResult.payment
-                ) {
-
-                    payment = {
-
-                        ...selectedPayment,
-
-                        ...receiptResult.payment
-
-                    };
-
+                if (receiptResult.payment) {
+                    payment = Object.assign({}, selectedPayment, receiptResult.payment);
                 }
-
-
-                if (
-                    receiptResult.student
-                ) {
-
-                    student = {
-
-                        ...(student || {}),
-
-                        ...receiptResult.student
-
-                    };
-
+                if (receiptResult.student) {
+                    student = Object.assign({}, student || {}, receiptResult.student);
                 }
-
-
-                if (
-                    receiptResult.institution
-                ) {
-
-                    institution =
-                        receiptResult.institution;
-
+                if (receiptResult.institution) {
+                    institution = receiptResult.institution;
                 }
-
             } catch (error) {
-
-                console.warn(
-                    "getReceipt failed. Using selected payment data:",
-                    error
-                );
-
+                console.warn("getReceipt failed. Using selected payment data:", error);
             }
-
         }
 
-
-        /*
-         * Currency only.
-         *
-         * No school name, logo, phone,
-         * address, email or Institution ID
-         * is included in the receipt.
-         */
-
-        const currency =
-            institution.currency ||
-            payment.currency ||
-            "MRU";
-
-
-        /*
-         * Student information.
-         */
+        const currency = institution.currency || payment.currency || "MRU";
 
         const studentName =
-            getPaymentStudentName(
-                payment
-            ) ||
-            student?.name ||
-            student?.studentName ||
+            getPaymentStudentName(payment) ||
+            (student && (student.name || student.studentName)) ||
             "-";
-
-
         const studentNumber =
-            getPaymentStudentNumber(
-                payment
-            ) ||
-            student?.studentNumber ||
+            getPaymentStudentNumber(payment) ||
+            (student && student.studentNumber) ||
             "-";
-
-
-        const academicYear =
-            getPaymentAcademicYear(
-                payment
-            ) ||
-            "-";
-
-
-        const stageName =
-            formatStage(
-                getStageForPayment(
-                    payment
-                )
-            );
-
-
+        const academicYear = getPaymentAcademicYear(payment) || "-";
+        const stageName = formatStage(getStageForPayment(payment));
         const className =
-            student?.className ||
-            student?.class ||
-            student?.classNumber ||
-            student?.class_name ||
+            (student && (student.className || student.class || student.classNumber || student.class_name)) ||
             payment.className ||
             payment.class ||
             "-";
-
-
-        const paidMonth =
-            formatMonth(
-                getPaymentMonth(
-                    payment
-                )
-            );
-
-
-        const paymentAmount =
-            getPaymentAmount(
-                payment
-            );
-
-
-        const paidDate =
-            getPaymentDate(
-                payment
-            ) ||
-            "-";
-
-
-        const receiptNumber =
-            getReceiptNumber(
-                payment
-            ) ||
-            "-";
-
-
-        const recordedBy =
-            getRecordedBy(
-                payment
-            ) ||
-            "-";
-
-
-        const notes =
-            String(
-                payment.notes ||
-                ""
-            ).trim();
-
-
-        /*
-         * Remove any old receipt.
-         */
-
-        const oldPrintReceipt =
-            document.getElementById(
-                "bmpPrintReceipt"
-            );
-
-        if (
-            oldPrintReceipt
-        ) {
-
-            oldPrintReceipt.remove();
-
-        }
-
-
-        /*
-         * Create the print-only receipt.
-         */
-
-        const printArea =
-            document.createElement(
-                "div"
-            );
-
-        printArea.id =
-            "bmpPrintReceipt";
-
-        printArea.dir =
-            currentLanguage === "ar"
-                ? "rtl"
-                : "ltr";
-
-
-        /*
-         * IMPORTANT:
-         *
-         * ONLY selected payment information
-         * is printed.
-         *
-         * No school information.
-         */
-
-        printArea.innerHTML = `
-
-            <div class="bmp-receipt-header">
-
-                <div class="bmp-receipt-title">
-
-                    ${escapeHtml(
-                        getReceiptTitle()
-                    )}
-
-                </div>
-
-            </div>
-
-
-            <div class="bmp-receipt-divider"></div>
-
-
-            <div class="bmp-receipt-number">
-
-                <span>
-                    ${escapeHtml(
-                        t("receiptNumber")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        receiptNumber
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="bmp-receipt-divider"></div>
-
-
-            <div class="bmp-receipt-section-title">
-
-                ${escapeHtml(
-                    t("studentName")
-                )}
-
-            </div>
-
-
-            <div class="bmp-receipt-main-name">
-
-                ${escapeHtml(
-                    studentName
-                )}
-
-            </div>
-
-
-            <div class="bmp-receipt-row">
-
-                <span>
-                    ${escapeHtml(
-                        t("studentNumber")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        studentNumber
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="bmp-receipt-row">
-
-                <span>
-                    ${escapeHtml(
-                        t("academicYear")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        academicYear
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="bmp-receipt-row">
-
-                <span>
-                    ${escapeHtml(
-                        t("stage")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        stageName
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="bmp-receipt-row">
-
-                <span>
-                    ${escapeHtml(
-                        t("class")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        className
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="bmp-receipt-divider"></div>
-
-
-            <div class="bmp-receipt-row">
-
-                <span>
-                    ${escapeHtml(
-                        t("month")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        paidMonth
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="bmp-receipt-amount">
-
-                <span>
-                    ${escapeHtml(
-                        t("amount")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        paymentAmount.toLocaleString(
-                            currentLanguage === "ar"
-                                ? "ar"
-                                : currentLanguage === "fr"
-                                    ? "fr-FR"
-                                    : "en-US"
-                        )
-                    )}
-                    ${escapeHtml(
-                        currency
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="bmp-receipt-row">
-
-                <span>
-                    ${escapeHtml(
-                        t("paymentDate")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        formatReceiptDate(
-                            paidDate
-                        )
-                    )}
-                </strong>
-
-            </div>
-
-
-            <div class="bmp-receipt-row">
-
-                <span>
-                    ${escapeHtml(
-                        t("recordedBy")
-                    )}
-                </span>
-
-                <strong>
-                    ${escapeHtml(
-                        recordedBy
-                    )}
-                </strong>
-
-            </div>
-
-
-            ${
-                notes
-                    ? `
-                    <div class="bmp-receipt-notes">
-
-                        <strong>
-                            ${escapeHtml(
-                                t("notes")
-                            )}
-                        </strong>
-
-                        <div>
-                            ${escapeHtml(
-                                notes
-                            )}
-                        </div>
-
-                    </div>
-                    `
-                    : ""
-            }
-
-        `;
-
-
-        document.body.appendChild(
-            printArea
-        );
-
-
-        /*
-         * Close the payment details modal
-         * before printing.
-         */
-
+        const paidMonth = formatMonth(getPaymentMonth(payment));
+        const paymentAmount = getPaymentAmount(payment);
+        const paidDate = getPaymentDate(payment) || "-";
+        const receiptNumber = getReceiptNumber(payment) || "-";
+        const recordedBy = getRecordedBy(payment) || "-";
+        const notes = String(payment.notes || "").trim();
+
+        const oldPrintReceipt = document.getElementById("bmpPrintReceipt");
+        if (oldPrintReceipt) oldPrintReceipt.remove();
+
+        const printArea = document.createElement("div");
+        printArea.id = "bmpPrintReceipt";
+        printArea.dir = currentLanguage === "ar" ? "rtl" : "ltr";
+
+        printArea.innerHTML =
+            '<div class="bmp-receipt-header">' +
+                '<div class="bmp-receipt-title">' + escapeHtml(getReceiptTitle()) + '</div>' +
+            '</div>' +
+            '<div class="bmp-receipt-divider"></div>' +
+            '<div class="bmp-receipt-number">' +
+                '<span>' + escapeHtml(t("receiptNumber")) + '</span>' +
+                '<strong>' + escapeHtml(receiptNumber) + '</strong>' +
+            '</div>' +
+            '<div class="bmp-receipt-divider"></div>' +
+            '<div class="bmp-receipt-section-title">' + escapeHtml(t("studentName")) + '</div>' +
+            '<div class="bmp-receipt-main-name">' + escapeHtml(studentName) + '</div>' +
+            '<div class="bmp-receipt-row"><span>' + escapeHtml(t("studentNumber")) + '</span><strong>' + escapeHtml(studentNumber) + '</strong></div>' +
+            '<div class="bmp-receipt-row"><span>' + escapeHtml(t("academicYear")) + '</span><strong>' + escapeHtml(academicYear) + '</strong></div>' +
+            '<div class="bmp-receipt-row"><span>' + escapeHtml(t("stage")) + '</span><strong>' + escapeHtml(stageName) + '</strong></div>' +
+            '<div class="bmp-receipt-row"><span>' + escapeHtml(t("class")) + '</span><strong>' + escapeHtml(className) + '</strong></div>' +
+            '<div class="bmp-receipt-divider"></div>' +
+            '<div class="bmp-receipt-row"><span>' + escapeHtml(t("month")) + '</span><strong>' + escapeHtml(paidMonth) + '</strong></div>' +
+            '<div class="bmp-receipt-amount">' +
+                '<span>' + escapeHtml(t("amount")) + '</span>' +
+                '<strong>' + escapeHtml(paymentAmount.toLocaleString(currentLanguage === "ar" ? "ar" : currentLanguage === "fr" ? "fr-FR" : "en-US")) + ' ' + escapeHtml(currency) + '</strong>' +
+            '</div>' +
+            '<div class="bmp-receipt-row"><span>' + escapeHtml(t("paymentDate")) + '</span><strong>' + escapeHtml(formatReceiptDate(paidDate)) + '</strong></div>' +
+            '<div class="bmp-receipt-row"><span>' + escapeHtml(t("recordedBy")) + '</span><strong>' + escapeHtml(recordedBy) + '</strong></div>' +
+            (notes
+                ? '<div class="bmp-receipt-notes"><strong>' + escapeHtml(t("notes")) + '</strong><div>' + escapeHtml(notes) + '</div></div>'
+                : "");
+
+        document.body.appendChild(printArea);
         closePaymentDetails();
 
+        window.addEventListener("afterprint", function cleanup() {
+            const r = document.getElementById("bmpPrintReceipt");
+            if (r) r.remove();
+        }, { once: true });
 
-        /*
-         * Clean up after printing.
-         */
-
-        const cleanup =
-            function () {
-
-                const currentPrintReceipt =
-                    document.getElementById(
-                        "bmpPrintReceipt"
-                    );
-
-                if (
-                    currentPrintReceipt
-                ) {
-
-                    currentPrintReceipt.remove();
-
-                }
-
-            };
-
-
-        window.addEventListener(
-            "afterprint",
-            cleanup,
-            {
-                once:
-                    true
-            }
-        );
-
-
-        /*
-         * Small delay so the browser has
-         * time to render the receipt.
-         */
-
-        await new Promise(
-            resolve =>
-                setTimeout(
-                    resolve,
-                    150
-                )
-        );
-
+        await new Promise(function (resolve) { setTimeout(resolve, 150); });
 
         window.print();
 
+    } catch (error) {
+        console.error("Receipt printing error:", error);
+        alert(error.message || "Failed to prepare receipt.");
     }
-
-    catch (error) {
-
-        console.error(
-            "Receipt printing error:",
-            error
-        );
-
-        alert(
-            error.message ||
-            "Failed to prepare receipt."
-        );
-
-    }
-
 }
 
 
-/* =================================
-   Navigation
-   ================================= */
-
-function getNavigationInstitutionId() {
-
-    if (
-        institutionId
-    ) {
-
-        return institutionId;
-
-    }
-
-    if (
-        currentUser &&
-        currentUser.institutionId
-    ) {
-
-        return String(
-            currentUser.institutionId
-        );
-
-    }
-
-    const params =
-        new URLSearchParams(
-            window.location.search
-        );
-
-    return (
-        params.get(
-            "institutionId"
-        ) ||
-        params.get(
-            "id"
-        ) ||
-        ""
-    );
-
-}
-
+// =====================================================
+// Navigation
+// =====================================================
 
 function goBack() {
-
-    const id =
-        getNavigationInstitutionId();
-
-    if (id) {
-
-        window.location.href =
-            "school.html?id=" +
-            encodeURIComponent(
-                id
-            );
-
+    if (institutionId) {
+        window.location.href = "school.html?id=" + encodeURIComponent(institutionId);
     } else {
-
-        window.location.href =
-            "school.html";
-
+        window.location.href = "school.html";
     }
-
 }
-
 
 function goToRecordPayment() {
-
-    const id =
-        getNavigationInstitutionId();
-
-    if (id) {
-
-        window.location.href =
-            "school-record-payment.html?id=" +
-            encodeURIComponent(
-                id
-            );
-
+    if (institutionId) {
+        window.location.href = "school-record-payment.html?id=" + encodeURIComponent(institutionId);
     } else {
-
-        window.location.href =
-            "school-record-payment.html";
-
+        window.location.href = "school-record-payment.html";
     }
-
 }
 
 
-/* =================================
-   Event Listeners
-   ================================= */
+// =====================================================
+// Event listeners
+// =====================================================
 
 function setupEventListeners() {
 
-    const backButton =
-        document.getElementById(
-            "backButton"
-        );
+    document.getElementById("backButton")?.addEventListener("click", goBack);
+    document.getElementById("recordPaymentPageBtn")?.addEventListener("click", goToRecordPayment);
+    document.getElementById("applyFiltersBtn")?.addEventListener("click", applyFilters);
+    document.getElementById("resetFiltersBtn")?.addEventListener("click", resetFilters);
+    document.getElementById("retryBtn")?.addEventListener("click", initializePage);
 
-    const recordPaymentButton =
-        document.getElementById(
-            "recordPaymentPageBtn"
-        );
-
-    const applyFiltersButton =
-        document.getElementById(
-            "applyFiltersBtn"
-        );
-
-    const resetFiltersButton =
-        document.getElementById(
-            "resetFiltersBtn"
-        );
-
-    const retryButton =
-        document.getElementById(
-            "retryBtn"
-        );
-
-    const searchInput =
-        document.getElementById(
-            "studentSearch"
-        );
-
-    const academicYear =
-        document.getElementById(
-            "academicYear"
-        );
-
-    const paymentMonth =
-        document.getElementById(
-            "paymentMonth"
-        );
-
-    const stageFilter =
-        document.getElementById(
-            "stageFilter"
-        );
-
-    const modalCloseButton =
-        document.getElementById(
-            "paymentDetailsCloseBtn"
-        );
-
-    const modalOverlay =
-        document.getElementById(
-            "paymentDetailsOverlay"
-        );
-
-    if (backButton) {
-
-        backButton.addEventListener(
-            "click",
-            goBack
-        );
-
-    }
-
-    if (
-        recordPaymentButton
-    ) {
-
-        recordPaymentButton.addEventListener(
-            "click",
-            goToRecordPayment
-        );
-
-    }
-
-    if (
-        applyFiltersButton
-    ) {
-
-        applyFiltersButton.addEventListener(
-            "click",
-            applyFilters
-        );
-
-    }
-
-    if (
-        resetFiltersButton
-    ) {
-
-        resetFiltersButton.addEventListener(
-            "click",
-            resetFilters
-        );
-
-    }
-
-    if (
-        retryButton
-    ) {
-
-        retryButton.addEventListener(
-            "click",
-            initializePage
-        );
-
-    }
-
-    if (
-        searchInput
-    ) {
-
-        searchInput.addEventListener(
-            "keydown",
-            event => {
-
-                if (
-                    event.key ===
-                    "Enter"
-                ) {
-
-                    event.preventDefault();
-
-                    applyFilters();
-
-                }
-
+    const searchInput = document.getElementById("studentSearch");
+    if (searchInput) {
+        searchInput.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                applyFilters();
             }
-        );
-
+        });
     }
 
-    if (
-        academicYear
-    ) {
+    document.getElementById("academicYear")?.addEventListener("change", applyFilters);
+    document.getElementById("paymentMonth")?.addEventListener("change", applyFilters);
+    document.getElementById("stageFilter")?.addEventListener("change", applyFilters);
 
-        academicYear.addEventListener(
-            "change",
-            applyFilters
-        );
+    document.getElementById("paymentDetailsCloseBtn")?.addEventListener("click", closePaymentDetails);
+    document.getElementById("paymentDetailsOverlay")?.addEventListener("click", closePaymentDetails);
 
-    }
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") closePaymentDetails();
+    });
 
-    if (
-        paymentMonth
-    ) {
-
-        paymentMonth.addEventListener(
-            "change",
-            applyFilters
-        );
-
-    }
-
-    if (
-        stageFilter
-    ) {
-
-        stageFilter.addEventListener(
-            "change",
-            applyFilters
-        );
-
-    }
-
-    if (
-        modalCloseButton
-    ) {
-
-        modalCloseButton.addEventListener(
-            "click",
-            closePaymentDetails
-        );
-
-    }
-
-    if (
-        modalOverlay
-    ) {
-
-        modalOverlay.addEventListener(
-            "click",
-            closePaymentDetails
-        );
-
-    }
-
-    document.addEventListener(
-        "keydown",
-        event => {
-
-            if (
-                event.key ===
-                "Escape"
-            ) {
-
-                closePaymentDetails();
-
-            }
-
-        }
-    );
-
+    document.querySelectorAll(".lang-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            currentLanguage = btn.dataset.lang || "ar";
+            localStorage.setItem("bmpLanguage", currentLanguage);
+            applyLanguage();
+        });
+    });
 }
 
 
-/* =================================
-   Language Initialization
-   ================================= */
+// =====================================================
+// Language initialization
+// =====================================================
 
 function initializeLanguage() {
-
-    currentLanguage =
-        getSavedLanguage();
-
-    ensureLanguageSelector();
-
+    const saved = localStorage.getItem("bmpLanguage");
+    currentLanguage = (saved && TRANSLATIONS[saved]) ? saved : "ar";
     applyLanguage();
-
-    window.addEventListener(
-        "bmpLanguageChanged",
-        event => {
-
-            const language =
-                event.detail?.language;
-
-            if (
-                language
-            ) {
-
-                setLanguage(
-                    language
-                );
-
-            }
-
-        }
-    );
-
 }
 
 
-/* =================================
-   Initialize
-   ================================= */
+// =====================================================
+// Initialize
+// =====================================================
 
 async function initializePage() {
 
-    if (
-        pageInitialized &&
-        paymentsLoaded
-    ) {
-
-        return;
-
-    }
-
-    pageInitialized =
-        true;
-
     hideError();
+    showLoader();
 
-    const authenticated =
-        initializeAuthentication();
-
+    const authenticated = initializeAuthentication();
     if (!authenticated) {
-
-        showError(
-            t(
-                "errors.authentication"
-            )
-        );
-
+        hideLoaderAfterPaint();
+        showError(t("errors.authentication"));
         return;
-
     }
 
-    console.log(
-        "Institution ID:",
-        institutionId
-    );
+    // 1) Instant paint from cache
+    const hadPaymentsCache = loadPaymentsFromCache();
+    const hadStudentsCache = loadStudentsFromCache();
 
-    const paymentsResult =
-        await loadPayments();
-
-    await loadStudents();
-
-    loadAcademicYears();
-
-    applyLanguage();
-
-    if (
-        paymentsResult
-    ) {
-
+    if (hadPaymentsCache) {
+        loadAcademicYears();
+        applyLanguage();
         applyFilters();
-
+        hideLoaderAfterPaint();
     }
 
+    // 2) Parallel network refresh
+    try {
+        await Promise.all([
+            loadPayments(),
+            loadStudents()
+        ]);
+
+        loadAcademicYears();
+        applyLanguage();
+        applyFilters();
+        hideLoading();
+
+        if (!hadPaymentsCache) {
+            hideLoaderAfterPaint();
+        }
+
+    } catch (error) {
+        console.error("Failed to load:", error);
+        hideLoading();
+
+        if (!hadPaymentsCache) {
+            allPayments = [];
+            renderPayments([]);
+            updateSummary([]);
+            showError(error.message || t("errors.failedPayments"));
+            hideLoaderAfterPaint();
+        }
+    }
+
+    pageInitialized = true;
 }
 
 
-/* =================================
-   Start
-   ================================= */
+// =====================================================
+// Start
+// =====================================================
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        initializeLanguage();
-
-        setupEventListeners();
-
-        initializePage();
-
-    }
-);
+document.addEventListener("DOMContentLoaded", function () {
+    initializeLanguage();
+    setupEventListeners();
+    initializePage();
+});
