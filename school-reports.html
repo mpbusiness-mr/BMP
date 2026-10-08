@@ -1,295 +1,173 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>School Reports - BMP</title>
+    <title>BMP · تقارير المدرسة | School Reports</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <link rel="stylesheet" href="school-reports.css">
 </head>
 
-<body>
+<body class="lang-ar">
+
+    <div class="bg-blob bg-blob-1" aria-hidden="true"></div>
+    <div class="bg-blob bg-blob-2" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <div class="page-loader" id="pageLoader" aria-hidden="true">
+        <div class="loader-spinner"></div>
+        <span class="loader-text" data-i18n="loading">Loading...</span>
+    </div>
 
     <div class="page-container">
 
-        <!-- Header -->
         <header class="page-header">
 
-            <div>
-                <h1>
-                    School Reports
-                </h1>
-
-                <p>
-                    View school statistics and payment reports.
-                </p>
-            </div>
-
-            <button
-                id="backButton"
-                class="btn btn-secondary">
-                Back
-            </button>
-
-        </header>
-
-
-        <!-- School Information -->
-        <section class="school-summary">
-
-            <div class="summary-item">
-
-                <span class="summary-label">
-                    Institution ID
-                </span>
-
-                <strong id="institutionId">
-                    -
-                </strong>
-
-            </div>
-
-
-            <div class="summary-item">
-
-                <span class="summary-label">
-                    School Name
-                </span>
-
-                <strong id="institutionName">
-                    -
-                </strong>
-
-            </div>
-
-
-            <div class="summary-item">
-
-                <span class="summary-label">
-                    Academic Year
-                </span>
-
-                <select id="academicYearFilter">
-                    <option value="">
-                        All Academic Years
-                    </option>
-                </select>
-
-            </div>
-
-        </section>
-
-
-        <!-- Report Summary -->
-        <main class="reports-grid">
-
-            <!-- Students -->
-            <div class="report-card">
-
-                <span class="report-label">
-                    Total Students
-                </span>
-
-                <strong
-                    id="totalStudents"
-                    class="report-value">
-                    0
-                </strong>
-
-            </div>
-
-
-            <!-- Payments -->
-            <div class="report-card">
-
-                <span class="report-label">
-                    Total Payments
-                </span>
-
-                <strong
-                    id="totalPayments"
-                    class="report-value">
-                    0
-                </strong>
-
-            </div>
-
-
-            <!-- Amount -->
-            <div class="report-card">
-
-                <span class="report-label">
-                    Total Amount Paid
-                </span>
-
-                <strong
-                    id="totalAmount"
-                    class="report-value">
-                    0
-                </strong>
-
-            </div>
-
-
-            <!-- Paid Students -->
-            <div class="report-card">
-
-                <span class="report-label">
-                    Students With Payments
-                </span>
-
-                <strong
-                    id="paidStudents"
-                    class="report-value">
-                    0
-                </strong>
-
-            </div>
-
-
-            <!-- Unpaid Students -->
-            <div class="report-card">
-
-                <span class="report-label">
-                    Students Without Payments
-                </span>
-
-                <strong
-                    id="unpaidStudents"
-                    class="report-value">
-                    0
-                </strong>
-
-            </div>
-
-
-            <!-- Paid Months -->
-            <div class="report-card">
-
-                <span class="report-label">
-                    Paid Months
-                </span>
-
-                <strong
-                    id="paidMonths"
-                    class="report-value">
-                    0
-                </strong>
-
-            </div>
-
-        </main>
-
-
-        <!-- Payment Report -->
-        <section class="report-section">
-
-            <div class="section-header">
-
+            <div class="header-brand">
+                <a href="school.html" class="topbar-logo">
+                    <i class="fas fa-cubes"></i> BMP
+                </a>
                 <div>
-                    <h2>
-                        Payment Report
-                    </h2>
+                    <h1 data-i18n="pageTitle">School Reports</h1>
+                    <p data-i18n="pageSubtitle">View school statistics and payment reports.</p>
+                </div>
+            </div>
 
-                    <p>
-                        Monthly payment activity for the selected academic year.
-                    </p>
+            <div class="header-actions">
+
+                <div class="lang-switcher" role="group" aria-label="Language">
+                    <button type="button" class="lang-btn active" data-lang="ar">عربية</button>
+                    <button type="button" class="lang-btn"        data-lang="fr">Français</button>
+                    <button type="button" class="lang-btn"        data-lang="en">English</button>
                 </div>
 
-                <button
-                    id="printButton"
-                    class="btn btn-primary">
-                    Print / Save PDF
+                <button id="backButton" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i>
+                    <span data-i18n="back">Back</span>
                 </button>
 
             </div>
 
+        </header>
 
-            <div class="table-container">
+        <section class="school-summary">
 
-                <table>
+            <div class="summary-item">
+                <span class="summary-label" data-i18n="institutionId">Institution ID</span>
+                <strong id="institutionId">-</strong>
+            </div>
 
-                    <thead>
+            <div class="summary-item">
+                <span class="summary-label" data-i18n="schoolName">School Name</span>
+                <strong id="institutionName">-</strong>
+            </div>
 
-                        <tr>
-                            <th>Month</th>
-                            <th>Payments</th>
-                            <th>Students</th>
-                            <th>Total Amount</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="paymentReportBody">
-
-                        <tr>
-                            <td
-                                colspan="4"
-                                class="empty-state">
-                                No payment data available.
-                            </td>
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
+            <div class="summary-item">
+                <span class="summary-label" data-i18n="academicYear">Academic Year</span>
+                <select id="academicYearFilter"></select>
             </div>
 
         </section>
 
+        <main class="reports-grid">
 
-        <!-- Student Report -->
+            <div class="report-card">
+                <span class="report-label" data-i18n="totalStudents">Total Students</span>
+                <strong id="totalStudents" class="report-value">0</strong>
+            </div>
+
+            <div class="report-card">
+                <span class="report-label" data-i18n="totalPayments">Total Payments</span>
+                <strong id="totalPayments" class="report-value">0</strong>
+            </div>
+
+            <div class="report-card">
+                <span class="report-label" data-i18n="totalAmountPaid">Total Amount Paid</span>
+                <strong id="totalAmount" class="report-value">0</strong>
+            </div>
+
+            <div class="report-card">
+                <span class="report-label" data-i18n="studentsWithPayments">Students With Payments</span>
+                <strong id="paidStudents" class="report-value">0</strong>
+            </div>
+
+            <div class="report-card">
+                <span class="report-label" data-i18n="studentsWithoutPayments">Students Without Payments</span>
+                <strong id="unpaidStudents" class="report-value">0</strong>
+            </div>
+
+            <div class="report-card">
+                <span class="report-label" data-i18n="paidMonths">Paid Months</span>
+                <strong id="paidMonths" class="report-value">0</strong>
+            </div>
+
+        </main>
+
         <section class="report-section">
 
             <div class="section-header">
-
                 <div>
-                    <h2>
-                        Student Report
-                    </h2>
-
-                    <p>
-                        Student payment status for the selected academic year.
-                    </p>
+                    <h2 data-i18n="paymentReport">Payment Report</h2>
+                    <p data-i18n="paymentReportSubtitle">Monthly payment activity for the selected academic year.</p>
                 </div>
 
+                <button id="printButton" class="btn btn-primary">
+                    <i class="fas fa-print"></i>
+                    <span data-i18n="printSave">Print / Save PDF</span>
+                </button>
             </div>
 
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-i18n="month">Month</th>
+                            <th data-i18n="payments">Payments</th>
+                            <th data-i18n="students">Students</th>
+                            <th data-i18n="totalAmount">Total Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentReportBody">
+                        <tr><td colspan="4" class="empty-state" data-i18n="loadingReports">Loading reports...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <section class="report-section">
+
+            <div class="section-header">
+                <div>
+                    <h2 data-i18n="studentReport">Student Report</h2>
+                    <p data-i18n="studentReportSubtitle">Student payment status for the selected academic year.</p>
+                </div>
+            </div>
 
             <div class="table-container">
-
                 <table>
-
                     <thead>
-
                         <tr>
-                            <th>Student Number</th>
-                            <th>Student Name</th>
-                            <th>Stage</th>
-                            <th>Class</th>
-                            <th>Paid Months</th>
-                            <th>Total Paid</th>
+                            <th data-i18n="studentNumber">Student Number</th>
+                            <th data-i18n="studentName">Student Name</th>
+                            <th data-i18n="stage">Stage</th>
+                            <th data-i18n="class">Class</th>
+                            <th data-i18n="paidMonthsColumn">Paid Months</th>
+                            <th data-i18n="totalPaid">Total Paid</th>
                         </tr>
-
                     </thead>
-
                     <tbody id="studentReportBody">
-
-                        <tr>
-                            <td
-                                colspan="6"
-                                class="empty-state">
-                                No students available.
-                            </td>
-                        </tr>
-
+                        <tr><td colspan="6" class="empty-state" data-i18n="loadingReports">Loading reports...</td></tr>
                     </tbody>
-
                 </table>
-
             </div>
 
         </section>
