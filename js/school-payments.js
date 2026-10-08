@@ -420,7 +420,6 @@ async function apiRequest(action, data, attempt) {
     } catch (error) {
         clearTimeout(timeoutId);
 
-        // Network error or timeout → retry once
         if (attempt < 2) {
             await new Promise(function (r) { setTimeout(r, 800); });
             return apiRequest(action, data, attempt + 1);
@@ -435,7 +434,6 @@ async function apiRequest(action, data, attempt) {
     const responseText = await response.text();
 
     if (!response.ok) {
-        // Server error → retry once on 5xx only
         if (attempt < 2 && response.status >= 500) {
             await new Promise(function (r) { setTimeout(r, 800); });
             return apiRequest(action, data, attempt + 1);
@@ -513,7 +511,6 @@ function initializeAuthentication() {
 
     if (!institutionId) return false;
 
-    // Optional URL hint check — if mismatch, redirect
     const urlParams = new URLSearchParams(window.location.search);
     const urlId = urlParams.get("id") || urlParams.get("institutionId");
     if (urlId && urlId !== institutionId) {
@@ -539,14 +536,19 @@ function getCurrentUsername() {
 
 
 // =====================================================
-// Current academic year
+// Current academic year — YYYY-YY format (matches your data)
 // =====================================================
 
 function getCurrentAcademicYear() {
     const now = new Date();
-    let year = now.getFullYear();
-    if (now.getMonth() < 9) year--;
-    return year + "-" + (year + 1);
+    let startYear = now.getFullYear();
+
+    // Academic year starts in October (month index 9)
+    if (now.getMonth() < 9) {
+        startYear--;
+    }
+
+    return startYear + "-" + String(startYear + 1).slice(-2);
 }
 
 
