@@ -1,99 +1,57 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <title>BMP · تسجيل دفعة مدرسية | Record Payment</title>
 
-    <title>Record School Payment - BMP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link
-        rel="stylesheet"
-        href="school-record-payment.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <style>
-        button,
-        select,
-        input,
-        textarea {
-            pointer-events: auto !important;
-        }
-
-        .page-header,
-        .card,
-        .form-actions,
-        .message {
-            position: relative;
-            z-index: 10;
-        }
-
-        .student-search-row {
-            display: flex;
-            gap: 10px;
-            align-items: flex-end;
-        }
-
-        .student-search-input {
-            flex: 1;
-        }
-
-        .student-search-button {
-            min-width: 100px;
-        }
-
-        .student-result {
-            margin-top: 12px;
-            padding: 12px 14px;
-            border-radius: 8px;
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            color: #166534;
-            font-size: 14px;
-            display: none;
-        }
-
-        .student-result.error {
-            background: #fef2f2;
-            border-color: #fecaca;
-            color: #b91c1c;
-        }
-
-        @media (max-width: 700px) {
-            .student-search-row {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .student-search-button {
-                width: 100%;
-            }
-        }
-    </style>
-
+    <link rel="stylesheet" href="school-record-payment.css">
 </head>
 
-<body>
+<body class="lang-ar">
+
+    <div class="bg-blob bg-blob-1" aria-hidden="true"></div>
+    <div class="bg-blob bg-blob-2" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <div class="page-loader" id="pageLoader" aria-hidden="true">
+        <div class="loader-spinner"></div>
+        <span class="loader-text" data-i18n="loading">Loading...</span>
+    </div>
 
     <div class="page-container">
 
         <header class="page-header">
 
-            <div>
-                <h1>Record School Payment</h1>
-                <p>Register a monthly student payment</p>
+            <div class="header-brand">
+                <a href="school.html" class="topbar-logo">
+                    <i class="fas fa-cubes"></i> BMP
+                </a>
+                <div>
+                    <h1 id="pageTitle" data-i18n="pageTitle">Record School Payment</h1>
+                    <p id="pageSubtitle" data-i18n="pageSubtitle">Register a monthly student payment</p>
+                </div>
             </div>
 
             <div class="header-actions">
 
-                <button
-                    type="button"
-                    id="backButton"
-                    class="btn btn-secondary">
-                    Back
+                <div class="lang-switcher" role="group" aria-label="Language">
+                    <button type="button" class="lang-btn active" data-lang="ar">عربية</button>
+                    <button type="button" class="lang-btn"        data-lang="fr">Français</button>
+                    <button type="button" class="lang-btn"        data-lang="en">English</button>
+                </div>
+
+                <button type="button" id="backButton" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right"></i>
+                    <span data-i18n="back">Back</span>
                 </button>
 
             </div>
@@ -101,177 +59,98 @@
         </header>
 
 
+        <!-- School Information -->
         <section class="card">
-
-            <h2>School Information</h2>
+            <h2 data-i18n="schoolInformation">School Information</h2>
 
             <div class="info-grid">
-
                 <div class="info-item">
-
-                    <span>Institution ID</span>
-
-                    <strong id="institutionId">
-                        -
-                    </strong>
-
+                    <span data-i18n="institutionId">Institution ID</span>
+                    <strong id="institutionId">-</strong>
                 </div>
-
                 <div class="info-item">
-
-                    <span>School Name</span>
-
-                    <strong id="institutionName">
-                        -
-                    </strong>
-
+                    <span data-i18n="schoolName">School Name</span>
+                    <strong id="institutionName">-</strong>
                 </div>
-
             </div>
-
         </section>
 
 
+        <!-- Payment Information -->
         <section class="card">
 
-            <h2>Payment Information</h2>
+            <h2 data-i18n="paymentInformation">Payment Information</h2>
 
-            <form
-                id="paymentForm"
-                novalidate>
+            <form id="paymentForm" novalidate>
 
                 <div class="form-grid">
 
+                    <!-- Academic Year -->
                     <div class="form-group">
-
-                        <label for="academicYear">
-                            Academic Year
-                        </label>
-
-                        <select
-                            id="academicYear"
-                            required>
-
-                            <option value="">
-                                Select Academic Year
-                            </option>
-
+                        <label for="academicYear" data-i18n="academicYear">Academic Year</label>
+                        <select id="academicYear" required>
+                            <option value="" data-i18n="selectAcademicYear">Select Academic Year</option>
                         </select>
-
+                        <span class="field-error" data-error-for="academicYear"></span>
                     </div>
 
-
+                    <!-- Student Number Search (auto-filter) -->
                     <div class="form-group">
+                        <label for="studentNumberSearch" data-i18n="searchByStudentNumber">
+                            Search by Student Number
+                        </label>
 
-                        <label for="studentNumberSearch">
+                        <input type="text" id="studentNumberSearch"
+                               class="student-search-input"
+                               placeholder="Enter student number"
+                               data-i18n-placeholder="enterStudentNumber"
+                               autocomplete="off">
+
+                        <div id="studentSearchResult" class="student-result"></div>
+                        <span class="field-error" data-error-for="studentNumberSearch"></span>
+                    </div>
+
+                    <!-- Student Name -->
+                    <div class="form-group">
+                        <label for="studentName" data-i18n="studentName">Student Name</label>
+                        <input type="text" id="studentName" readonly
+                               placeholder="Search for a student"
+                               data-i18n-placeholder="searchForStudent">
+                    </div>
+
+                    <input type="hidden" id="studentId">
+
+                    <!-- Student Number (display) -->
+                    <div class="form-group">
+                        <label for="studentNumber" data-i18n="studentNumberDisplay">
                             Student Number
                         </label>
-
-                        <div class="student-search-row">
-
-                            <input
-                                type="text"
-                                id="studentNumberSearch"
-                                class="student-search-input"
-                                placeholder="Enter student number"
-                                autocomplete="off">
-
-                            <button
-                                type="button"
-                                id="searchStudentButton"
-                                class="btn btn-primary student-search-button">
-                                Search
-                            </button>
-
-                        </div>
-
-                        <div
-                            id="studentSearchResult"
-                            class="student-result">
-                        </div>
-
+                        <input type="text" id="studentNumber" readonly
+                               placeholder="Student number"
+                               data-i18n-placeholder="studentNumber">
                     </div>
 
-
+                    <!-- Stage -->
                     <div class="form-group">
-
-                        <label for="studentName">
-                            Student Name
-                        </label>
-
-                        <input
-                            type="text"
-                            id="studentName"
-                            readonly
-                            placeholder="Search for a student">
-
+                        <label for="stage" data-i18n="stage">Stage</label>
+                        <input type="text" id="stage" readonly
+                               placeholder="Stage"
+                               data-i18n-placeholder="stage">
                     </div>
 
-
-                    <input
-                        type="hidden"
-                        id="studentId">
-
-
+                    <!-- Class -->
                     <div class="form-group">
-
-                        <label for="studentNumber">
-                            Student Number
-                        </label>
-
-                        <input
-                            type="text"
-                            id="studentNumber"
-                            readonly
-                            placeholder="Student number">
-
+                        <label for="className" data-i18n="class">Class</label>
+                        <input type="text" id="className" readonly
+                               placeholder="Class"
+                               data-i18n-placeholder="class">
                     </div>
 
-
+                    <!-- Month -->
                     <div class="form-group">
-
-                        <label for="stage">
-                            Stage
-                        </label>
-
-                        <input
-                            type="text"
-                            id="stage"
-                            readonly
-                            placeholder="Stage">
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="className">
-                            Class
-                        </label>
-
-                        <input
-                            type="text"
-                            id="className"
-                            readonly
-                            placeholder="Class">
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="month">
-                            Month
-                        </label>
-
-                        <select
-                            id="month"
-                            required>
-
-                            <option value="">
-                                Select Month
-                            </option>
-
+                        <label for="month" data-i18n="month">Month</label>
+                        <select id="month" required>
+                            <option value="" data-i18n="selectMonth">Select Month</option>
                             <option value="October">October</option>
                             <option value="November">November</option>
                             <option value="December">December</option>
@@ -281,119 +160,64 @@
                             <option value="April">April</option>
                             <option value="May">May</option>
                             <option value="June">June</option>
-
                         </select>
-
+                        <span class="field-error" data-error-for="month"></span>
                     </div>
 
-
+                    <!-- Amount -->
                     <div class="form-group">
-
-                        <label for="amount">
-                            Amount
-                        </label>
-
-                        <input
-                            type="number"
-                            id="amount"
-                            min="0.01"
-                            step="0.01"
-                            placeholder="Enter amount"
-                            required>
-
+                        <label for="amount" data-i18n="amount">Amount</label>
+                        <input type="number" id="amount" min="0.01" step="0.01"
+                               placeholder="Enter amount"
+                               data-i18n-placeholder="enterAmount" required>
+                        <span class="field-error" data-error-for="amount"></span>
                     </div>
 
-
+                    <!-- Payment Date -->
                     <div class="form-group">
-
-                        <label for="paymentDate">
-                            Payment Date
-                        </label>
-
-                        <input
-                            type="date"
-                            id="paymentDate"
-                            required>
-
+                        <label for="paymentDate" data-i18n="paymentDate">Payment Date</label>
+                        <input type="date" id="paymentDate" required>
+                        <span class="field-error" data-error-for="paymentDate"></span>
                     </div>
 
-
+                    <!-- Receipt Number -->
                     <div class="form-group">
-
-                        <label for="receiptNumber">
-                            Receipt Number
-                        </label>
-
-                        <input
-                            type="text"
-                            id="receiptNumber"
-                            readonly
-                            placeholder="Generated after payment">
-
+                        <label for="receiptNumber" data-i18n="receiptNumber">Receipt Number</label>
+                        <input type="text" id="receiptNumber" readonly
+                               placeholder="Generated after payment"
+                               data-i18n-placeholder="generatedAfterSaving">
                     </div>
 
-
+                    <!-- Recorded By -->
                     <div class="form-group">
-
-                        <label for="recordedBy">
-                            Recorded By
-                        </label>
-
-                        <input
-                            type="text"
-                            id="recordedBy"
-                            readonly
-                            placeholder="Current user">
-
+                        <label for="recordedBy" data-i18n="recordedBy">Recorded By</label>
+                        <input type="text" id="recordedBy" readonly
+                               placeholder="Current user"
+                               data-i18n-placeholder="currentUser">
                     </div>
 
-
+                    <!-- Notes -->
                     <div class="form-group form-group-full">
-
-                        <label for="notes">
-                            Notes
-                        </label>
-
-                        <textarea
-                            id="notes"
-                            rows="4"
-                            placeholder="Optional notes"></textarea>
-
+                        <label for="notes" data-i18n="notes">Notes</label>
+                        <textarea id="notes" rows="4"
+                                  placeholder="Optional notes"
+                                  data-i18n-placeholder="optionalNotes"></textarea>
                     </div>
 
                 </div>
 
-
-                <div
-                    id="errorMessage"
-                    class="message error-message"
-                    style="display: none;">
-                </div>
-
-
-                <div
-                    id="successMessage"
-                    class="message success-message"
-                    style="display: none;">
-                </div>
-
+                <div id="errorMessage" class="message error-message" style="display: none;"></div>
+                <div id="successMessage" class="message success-message" style="display: none;"></div>
 
                 <div class="form-actions">
-
-                    <button
-                        type="button"
-                        id="cancelButton"
-                        class="btn btn-secondary">
+                    <button type="button" id="cancelButton" class="btn btn-secondary" data-i18n="cancel">
                         Cancel
                     </button>
 
-                    <button
-                        type="submit"
-                        id="recordPaymentButton"
-                        class="btn btn-primary">
-                        Record Payment
+                    <button type="submit" id="recordPaymentButton" class="btn btn-primary">
+                        <span class="btn-spinner" aria-hidden="true"></span>
+                        <span class="btn-label" data-i18n="recordPayment">Record Payment</span>
                     </button>
-
                 </div>
 
             </form>
@@ -401,7 +225,6 @@
         </section>
 
     </div>
-
 
     <script src="js/auth.js"></script>
     <script src="js/school-record-payment.js"></script>
