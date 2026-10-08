@@ -83,7 +83,7 @@
         </section>
 
 
-        <!-- Academic Settings (hidden — will be re-enabled later) -->
+        <!-- Academic Settings (hidden) -->
         <section class="settings-card" id="academicSettingsSection" style="display: none;">
 
             <div class="card-header">
@@ -103,7 +103,32 @@
         </section>
 
 
-        <!-- Password Change (hidden — will be built later) -->
+        <!-- Payment Settings (hidden) -->
+        <section class="settings-card" id="paymentSettingsSection" style="display: none;">
+
+            <div class="card-header">
+                <h2 data-i18n="paymentSettings">Payment Settings</h2>
+                <p data-i18n="paymentSettingsSubtitle">Configure basic school payment information.</p>
+            </div>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label for="monthlyFee" data-i18n="monthlyFee">Default Monthly Fee</label>
+                    <input type="number" id="monthlyFee" min="0" step="0.01" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="currency" data-i18n="currency">Currency</label>
+                    <input type="text" id="currency" value="MRU">
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Password Change (hidden) -->
         <section class="settings-card" id="passwordSettingsSection" style="display: none;">
 
             <div class="card-header">
