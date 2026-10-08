@@ -94,7 +94,8 @@ const TRANSLATIONS = {
             invalidResponse: "The server returned an invalid response.",
             authentication: "School authentication failed. Please log in again.",
             unknownRequest: "The request failed.",
-            failedPayments: "Failed to load payments."
+            failedPayments: "Failed to load payments.",
+            timeout: "The server took too long to respond."
         }
     },
 
@@ -156,7 +157,8 @@ const TRANSLATIONS = {
             invalidResponse: "أعاد الخادم استجابة غير صالحة.",
             authentication: "فشل تسجيل دخول المدرسة. يرجى تسجيل الدخول مرة أخرى.",
             unknownRequest: "فشل تنفيذ الطلب.",
-            failedPayments: "فشل تحميل المدفوعات."
+            failedPayments: "فشل تحميل المدفوعات.",
+            timeout: "استغرق الخادم وقتًا طويلاً للرد."
         }
     },
 
@@ -218,7 +220,8 @@ const TRANSLATIONS = {
             invalidResponse: "Le serveur a renvoyé une réponse invalide.",
             authentication: "L'authentification de l'école a échoué. Veuillez vous reconnecter.",
             unknownRequest: "La requête a échoué.",
-            failedPayments: "Échec du chargement des paiements."
+            failedPayments: "Échec du chargement des paiements.",
+            timeout: "Le serveur a mis trop de temps à répondre."
         }
     }
 
@@ -297,7 +300,6 @@ function applyLanguage() {
         if (label) label.textContent = t("recordPayment");
     }
 
-    // Filter labels via data-i18n
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
         const key = el.getAttribute("data-i18n");
         if (TRANSLATIONS[currentLanguage][key]) {
@@ -305,21 +307,15 @@ function applyLanguage() {
         }
     });
 
-    // Search placeholder
     const searchInput = document.getElementById("studentSearch");
     if (searchInput) searchInput.placeholder = t("searchStudent");
 
-    // Loading
     const loadingMessage = document.getElementById("loadingMessage");
     if (loadingMessage) loadingMessage.textContent = t("loadingPayments");
 
-    // Retry
     const retryButton = document.getElementById("retryBtn");
     if (retryButton) retryButton.textContent = t("retry");
 
-    // Summary labels — already handled by data-i18n
-
-    // Lang buttons active state
     document.querySelectorAll(".lang-btn").forEach(function (btn) {
         btn.classList.toggle("active", btn.dataset.lang === currentLanguage);
     });
@@ -385,12 +381,13 @@ function updateTableHeaders() {
 
 
 // =====================================================
-// API request
+// API request — with timeout + single retry
 // =====================================================
 
-async function apiRequest(action, data) {
+async function apiRequest(action, data, attempt) {
 
     data = data || {};
+    attempt = attempt || 1;
 
     if (!institutionId) {
         throw new Error(t("errors.institutionMissing"));
@@ -407,20 +404,42 @@ async function apiRequest(action, data) {
         username: username
     }, data);
 
+    // 12s timeout per attempt
+    const controller = new AbortController();
+    const timeoutId = setTimeout(function () { controller.abort(); }, 12000);
+
     let response;
     try {
         response = await fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
     } catch (error) {
+        clearTimeout(timeoutId);
+
+        // Network error or timeout → retry once
+        if (attempt < 2) {
+            await new Promise(function (r) { setTimeout(r, 800); });
+            return apiRequest(action, data, attempt + 1);
+        }
+
+        if (error.name === "AbortError") {
+            throw new Error(t("errors.timeout"));
+        }
         throw new Error(t("errors.connection"));
     }
 
     const responseText = await response.text();
 
     if (!response.ok) {
+        // Server error → retry once on 5xx only
+        if (attempt < 2 && response.status >= 500) {
+            await new Promise(function (r) { setTimeout(r, 800); });
+            return apiRequest(action, data, attempt + 1);
+        }
         throw new Error("Server error: " + response.status);
     }
 
@@ -716,7 +735,7 @@ function loadPaymentsFromCache() {
 
 
 // =====================================================
-// Academic years
+// Academic years — default to current year
 // =====================================================
 
 function loadAcademicYears() {
@@ -747,8 +766,15 @@ function loadAcademicYears() {
         select.appendChild(option);
     });
 
+    const currentYear = getCurrentAcademicYear();
+
+    // Priority: previously-selected → current academic year → all
     if (currentValue && years.has(currentValue)) {
         select.value = currentValue;
+    } else if (years.has(currentYear)) {
+        select.value = currentYear;
+    } else {
+        select.value = "";
     }
 }
 
@@ -1026,17 +1052,8 @@ function closePaymentDetails() {
 
 
 // =====================================================
-// Receipt title / date
+// Receipt date
 // =====================================================
-
-function getReceiptTitle() {
-    const titles = {
-        en: "Official Payment Receipt",
-        ar: "إيصال دفع رسمي",
-        fr: "Reçu de paiement officiel"
-    };
-    return titles[currentLanguage] || titles.en;
-}
 
 function formatReceiptDate(value) {
     if (!value) return "-";
@@ -1048,7 +1065,7 @@ function formatReceiptDate(value) {
 
 
 // =====================================================
-// Print payment receipt
+// Print payment receipt — title = school name
 // =====================================================
 
 async function printPaymentReceipt(selectedPayment) {
@@ -1080,6 +1097,12 @@ async function printPaymentReceipt(selectedPayment) {
                 console.warn("getReceipt failed. Using selected payment data:", error);
             }
         }
+
+        // Receipt title = school name (fallback to BMP)
+        const schoolName =
+            (institution && institution.name) ||
+            (currentUser && currentUser.institutionName) ||
+            "BMP";
 
         const currency = institution.currency || payment.currency || "MRU";
 
@@ -1114,7 +1137,7 @@ async function printPaymentReceipt(selectedPayment) {
 
         printArea.innerHTML =
             '<div class="bmp-receipt-header">' +
-                '<div class="bmp-receipt-title">' + escapeHtml(getReceiptTitle()) + '</div>' +
+                '<div class="bmp-receipt-title">' + escapeHtml(schoolName) + '</div>' +
             '</div>' +
             '<div class="bmp-receipt-divider"></div>' +
             '<div class="bmp-receipt-number">' +
