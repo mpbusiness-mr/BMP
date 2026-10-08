@@ -43,6 +43,7 @@ const translations = {
         studentNumber: "Student Number",
         studentName: "Student Name",
         registrationDate: "Registration Date",
+        guardian: "Guardian",
         actions: "Actions",
         view: "View",
         edit: "Edit",
@@ -80,6 +81,7 @@ const translations = {
         studentNumber: "رقم الطالب",
         studentName: "اسم الطالب",
         registrationDate: "تاريخ التسجيل",
+        guardian: "ولي الأمر",
         actions: "الإجراءات",
         view: "عرض",
         edit: "تعديل",
@@ -117,6 +119,7 @@ const translations = {
         studentNumber: "Numéro d'élève",
         studentName: "Nom de l'élève",
         registrationDate: "Date d'inscription",
+        guardian: "Tuteur",
         actions: "Actions",
         view: "Voir",
         edit: "Modifier",
@@ -184,6 +187,13 @@ const isDirector =
 
 
 // =====================================================
+// Cache key
+// =====================================================
+
+const CACHE_KEY = "bmp_students_" + institution.id;
+
+
+// =====================================================
 // Elements
 // =====================================================
 
@@ -210,18 +220,19 @@ const langButtons             = document.querySelectorAll(".lang-btn");
 // =====================================================
 
 let students = [];
+let isFirstRender = true;
 
 
 // =====================================================
-// Loader
+// Loader helpers
 // =====================================================
 
-function showLoader() {
-    if (pageLoader) pageLoader.classList.remove("hidden");
-}
-
-function hideLoader() {
-    if (pageLoader) pageLoader.classList.add("hidden");
+function hideLoaderAfterPaint() {
+    requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+            if (pageLoader) pageLoader.classList.add("hidden");
+        });
+    });
 }
 
 
@@ -285,12 +296,10 @@ langButtons.forEach(function (btn) {
 
 
 // =====================================================
-// Initialize
+// Initialize UI (no network)
 // =====================================================
 
-async function initializeStudents() {
-
-    showLoader();
+function initializeUI() {
 
     pageTitle.textContent = translations[currentLanguage].students;
 
@@ -304,15 +313,10 @@ async function initializeStudents() {
 
     applyLanguage(currentLanguage);
 
-    // Role-based UI
     if (!isDirector) {
         if (addStudentButton)      addStudentButton.style.display = "none";
         if (emptyAddStudentButton) emptyAddStudentButton.style.display = "none";
     }
-
-    await loadStudents();
-
-    hideLoader();
 }
 
 
@@ -321,9 +325,6 @@ async function initializeStudents() {
 // =====================================================
 
 async function loadStudents() {
-
-    studentsTableBody.innerHTML = "";
-    totalStudentsElement.textContent = "0";
 
     try {
 
@@ -351,17 +352,48 @@ async function loadStudents() {
 
         students = (result.students || []).map(normalizeStudent);
 
+        try {
+            sessionStorage.setItem(CACHE_KEY, JSON.stringify(students));
+        } catch (e) {}
+
         loadAcademicYearFilter();
         renderStudents();
+
+        return true;
 
     } catch (error) {
 
         console.error("Students loading error:", error);
 
-        students = [];
+        if (students.length === 0) {
+            renderStudents();
+            alert(error.message || translations[currentLanguage].unableToLoadStudents);
+        }
+
+        return false;
+    }
+}
+
+
+// =====================================================
+// Read from cache (sessionStorage)
+// =====================================================
+
+function loadStudentsFromCache() {
+    try {
+        const cached = sessionStorage.getItem(CACHE_KEY);
+        if (!cached) return false;
+
+        const parsed = JSON.parse(cached);
+        if (!Array.isArray(parsed) || parsed.length === 0) return false;
+
+        students = parsed.map(normalizeStudent);
+        loadAcademicYearFilter();
         renderStudents();
 
-        alert(error.message || translations[currentLanguage].unableToLoadStudents);
+        return true;
+    } catch (e) {
+        return false;
     }
 }
 
@@ -381,7 +413,9 @@ function normalizeStudent(student) {
         className:        student.class
             ? translations[currentLanguage].classNumber + " " + student.class
             : "",
-        registrationDate: student.createdAt || ""
+        registrationDate: student.createdAt || "",
+        guardianName:     student.guardianName  || "",
+        guardianPhone:    student.guardianPhone || ""
     };
 }
 
@@ -395,9 +429,7 @@ function loadAcademicYearFilter() {
     const selectedValue = academicYearFilter.value;
 
     const academicYears = [
-        ...new Set(
-            students.map(s => s.academicYear).filter(y => y)
-        )
+        ...new Set(students.map(s => s.academicYear).filter(y => y))
     ];
 
     academicYears.sort(function (a, b) {
@@ -448,7 +480,6 @@ function loadClassFilter() {
     classFilter.appendChild(allOption);
 
     let numberOfClasses = 6;
-
     if (stage === "primary")          numberOfClasses = 6;
     else if (stage === "preparatory") numberOfClasses = 4;
     else if (stage === "secondary")   numberOfClasses = 3;
@@ -512,7 +543,9 @@ function renderStudents() {
     studentsTableBody.innerHTML = "";
 
     if (filteredStudents.length === 0) {
-        emptyState.style.display = "block";
+        if (!isFirstRender) {
+            emptyState.style.display = "block";
+        }
         return;
     }
 
@@ -525,6 +558,8 @@ function renderStudents() {
             { numeric: true }
         );
     });
+
+    const fragment = document.createDocumentFragment();
 
     filteredStudents.forEach(function (student) {
 
@@ -539,6 +574,31 @@ function renderStudents() {
         const className = student.classNumber
             ? translations[currentLanguage].classNumber + " " + student.classNumber
             : "-";
+
+        // ---------------------------------------------
+        // Guardian cell
+        // ---------------------------------------------
+
+        const guardianName  = student.guardianName  || "";
+        const guardianPhone = student.guardianPhone || "";
+        let guardianCell    = "-";
+
+        if (guardianName || guardianPhone) {
+
+            const nameHtml = guardianName
+                ? `<div class="guardian-name">${escapeHtml(guardianName)}</div>`
+                : "";
+
+            const phoneHtml = guardianPhone
+                ? `<a class="guardian-phone" href="tel:${escapeHtml(guardianPhone)}">${escapeHtml(guardianPhone)}</a>`
+                : "";
+
+            guardianCell = `<div class="guardian-cell">${nameHtml}${phoneHtml}</div>`;
+        }
+
+        // ---------------------------------------------
+        // Actions
+        // ---------------------------------------------
 
         const actionsHtml = isDirector
             ? `
@@ -562,11 +622,15 @@ function renderStudents() {
             <td><span class="stage-badge">${escapeHtml(stageName)}</span></td>
             <td><span class="class-badge">${escapeHtml(className)}</span></td>
             <td>${escapeHtml(registrationDate)}</td>
+            <td>${guardianCell}</td>
             <td>${actionsHtml}</td>
         `;
 
-        studentsTableBody.appendChild(row);
+        fragment.appendChild(row);
     });
+
+    studentsTableBody.appendChild(fragment);
+    isFirstRender = false;
 }
 
 
@@ -591,7 +655,6 @@ function formatDate(dateValue) {
     if (!dateValue) return "-";
 
     const date = new Date(dateValue);
-
     if (isNaN(date.getTime())) return "-";
 
     return date.toLocaleDateString(
@@ -675,7 +738,25 @@ function escapeHtml(value) {
 
 
 // =====================================================
-// Boot
+// BOOT
 // =====================================================
 
-initializeStudents();
+(function boot() {
+
+    // 1) UI paints instantly
+    initializeUI();
+
+    // 2) Instant render from cache if available
+    const hadCache = loadStudentsFromCache();
+    if (hadCache) {
+        hideLoaderAfterPaint();
+    }
+
+    // 3) Always refresh from network
+    loadStudents().then(function () {
+        if (!hadCache) {
+            hideLoaderAfterPaint();
+        }
+    });
+
+})();
