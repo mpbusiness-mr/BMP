@@ -26,6 +26,8 @@ let paymentsLoaded  = false;
 
 let currentLanguage = "ar";
 
+let searchDebounceTimer = null;
+
 const CACHE_KEY_PAYMENTS = () => "bmp_payments_" + institutionId;
 const CACHE_KEY_STUDENTS = () => "bmp_students_" + institutionId;
 
@@ -404,7 +406,6 @@ async function apiRequest(action, data, attempt) {
         username: username
     }, data);
 
-    // 12s timeout per attempt
     const controller = new AbortController();
     const timeoutId = setTimeout(function () { controller.abort(); }, 12000);
 
@@ -536,14 +537,13 @@ function getCurrentUsername() {
 
 
 // =====================================================
-// Current academic year — YYYY-YY format (matches your data)
+// Current academic year — YYYY-YY format
 // =====================================================
 
 function getCurrentAcademicYear() {
     const now = new Date();
     let startYear = now.getFullYear();
 
-    // Academic year starts in October (month index 9)
     if (now.getMonth() < 9) {
         startYear--;
     }
@@ -786,6 +786,31 @@ function loadAcademicYears() {
 
 
 // =====================================================
+// Lock Stage filter to "All"
+// =====================================================
+
+function lockStageFilter() {
+
+    const stageFilter = document.getElementById("stageFilter");
+    if (!stageFilter) return;
+
+    // Force value to All
+    stageFilter.value = "";
+
+    // Disable interaction
+    stageFilter.disabled = true;
+
+    // Grey it out
+    stageFilter.style.opacity = "0.6";
+    stageFilter.style.cursor = "not-allowed";
+
+    // Also grey the label
+    const label = document.querySelector('label[for="stageFilter"]');
+    if (label) label.style.opacity = "0.6";
+}
+
+
+// =====================================================
 // Filtering
 // =====================================================
 
@@ -793,20 +818,18 @@ function getFilteredPayments() {
 
     const academicYear = String(document.getElementById("academicYear")?.value || "").trim();
     const month = String(document.getElementById("paymentMonth")?.value || "").trim().toLowerCase();
-    const stage = String(document.getElementById("stageFilter")?.value || "").trim().toLowerCase();
     const search = String(document.getElementById("studentSearch")?.value || "").trim().toLowerCase();
 
+    // Stage is locked to All → ignore
     return allPayments.filter(function (payment) {
 
         const paymentYear = getPaymentAcademicYear(payment);
         const paymentMonth = getPaymentMonth(payment).toLowerCase();
         const paymentStudentNumber = getPaymentStudentNumber(payment).toLowerCase();
         const paymentStudentName = getPaymentStudentName(payment).toLowerCase();
-        const paymentStage = getStageForPayment(payment);
 
         if (academicYear && paymentYear !== academicYear) return false;
         if (month && paymentMonth !== month) return false;
-        if (stage && paymentStage !== stage) return false;
 
         if (search) {
             const matches =
@@ -948,8 +971,11 @@ function resetFilters() {
     const currentYear = getCurrentAcademicYear();
 
     document.getElementById("paymentMonth").value = "";
-    document.getElementById("stageFilter").value = "";
     document.getElementById("studentSearch").value = "";
+
+    // Stage stays locked to All
+    const stageFilter = document.getElementById("stageFilter");
+    if (stageFilter) stageFilter.value = "";
 
     // Reset academic year to current year (if present in options)
     const academicYearSelect = document.getElementById("academicYear");
@@ -1116,7 +1142,6 @@ async function printPaymentReceipt(selectedPayment) {
             }
         }
 
-        // Receipt title = school name (fallback to BMP)
         const schoolName =
             (institution && institution.name) ||
             (currentUser && currentUser.institutionName) ||
@@ -1222,6 +1247,22 @@ function goToRecordPayment() {
 
 
 // =====================================================
+// Debounced live search
+// =====================================================
+
+function onSearchInput() {
+
+    if (searchDebounceTimer) {
+        clearTimeout(searchDebounceTimer);
+    }
+
+    searchDebounceTimer = setTimeout(function () {
+        applyFilters();
+    }, 150);
+}
+
+
+// =====================================================
 // Event listeners
 // =====================================================
 
@@ -1233,11 +1274,14 @@ function setupEventListeners() {
     document.getElementById("resetFiltersBtn")?.addEventListener("click", resetFilters);
     document.getElementById("retryBtn")?.addEventListener("click", initializePage);
 
+    // Live search — filter as user types (debounced 150ms)
     const searchInput = document.getElementById("studentSearch");
     if (searchInput) {
+        searchInput.addEventListener("input", onSearchInput);
         searchInput.addEventListener("keydown", function (e) {
             if (e.key === "Enter") {
                 e.preventDefault();
+                if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
                 applyFilters();
             }
         });
@@ -1245,6 +1289,8 @@ function setupEventListeners() {
 
     document.getElementById("academicYear")?.addEventListener("change", applyFilters);
     document.getElementById("paymentMonth")?.addEventListener("change", applyFilters);
+
+    // Stage is locked — no listener needed, but keep it harmless
     document.getElementById("stageFilter")?.addEventListener("change", applyFilters);
 
     document.getElementById("paymentDetailsCloseBtn")?.addEventListener("click", closePaymentDetails);
@@ -1290,6 +1336,9 @@ async function initializePage() {
         showError(t("errors.authentication"));
         return;
     }
+
+    // Lock stage filter to All — always
+    lockStageFilter();
 
     // 1) Instant paint from cache
     const hadPaymentsCache = loadPaymentsFromCache();
