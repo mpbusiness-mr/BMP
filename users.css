@@ -1,5 +1,5 @@
 /* =====================================================
-   BMP · Institution Users — Brand + Fast
+   BMP · Institution Users — Brand
    ===================================================== */
 
 * {
@@ -522,13 +522,8 @@ tbody tr:last-child td {
     .header-actions { justify-content: space-between; }
     .header-actions .btn { flex: 1; }
 
-    .topbar-logo {
-        font-size: 1.5rem;
-    }
-
-    .topbar-logo i {
-        font-size: 1.7rem;
-    }
+    .topbar-logo { font-size: 1.5rem; }
+    .topbar-logo i { font-size: 1.7rem; }
 
     .page-title-block h1 { font-size: 1.2rem; }
 
