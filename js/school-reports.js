@@ -370,7 +370,7 @@ function getCurrentAcademicYear() {
 
 
 // =====================================================
-// API request — timeout + retry
+// API request — clean, no abort controller
 // =====================================================
 
 function apiRequest(action, data) {
@@ -386,17 +386,12 @@ function apiRequest(action, data) {
             username: username
         }, data || {});
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(function () { controller.abort(); }, 12000);
-
         fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify(payload),
-            signal: controller.signal
+            body: JSON.stringify(payload)
         })
         .then(function (response) {
-            clearTimeout(timeoutId);
             if (!response.ok) throw new Error("Server error: " + response.status);
             return response.text();
         })
@@ -408,7 +403,6 @@ function apiRequest(action, data) {
             resolve(result);
         })
         .catch(function (error) {
-            clearTimeout(timeoutId);
             reject(error);
         });
 
@@ -851,6 +845,6 @@ function initializePage() {
 document.addEventListener("DOMContentLoaded", function () {
     currentLanguage = getSavedLanguage();
     applyLanguage();
-    setupListeners();
+    setupEventListeners();
     initializePage();
 });
