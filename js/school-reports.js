@@ -590,7 +590,7 @@ function updateSummary() {
     let totalAmount = 0;
     selectedPayments.forEach(function (p) { totalAmount += Number(p.amount || 0); });
 
-    if (totalAmountElement) totalAmountElement.textContent = formatAmount(totalAmount);
+    if (totalAmountElement) totalAmountElement.textContent = formatAmount(totalAmount) + " MRU";
 
     const paidIds = {};
     selectedPayments.forEach(function (p) {
@@ -637,7 +637,7 @@ function renderPaymentReport() {
             "<td>" + escapeHtml(t("months." + month)) + "</td>" +
             "<td>" + count + "</td>" +
             "<td>" + Object.keys(studentIds).length + "</td>" +
-            "<td>" + escapeHtml(formatAmount(total)) + "</td>";
+            "<td>" + escapeHtml(formatAmount(total)) + " MRU</td>";
 
         fragment.appendChild(row);
     });
@@ -698,7 +698,7 @@ function renderStudentReport() {
             "<td>" + escapeHtml(formatStage(student.stage)) + "</td>" +
             "<td>" + escapeHtml(student.className || student.class || "") + "</td>" +
             "<td>" + paidCount + "</td>" +
-            "<td>" + escapeHtml(formatAmount(totalPaid)) + "</td>";
+            "<td>" + escapeHtml(formatAmount(totalPaid)) + " MRU</td>";
 
         fragment.appendChild(row);
     });
@@ -851,6 +851,6 @@ function initializePage() {
 document.addEventListener("DOMContentLoaded", function () {
     currentLanguage = getSavedLanguage();
     applyLanguage();
-    setupEventListeners();
+    setupListeners();
     initializePage();
 });
