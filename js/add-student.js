@@ -38,6 +38,10 @@ const translations = {
         class: "Class",
         selectClass: "Select Class",
         registrationDate: "Registration Date",
+        guardianName: "Guardian Name",
+        guardianPhone: "Guardian Phone",
+        enterGuardianName: "Enter guardian name",
+        enterGuardianPhone: "Enter guardian phone",
         cancel: "Cancel",
         registerStudent: "Register Student",
         registering: "Registering...",
@@ -72,6 +76,10 @@ const translations = {
         class: "القسم",
         selectClass: "اختر القسم",
         registrationDate: "تاريخ التسجيل",
+        guardianName: "اسم ولي الأمر",
+        guardianPhone: "رقم ولي الأمر",
+        enterGuardianName: "أدخل اسم ولي الأمر",
+        enterGuardianPhone: "أدخل رقم ولي الأمر",
         cancel: "إلغاء",
         registerStudent: "تسجيل الطالب",
         registering: "جاري التسجيل...",
@@ -106,6 +114,10 @@ const translations = {
         class: "Classe",
         selectClass: "Sélectionner la classe",
         registrationDate: "Date d'inscription",
+        guardianName: "Nom du tuteur",
+        guardianPhone: "Téléphone du tuteur",
+        enterGuardianName: "Entrez le nom du tuteur",
+        enterGuardianPhone: "Entrez le téléphone du tuteur",
         cancel: "Annuler",
         registerStudent: "Inscrire l'élève",
         registering: "Inscription...",
@@ -188,6 +200,8 @@ const studentNameInput        = document.getElementById("studentName");
 const stageSelect             = document.getElementById("stage");
 const classSelect             = document.getElementById("className");
 const registrationDateInput   = document.getElementById("registrationDate");
+const guardianNameInput       = document.getElementById("guardianName");
+const guardianPhoneInput      = document.getElementById("guardianPhone");
 const studentForm             = document.getElementById("studentForm");
 const backButton              = document.getElementById("backButton");
 const cancelButton            = document.getElementById("cancelButton");
@@ -208,6 +222,8 @@ const requiredElements = [
     stageSelect,
     classSelect,
     registrationDateInput,
+    guardianNameInput,
+    guardianPhoneInput,
     studentForm,
     backButton,
     cancelButton,
@@ -258,7 +274,8 @@ function clearFieldError(fieldId) {
 }
 
 function clearAllErrors() {
-    ["academicYear", "studentName", "stage", "className", "registrationDate"]
+    ["academicYear", "studentName", "stage", "className", "registrationDate",
+     "guardianName", "guardianPhone"]
         .forEach(clearFieldError);
 }
 
@@ -421,6 +438,8 @@ async function registerStudent() {
     const stage            = stageSelect.value;
     const classNumber      = classSelect.value;
     const registrationDate = registrationDateInput.value;
+    const guardianName     = guardianNameInput.value.trim();
+    const guardianPhone    = guardianPhoneInput.value.trim();
 
     clearAllErrors();
 
@@ -472,7 +491,9 @@ async function registerStudent() {
                 name:             name,
                 stage:            stage,
                 classNumber:      classNumber,
-                registrationDate: registrationDate
+                registrationDate: registrationDate,
+                guardianName:     guardianName,
+                guardianPhone:    guardianPhone
             })
         });
 
@@ -561,6 +582,14 @@ studentNameInput.addEventListener("input", function () {
 
 registrationDateInput.addEventListener("change", function () {
     clearFieldError("registrationDate");
+});
+
+guardianNameInput.addEventListener("input", function () {
+    clearFieldError("guardianName");
+});
+
+guardianPhoneInput.addEventListener("input", function () {
+    clearFieldError("guardianPhone");
 });
 
 studentForm.addEventListener("submit", function (event) {
