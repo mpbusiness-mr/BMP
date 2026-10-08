@@ -1,6 +1,6 @@
 // =====================================================
-// BMP · Classes & Stages
-// ===================================================== 
+// BMP · Classes & Stages — Speed-optimized
+// =====================================================
 
 
 // =====================================================
@@ -9,6 +9,13 @@
 
 const API_URL =
     "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+
+
+// =====================================================
+// Config
+// =====================================================
+
+const CACHE_TTL = 2 * 60 * 1000;   // 2 minutes
 
 
 // =====================================================
@@ -38,19 +45,15 @@ const TRANSLATIONS = {
         pageSubtitle: "Manage academic stages and classes.",
         back: "Back",
         loading: "Loading...",
-
         institutionId: "Institution ID",
         schoolName: "School Name",
         academicYearLabel: "Academic Year",
-
         primaryEducation: "Primary Education",
         preparatoryEducation: "Preparatory Education",
         secondaryEducation: "Secondary Education",
-
         sixClasses: "6 Classes",
         fourClasses: "4 Classes",
         threeClasses: "3 Classes",
-
         studentsWord: "students",
         classLabel: "Class",
         codeLabel: "Code",
@@ -62,19 +65,15 @@ const TRANSLATIONS = {
         pageSubtitle: "إدارة المراحل الدراسية والأقسام.",
         back: "رجوع",
         loading: "جارٍ التحميل...",
-
         institutionId: "معرّف المؤسسة",
         schoolName: "اسم المدرسة",
         academicYearLabel: "السنة الدراسية",
-
         primaryEducation: "التعليم الابتدائي",
         preparatoryEducation: "التعليم الإعدادي",
         secondaryEducation: "التعليم الثانوي",
-
         sixClasses: "6 أقسام",
         fourClasses: "4 أقسام",
         threeClasses: "3 أقسام",
-
         studentsWord: "طالب",
         classLabel: "القسم",
         codeLabel: "الرمز",
@@ -86,19 +85,15 @@ const TRANSLATIONS = {
         pageSubtitle: "Gérer les niveaux et les classes.",
         back: "Retour",
         loading: "Chargement...",
-
         institutionId: "ID de l'établissement",
         schoolName: "Nom de l'école",
         academicYearLabel: "Année scolaire",
-
         primaryEducation: "Enseignement primaire",
         preparatoryEducation: "Enseignement préparatoire",
         secondaryEducation: "Enseignement secondaire",
-
         sixClasses: "6 classes",
         fourClasses: "4 classes",
         threeClasses: "3 classes",
-
         studentsWord: "élèves",
         classLabel: "Classe",
         codeLabel: "Code",
@@ -126,6 +121,34 @@ function t(key) {
     }
 
     return value;
+}
+
+
+// =====================================================
+// Cache helpers — TTL aware, wrap data with timestamp
+// =====================================================
+
+function readCache(key, ttl) {
+    try {
+        const raw = sessionStorage.getItem(key);
+        if (!raw) return { data: null, fresh: false };
+
+        const parsed = JSON.parse(raw);
+        if (!parsed || !parsed.data) return { data: null, fresh: false };
+
+        const age = Date.now() - (parsed.ts || 0);
+        const fresh = ttl ? age < ttl : true;
+
+        return { data: parsed.data, fresh: fresh };
+    } catch (e) {
+        return { data: null, fresh: false };
+    }
+}
+
+function writeCache(key, data) {
+    try {
+        sessionStorage.setItem(key, JSON.stringify({ ts: Date.now(), data: data }));
+    } catch (e) {}
 }
 
 
@@ -189,12 +212,8 @@ function applyLanguage() {
         btn.classList.toggle("active", btn.dataset.lang === currentLanguage);
     });
 
-    // Re-render to update embedded text
-    if (allClasses.length > 0) {
-        renderClasses(allClasses);
-    } else {
-        renderDefaultClasses();
-    }
+    // Re-render with new language labels
+    renderAll();
 }
 
 
@@ -228,8 +247,7 @@ function initializeAuthentication() {
     const urlParams = new URLSearchParams(window.location.search);
     const urlId = urlParams.get("id") || urlParams.get("institutionId");
     if (urlId && urlId !== institutionId) {
-        window.location.href =
-            "classes.html?id=" + encodeURIComponent(institutionId);
+        window.location.href = "classes.html?id=" + encodeURIComponent(institutionId);
         return false;
     }
 
@@ -257,7 +275,7 @@ function getCurrentAcademicYear() {
 
 
 // =====================================================
-// API request with timeout + retry
+// API request — timeout + retry
 // =====================================================
 
 async function apiRequest(action, data, attempt) {
@@ -289,7 +307,6 @@ async function apiRequest(action, data, attempt) {
         clearTimeout(timeoutId);
     } catch (error) {
         clearTimeout(timeoutId);
-
         if (attempt < 2) {
             await new Promise(function (r) { setTimeout(r, 800); });
             return apiRequest(action, data, attempt + 1);
@@ -353,48 +370,46 @@ function displayInstitution() {
 
 
 // =====================================================
-// Student count per stage+class
+// Student counts
 // =====================================================
+
+let studentCountMap = {};
 
 function buildStudentCountMap() {
 
-    // key: "<stage>|<classNumber>" → count
     const map = {};
-
     const academicYear = getCurrentAcademicYear();
 
-    allStudents.forEach(function (student) {
+    for (let i = 0; i < allStudents.length; i++) {
 
-        // Only count students from current academic year
+        const student = allStudents[i];
+
         const studentYear = String(student.academicYear || "").trim();
-        if (studentYear && studentYear !== academicYear) return;
+        if (studentYear && studentYear !== academicYear) continue;
 
         const stage = String(student.stage || "").trim().toLowerCase();
         const cls   = String(student.class || student.classNumber || "").trim();
-
-        if (!stage || !cls) return;
+        if (!stage || !cls) continue;
 
         const key = stage + "|" + cls;
         map[key] = (map[key] || 0) + 1;
-    });
+    }
 
+    studentCountMap = map;
     return map;
 }
 
-
-function getStudentCount(studentCountMap, stage, classNumber) {
+function getStudentCount(stage, classNumber) {
     const key = String(stage).toLowerCase() + "|" + String(classNumber);
     return studentCountMap[key] || 0;
 }
 
-
-function updateStageTotals(studentCountMap) {
+function updateStageTotals() {
 
     const primaryTotalEl     = document.getElementById("primaryTotalStudents");
     const preparatoryTotalEl = document.getElementById("preparatoryTotalStudents");
     const secondaryTotalEl   = document.getElementById("secondaryTotalStudents");
 
-    const stages = ["primary", "preparatory", "secondary"];
     const totals = { primary: 0, preparatory: 0, secondary: 0 };
 
     Object.keys(studentCountMap).forEach(function (key) {
@@ -412,137 +427,40 @@ function updateStageTotals(studentCountMap) {
 
 
 // =====================================================
-// Load data (parallel: classes + students)
+// Render — single source of truth
 // =====================================================
 
-async function loadData() {
+function renderAll() {
 
-    try {
-
-        // Show loading placeholders
-        showLoading(primaryClasses);
-        showLoading(preparatoryClasses);
-        showLoading(secondaryClasses);
-
-        // Parallel fetch
-        const [classesResult, studentsResult] = await Promise.all([
-            apiRequest("getClasses"),
-            apiRequest("getStudents")
-        ]);
-
-        // ----- Classes -----
-        allClasses = Array.isArray(classesResult.classes) ? classesResult.classes : [];
-
-        try {
-            sessionStorage.setItem(CACHE_KEY_CLASSES(), JSON.stringify(allClasses));
-        } catch (e) {}
-
-        // ----- Students -----
-        allStudents = Array.isArray(studentsResult.students) ? studentsResult.students : [];
-
-        try {
-            sessionStorage.setItem(CACHE_KEY_STUDENTS(), JSON.stringify(allStudents));
-        } catch (e) {}
-
-        // Institution info from classes response (has canonical name)
-        if (classesResult.institution) {
-            const idEl   = document.getElementById("institutionId");
-            const nameEl = document.getElementById("institutionName");
-
-            if (idEl && classesResult.institution.id) {
-                idEl.textContent = classesResult.institution.id;
-            }
-            if (nameEl && classesResult.institution.name) {
-                nameEl.textContent = classesResult.institution.name;
-                document.title = classesResult.institution.name + " - Classes & Stages";
-            }
-        }
-
-        // Render
-        if (allClasses.length > 0) {
-            renderClasses(allClasses);
-        } else {
-            renderDefaultClasses();
-        }
-
-    } catch (error) {
-
-        console.error("Classes loading error:", error);
-
-        // Fallback — still show default classes
+    if (allClasses.length > 0) {
+        renderClasses(allClasses);
+    } else {
         renderDefaultClasses();
-
-    }
-
-}
-
-
-// =====================================================
-// Cache-first load
-// =====================================================
-
-function loadFromCache() {
-    try {
-        const classesCache  = sessionStorage.getItem(CACHE_KEY_CLASSES());
-        const studentsCache = sessionStorage.getItem(CACHE_KEY_STUDENTS());
-
-        let hasAnything = false;
-
-        if (classesCache) {
-            const parsed = JSON.parse(classesCache);
-            if (Array.isArray(parsed)) {
-                allClasses = parsed;
-                hasAnything = true;
-            }
-        }
-
-        if (studentsCache) {
-            const parsed = JSON.parse(studentsCache);
-            if (Array.isArray(parsed)) {
-                allStudents = parsed;
-            }
-        }
-
-        if (hasAnything) {
-            if (allClasses.length > 0) {
-                renderClasses(allClasses);
-            } else {
-                renderDefaultClasses();
-            }
-        }
-
-        return hasAnything;
-    } catch (e) {
-        return false;
     }
 }
 
-
-// =====================================================
-// Render classes from backend
-// =====================================================
 
 function renderClasses(classes) {
 
-    const studentCountMap = buildStudentCountMap();
+    buildStudentCountMap();
 
     const primary     = classes.filter(c => String(c.stage || "").toLowerCase() === "primary");
     const preparatory = classes.filter(c => String(c.stage || "").toLowerCase() === "preparatory");
     const secondary   = classes.filter(c => String(c.stage || "").toLowerCase() === "secondary");
 
-    renderStageClasses(primaryClasses,     primary,     studentCountMap);
-    renderStageClasses(preparatoryClasses, preparatory, studentCountMap);
-    renderStageClasses(secondaryClasses,   secondary,   studentCountMap);
+    renderStageClasses(primaryClasses,     primary);
+    renderStageClasses(preparatoryClasses, preparatory);
+    renderStageClasses(secondaryClasses,   secondary);
 
-    updateStageTotals(studentCountMap);
+    updateStageTotals();
 }
 
 
-function renderStageClasses(container, classes, studentCountMap) {
+function renderStageClasses(container, classes) {
 
     if (!container) return;
 
-    container.innerHTML = "";
+    const fragment = document.createDocumentFragment();
 
     if (!classes || classes.length === 0) {
         const empty = document.createElement("div");
@@ -551,7 +469,8 @@ function renderStageClasses(container, classes, studentCountMap) {
             '<div class="class-info"><div><div class="class-name">' +
             escapeHtml(t("noClasses")) +
             '</div></div></div>';
-        container.appendChild(empty);
+        fragment.appendChild(empty);
+        container.replaceChildren(fragment);
         return;
     }
 
@@ -566,7 +485,7 @@ function renderStageClasses(container, classes, studentCountMap) {
         const classCode   = String(item.classCode || "");
         const stage       = String(item.stage || "");
 
-        const count = getStudentCount(studentCountMap, stage, classNumber);
+        const count = getStudentCount(stage, classNumber);
 
         const classItem = document.createElement("div");
         classItem.className = "class-item";
@@ -585,37 +504,34 @@ function renderStageClasses(container, classes, studentCountMap) {
             '</span>';
 
         attachClassClick(classItem, stage, classNumber);
-
-        container.appendChild(classItem);
+        fragment.appendChild(classItem);
     });
+
+    container.replaceChildren(fragment);
 }
 
-
-// =====================================================
-// Render default classes (fallback when backend has none)
-// =====================================================
 
 function renderDefaultClasses() {
 
-    const studentCountMap = buildStudentCountMap();
+    buildStudentCountMap();
 
-    renderDefaultStageClasses(primaryClasses,     "primary",     "A", 6, studentCountMap);
-    renderDefaultStageClasses(preparatoryClasses, "preparatory", "B", 4, studentCountMap);
-    renderDefaultStageClasses(secondaryClasses,   "secondary",   "C", 3, studentCountMap);
+    renderDefaultStageClasses(primaryClasses,     "primary",     "A", 6);
+    renderDefaultStageClasses(preparatoryClasses, "preparatory", "B", 4);
+    renderDefaultStageClasses(secondaryClasses,   "secondary",   "C", 3);
 
-    updateStageTotals(studentCountMap);
+    updateStageTotals();
 }
 
 
-function renderDefaultStageClasses(container, stage, stageLetter, numberOfClasses, studentCountMap) {
+function renderDefaultStageClasses(container, stage, stageLetter, numberOfClasses) {
 
     if (!container) return;
 
-    container.innerHTML = "";
+    const fragment = document.createDocumentFragment();
 
     for (let classNumber = 1; classNumber <= numberOfClasses; classNumber++) {
 
-        const count = getStudentCount(studentCountMap, stage, String(classNumber));
+        const count = getStudentCount(stage, String(classNumber));
 
         const classItem = document.createElement("div");
         classItem.className = "class-item";
@@ -639,14 +555,56 @@ function renderDefaultStageClasses(container, stage, stageLetter, numberOfClasse
             '</span>';
 
         attachClassClick(classItem, stage, classNumber);
-
-        container.appendChild(classItem);
+        fragment.appendChild(classItem);
     }
+
+    container.replaceChildren(fragment);
 }
 
 
 // =====================================================
-// Class click → navigate
+// Update only the count badges (fast partial update)
+// =====================================================
+
+function updateCountBadgesOnly() {
+
+    buildStudentCountMap();
+
+    document.querySelectorAll(".class-item").forEach(function (item) {
+
+        const codeEl = item.querySelector(".class-code");
+        if (!codeEl) return;
+
+        // Extract classCode from "Code: A1"
+        const codeText = codeEl.textContent || "";
+        const match = codeText.match(/:\s*([A-Z])(\d+)/);
+        if (!match) return;
+
+        const stageLetter = match[1];
+        const classNumber = match[2];
+
+        const stageMap = { A: "primary", B: "preparatory", C: "secondary" };
+        const stage = stageMap[stageLetter];
+        if (!stage) return;
+
+        const count = getStudentCount(stage, classNumber);
+
+        const badge = item.querySelector(".class-students");
+        if (!badge) return;
+
+        badge.classList.toggle("empty", count === 0);
+        const badgeText = badge.querySelector("span");
+        if (badgeText) {
+            badgeText.textContent = count + " " + t("studentsWord");
+        }
+    });
+
+    updateStageTotals();
+}
+
+
+// =====================================================
+// Class click
 // =====================================================
 
 function attachClassClick(classItem, stage, classNumber) {
@@ -664,16 +622,82 @@ function attachClassClick(classItem, stage, classNumber) {
 // Loading placeholder
 // =====================================================
 
-function showLoading(container) {
-    if (!container) return;
-    container.innerHTML =
+function showLoadingPlaceholders() {
+    const skeletonHtml =
         '<div class="class-item">' +
             '<div class="class-info"><div>' +
                 '<div class="class-name">' +
-                    '<span class="skeleton-line" style="display:inline-block;width:120px;height:14px;"></span>' +
+                    '<span style="display:inline-block;width:120px;height:14px;background:rgba(15,43,75,0.08);border-radius:6px;"></span>' +
                 '</div>' +
             '</div></div>' +
         '</div>';
+
+    if (primaryClasses)     primaryClasses.innerHTML     = skeletonHtml;
+    if (preparatoryClasses) preparatoryClasses.innerHTML = skeletonHtml;
+    if (secondaryClasses)   secondaryClasses.innerHTML   = skeletonHtml;
+}
+
+
+// =====================================================
+// Background fetchers — do not block render
+// =====================================================
+
+async function refreshClassesInBackground() {
+
+    try {
+
+        const result = await apiRequest("getClasses");
+        const newClasses = Array.isArray(result.classes) ? result.classes : [];
+
+        // Institution info
+        if (result.institution) {
+            const idEl   = document.getElementById("institutionId");
+            const nameEl = document.getElementById("institutionName");
+            if (idEl && result.institution.id)   idEl.textContent   = result.institution.id;
+            if (nameEl && result.institution.name) {
+                nameEl.textContent = result.institution.name;
+                document.title = result.institution.name + " - Classes & Stages";
+            }
+        }
+
+        // Only re-render if the classes actually changed
+        const changed = JSON.stringify(newClasses) !== JSON.stringify(allClasses);
+
+        allClasses = newClasses;
+        writeCache(CACHE_KEY_CLASSES(), allClasses);
+
+        if (changed && allClasses.length > 0) {
+            renderClasses(allClasses);
+        } else if (changed && allClasses.length === 0) {
+            renderDefaultClasses();
+        }
+
+    } catch (error) {
+        console.error("Classes refresh failed:", error);
+    }
+}
+
+
+async function refreshStudentsInBackground() {
+
+    try {
+
+        const result = await apiRequest("getStudents");
+        const newStudents = Array.isArray(result.students) ? result.students : [];
+
+        const changed = JSON.stringify(newStudents) !== JSON.stringify(allStudents);
+
+        allStudents = newStudents;
+        writeCache(CACHE_KEY_STUDENTS(), allStudents);
+
+        if (changed) {
+            // Only patch count badges — no full re-render
+            updateCountBadgesOnly();
+        }
+
+    } catch (error) {
+        console.error("Students refresh failed:", error);
+    }
 }
 
 
@@ -696,13 +720,12 @@ function setupEventListeners() {
 
 
 // =====================================================
-// Initialize
+// Initialize — cache-first, non-blocking refresh
 // =====================================================
 
 async function initializePage() {
 
-    showLoader();
-
+    // Authenticate
     const authenticated = initializeAuthentication();
     if (!authenticated) {
         hideLoaderAfterPaint();
@@ -711,16 +734,57 @@ async function initializePage() {
 
     displayInstitution();
 
-    // 1) Cache-first render
-    const hadCache = loadFromCache();
-    if (hadCache) {
-        hideLoaderAfterPaint();
+    // ---- STEP 1: Read both caches (fast, synchronous) ----
+    const classesCache  = readCache(CACHE_KEY_CLASSES(), CACHE_TTL);
+    const studentsCache = readCache(CACHE_KEY_STUDENTS(), CACHE_TTL);
+
+    const hasClasses  = Array.isArray(classesCache.data) && classesCache.data.length > 0;
+    const hasStudents = Array.isArray(studentsCache.data) && studentsCache.data.length > 0;
+
+    // Reuse the students cache written by other pages (students.html, school-payments.html, etc.)
+    if (hasStudents) {
+        allStudents = studentsCache.data;
     }
 
-    // 2) Network refresh (parallel)
-    await loadData();
+    // ---- STEP 2: Render as fast as possible ----
+    if (hasClasses) {
+        // Classes already known → paint immediately with counts if we have students
+        allClasses = classesCache.data;
+        buildStudentCountMap();
+        renderClasses(allClasses);
+        hideLoaderAfterPaint();
+    } else if (hasStudents) {
+        // No classes cached yet, but we have students → draw default classes with counts
+        buildStudentCountMap();
+        renderDefaultClasses();
+        hideLoaderAfterPaint();
+    } else {
+        // Cold start → show loader + placeholders
+        showLoader();
+        showLoadingPlaceholders();
+    }
 
-    if (!hadCache) hideLoaderAfterPaint();
+    // ---- STEP 3: Network refresh (non-blocking) ----
+
+    const classesStale  = !classesCache.fresh;
+    const studentsStale = !studentsCache.fresh;
+
+    // Fetch classes only if stale OR missing
+    const classesPromise = classesStale
+        ? refreshClassesInBackground()
+        : Promise.resolve();
+
+    // Fetch students only if stale AND we don't already have a fresh copy from another page
+    const studentsPromise = studentsStale
+        ? refreshStudentsInBackground()
+        : Promise.resolve();
+
+    await Promise.all([classesPromise, studentsPromise]);
+
+    // Cold start — first fetch just completed → now hide loader
+    if (!hasClasses && !hasStudents) {
+        hideLoaderAfterPaint();
+    }
 }
 
 
