@@ -1,56 +1,53 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <title>BMP · ملف الطالب | Student Profile</title>
 
-    <title>Student Profile - BMP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <link
-        rel="stylesheet"
-        href="student.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+    <link rel="stylesheet" href="student.css">
 </head>
 
-<body>
+<body class="lang-ar">
 
     <div class="page-container">
 
-        <!-- Header -->
-
         <header class="page-header">
 
-            <div>
-
-                <h1>Student Profile</h1>
-
-                <p>
-                    View student information and payment history
-                </p>
-
+            <div class="header-brand">
+                <a href="school.html" class="topbar-logo">
+                    <i class="fas fa-cubes"></i> BMP
+                </a>
+                <div class="page-title-block">
+                    <h1 data-i18n="pageTitle">Student Profile</h1>
+                    <p data-i18n="pageSubtitle">View student information and payment history</p>
+                </div>
             </div>
 
             <div class="header-actions">
 
-                <button
-                    id="backButton"
-                    class="btn btn-secondary">
+                <div class="lang-switcher" role="group" aria-label="Language">
+                    <button type="button" class="lang-btn active" data-lang="ar" onclick="setLanguage('ar')">عربية</button>
+                    <button type="button" class="lang-btn"        data-lang="fr" onclick="setLanguage('fr')">Français</button>
+                    <button type="button" class="lang-btn"        data-lang="en" onclick="setLanguage('en')">English</button>
+                </div>
 
-                    Back
-
+                <button id="backButton" class="btn btn-secondary" data-i18n="back">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Back</span>
                 </button>
 
-                <button
-                    id="editButton"
-                    class="btn btn-primary">
-
-                    Edit Student
-
+                <button id="editButton" class="btn btn-primary" data-i18n="editStudent">
+                    <i class="fas fa-pen"></i>
+                    <span>Edit Student</span>
                 </button>
 
             </div>
@@ -59,262 +56,120 @@
 
 
         <!-- School Information -->
-
         <section class="card">
-
-            <h2>
-                School Information
-            </h2>
+            <h2 data-i18n="schoolInformation">School Information</h2>
 
             <div class="info-grid">
-
                 <div class="info-item">
-
-                    <span>
-                        Institution ID
-                    </span>
-
-                    <strong id="institutionId">
-                        -
-                    </strong>
-
+                    <span data-i18n="institutionId">Institution ID</span>
+                    <strong id="institutionId">-</strong>
                 </div>
 
-
                 <div class="info-item">
-
-                    <span>
-                        School Name
-                    </span>
-
-                    <strong id="institutionName">
-                        -
-                    </strong>
-
+                    <span data-i18n="schoolName">School Name</span>
+                    <strong id="institutionName">-</strong>
                 </div>
-
             </div>
-
         </section>
 
 
         <!-- Student Information -->
-
         <section class="card">
-
-            <h2>
-                Student Information
-            </h2>
+            <h2 data-i18n="studentInformation">Student Information</h2>
 
             <div class="info-grid">
-
-
                 <div class="info-item">
-
-                    <span>
-                        Academic Year
-                    </span>
-
-                    <strong id="academicYear">
-                        -
-                    </strong>
-
+                    <span data-i18n="academicYear">Academic Year</span>
+                    <strong id="academicYear">-</strong>
                 </div>
 
-
                 <div class="info-item">
-
-                    <span>
-                        Student Number
-                    </span>
-
-                    <strong id="studentNumber">
-                        -
-                    </strong>
-
+                    <span data-i18n="studentNumber">Student Number</span>
+                    <strong id="studentNumber">-</strong>
                 </div>
 
-
                 <div class="info-item">
-
-                    <span>
-                        Student Name
-                    </span>
-
-                    <strong id="studentName">
-                        -
-                    </strong>
-
+                    <span data-i18n="studentName">Student Name</span>
+                    <strong id="studentName">-</strong>
                 </div>
 
-
                 <div class="info-item">
-
-                    <span>
-                        Stage
-                    </span>
-
-                    <strong id="stage">
-                        -
-                    </strong>
-
+                    <span data-i18n="stage">Stage</span>
+                    <strong id="stage">-</strong>
                 </div>
 
-
                 <div class="info-item">
-
-                    <span>
-                        Class
-                    </span>
-
-                    <strong id="className">
-                        -
-                    </strong>
-
+                    <span data-i18n="class">Class</span>
+                    <strong id="className">-</strong>
                 </div>
 
-
                 <div class="info-item">
-
-                    <span>
-                        Registration Date
-                    </span>
-
-                    <strong id="registrationDate">
-                        -
-                    </strong>
-
+                    <span data-i18n="registrationDate">Registration Date</span>
+                    <strong id="registrationDate">-</strong>
                 </div>
 
-
                 <div class="info-item">
-
-                    <span>
-                        Student ID
-                    </span>
-
-                    <strong id="studentId">
-                        -
-                    </strong>
-
+                    <span data-i18n="guardianName">Guardian Name</span>
+                    <strong id="guardianName">-</strong>
                 </div>
 
+                <div class="info-item">
+                    <span data-i18n="guardianPhone">Guardian Phone</span>
+                    <strong id="guardianPhone">-</strong>
+                </div>
             </div>
-
         </section>
 
 
         <!-- Payment Summary -->
-
         <section class="card">
-
-            <h2>
-                Payment Summary
-            </h2>
+            <h2 data-i18n="paymentSummary">Payment Summary</h2>
 
             <div class="summary-grid">
-
                 <div class="summary-item">
-
-                    <span>
-                        Paid Months
-                    </span>
-
-                    <strong id="paidMonths">
-                        0
-                    </strong>
-
+                    <span data-i18n="paidMonths">Paid Months</span>
+                    <strong id="paidMonths">0</strong>
                 </div>
 
-
                 <div class="summary-item">
-
-                    <span>
-                        Unpaid Months
-                    </span>
-
-                    <strong id="unpaidMonths">
-                        0
-                    </strong>
-
+                    <span data-i18n="unpaidMonths">Unpaid Months</span>
+                    <strong id="unpaidMonths">0</strong>
                 </div>
 
-
                 <div class="summary-item">
-
-                    <span>
-                        Total Paid
-                    </span>
-
-                    <strong id="totalPaid">
-                        0
-                    </strong>
-
+                    <span data-i18n="totalPaid">Total Paid</span>
+                    <strong id="totalPaid">0 MRU</strong>
                 </div>
-
             </div>
-
         </section>
 
 
         <!-- Payment History -->
-
         <section class="card">
-
-            <h2>
-                Payment History
-            </h2>
+            <h2 data-i18n="paymentHistory">Payment History</h2>
 
             <div class="table-container">
-
                 <table>
-
                     <thead>
-
                         <tr>
-
-                            <th>
-                                Month
-                            </th>
-
-                            <th>
-                                Amount
-                            </th>
-
-                            <th>
-                                Payment Date
-                            </th>
-
-                            <th>
-                                Receipt Number
-                            </th>
-
-                            <th>
-                                Recorded By
-                            </th>
-
+                            <th data-i18n="month">Month</th>
+                            <th data-i18n="amount">Amount</th>
+                            <th data-i18n="paymentDate">Payment Date</th>
+                            <th data-i18n="receiptNumber">Receipt Number</th>
+                            <th data-i18n="recordedBy">Recorded By</th>
                         </tr>
-
                     </thead>
-
                     <tbody id="paymentHistoryBody">
-
+                        <tr>
+                            <td colspan="5" class="empty-state" data-i18n="loadingPayments">Loading payments...</td>
+                        </tr>
                     </tbody>
-
                 </table>
-
             </div>
 
-
-            <div
-                id="emptyPayments"
-                class="empty-state"
-                style="display: none;">
-
+            <div id="emptyPayments" class="empty-state" style="display: none;" data-i18n="noPayments">
                 No payment records found.
-
             </div>
-
         </section>
 
     </div>
