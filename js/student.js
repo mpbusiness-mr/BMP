@@ -1,703 +1,402 @@
 // =====================================================
-// BMP Students
+// BMP · Student Profile
 // =====================================================
 
 
 // =====================================================
-// Backend API
+// API
 // =====================================================
 
-const STUDENTS_API_URL =
+const API_URL =
     "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+
+
+// =====================================================
+// Config
+// =====================================================
+
+const CACHE_TTL = 2 * 60 * 1000;   // 2 minutes
+
+const MONTHS = [
+    "October", "November", "December",
+    "January", "February", "March",
+    "April", "May", "June"
+];
+
+
+// =====================================================
+// State
+// =====================================================
+
+let currentUser    = null;
+let institutionId  = null;
+
+let studentId      = null;
+
+let currentLanguage = "ar";
+
+let student  = null;
+let payments = [];
+
+let dataLoaded = false;
 
 
 // =====================================================
 // Translations
 // =====================================================
 
-const translations = {
+const TRANSLATIONS = {
 
     en: {
-        language: "Language",
-        loading: "Loading...",
+        pageTitle: "Student Profile",
+        pageSubtitle: "View student information and payment history",
         back: "Back",
-        addStudent: "+ Add Student",
-        students: "Students",
-        manageStudents: "Manage school students",
+        editStudent: "Edit Student",
+
+        schoolInformation: "School Information",
         institutionId: "Institution ID",
-        school: "School",
-        studentsInSelectedYear: "Students in Selected Year",
-        studentList: "Student List",
-        searchAndFilter: "Search and filter students",
+        schoolName: "School Name",
+
+        studentInformation: "Student Information",
         academicYear: "Academic Year",
-        allAcademicYears: "All Academic Years",
-        search: "Search",
-        searchPlaceholder: "Search by name or student number...",
+        studentNumber: "Student Number",
+        studentName: "Student Name",
         stage: "Stage",
-        allStages: "All Stages",
+        class: "Class",
+        registrationDate: "Registration Date",
+        guardianName: "Guardian Name",
+        guardianPhone: "Guardian Phone",
+
+        paymentSummary: "Payment Summary",
+        paidMonths: "Paid Months",
+        unpaidMonths: "Unpaid Months",
+        totalPaid: "Total Paid",
+
+        paymentHistory: "Payment History",
+        month: "Month",
+        amount: "Amount",
+        paymentDate: "Payment Date",
+        receiptNumber: "Receipt Number",
+        recordedBy: "Recorded By",
+
+        loadingPayments: "Loading payments...",
+        noPayments: "No payment records found.",
+        studentNotFound: "Student not found.",
+
         primary: "Primary",
         preparatory: "Preparatory",
         secondary: "Secondary",
-        class: "Class",
-        allClasses: "All Classes",
-        studentNumber: "Student Number",
-        studentName: "Student Name",
-        registrationDate: "Registration Date",
-        actions: "Actions",
-        view: "View",
-        edit: "Edit",
-        noStudentsFound: "No Students Found",
-        noStudentsDescription: "There are no students matching your search or filters.",
-        classNumber: "Class",
-        serverConnectionFailed: "Server connection failed.",
-        unableToLoadStudents: "Unable to load students.",
-        institutionAccessDenied: "Institution access denied."
+
+        unknown: "-",
+
+        months: {
+            October: "October",
+            November: "November",
+            December: "December",
+            January: "January",
+            February: "February",
+            March: "March",
+            April: "April",
+            May: "May",
+            June: "June"
+        }
     },
 
     ar: {
-        language: "اللغة",
-        loading: "جاري التحميل...",
+        pageTitle: "ملف الطالب",
+        pageSubtitle: "عرض معلومات الطالب وسجل المدفوعات",
         back: "رجوع",
-        addStudent: "+ إضافة طالب",
-        students: "الطلاب",
-        manageStudents: "إدارة طلاب المدرسة",
-        institutionId: "رقم المؤسسة",
-        school: "المدرسة",
-        studentsInSelectedYear: "الطلاب في السنة المحددة",
-        studentList: "قائمة الطلاب",
-        searchAndFilter: "البحث عن الطلاب وتصفيتهم",
+        editStudent: "تعديل الطالب",
+
+        schoolInformation: "معلومات المدرسة",
+        institutionId: "معرّف المؤسسة",
+        schoolName: "اسم المدرسة",
+
+        studentInformation: "معلومات الطالب",
         academicYear: "السنة الدراسية",
-        allAcademicYears: "جميع السنوات الدراسية",
-        search: "بحث",
-        searchPlaceholder: "البحث بالاسم أو رقم الطالب...",
-        stage: "المرحلة",
-        allStages: "جميع المراحل",
-        primary: "التعليم الابتدائي",
-        preparatory: "التعليم الإعدادي",
-        secondary: "التعليم الثانوي",
-        class: "القسم",
-        allClasses: "جميع الأقسام",
         studentNumber: "رقم الطالب",
         studentName: "اسم الطالب",
+        stage: "المرحلة",
+        class: "القسم",
         registrationDate: "تاريخ التسجيل",
-        actions: "الإجراءات",
-        view: "عرض",
-        edit: "تعديل",
-        noStudentsFound: "لم يتم العثور على طلاب",
-        noStudentsDescription: "لا يوجد طلاب يطابقون البحث أو عوامل التصفية المحددة.",
-        classNumber: "القسم",
-        serverConnectionFailed: "فشل الاتصال بالخادم.",
-        unableToLoadStudents: "تعذر تحميل الطلاب.",
-        institutionAccessDenied: "تم رفض الوصول إلى المؤسسة."
+        guardianName: "اسم ولي الأمر",
+        guardianPhone: "رقم ولي الأمر",
+
+        paymentSummary: "ملخص المدفوعات",
+        paidMonths: "الأشهر المدفوعة",
+        unpaidMonths: "الأشهر غير المدفوعة",
+        totalPaid: "إجمالي المدفوع",
+
+        paymentHistory: "سجل المدفوعات",
+        month: "الشهر",
+        amount: "المبلغ",
+        paymentDate: "تاريخ الدفع",
+        receiptNumber: "رقم الإيصال",
+        recordedBy: "سجلها المستخدم",
+
+        loadingPayments: "جارٍ تحميل المدفوعات...",
+        noPayments: "لا توجد سجلات مدفوعات.",
+        studentNotFound: "لم يتم العثور على الطالب.",
+
+        primary: "الابتدائية",
+        preparatory: "الإعدادية",
+        secondary: "الثانوية",
+
+        unknown: "-",
+
+        months: {
+            October: "أكتوبر",
+            November: "نوفمبر",
+            December: "ديسمبر",
+            January: "يناير",
+            February: "فبراير",
+            March: "مارس",
+            April: "أبريل",
+            May: "مايو",
+            June: "يونيو"
+        }
     },
 
     fr: {
-        language: "Langue",
-        loading: "Chargement...",
+        pageTitle: "Profil de l'élève",
+        pageSubtitle: "Consulter les informations et l'historique des paiements",
         back: "Retour",
-        addStudent: "+ Ajouter un élève",
-        students: "Élèves",
-        manageStudents: "Gérer les élèves de l'école",
+        editStudent: "Modifier l'élève",
+
+        schoolInformation: "Informations de l'école",
         institutionId: "ID de l'établissement",
-        school: "École",
-        studentsInSelectedYear: "Élèves pour l'année sélectionnée",
-        studentList: "Liste des élèves",
-        searchAndFilter: "Rechercher et filtrer les élèves",
+        schoolName: "Nom de l'école",
+
+        studentInformation: "Informations de l'élève",
         academicYear: "Année scolaire",
-        allAcademicYears: "Toutes les années scolaires",
-        search: "Recherche",
-        searchPlaceholder: "Rechercher par nom ou numéro d'élève...",
-        stage: "Niveau",
-        allStages: "Tous les niveaux",
+        studentNumber: "Numéro de l'élève",
+        studentName: "Nom de l'élève",
+        stage: "Cycle",
+        class: "Classe",
+        registrationDate: "Date d'inscription",
+        guardianName: "Nom du tuteur",
+        guardianPhone: "Téléphone du tuteur",
+
+        paymentSummary: "Résumé des paiements",
+        paidMonths: "Mois payés",
+        unpaidMonths: "Mois impayés",
+        totalPaid: "Total payé",
+
+        paymentHistory: "Historique des paiements",
+        month: "Mois",
+        amount: "Montant",
+        paymentDate: "Date du paiement",
+        receiptNumber: "Numéro du reçu",
+        recordedBy: "Enregistré par",
+
+        loadingPayments: "Chargement des paiements...",
+        noPayments: "Aucun paiement trouvé.",
+        studentNotFound: "Élève introuvable.",
+
         primary: "Primaire",
         preparatory: "Collège",
         secondary: "Secondaire",
-        class: "Classe",
-        allClasses: "Toutes les classes",
-        studentNumber: "Numéro d'élève",
-        studentName: "Nom de l'élève",
-        registrationDate: "Date d'inscription",
-        actions: "Actions",
-        view: "Voir",
-        edit: "Modifier",
-        noStudentsFound: "Aucun élève trouvé",
-        noStudentsDescription: "Aucun élève ne correspond à votre recherche ou à vos filtres.",
-        classNumber: "Classe",
-        serverConnectionFailed: "Échec de la connexion au serveur.",
-        unableToLoadStudents: "Impossible de charger les élèves.",
-        institutionAccessDenied: "Accès à l'établissement refusé."
+
+        unknown: "-",
+
+        months: {
+            October: "Octobre",
+            November: "Novembre",
+            December: "Décembre",
+            January: "Janvier",
+            February: "Février",
+            March: "Mars",
+            April: "Avril",
+            May: "Mai",
+            June: "Juin"
+        }
     }
 
 };
 
 
 // =====================================================
-// Current Language
+// Translation helper
 // =====================================================
 
-const DEFAULT_LANG = "ar";
+function t(key) {
+    const lang = TRANSLATIONS[currentLanguage] || TRANSLATIONS.en;
+    const parts = String(key).split(".");
+    let value = lang;
 
-let currentLanguage =
-    localStorage.getItem("bmpLanguage") || DEFAULT_LANG;
+    for (let i = 0; i < parts.length; i++) {
+        if (value && Object.prototype.hasOwnProperty.call(value, parts[i])) {
+            value = value[parts[i]];
+        } else {
+            return key;
+        }
+    }
 
-
-// =====================================================
-// Authentication
-// =====================================================
-
-const currentUser = requireSchoolLogin();
-
-if (!currentUser) {
-    throw new Error("School login required.");
-}
-
-const institutionId = getActiveInstitutionId();
-
-if (!institutionId) {
-    throw new Error("Institution access denied.");
+    return value;
 }
 
 
 // =====================================================
-// Institution
+// Language
 // =====================================================
 
-const institution = {
-    id:    currentUser.institutionId    || "",
-    name:  currentUser.institutionName  || "",
-    phone: currentUser.institutionPhone || "",
-    email: currentUser.institutionEmail || ""
-};
-
-if (institution.id !== institutionId) {
-    alert(translations[currentLanguage].institutionAccessDenied);
-    window.location.href = "school-login.html";
+function getSavedLanguage() {
+    const v = localStorage.getItem("bmpLanguage");
+    if (v && ["en", "ar", "fr"].indexOf(v.toLowerCase()) !== -1) {
+        return v.toLowerCase();
+    }
+    return "ar";
 }
 
-
-// =====================================================
-// Role
-// =====================================================
-
-const isDirector =
-    String(currentUser.role || "").trim().toLowerCase() === "director";
-
-
-// =====================================================
-// Cache key
-// =====================================================
-
-const CACHE_KEY = "bmp_students_" + institution.id;
-
-
-// =====================================================
-// Elements
-// =====================================================
-
-const pageTitle               = document.getElementById("pageTitle");
-const pageSubtitle            = document.getElementById("pageSubtitle");
-const institutionIdElement    = document.getElementById("institutionId");
-const institutionNameElement  = document.getElementById("institutionName");
-const totalStudentsElement    = document.getElementById("totalStudents");
-const academicYearFilter      = document.getElementById("academicYearFilter");
-const searchStudent           = document.getElementById("searchStudent");
-const stageFilter             = document.getElementById("stageFilter");
-const classFilter             = document.getElementById("classFilter");
-const studentsTableBody       = document.getElementById("studentsTableBody");
-const emptyState              = document.getElementById("emptyState");
-const addStudentButton        = document.getElementById("addStudentButton");
-const emptyAddStudentButton   = document.getElementById("emptyAddStudentButton");
-const backButton              = document.getElementById("backButton");
-const pageLoader              = document.getElementById("pageLoader");
-const langButtons             = document.querySelectorAll(".lang-btn");
-
-
-// =====================================================
-// Students data
-// =====================================================
-
-let students = [];
-let isFirstRender = true;
-
-
-// =====================================================
-// Loader helpers
-// =====================================================
-
-function hideLoaderAfterPaint() {
-    requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-            if (pageLoader) pageLoader.classList.add("hidden");
-        });
-    });
-}
-
-
-// =====================================================
-// Apply Language
-// =====================================================
-
-function applyLanguage(language) {
-
-    if (!translations[language]) language = DEFAULT_LANG;
+function setLanguage(language) {
+    language = String(language || "ar").toLowerCase().trim();
+    if (!TRANSLATIONS[language]) language = "ar";
 
     currentLanguage = language;
-    localStorage.setItem("bmpLanguage", language);
+    try { localStorage.setItem("bmpLanguage", language); } catch (e) {}
 
-    document.documentElement.lang = language;
-    document.documentElement.dir  = (language === "ar") ? "rtl" : "ltr";
+    applyLanguage();
+}
+
+function applyLanguage() {
+
+    document.documentElement.lang = currentLanguage;
+    document.documentElement.dir  = currentLanguage === "ar" ? "rtl" : "ltr";
 
     document.body.classList.remove("lang-ar", "lang-fr", "lang-en");
-    document.body.classList.add("lang-" + language);
+    document.body.classList.add("lang-" + currentLanguage);
 
-    document.querySelectorAll("[data-i18n]").forEach(function (element) {
-        const key = element.getAttribute("data-i18n");
-        if (translations[language][key]) {
-            element.textContent = translations[language][key];
-        }
+    document.title = t("pageTitle") + " - BMP";
+
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+        const key = el.getAttribute("data-i18n");
+        const value = TRANSLATIONS[currentLanguage][key];
+        if (value !== undefined) el.textContent = value;
     });
 
-    document.querySelectorAll("[data-i18n-placeholder]").forEach(function (element) {
-        const key = element.getAttribute("data-i18n-placeholder");
-        if (translations[language][key]) {
-            element.placeholder = translations[language][key];
-        }
+    document.querySelectorAll(".lang-btn").forEach(function (btn) {
+        btn.classList.toggle("active", btn.dataset.lang === currentLanguage);
     });
 
-    if (pageSubtitle) {
-        pageSubtitle.textContent =
-            institution.name
-                ? translations[language].manageStudents + " - " + institution.name
-                : translations[language].manageStudents;
-    }
-
-    langButtons.forEach(function (btn) {
-        btn.classList.toggle("active", btn.dataset.lang === language);
-    });
-
-    loadClassFilter();
-    loadAcademicYearFilter();
-    renderStudents();
-}
-
-
-// =====================================================
-// Language Switcher
-// =====================================================
-
-langButtons.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-        applyLanguage(btn.dataset.lang);
-    });
-});
-
-
-// =====================================================
-// Initialize UI (no network)
-// =====================================================
-
-function initializeUI() {
-
-    pageTitle.textContent = translations[currentLanguage].students;
-
-    pageSubtitle.textContent =
-        institution.name
-            ? translations[currentLanguage].manageStudents + " - " + institution.name
-            : translations[currentLanguage].manageStudents;
-
-    institutionIdElement.textContent   = institution.id;
-    institutionNameElement.textContent = institution.name;
-
-    applyLanguage(currentLanguage);
-
-    if (!isDirector) {
-        if (addStudentButton)      addStudentButton.style.display = "none";
-        if (emptyAddStudentButton) emptyAddStudentButton.style.display = "none";
+    if (dataLoaded) {
+        renderStudent();
+        renderPaymentHistory();
     }
 }
 
 
 // =====================================================
-// Load students from Backend
+// Cache helpers
 // =====================================================
 
-async function loadStudents() {
+function readCache(key, ttl) {
+    try {
+        const raw = sessionStorage.getItem(key);
+        if (!raw) return { data: null, fresh: false };
+        const parsed = JSON.parse(raw);
+        if (!parsed || parsed.data === undefined) return { data: null, fresh: false };
+        const age = Date.now() - (parsed.ts || 0);
+        return { data: parsed.data, fresh: age < ttl };
+    } catch (e) {
+        return { data: null, fresh: false };
+    }
+}
+
+function writeCache(key, data) {
+    try {
+        sessionStorage.setItem(key, JSON.stringify({ ts: Date.now(), data: data }));
+    } catch (e) {}
+}
+
+
+// =====================================================
+// Authentication — session only
+// =====================================================
+
+function initializeAuthentication() {
 
     try {
+        if (typeof requireSchoolLogin === "function") {
+            currentUser = requireSchoolLogin();
+        }
+    } catch (error) {
+        console.error("Authentication error:", error);
+    }
 
-        const response = await fetch(STUDENTS_API_URL, {
+    if (!currentUser) {
+        try {
+            currentUser = JSON.parse(localStorage.getItem("bmpCurrentUser") || "null");
+        } catch (error) {
+            currentUser = null;
+        }
+    }
+
+    if (!currentUser) return false;
+
+    institutionId = String(currentUser.institutionId || "").trim();
+    return Boolean(institutionId);
+}
+
+function getCurrentUsername() {
+    if (currentUser && currentUser.username) return String(currentUser.username).trim();
+    if (currentUser && currentUser.userName) return String(currentUser.userName).trim();
+    if (currentUser && currentUser.name)     return String(currentUser.name).trim();
+    return "";
+}
+
+function isDirector() {
+    return String(currentUser && currentUser.role || "")
+        .trim()
+        .toLowerCase() === "director";
+}
+
+
+// =====================================================
+// API request — clean, no abort controller
+// =====================================================
+
+function apiRequest(action, data) {
+    return new Promise(function (resolve, reject) {
+
+        if (!institutionId) return reject(new Error("Institution missing"));
+        const username = getCurrentUsername();
+        if (!username) return reject(new Error("User missing"));
+
+        const payload = Object.assign({
+            action: action,
+            institutionId: institutionId,
+            username: username
+        }, data || {});
+
+        fetch(API_URL, {
             method: "POST",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({
-                action: "getStudents",
-                institutionId: institution.id,
-                username: currentUser.username
-            })
+            body: JSON.stringify(payload)
+        })
+        .then(function (response) {
+            if (!response.ok) throw new Error("Server error: " + response.status);
+            return response.text();
+        })
+        .then(function (text) {
+            let result;
+            try { result = JSON.parse(text); }
+            catch (e) { throw new Error("Invalid response"); }
+            if (!result.success) throw new Error(result.message || "Request failed");
+            resolve(result);
+        })
+        .catch(function (error) {
+            reject(error);
         });
-
-        if (!response.ok) {
-            throw new Error(translations[currentLanguage].serverConnectionFailed);
-        }
-
-        const result = await response.json();
-
-        if (!result.success) {
-            throw new Error(
-                result.message || translations[currentLanguage].unableToLoadStudents
-            );
-        }
-
-        students = (result.students || []).map(normalizeStudent);
-
-        try {
-            sessionStorage.setItem(CACHE_KEY, JSON.stringify(students));
-        } catch (e) {}
-
-        loadAcademicYearFilter();
-        renderStudents();
-
-        return true;
-
-    } catch (error) {
-
-        console.error("Students loading error:", error);
-
-        if (students.length === 0) {
-            renderStudents();
-            alert(error.message || translations[currentLanguage].unableToLoadStudents);
-        }
-
-        return false;
-    }
-}
-
-
-// =====================================================
-// Read from cache (sessionStorage)
-// =====================================================
-
-function loadStudentsFromCache() {
-    try {
-        const cached = sessionStorage.getItem(CACHE_KEY);
-        if (!cached) return false;
-
-        const parsed = JSON.parse(cached);
-        if (!Array.isArray(parsed) || parsed.length === 0) return false;
-
-        students = parsed.map(normalizeStudent);
-        loadAcademicYearFilter();
-        renderStudents();
-
-        return true;
-    } catch (e) {
-        return false;
-    }
-}
-
-
-// =====================================================
-// Normalize student data
-// =====================================================
-
-function normalizeStudent(student) {
-    return {
-        id:               student.studentId || "",
-        studentNumber:    student.studentNumber || "",
-        academicYear:     student.academicYear || "",
-        name:             student.name || "",
-        stage:            student.stage || "",
-        classNumber:      student.class || student.classNumber || "",
-        className:        student.class
-            ? translations[currentLanguage].classNumber + " " + student.class
-            : "",
-        registrationDate: student.createdAt || ""
-    };
-}
-
-
-// =====================================================
-// Load academic years
-// =====================================================
-
-function loadAcademicYearFilter() {
-
-    const selectedValue = academicYearFilter.value;
-
-    const academicYears = [
-        ...new Set(students.map(s => s.academicYear).filter(y => y))
-    ];
-
-    academicYears.sort(function (a, b) {
-        return Number(b.split("-")[0]) - Number(a.split("-")[0]);
     });
-
-    academicYearFilter.innerHTML = "";
-
-    const allOption = document.createElement("option");
-    allOption.value = "all";
-    allOption.textContent = translations[currentLanguage].allAcademicYears;
-    academicYearFilter.appendChild(allOption);
-
-    academicYears.forEach(function (year) {
-        const option = document.createElement("option");
-        option.value = year;
-        option.textContent = year;
-        academicYearFilter.appendChild(option);
-    });
-
-    const currentYear = new Date().getFullYear();
-    const currentAcademicYear = currentYear + "-" + (currentYear + 1);
-
-    if (academicYears.includes(selectedValue)) {
-        academicYearFilter.value = selectedValue;
-    } else if (academicYears.includes(currentAcademicYear)) {
-        academicYearFilter.value = currentAcademicYear;
-    } else {
-        academicYearFilter.value = "all";
-    }
 }
 
 
 // =====================================================
-// Load classes
-// =====================================================
-
-function loadClassFilter() {
-
-    const selectedClass = classFilter.value;
-    const stage = stageFilter.value;
-
-    classFilter.innerHTML = "";
-
-    const allOption = document.createElement("option");
-    allOption.value = "all";
-    allOption.textContent = translations[currentLanguage].allClasses;
-    classFilter.appendChild(allOption);
-
-    let numberOfClasses = 6;
-    if (stage === "primary")          numberOfClasses = 6;
-    else if (stage === "preparatory") numberOfClasses = 4;
-    else if (stage === "secondary")   numberOfClasses = 3;
-
-    for (let i = 1; i <= numberOfClasses; i++) {
-        const option = document.createElement("option");
-        option.value = String(i);
-        option.textContent = translations[currentLanguage].classNumber + " " + i;
-        classFilter.appendChild(option);
-    }
-
-    if (selectedClass && Number(selectedClass) <= numberOfClasses) {
-        classFilter.value = selectedClass;
-    } else {
-        classFilter.value = "all";
-    }
-}
-
-
-// =====================================================
-// Render students
-// =====================================================
-
-function renderStudents() {
-
-    const selectedAcademicYear = academicYearFilter.value;
-    const selectedStage        = stageFilter.value;
-    const selectedClass        = classFilter.value;
-    const searchValue          = searchStudent.value.trim().toLowerCase();
-
-    const filteredStudents = students.filter(function (student) {
-
-        const studentName   = String(student.name || "").toLowerCase();
-        const studentNumber = String(student.studentNumber || "").toLowerCase();
-
-        const matchesSearch =
-            studentName.includes(searchValue) ||
-            studentNumber.includes(searchValue);
-
-        const matchesAcademicYear =
-            selectedAcademicYear === "all" ||
-            student.academicYear === selectedAcademicYear;
-
-        const matchesStage =
-            selectedStage === "all" ||
-            student.stage === selectedStage;
-
-        const matchesClass =
-            selectedClass === "all" ||
-            String(student.classNumber) === String(selectedClass);
-
-        return (
-            matchesSearch &&
-            matchesAcademicYear &&
-            matchesStage &&
-            matchesClass
-        );
-    });
-
-    totalStudentsElement.textContent = filteredStudents.length;
-    studentsTableBody.innerHTML = "";
-
-    if (filteredStudents.length === 0) {
-        if (!isFirstRender) {
-            emptyState.style.display = "block";
-        }
-        return;
-    }
-
-    emptyState.style.display = "none";
-
-    filteredStudents.sort(function (a, b) {
-        return String(a.studentNumber || "").localeCompare(
-            String(b.studentNumber || ""),
-            undefined,
-            { numeric: true }
-        );
-    });
-
-    const fragment = document.createDocumentFragment();
-
-    filteredStudents.forEach(function (student) {
-
-        const row = document.createElement("tr");
-
-        const registrationDate = student.registrationDate
-            ? formatDate(student.registrationDate)
-            : "-";
-
-        const stageName = formatStage(student.stage);
-
-        const className = student.classNumber
-            ? translations[currentLanguage].classNumber + " " + student.classNumber
-            : "-";
-
-        const actionsHtml = isDirector
-            ? `
-                <button class="table-action" onclick="viewStudent('${escapeHtml(student.id)}')">
-                    ${translations[currentLanguage].view}
-                </button>
-                <button class="table-action edit" onclick="editStudent('${escapeHtml(student.id)}')">
-                    ${translations[currentLanguage].edit}
-                </button>
-              `
-            : `
-                <button class="table-action" onclick="viewStudent('${escapeHtml(student.id)}')">
-                    ${translations[currentLanguage].view}
-                </button>
-              `;
-
-        row.innerHTML = `
-            <td><span class="student-number">${escapeHtml(student.studentNumber || "-")}</span></td>
-            <td><span class="student-name">${escapeHtml(student.name || "-")}</span></td>
-            <td><span class="class-badge">${escapeHtml(student.academicYear || "-")}</span></td>
-            <td><span class="stage-badge">${escapeHtml(stageName)}</span></td>
-            <td><span class="class-badge">${escapeHtml(className)}</span></td>
-            <td>${escapeHtml(registrationDate)}</td>
-            <td>${actionsHtml}</td>
-        `;
-
-        fragment.appendChild(row);
-    });
-
-    studentsTableBody.appendChild(fragment);
-    isFirstRender = false;
-}
-
-
-// =====================================================
-// Format stage
-// =====================================================
-
-function formatStage(stage) {
-    if (stage === "primary")     return translations[currentLanguage].primary;
-    if (stage === "preparatory") return translations[currentLanguage].preparatory;
-    if (stage === "secondary")   return translations[currentLanguage].secondary;
-    return stage || "-";
-}
-
-
-// =====================================================
-// Format date
-// =====================================================
-
-function formatDate(dateValue) {
-
-    if (!dateValue) return "-";
-
-    const date = new Date(dateValue);
-    if (isNaN(date.getTime())) return "-";
-
-    return date.toLocaleDateString(
-        currentLanguage === "ar"
-            ? "ar"
-            : currentLanguage === "fr"
-                ? "fr-FR"
-                : "en-US"
-    );
-}
-
-
-// =====================================================
-// Navigation
-// =====================================================
-
-function viewStudent(studentId) {
-    window.location.href =
-        "student.html?id=" +
-        encodeURIComponent(studentId) +
-        "&institutionId=" +
-        encodeURIComponent(institution.id);
-}
-
-function editStudent(studentId) {
-    window.location.href =
-        "edit-student.html?id=" +
-        encodeURIComponent(studentId) +
-        "&institutionId=" +
-        encodeURIComponent(institution.id);
-}
-
-function openAddStudent() {
-    window.location.href =
-        "add-student.html?id=" +
-        encodeURIComponent(institution.id);
-}
-
-
-// =====================================================
-// Events
-// =====================================================
-
-if (addStudentButton) {
-    addStudentButton.addEventListener("click", openAddStudent);
-}
-
-if (emptyAddStudentButton) {
-    emptyAddStudentButton.addEventListener("click", openAddStudent);
-}
-
-academicYearFilter.addEventListener("change", renderStudents);
-searchStudent.addEventListener("input", renderStudents);
-
-stageFilter.addEventListener("change", function () {
-    loadClassFilter();
-    renderStudents();
-});
-
-classFilter.addEventListener("change", renderStudents);
-
-backButton.addEventListener("click", function () {
-    window.location.href =
-        "school.html?id=" +
-        encodeURIComponent(institution.id);
-});
-
-
-// =====================================================
-// Escape HTML
+// Helpers
 // =====================================================
 
 function escapeHtml(value) {
-    return String(value)
+    return String(value == null ? "" : value)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -705,27 +404,397 @@ function escapeHtml(value) {
         .replace(/'/g, "&#039;");
 }
 
+function formatAmount(amount) {
+    const number = Number(amount || 0);
+    const locale =
+        currentLanguage === "ar" ? "ar" :
+        currentLanguage === "fr" ? "fr-FR" : "en-US";
+    return number.toLocaleString(locale, {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
+}
+
+function formatStage(stage) {
+    const key = String(stage || "").trim().toLowerCase();
+    if (key === "primary")     return t("primary");
+    if (key === "preparatory") return t("preparatory");
+    if (key === "secondary")   return t("secondary");
+    return stage || t("unknown");
+}
+
+function formatMonth(month) {
+    if (!month) return t("unknown");
+    const key = String(month).trim();
+    if (TRANSLATIONS.en.months[key]) {
+        return t("months." + key);
+    }
+    return key;
+}
+
+function formatPaymentDate(value) {
+
+    if (!value) return "-";
+
+    const str = String(value).trim();
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+
+    const isoMatch = str.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (isoMatch) return isoMatch[1];
+
+    const date = new Date(str);
+    if (Number.isNaN(date.getTime())) return str;
+
+    const y  = date.getFullYear();
+    const mo = String(date.getMonth() + 1).padStart(2, "0");
+    const d  = String(date.getDate()).padStart(2, "0");
+
+    return y + "-" + mo + "-" + d;
+}
+
 
 // =====================================================
-// BOOT
+// Element refs
 // =====================================================
 
-(function boot() {
+const institutionIdElement   = document.getElementById("institutionId");
+const institutionNameElement = document.getElementById("institutionName");
 
-    // 1) UI paints instantly
-    initializeUI();
+const academicYearElement    = document.getElementById("academicYear");
+const studentNumberElement   = document.getElementById("studentNumber");
+const studentNameElement     = document.getElementById("studentName");
+const stageElement           = document.getElementById("stage");
+const classNameElement       = document.getElementById("className");
+const registrationDateElement= document.getElementById("registrationDate");
+const guardianNameElement    = document.getElementById("guardianName");
+const guardianPhoneElement   = document.getElementById("guardianPhone");
 
-    // 2) Instant render from cache if available
-    const hadCache = loadStudentsFromCache();
-    if (hadCache) {
-        hideLoaderAfterPaint();
+const paidMonthsElement      = document.getElementById("paidMonths");
+const unpaidMonthsElement    = document.getElementById("unpaidMonths");
+const totalPaidElement       = document.getElementById("totalPaid");
+
+const paymentHistoryBody     = document.getElementById("paymentHistoryBody");
+const emptyPayments          = document.getElementById("emptyPayments");
+
+const backButton             = document.getElementById("backButton");
+const editButton             = document.getElementById("editButton");
+
+
+// =====================================================
+// Update header display
+// =====================================================
+
+function updateHeader() {
+    if (institutionIdElement) {
+        institutionIdElement.textContent = institutionId || "-";
+    }
+    if (institutionNameElement) {
+        institutionNameElement.textContent =
+            (currentUser && currentUser.institutionName) || "-";
+    }
+}
+
+
+// =====================================================
+// Render student info
+// =====================================================
+
+function renderStudent() {
+
+    if (!student) return;
+
+    if (academicYearElement)     academicYearElement.textContent     = student.academicYear || t("unknown");
+    if (studentNumberElement)    studentNumberElement.textContent    = student.studentNumber || t("unknown");
+    if (studentNameElement)      studentNameElement.textContent      = student.name || t("unknown");
+    if (stageElement)            stageElement.textContent            = formatStage(student.stage);
+    if (classNameElement)        classNameElement.textContent        =
+        student.class ? (t("class") + " " + student.class) : t("unknown");
+    if (registrationDateElement) registrationDateElement.textContent =
+        formatPaymentDate(student.registrationDate) || t("unknown");
+
+    if (guardianNameElement) {
+        guardianNameElement.textContent = student.guardianName || t("unknown");
+    }
+    if (guardianPhoneElement) {
+        guardianPhoneElement.textContent = student.guardianPhone || t("unknown");
     }
 
-    // 3) Always refresh from network
-    loadStudents().then(function () {
-        if (!hadCache) {
-            hideLoaderAfterPaint();
-        }
+    // Document title
+    if (student.name) {
+        document.title = student.name + " · " + t("pageTitle") + " - BMP";
+    }
+}
+
+
+// =====================================================
+// Filter payments for this student
+// =====================================================
+
+function getStudentPayments() {
+    if (!student) return [];
+
+    const sid = String(student.studentId || student.id || "");
+    const year = String(student.academicYear || "");
+
+    return payments.filter(function (p) {
+        const pSid  = String(p.studentId || "");
+        const pYear = String(p.academicYear || "");
+        return pSid === sid && (!year || pYear === year);
+    });
+}
+
+
+// =====================================================
+// Payment summary
+// =====================================================
+
+function renderPaymentSummary() {
+
+    const studentPayments = getStudentPayments();
+
+    const paidCount = studentPayments.length;
+    const totalPaid = studentPayments.reduce(function (sum, p) {
+        return sum + Number(p.amount || 0);
+    }, 0);
+
+    const totalMonths = MONTHS.length;   // 9
+    const unpaidCount = Math.max(0, totalMonths - paidCount);
+
+    if (paidMonthsElement)   paidMonthsElement.textContent   = String(paidCount);
+    if (unpaidMonthsElement) unpaidMonthsElement.textContent = String(unpaidCount);
+    if (totalPaidElement)    totalPaidElement.textContent    = formatAmount(totalPaid) + " MRU";
+}
+
+
+// =====================================================
+// Payment history table
+// =====================================================
+
+function renderPaymentHistory() {
+
+    if (!paymentHistoryBody) return;
+
+    const studentPayments = getStudentPayments();
+
+    paymentHistoryBody.innerHTML = "";
+
+    if (studentPayments.length === 0) {
+        if (emptyPayments) emptyPayments.style.display = "block";
+        return;
+    }
+
+    if (emptyPayments) emptyPayments.style.display = "none";
+
+    // Sort: by month order (Oct → Jun), then by date
+    studentPayments.sort(function (a, b) {
+        const ai = MONTHS.indexOf(String(a.month || ""));
+        const bi = MONTHS.indexOf(String(b.month || ""));
+        if (ai !== bi) return ai - bi;
+        return String(a.paymentDate || "").localeCompare(String(b.paymentDate || ""));
     });
 
-})();
+    const fragment = document.createDocumentFragment();
+
+    studentPayments.forEach(function (p) {
+
+        const row = document.createElement("tr");
+
+        const month         = formatMonth(p.month);
+        const amount        = formatAmount(p.amount) + " MRU";
+        const paymentDate   = formatPaymentDate(p.paymentDate || p.date);
+        const receiptNumber = p.receiptNumber || t("unknown");
+        const recordedBy    = p.recordedBy || t("unknown");
+
+        row.innerHTML =
+            "<td>" + escapeHtml(month) + "</td>" +
+            "<td>" + escapeHtml(amount) + "</td>" +
+            "<td>" + escapeHtml(paymentDate) + "</td>" +
+            "<td>" + escapeHtml(receiptNumber) + "</td>" +
+            "<td>" + escapeHtml(recordedBy) + "</td>";
+
+        fragment.appendChild(row);
+    });
+
+    paymentHistoryBody.appendChild(fragment);
+}
+
+
+// =====================================================
+// Load data — parallel, cache-first
+// =====================================================
+
+function loadData() {
+
+    // 1) Cache-first (students + payments)
+    const studentsCache = readCache("bmp_students_" + institutionId, CACHE_TTL);
+    const paymentsCache = readCache("bmp_payments_" + institutionId, CACHE_TTL);
+
+    let students = [];
+
+    if (studentsCache.data) {
+        students = studentsCache.data;
+    }
+
+    if (paymentsCache.data) {
+        payments = paymentsCache.data;
+    }
+
+    // Find student in cache
+    if (students.length > 0) {
+        const found = students.find(function (s) {
+            return String(s.studentId || s.id || "") === String(studentId);
+        });
+
+        if (found) {
+            student = normalizeStudent(found);
+            dataLoaded = true;
+
+            updateHeader();
+            renderStudent();
+            renderPaymentSummary();
+            renderPaymentHistory();
+        }
+    }
+
+    // 2) Network refresh — both calls in parallel
+    const studentsPromise = studentsCache.fresh
+        ? Promise.resolve()
+        : apiRequest("getStudents").then(function (result) {
+            const list = Array.isArray(result.students) ? result.students : [];
+            writeCache("bmp_students_" + institutionId, list);
+            return list;
+        });
+
+    const paymentsPromise = paymentsCache.fresh
+        ? Promise.resolve()
+        : apiRequest("getPayments").then(function (result) {
+            const list = Array.isArray(result.payments) ? result.payments : [];
+            writeCache("bmp_payments_" + institutionId, list);
+            return list;
+        });
+
+    Promise.all([studentsPromise, paymentsPromise])
+        .then(function (results) {
+
+            const freshStudents = results[0];
+            const freshPayments = results[1];
+
+            if (Array.isArray(freshStudents) && freshStudents.length > 0) {
+                students = freshStudents;
+            }
+            if (Array.isArray(freshPayments)) {
+                payments = freshPayments;
+            }
+
+            const found = students.find(function (s) {
+                return String(s.studentId || s.id || "") === String(studentId);
+            });
+
+            if (!found) {
+                if (!student) {
+                    alert(t("studentNotFound"));
+                    window.location.href =
+                        "students.html?id=" + encodeURIComponent(institutionId);
+                }
+                return;
+            }
+
+            student = normalizeStudent(found);
+            dataLoaded = true;
+
+            updateHeader();
+            renderStudent();
+            renderPaymentSummary();
+            renderPaymentHistory();
+        })
+        .catch(function (error) {
+            console.error("Student profile loading error:", error);
+
+            if (!student) {
+                alert(t("studentNotFound"));
+                window.location.href =
+                    "students.html?id=" + encodeURIComponent(institutionId);
+            }
+        });
+}
+
+
+// =====================================================
+// Normalize student shape
+// =====================================================
+
+function normalizeStudent(s) {
+    return {
+        id:               s.studentId || s.id || "",
+        studentId:        s.studentId || s.id || "",
+        studentNumber:    s.studentNumber || "",
+        academicYear:     s.academicYear || "",
+        name:             s.name || "",
+        stage:            s.stage || "",
+        class:            s.class || s.classNumber || "",
+        registrationDate: s.registrationDate || s.createdAt || "",
+        guardianName:     s.guardianName || "",
+        guardianPhone:    s.guardianPhone || ""
+    };
+}
+
+
+// =====================================================
+// Events
+// =====================================================
+
+function goBack() {
+    window.location.href =
+        "students.html?id=" + encodeURIComponent(institutionId);
+}
+
+function goEdit() {
+    window.location.href =
+        "edit-student.html?id=" + encodeURIComponent(studentId) +
+        "&institutionId=" + encodeURIComponent(institutionId);
+}
+
+
+// =====================================================
+// Initialize
+// =====================================================
+
+function initializePage() {
+
+    // 1) URL params
+    const params = new URLSearchParams(window.location.search);
+    studentId = String(params.get("id") || "").trim();
+
+    if (!studentId) {
+        window.location.href = "students.html";
+        return;
+    }
+
+    // 2) Auth
+    const authenticated = initializeAuthentication();
+    if (!authenticated) return;
+
+    // 3) Language
+    currentLanguage = getSavedLanguage();
+    applyLanguage();
+
+    // 4) Header/back/edit
+    updateHeader();
+
+    if (backButton) backButton.addEventListener("click", goBack);
+
+    if (editButton) {
+        if (isDirector()) {
+            editButton.addEventListener("click", goEdit);
+        } else {
+            editButton.style.display = "none";
+        }
+    }
+
+    // 5) Load data
+    loadData();
+}
+
+
+document.addEventListener("DOMContentLoaded", initializePage);
