@@ -1,317 +1,513 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Student Profile - BMP</title>
-
-    <link rel="stylesheet" href="student.css">
-</head>
-
-<body>
-
-    <div class="page-container">
-
-        <!-- Header -->
-
-        <header class="page-header">
-
-            <div>
-                <h1 id="studentPageTitle">
-                    Student Profile
-                </h1>
-
-                <p id="studentPageSubtitle">
-                    View student information
-                </p>
-            </div>
-
-            <div class="header-actions">
-
-                <button
-                    id="backButton"
-                    class="btn btn-secondary">
-                    Back
-                </button>
-
-                <button
-                    id="editButton"
-                    class="btn btn-primary">
-                    Edit Student
-                </button>
-
-            </div>
-
-        </header>
-
-
-        <!-- School Information -->
-
-        <section class="card">
-
-            <h2>School Information</h2>
-
-            <div class="info-grid">
-
-                <div class="info-item">
-
-                    <span>
-                        Institution ID
-                    </span>
-
-                    <strong id="institutionId">
-                        -
-                    </strong>
-
-                </div>
-
-
-                <div class="info-item">
-
-                    <span>
-                        School Name
-                    </span>
-
-                    <strong id="institutionName">
-                        -
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- Student Information -->
-
-        <section class="card">
-
-            <h2>Student Information</h2>
-
-            <div class="student-profile-grid">
-
-
-                <div class="profile-item student-number-item">
-
-                    <span>
-                        Student Number
-                    </span>
-
-                    <strong id="studentNumber">
-                        -
-                    </strong>
-
-                </div>
-
-
-                <div class="profile-item">
-
-                    <span>
-                        Student Name
-                    </span>
-
-                    <strong id="studentName">
-                        -
-                    </strong>
-
-                </div>
-
-
-                <div class="profile-item">
-
-                    <span>
-                        Stage
-                    </span>
-
-                    <strong id="studentStage">
-                        -
-                    </strong>
-
-                </div>
-
-
-                <div class="profile-item">
-
-                    <span>
-                        Class
-                    </span>
-
-                    <strong id="studentClass">
-                        -
-                    </strong>
-
-                </div>
-
-
-                <div class="profile-item">
-
-                    <span>
-                        Registration Date
-                    </span>
-
-                    <strong id="registrationDate">
-                        -
-                    </strong>
-
-                </div>
-
-
-                <div class="profile-item">
-
-                    <span>
-                        Student ID
-                    </span>
-
-                    <strong id="studentId">
-                        -
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- Payment Summary -->
-
-        <section class="card">
-
-            <h2>Payment Summary</h2>
-
-            <div class="summary-grid">
-
-                <div class="summary-item">
-
-                    <span>
-                        Paid Months
-                    </span>
-
-                    <strong id="paidMonths">
-                        0
-                    </strong>
-
-                </div>
-
-
-                <div class="summary-item">
-
-                    <span>
-                        Unpaid Months
-                    </span>
-
-                    <strong id="unpaidMonths">
-                        0
-                    </strong>
-
-                </div>
-
-
-                <div class="summary-item">
-
-                    <span>
-                        Total Paid
-                    </span>
-
-                    <strong id="totalPaid">
-                        0
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- Payment History -->
-
-        <section class="card">
-
-            <div class="section-header">
-
-                <div>
-
-                    <h2>
-                        Payment History
-                    </h2>
-
-                    <p>
-                        Student payment records
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div
-                id="paymentEmptyState"
-                class="empty-state">
-
-                <h3>
-                    No Payment Records
-                </h3>
-
-                <p>
-                    Payment records will appear here
-                    after payments are registered.
-                </p>
-
-            </div>
-
-
-            <div
-                id="paymentTableContainer"
-                class="table-container">
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                Month
-                            </th>
-
-                            <th>
-                                Amount
-                            </th>
-
-                            <th>
-                                Payment Date
-                            </th>
-
-                            <th>
-                                Receipt Number
-                            </th>
-
-                            <th>
-                                Recorded By
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="paymentTableBody">
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </section>
-
-    </div>
-
-
-    <script src="js/student.js"></script>
-
-</body>
-
-</html>
+/* =====================================================
+   BMP · Student Profile — Brand
+   ===================================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --primary: #0f2b4b;
+    --primary-light: #1a3f66;
+    --accent: #00b4d8;
+    --accent-soft: #e6f7fd;
+    --text-dark: #0b1a2a;
+    --text-muted: #3e5a76;
+    --white: #ffffff;
+    --border: #e5eaf0;
+    --bg: #f5f8fc;
+    --success: #16a34a;
+    --success-soft: #dcfce7;
+    --danger: #dc2626;
+    --danger-soft: #fee2e2;
+
+    --shadow-sm: 0 4px 14px rgba(15, 43, 75, 0.05);
+    --radius: 14px;
+    --radius-sm: 10px;
+    --transition: all 0.22s ease;
+}
+
+body {
+    font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+body.lang-ar { font-family: 'IBM Plex Sans Arabic', sans-serif; }
+body.lang-fr,
+body.lang-en { font-family: 'Inter', sans-serif; }
+
+.page-container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 30px;
+}
+
+/* =====================================================
+   Header
+   ===================================================== */
+
+.page-header {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 30px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    box-shadow: var(--shadow-sm);
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.topbar-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1.9rem;
+    letter-spacing: -0.8px;
+    color: var(--primary);
+    text-decoration: none;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.topbar-logo i {
+    color: var(--accent);
+    font-size: 2.1rem;
+    line-height: 1;
+}
+
+.page-title-block h1 {
+    font-size: 1.5rem;
+    color: var(--primary);
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    margin-bottom: 2px;
+}
+
+.page-title-block p {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* =====================================================
+   Language Switcher
+   ===================================================== */
+
+.lang-switcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 40px;
+    box-shadow: var(--shadow-sm);
+}
+
+.lang-btn {
+    background: transparent;
+    border: none;
+    padding: 7px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-radius: 30px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+    letter-spacing: 0.3px;
+}
+
+.lang-btn:hover { color: var(--primary); }
+
+.lang-btn.active {
+    background: var(--primary);
+    color: var(--white);
+    box-shadow: 0 4px 10px rgba(15, 43, 75, 0.2);
+}
+
+/* =====================================================
+   Buttons
+   ===================================================== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 42px;
+    padding: 0 20px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: linear-gradient(145deg, #0f2b4b, #1a3f66);
+    color: var(--white);
+    box-shadow: 0 8px 20px rgba(15, 43, 75, 0.22);
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px rgba(15, 43, 75, 0.28);
+}
+
+.btn-secondary {
+    background: var(--white);
+    color: var(--primary);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+}
+
+/* =====================================================
+   Cards
+   ===================================================== */
+
+.card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 26px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+.card h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: -0.2px;
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* =====================================================
+   Info Grid
+   ===================================================== */
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    position: relative;
+    padding-inline-start: 12px;
+    min-width: 0;
+}
+
+.info-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    inset-inline-start: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--accent), var(--primary));
+    border-radius: 2px;
+}
+
+.info-item span {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-item strong {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--primary);
+    word-break: break-word;
+}
+
+/* =====================================================
+   Summary Grid
+   ===================================================== */
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.summary-item {
+    background: rgba(15, 43, 75, 0.03);
+    border: 1px solid rgba(15, 43, 75, 0.06);
+    border-radius: var(--radius-sm);
+    padding: 20px 18px;
+    text-align: center;
+}
+
+.summary-item span {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.summary-item strong {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* =====================================================
+   Table
+   ===================================================== */
+
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+thead {
+    background: rgba(15, 43, 75, 0.04);
+}
+
+th {
+    text-align: start;
+    padding: 14px 16px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid rgba(0, 180, 216, 0.25);
+    white-space: nowrap;
+}
+
+td {
+    padding: 14px 16px;
+    font-size: 0.88rem;
+    color: var(--text-dark);
+    border-bottom: 1px solid var(--border);
+}
+
+tbody tr {
+    transition: var(--transition);
+}
+
+tbody tr:hover {
+    background: rgba(0, 180, 216, 0.06);
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+td:first-child {
+    font-weight: 700;
+    color: var(--accent);
+    font-family: 'Inter', monospace;
+}
+
+/* =====================================================
+   Empty / Loading
+   ===================================================== */
+
+.empty-state {
+    text-align: center !important;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    font-weight: 500;
+}
+
+/* =====================================================
+   Focus
+   ===================================================== */
+
+.btn:focus-visible,
+.lang-btn:focus-visible {
+    outline: 3px solid rgba(0, 180, 216, 0.4);
+    outline-offset: 2px;
+}
+
+/* =====================================================
+   Responsive
+   ===================================================== */
+
+@media (max-width: 800px) {
+    .page-container { padding: 20px; }
+    .info-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 600px) {
+    .page-container { padding: 18px; }
+
+    .page-header {
+        padding: 20px;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .header-brand {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .header-actions { justify-content: space-between; }
+    .header-actions .btn { flex: 1; }
+
+    .topbar-logo { font-size: 1.5rem; }
+    .topbar-logo i { font-size: 1.7rem; }
+    .page-title-block h1 { font-size: 1.2rem; }
+
+    .info-grid,
+    .summary-grid { grid-template-columns: 1fr; }
+
+    .lang-btn {
+        padding: 6px 10px;
+        font-size: 0.72rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .lang-btn {
+        padding: 5px 8px;
+        font-size: 0.68rem;
+    }
+}
+
+/* =====================================================
+   Print
+   ===================================================== */
+
+@media print {
+
+    @page {
+        size: A4;
+        margin: 12mm;
+    }
+
+    body {
+        background: #ffffff;
+        padding: 0;
+        margin: 0;
+    }
+
+    .lang-switcher,
+    .header-actions,
+    .page-loader {
+        display: none !important;
+    }
+
+    .page-container {
+        max-width: none;
+        padding: 0;
+    }
+
+    .page-header {
+        border-bottom: 2px solid #0f2b4b;
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+    }
+
+    .page-title-block h1 { color: #0f2b4b !important; font-size: 22px; }
+    .page-title-block p  { color: #4a6078 !important; font-size: 12px; }
+
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #dbe4ee !important;
+        background: #ffffff !important;
+    }
+
+    .card h2 {
+        color: #0f2b4b !important;
+    }
+
+    .info-item span,
+    .summary-item span { color: #4a6078 !important; }
+
+    .info-item strong,
+    .summary-item strong { color: #0f2b4b !important; }
+
+    table { min-width: 0; }
+
+    th {
+        background: #0f2b4b !important;
+        color: #ffffff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    th, td {
+        border: 1px solid #dbe4ee !important;
+        font-size: 10px !important;
+        padding: 6px 8px !important;
+    }
+
+    td:first-child { color: #0f2b4b !important; }
+
+    tbody tr:nth-child(even) {
+        background: #f5f8fc !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .page-container::after {
+        content: "BMP · Business Management Platform";
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+        padding-top: 8px;
+        border-top: 1px solid #dbe4ee;
+        font-size: 9px;
+        color: #9aacc1;
+        letter-spacing: 0.5px;
+    }
+}
