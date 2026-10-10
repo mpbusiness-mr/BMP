@@ -23,6 +23,7 @@
       --accent: #00b4d8;
       --accent-soft: #e6f7fd;
       --gold: #f4c542;
+      --green: #16a34a;
       --gray-bg: #f9fbfd;
       --text-dark: #0b1a2a;
       --text-muted: #3e5a76;
@@ -44,7 +45,6 @@
       scroll-behavior: smooth;
     }
 
-    /* Font swap per language */
     body.lang-ar { font-family: 'IBM Plex Sans Arabic', sans-serif; }
     body.lang-fr,
     body.lang-en { font-family: 'Inter', sans-serif; }
@@ -573,7 +573,6 @@
       unicode-bidi: embed;
     }
 
-    /* WhatsApp highlight */
     .contact-method.whatsapp i {
       background: #e6f9ee;
       color: #25d366;
@@ -584,7 +583,6 @@
       color: var(--white);
     }
 
-    /* Contact CTA card */
     .contact-cta {
       background: var(--gray-bg);
       border-radius: var(--radius-sm);
@@ -756,13 +754,12 @@
       border: 1px solid #e5eaf0;
     }
 
-    .modal-action.wa i { color: #25d366; }
-    .modal-action.call i { color: #0f2b4b; }
-    .modal-action.mail i { color: #e0834d; }
+    .modal-action.school i { color: #00b4d8; }
+    .modal-action.restaurant i { color: #f4c542; }
+    .modal-action.store i { color: #16a34a; }
 
     .modal-action span {
-      direction: ltr;
-      unicode-bidi: embed;
+      font-weight: 600;
     }
 
     /* ---------- RESPONSIVE ---------- */
@@ -1308,31 +1305,44 @@
 
       <div class="modal-icon"><i class="fas fa-user-lock"></i></div>
 
-      <h3 data-ar="تسجيل الدخول مطلوب"
-          data-fr="Connexion requise"
-          data-en="Login required">
-        تسجيل الدخول مطلوب
+      <h3 data-ar="تسجيل الدخول"
+          data-fr="Connexion"
+          data-en="Login">
+        تسجيل الدخول
       </h3>
 
-      <p data-ar="لتسجيل الدخول إلى النظام، يرجى التواصل مع مدير النظام لإنشاء حسابك وتفعيله."
-         data-fr="Pour vous connecter au système, veuillez contacter l'administrateur afin de créer et d'activer votre compte."
-         data-en="To log in to the system, please contact the administrator to create and activate your account.">
-        لتسجيل الدخول إلى النظام، يرجى التواصل مع مدير النظام لإنشاء حسابك وتفعيله.
+      <p data-ar="اختر نوع المؤسسة للدخول إلى حسابك."
+         data-fr="Choisissez le type d'organisation pour accéder à votre compte."
+         data-en="Choose your organization type to access your account.">
+        اختر نوع المؤسسة للدخول إلى حسابك.
       </p>
 
       <div class="modal-actions">
-        <a href="https://wa.me/22244362949" target="_blank" rel="noopener" class="modal-action wa">
-          <i class="fab fa-whatsapp"></i>
-          <span data-ar="واتساب: +222 4436 2949" data-fr="WhatsApp : +222 4436 2949" data-en="WhatsApp: +222 4436 2949">واتساب: +222 4436 2949</span>
+
+        <a href="https://mpbusiness-mr.github.io/BMP/school-login.html"
+           class="modal-action school">
+          <i class="fas fa-school"></i>
+          <span data-ar="دخول المدارس"
+                data-fr="Écoles"
+                data-en="School">دخول المدارس</span>
         </a>
-        <a href="tel:44362949" class="modal-action call">
-          <i class="fas fa-phone-alt"></i>
-          <span data-ar="اتصال: 44362949" data-fr="Appeler : 44362949" data-en="Call: 44362949">اتصال: 44362949</span>
+
+        <a href="https://mpbusiness-mr.github.io/BMP-REST/rest.login.html"
+           class="modal-action restaurant">
+          <i class="fas fa-utensils"></i>
+          <span data-ar="دخول المطاعم"
+                data-fr="Restaurants"
+                data-en="Restaurant">دخول المطاعم</span>
         </a>
-        <a href="mailto:mobusiness.mr@gmail.com" class="modal-action mail">
-          <i class="fas fa-envelope"></i>
-          <span>mobusiness.mr@gmail.com</span>
+
+        <a href="https://mpbusiness-mr.github.io/BMP-store/store-login.html"
+           class="modal-action store">
+          <i class="fas fa-store"></i>
+          <span data-ar="دخول المتاجر"
+                data-fr="Grandes surfaces"
+                data-en="Store">دخول المتاجر</span>
         </a>
+
       </div>
     </div>
   </div>
@@ -1357,20 +1367,16 @@
         document.body.classList.remove('lang-ar', 'lang-fr', 'lang-en');
         document.body.classList.add('lang-' + lang);
 
-        // Swap text on all elements that carry data-ar / data-fr / data-en
         document.querySelectorAll('[data-ar]').forEach(function (el) {
           const value = el.dataset[lang];
           if (value === undefined) return;
 
-          // If the element contains only an icon + <span>, update the span
           const span = el.querySelector(':scope > span');
           if (span && el.children.length <= 2 && el.tagName !== 'P') {
             span.textContent = value;
           } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
             el.placeholder = value;
           } else {
-            // Plain text elements (p, h1, h2, etc.) → replace all text
-            // but keep child icons
             const iconChild = el.querySelector(':scope > i');
             if (iconChild) {
               el.textContent = '';
@@ -1382,7 +1388,6 @@
           }
         });
 
-        // Active state on the switcher
         document.querySelectorAll('.lang-btn').forEach(function (btn) {
           btn.classList.toggle('active', btn.dataset.lang === lang);
         });
@@ -1390,21 +1395,19 @@
         localStorage.setItem(STORAGE_KEY, lang);
       }
 
-      // Wire up the switcher
       document.querySelectorAll('.lang-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
           setLanguage(btn.dataset.lang);
         });
       });
 
-      // Apply saved / default language on load
       const savedLang = localStorage.getItem(STORAGE_KEY) || DEFAULT_LANG;
       setLanguage(savedLang);
 
       /* ---------- Login modal ---------- */
-      const modal      = document.getElementById('loginModal');
-      const openBtn    = document.getElementById('openLogin');
-      const closeBtn   = document.getElementById('closeLogin');
+      const modal    = document.getElementById('loginModal');
+      const openBtn  = document.getElementById('openLogin');
+      const closeBtn = document.getElementById('closeLogin');
 
       function openModal() {
         modal.classList.add('active');
@@ -1419,12 +1422,10 @@
       openBtn.addEventListener('click', openModal);
       closeBtn.addEventListener('click', closeModal);
 
-      // Close on backdrop click
       modal.addEventListener('click', function (e) {
         if (e.target === modal) closeModal();
       });
 
-      // Close on ESC
       document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
       });
