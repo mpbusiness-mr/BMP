@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>BMP · عقد تقديم خدمات وإتفاقية استخدام</title>
+    <title>BMP · عقد تقديم خدمات</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="logo.png">
@@ -17,706 +17,682 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="contract.css">
-</head>
-
-<body>
-
-    <!-- ============================================= -->
-    <!-- Screen-only toolbar -->
-    <!-- ============================================= -->
-    <div class="toolbar no-print">
-        <div class="toolbar-left">
-            <div class="bmp-logo">
-                <div class="bmp-logo-icon">
-                    <span class="cube cube-top"></span>
-                    <span class="cube cube-left"></span>
-                    <span class="cube cube-right"></span>
-                </div>
-                <div class="bmp-logo-text">BMP</div>
-            </div>
-        </div>
-        <div class="toolbar-right">
-            <button type="button" id="printBtn" class="toolbar-btn primary">
-                <span data-ar="طباعة / حفظ PDF" data-fr="Imprimer / PDF" data-en="Print / PDF">طباعة / حفظ PDF</span>
-            </button>
-        </div>
-    </div>
-
-
-    <!-- ============================================= -->
-    <!-- CONTRACT DOCUMENT -->
-    <!-- ============================================= -->
-    <main class="contract-page" id="contractPage">
-
-
-        <!-- ============================================ -->
-        <!-- PAGE 1 -->
-        <!-- ============================================ -->
-        <section class="contract-paper">
-
-            <header class="doc-header">
-                <div class="doc-logo">
-                    <div class="bmp-logo logo-lg">
-                        <div class="bmp-logo-icon">
-                            <span class="cube cube-top"></span>
-                            <span class="cube cube-left"></span>
-                            <span class="cube cube-right"></span>
-                        </div>
-                        <div class="bmp-logo-text">BMP</div>
-                    </div>
-                </div>
-                <div class="doc-title">
-                    <h1 data-ar="BMP – منصة إدارة الأعمال"
-                        data-fr="BMP – Business Management Platform"
-                        data-en="BMP – Business Management Platform">
-                        BMP – منصة إدارة الأعمال
-                    </h1>
-                    <p class="doc-subtitle" data-ar="عقد تقديم خدمات وإتفاقية استخدام"
-                       data-fr="Contrat de service et conditions d'utilisation"
-                       data-en="Service Contract and Terms of Use">
-                        عقد تقديم خدمات وإتفاقية استخدام
-                    </p>
-                </div>
-            </header>
-
-            <div class="doc-meta">
-                <div>
-                    <span class="meta-label" data-ar="رقم العقد" data-fr="N° du contrat" data-en="Contract No.">رقم العقد</span>
-                    <span class="meta-value" id="contractNumber">BMP-CONTRACT-____-____</span>
-                </div>
-                <div>
-                    <span class="meta-label" data-ar="التاريخ" data-fr="Date" data-en="Date">التاريخ</span>
-                    <span class="meta-value" id="contractDate">____ / ____ / ________</span>
-                </div>
-            </div>
-
-
-            <!-- Section 1 — Parties -->
-            <h2 class="section-num">
-                <span class="num">1.</span>
-                <span data-ar="الأطراف" data-fr="Les parties" data-en="Parties">الأطراف</span>
-            </h2>
-
-            <div class="party-block">
-                <h3 data-ar="الطرف الأول — مقدم الخدمة"
-                    data-fr="Première partie — Prestataire"
-                    data-en="First Party — Provider">
-                    الطرف الأول — مقدم الخدمة
-                </h3>
-                <table class="info-table">
-                    <tr>
-                        <th data-ar="الاسم" data-fr="Nom" data-en="Name">الاسم</th>
-                        <td>BMP – Business Management Platform</td>
-                    </tr>
-                    <tr>
-                        <th data-ar="العنوان / المدينة" data-fr="Adresse / Ville" data-en="Address / City">العنوان / المدينة</th>
-                        <td><input class="fill-input" type="text"></td>
-                    </tr>
-                    <tr>
-                        <th data-ar="الهاتف" data-fr="Téléphone" data-en="Phone">الهاتف</th>
-                        <td>44362949</td>
-                    </tr>
-                    <tr>
-                        <th data-ar="واتساب" data-fr="WhatsApp" data-en="WhatsApp">واتساب</th>
-                        <td>+222 4436 2949</td>
-                    </tr>
-                    <tr>
-                        <th data-ar="البريد الإلكتروني" data-fr="E-mail" data-en="Email">البريد الإلكتروني</th>
-                        <td>mobusiness.mr@gmail.com</td>
-                    </tr>
-                </table>
-            </div>
-
-            <div class="party-block">
-                <h3 data-ar="الطرف الثاني — المشترك"
-                    data-fr="Deuxième partie — Client"
-                    data-en="Second Party — Client">
-                    الطرف الثاني — المشترك
-                </h3>
-                <table class="info-table">
-                    <tr>
-                        <th data-ar="اسم المؤسسة" data-fr="Nom de l'organisation" data-en="Organization Name">اسم المؤسسة</th>
-                        <td><input class="fill-input" type="text" id="clientName"></td>
-                    </tr>
-
-                    <tr>
-                        <th data-ar="نوع المؤسسة" data-fr="Type d'organisation" data-en="Organization Type">نوع المؤسسة</th>
-                        <td>
-                            <div class="type-choices">
-                                <span class="type-choice">
-                                    <span class="checkbox"></span>
-                                    <span data-ar="مدرسة" data-fr="École" data-en="School">مدرسة</span>
-                                </span>
-                                <span class="type-choice">
-                                    <span class="checkbox"></span>
-                                    <span data-ar="مطعم" data-fr="Restaurant" data-en="Restaurant">مطعم</span>
-                                </span>
-                                <span class="type-choice">
-                                    <span class="checkbox"></span>
-                                    <span data-ar="متجر / سوبرماركت" data-fr="Magasin / Supermarché" data-en="Store / Supermarket">متجر / سوبرماركت</span>
-                                </span>
-                            </div>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <th data-ar="رقم المؤسسة" data-fr="ID de l'organisation" data-en="Institution ID">رقم المؤسسة</th>
-                        <td><input class="fill-input" type="text" id="clientId"></td>
-                    </tr>
-                    <tr>
-                        <th data-ar="الهاتف" data-fr="Téléphone" data-en="Phone">الهاتف</th>
-                        <td><input class="fill-input" type="text" id="clientPhone"></td>
-                    </tr>
-                    <tr>
-                        <th data-ar="البريد الإلكتروني" data-fr="E-mail" data-en="Email">البريد الإلكتروني</th>
-                        <td><input class="fill-input" type="text" id="clientEmail"></td>
-                    </tr>
-                    <tr>
-                        <th data-ar="العنوان / المدينة" data-fr="Adresse / Ville" data-en="Address / City">العنوان / المدينة</th>
-                        <td><input class="fill-input" type="text"></td>
-                    </tr>
-                    <tr>
-                        <th data-ar="الممثل القانوني" data-fr="Représentant légal" data-en="Legal Representative">الممثل القانوني</th>
-                        <td><input class="fill-input" type="text"></td>
-                    </tr>
-                </table>
-            </div>
-
-
-            <!-- Section 2 — Purpose -->
-            <h2 class="section-num">
-                <span class="num">2.</span>
-                <span data-ar="الغرض من العقد" data-fr="Objet du contrat" data-en="Purpose of the Contract">الغرض من العقد</span>
-            </h2>
-            <p class="clause">
-                يهدف هذا العقد إلى تحديد الشروط التي بموجبها يمنح الطرف الأول (BMP) للطرف الثاني ترخيصًا لاستخدام منصة BMP لإدارة الأعمال، مع الالتزام ببنود الاستخدام و<b>اتفاقية معالجة البيانات</b> المذكورة أدناه.
-            </p>
-            <p class="clause fr">
-                Le présent contrat définit les conditions dans lesquelles la première partie (BMP) accorde à la deuxième partie une licence d'utilisation de la plateforme BMP pour la gestion d'entreprise, sous réserve des conditions d'utilisation et de l'<b>accord de traitement des données</b> énoncé ci-dessous.
-            </p>
-
-
-            <!-- Section 3 — Service -->
-            <h2 class="section-num">
-                <span class="num">3.</span>
-                <span data-ar="وصف الخدمة" data-fr="Description du service" data-en="Service Description">وصف الخدمة</span>
-            </h2>
-            <p class="clause">
-                يوفر الطرف الأول منصة إدارية متكاملة تتيح للطرف الثاني إدارة عملياته اليومية، من بين ما تشمله:
-            </p>
-            <ul class="bullets">
-                <li>إدارة المستخدمين والصلاحيات</li>
-                <li>إدارة العمليات المالية (المدفوعات / الطلبات / المبيعات) حسب نوع المؤسسة</li>
-                <li>إنشاء التقارير والإحصائيات</li>
-                <li>سجل عمليات كامل</li>
-                <li>بيانات منفصلة لكل مؤسسة على حدة</li>
-                <li>الدعم الفني عبر واتساب والهاتف والبريد الإلكتروني</li>
-            </ul>
-            <p class="clause fr">
-                La première partie fournit une plateforme de gestion intégrée permettant à la deuxième partie de gérer ses opérations quotidiennes, comprenant notamment : la gestion des utilisateurs et des permissions, la gestion des opérations financières (paiements / commandes / ventes) selon le type d'organisation, la génération de rapports et de statistiques, un journal d'activité complet, des données isolées pour chaque organisation, et un support technique via WhatsApp, téléphone et e-mail.
-            </p>
-
-
-            <!-- Section 4 — License -->
-            <h2 class="section-num">
-                <span class="num">4.</span>
-                <span data-ar="مدة الترخيص" data-fr="Durée de la licence" data-en="License Term">مدة الترخيص</span>
-            </h2>
-            <table class="info-table">
-                <tr>
-                    <th data-ar="تاريخ البداية" data-fr="Date de début" data-en="Start Date">تاريخ البداية</th>
-                    <td><input class="fill-input" type="text" id="licenseStart"></td>
-                </tr>
-                <tr>
-                    <th data-ar="تاريخ الانتهاء" data-fr="Date de fin" data-en="End Date">تاريخ الانتهاء</th>
-                    <td><input class="fill-input" type="text" id="licenseEnd"></td>
-                </tr>
-                <tr>
-                    <th data-ar="قابل للتجديد" data-fr="Renouvelable" data-en="Renewable">قابل للتجديد</th>
-                    <td data-ar="نعم، باتفاق الطرفين" data-fr="Oui, d'un commun accord" data-en="Yes, by mutual agreement">نعم، باتفاق الطرفين</td>
-                </tr>
-            </table>
-
-
-            <div class="page-footer">
-                <span data-ar="صفحة 1 من 4" data-fr="Page 1 sur 4" data-en="Page 1 of 4">صفحة 1 من 4</span>
-                <span class="page-num-right" id="footerContractNum1">BMP-CONTRACT-____-____</span>
-            </div>
-
-        </section>
-
-
-        <!-- ============================================ -->
-        <!-- PAGE 2 — SUBSCRIPTION PLAN + TERMS SUMMARY -->
-        <!-- ============================================ -->
-        <section class="contract-paper">
-
-            <!-- Section 5 — Subscription Plan -->
-            <h2 class="section-num">
-                <span class="num">5.</span>
-                <span data-ar="نظام الاشتراك" data-fr="Formule d'abonnement" data-en="Subscription Plan">نظام الاشتراك</span>
-            </h2>
-
-            <p class="clause">
-                يختار الطرف الثاني أحد نظامي الاشتراك التاليين (يُشار إليه بعلامة ✓):
-            </p>
-
-            <div class="plan-choices">
-                <div class="plan-choice">
-                    <span class="checkbox"></span>
-                    <span class="plan-label" data-ar="اشتراك شهري" data-fr="Abonnement mensuel" data-en="Monthly Subscription">اشتراك شهري</span>
-                </div>
-                <div class="plan-choice">
-                    <span class="checkbox"></span>
-                    <span class="plan-label" data-ar="اشتراك سنوي" data-fr="Abonnement annuel" data-en="Yearly Subscription">اشتراك سنوي</span>
-                </div>
-            </div>
-
-            <table class="info-table plan-table">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th data-ar="الاشتراك الشهري" data-fr="Mensuel" data-en="Monthly">الاشتراك الشهري</th>
-                        <th data-ar="الاشتراك السنوي" data-fr="Annuel" data-en="Yearly">الاشتراك السنوي</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <th data-ar="الرسوم الدورية" data-fr="Frais périodiques" data-en="Recurring Fee">الرسوم الدورية</th>
-                        <td>
-                            <input class="fill-input inline" type="text" inputmode="numeric">
-                            <span class="unit">MRU / شهر</span>
-                        </td>
-                        <td>
-                            <input class="fill-input inline" type="text" inputmode="numeric">
-                            <span class="unit">MRU / سنة</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th data-ar="رسوم العقد الثابتة" data-fr="Frais de contrat fixes" data-en="Fixed Contract Fee">رسوم العقد الثابتة</th>
-                        <td>
-                            <input class="fill-input inline" type="text" inputmode="numeric">
-                            <span class="unit">MRU</span>
-                        </td>
-                        <td>
-                            <input class="fill-input inline" type="text" inputmode="numeric">
-                            <span class="unit">MRU</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <p class="clause fr">
-                La deuxième partie choisit l'une des deux formules ci-dessus (à cocher ✓). Les frais périodiques sont payables au début de chaque période. Les frais de contrat fixes sont payables une seule fois lors de la signature.
-            </p>
-
-            <p class="clause">
-                تُدفع الرسوم الدورية في بداية كل فترة (شهر / سنة). تُدفع رسوم العقد الثابتة مرة واحدة عند التوقيع.
-            </p>
-
-
-            <!-- Section 6 — Cancellation & Termination -->
-            <h2 class="section-num">
-                <span class="num">6.</span>
-                <span data-ar="الإلغاء والإنهاء" data-fr="Annulation et résiliation" data-en="Cancellation & Termination">الإلغاء والإنهاء</span>
-            </h2>
-
-            <h3 class="sub-num">
-                <span class="num">6.1</span>
-                <span data-ar="إلغاء المشترك" data-fr="Annulation par le client" data-en="Client Cancellation">إلغاء المشترك</span>
-            </h3>
-            <p class="clause">
-                يحق للمشترك إلغاء الاشتراك في أي وقت. لا يتم استرداد أي مبالغ مدفوعة مسبقًا.
-            </p>
-            <p class="clause fr">
-                La deuxième partie peut annuler l'abonnement à tout moment. Aucun montant déjà payé n'est remboursé.
-            </p>
-
-            <h3 class="sub-num">
-                <span class="num">6.2</span>
-                <span data-ar="إنهاء العقد من طرف BMP" data-fr="Résiliation par BMP" data-en="Termination by BMP">إنهاء العقد من طرف BMP</span>
-            </h3>
-            <p class="clause">
-                يحق لـ BMP إنهاء العقد:
-            </p>
-            <ul class="bullets">
-                <li>للاشتراك الشهري: في بداية كل شهر، قبل استحقاق الدفعة التالية</li>
-                <li>للاشتراك السنوي: بعد انتهاء كل سنة</li>
-            </ul>
-            <p class="clause">
-                في كلتا الحالتين، يمكن لـ BMP:
-            </p>
-            <ul class="bullets">
-                <li>عدم تجديد العقد، فيتوقف الاشتراك تلقائيًا</li>
-                <li>تجديد العقد بشروط جديدة (مزايا إضافية، تحديثات، تعديل في الرسوم)</li>
-            </ul>
-            <p class="clause fr">
-                BMP peut résilier le contrat : pour l'abonnement mensuel, au début de chaque mois avant l'échéance du paiement suivant ; pour l'abonnement annuel, après chaque année. Dans les deux cas, BMP peut soit ne pas renouveler le contrat (l'abonnement prend fin automatiquement), soit le renouveler avec de nouvelles conditions (fonctionnalités supplémentaires, mises à jour, ajustement des frais).
-            </p>
-
-
-            <!-- Section 7 — Terms Summary -->
-            <h2 class="section-num">
-                <span class="num">7.</span>
-                <span data-ar="ملخص الشروط والخصوصية" data-fr="Résumé des conditions et confidentialité" data-en="Terms & Privacy Summary">ملخص الشروط والخصوصية</span>
-            </h2>
-
-            <div class="terms-summary">
-                <p class="clause">
-                    <b data-ar="شروط الاستخدام:" data-fr="Conditions d'utilisation :" data-en="Terms of Use:">شروط الاستخدام:</b>
-                    يلتزم المشترك باستخدام المنصة للأغراض المشروعة فقط، وبعدم مشاركة بيانات الدخول مع أي طرف خارج المؤسسة، وبعدم محاولة الوصول إلى بيانات مؤسسات أخرى.
-                </p>
-
-                <p class="clause">
-                    <b data-ar="الخصوصية ومعالجة البيانات:" data-fr="Confidentialité et traitement des données :" data-en="Privacy & Data Processing:">الخصوصية ومعالجة البيانات:</b>
-                    تبقى جميع بيانات المؤسسة ملكًا حصريًا لها. يقوم BMP بمعالجتها وتخزينها بصفته أمينًا عليها فقط لتقديم الخدمة، دون مشاركتها مع أي طرف ثالث.
-                </p>
-
-                <p class="terms-link-line">
-                    <a href="https://mpbusiness-mr.github.io/BMP/terms.html" target="_blank" rel="noopener" class="terms-link">
-                        <span data-ar="اقرأ الشروط الكاملة ←" data-fr="Lire les conditions complètes ←" data-en="Read full terms ←">اقرأ الشروط الكاملة ←</span>
-                    </a>
-                </p>
-
-                <p class="clause fr">
-                    <b>Conditions d'utilisation :</b> la deuxième partie s'engage à utiliser la plateforme uniquement à des fins légitimes, à ne pas partager ses identifiants en dehors de l'organisation, et à ne pas tenter d'accéder aux données d'autres organisations.
-                </p>
-                <p class="clause fr">
-                    <b>Confidentialité et traitement des données :</b> toutes les données de l'organisation restent sa propriété exclusive. BMP les traite et les stocke en tant que dépositaire uniquement pour fournir le service, sans les partager avec des tiers.
-                </p>
-            </div>
-
-
-            <div class="page-footer">
-                <span data-ar="صفحة 2 من 4" data-fr="Page 2 sur 4" data-en="Page 2 of 4">صفحة 2 من 4</span>
-                <span class="page-num-right" id="footerContractNum2">BMP-CONTRACT-____-____</span>
-            </div>
-
-        </section>
-
-
-        <!-- ============================================ -->
-        <!-- PAGE 3 — DATA PROCESSING AGREEMENT -->
-        <!-- ============================================ -->
-        <section class="contract-paper">
-
-            <h2 class="section-num title-only">
-                <span class="num">8.</span>
-                <span data-ar="اتفاقية معالجة البيانات"
-                      data-fr="Accord de traitement des données"
-                      data-en="Data Processing Agreement">
-                    اتفاقية معالجة البيانات
-                </span>
-            </h2>
-
-            <div class="dpa-highlight">
-                <p class="clause strong">
-                    بالموافقة على هذا العقد، يمنح الطرف الثاني (المشترك) الطرف الأول (BMP) الموافقة الصريحة والكاملة على معالجة وتخزين جميع بيانات المؤسسة بصفته أمينًا عليها، وفق الشروط المفصلة في هذه الاتفاقية.
-                </p>
-                <p class="clause fr">
-                    En acceptant ce contrat, la deuxième partie (Client) accorde à la première partie (BMP) son consentement explicite et complet pour le traitement et le stockage de toutes les données de l'organisation en tant que dépositaire, selon les conditions détaillées dans cet accord.
-                </p>
-            </div>
-
-            <h3 class="sub-num">
-                <span class="num">8.1</span>
-                <span data-ar="نطاق البيانات المشمولة" data-fr="Champ d'application des données" data-en="Scope of Data Covered">نطاق البيانات المشمولة</span>
-            </h3>
-            <p class="clause">تشمل البيانات التي تتم معالجتها بموجب هذه الاتفاقية:</p>
-            <ul class="bullets">
-                <li>بيانات المؤسسة الأساسية (الاسم، النوع، بيانات التواصل، بيانات الترخيص)</li>
-                <li>بيانات المستخدمين (أسماء المستخدمين، كلمات المرور، الصلاحيات)</li>
-                <li>بيانات الطلاب (الأسماء، الأرقام، المراحل، الأقسام) — للمدارس</li>
-                <li>بيانات المدفوعات والسجلات المالية — لجميع المؤسسات</li>
-                <li>بيانات الطلبات والديون — للمطاعم</li>
-                <li>سجل العمليات (من قام بأي إجراء ومتى)</li>
-            </ul>
-
-            <h3 class="sub-num">
-                <span class="num">8.2</span>
-                <span data-ar="أغراض المعالجة" data-fr="Finalités du traitement" data-en="Purposes of Processing">أغراض المعالجة</span>
-            </h3>
-            <p class="clause">يلتزم الطرف الأول بمعالجة البيانات للأغراض التالية حصرًا:</p>
-            <ul class="bullets">
-                <li>تشغيل المنصة وتقديم الخدمة المتفق عليها</li>
-                <li>تمكين الطرف الثاني من إدارة عملياته اليومية</li>
-                <li>إنشاء التقارير والإحصائيات الخاصة بالطرف الثاني نفسه</li>
-                <li>تقديم الدعم الفني عند الحاجة</li>
-                <li>الامتثال للالتزامات القانونية عند الاقتضاء</li>
-            </ul>
-
-            <h3 class="sub-num">
-                <span class="num">8.3</span>
-                <span data-ar="عدم المشاركة مع أطراف ثالثة" data-fr="Non-partage avec des tiers" data-en="No Third-Party Sharing">عدم المشاركة مع أطراف ثالثة</span>
-            </h3>
-            <p class="clause">
-                يتعهد الطرف الأول بعدم بيع أو تأجير أو مشاركة أو نقل بيانات الطرف الثاني إلى أي طرف ثالث، سواء بشكل مجاني أو مدفوع. تُستثنى من ذلك الحالات التالية فقط:
-            </p>
-            <ul class="bullets">
-                <li>موافقة كتابية صريحة من الطرف الثاني</li>
-                <li>طلب قانوني ملزم من جهة قضائية مختصة</li>
-            </ul>
-
-            <h3 class="sub-num">
-                <span class="num">8.4</span>
-                <span data-ar="أمن البيانات" data-fr="Sécurité des données" data-en="Data Security">أمن البيانات</span>
-            </h3>
-            <p class="clause">
-                يلتزم الطرف الأول بتخزين البيانات في بيئة آمنة، ويطبق تدابير تقنية وتنظيمية معقولة لحماية البيانات من الوصول غير المصرح به أو الفقدان أو التعديل غير المسموح. البيانات محفوظة في بيئة Google Sheets معزولة لكل مؤسسة على حدة.
-            </p>
-
-            <h3 class="sub-num">
-                <span class="num">8.5</span>
-                <span data-ar="الوصول والتصدير والحذف" data-fr="Accès, export et suppression" data-en="Access, Export and Deletion">الوصول والتصدير والحذف</span>
-            </h3>
-            <p class="clause">يحق للطرف الثاني في أي وقت:</p>
-            <ul class="bullets">
-                <li>طلب نسخة من بياناته بصيغة قابلة للقراءة</li>
-                <li>طلب تصحيح أي بيانات غير دقيقة</li>
-                <li>طلب حذف كامل لبياناته بعد إنهاء العقد</li>
-            </ul>
-            <p class="clause">
-                ينفذ الطرف الأول هذه الطلبات خلال مدة معقولة لا تتجاوز 30 يومًا من تاريخ الطلب.
-            </p>
-
-            <h3 class="sub-num">
-                <span class="num">8.6</span>
-                <span data-ar="مدة الاحتفاظ بالبيانات" data-fr="Durée de conservation des données" data-en="Data Retention Period">مدة الاحتفاظ بالبيانات</span>
-            </h3>
-            <p class="clause">
-                يحتفظ الطرف الأول ببيانات الطرف الثاني طوال مدة سريان العقد وما يصل إلى 30 يومًا بعد انتهائه، ما لم يطلب الطرف الثاني حذفها فورًا أو الاحتفاظ بها لمدة أطول لأسباب تنظيمية.
-            </p>
-
-            <h3 class="sub-num">
-                <span class="num">8.7</span>
-                <span data-ar="إشعار الاختراق" data-fr="Notification de violation" data-en="Breach Notification">إشعار الاختراق</span>
-            </h3>
-            <p class="clause">
-                في حال وقوع أي اختراق أو وصول غير مصرح به إلى بيانات الطرف الثاني، يلتزم الطرف الأول بإبلاغ الطرف الثاني فورًا واتخاذ الإجراءات اللازمة للحد من الأثر.
-            </p>
-
-            <h3 class="sub-num">
-                <span class="num">8.8</span>
-                <span data-ar="مسؤولية الطرف الثاني" data-fr="Responsabilité du client" data-en="Client Responsibility">مسؤولية الطرف الثاني</span>
-            </h3>
-            <p class="clause">يقر الطرف الثاني بأنه:</p>
-            <ul class="bullets">
-                <li>المالك القانوني الوحيد للبيانات التي يُدخلها في المنصة</li>
-                <li>مسؤول عن دقة وصحة البيانات التي يُدخلها</li>
-                <li>قد حصل على موافقة أصحاب البيانات (عند الاقتضاء) لمشاركتها مع الطرف الأول</li>
-                <li>ملتزم بعدم إدخال بيانات حساسة غير ضرورية لتشغيل الخدمة</li>
-            </ul>
-
-            <div class="page-footer">
-                <span data-ar="صفحة 3 من 4" data-fr="Page 3 sur 4" data-en="Page 3 of 4">صفحة 3 من 4</span>
-                <span class="page-num-right" id="footerContractNum3">BMP-CONTRACT-____-____</span>
-            </div>
-
-        </section>
-
-
-        <!-- ============================================ -->
-        <!-- PAGE 4 — SIGNATURES -->
-        <!-- ============================================ -->
-        <section class="contract-paper">
-
-            <h2 class="section-num title-only">
-                <span class="num">9.</span>
-                <span data-ar="التوقيعات" data-fr="Signatures" data-en="Signatures">التوقيعات</span>
-            </h2>
-
-            <p class="intro">
-                بالتوقيع أدناه، يقر الطرفان بموافقتهما الكاملة على جميع بنود هذا العقد بما فيها ملخص الشروط واتفاقية معالجة البيانات.
-            </p>
-            <p class="intro fr">
-                En signant ci-dessous, les deux parties confirment leur accord complet sur toutes les clauses du présent contrat, y compris le résumé des conditions et l'accord de traitement des données.
-            </p>
-
-            <div class="signature-grid">
-
-                <div class="signature-block">
-                    <h3 data-ar="الطرف الأول — BMP" data-fr="Première partie — BMP" data-en="First Party — BMP">الطرف الأول — BMP</h3>
-
-                    <div class="signature-line">
-                        <span class="line-label" data-ar="الاسم" data-fr="Nom" data-en="Name">الاسم</span>
-                        <input class="blank-input" type="text">
-                    </div>
-
-                    <div class="signature-line">
-                        <span class="line-label" data-ar="المنصب" data-fr="Titre" data-en="Title">المنصب</span>
-                        <input class="blank-input small" type="text" value="Founder & CEO">
-                    </div>
-
-                    <div class="signature-line">
-                        <span class="line-label" data-ar="التاريخ" data-fr="Date" data-en="Date">التاريخ</span>
-                        <input class="blank-input" type="text">
-                    </div>
-
-                    <div class="signature-area">
-                        <span class="area-label" data-ar="التوقيع" data-fr="Signature" data-en="Signature">التوقيع</span>
-                        <div class="area-box"></div>
-                    </div>
-                </div>
-
-                <div class="signature-block">
-                    <h3 data-ar="الطرف الثاني — المشترك" data-fr="Deuxième partie — Client" data-en="Second Party — Client">الطرف الثاني — المشترك</h3>
-
-                    <div class="signature-line">
-                        <span class="line-label" data-ar="الاسم" data-fr="Nom" data-en="Name">الاسم</span>
-                        <input class="blank-input" type="text">
-                    </div>
-
-                    <div class="signature-line">
-                        <span class="line-label" data-ar="المنصب" data-fr="Titre" data-en="Title">المنصب</span>
-                        <input class="blank-input" type="text">
-                    </div>
-
-                    <div class="signature-line">
-                        <span class="line-label" data-ar="التاريخ" data-fr="Date" data-en="Date">التاريخ</span>
-                        <input class="blank-input" type="text">
-                    </div>
-
-                    <div class="signature-area">
-                        <span class="area-label" data-ar="التوقيع" data-fr="Signature" data-en="Signature">التوقيع</span>
-                        <div class="area-box"></div>
-                    </div>
-                </div>
-
-            </div>
-
-            <p class="final-note">
-                يُحرَّر هذا العقد في نسختين، نسخة لكل طرف، وتعتبر كلتاهما متساويتين في القيمة القانونية.
-            </p>
-            <p class="final-note fr">
-                Le présent contrat est établi en deux exemplaires, un pour chaque partie, les deux ayant la même valeur légale.
-            </p>
-
-            <div class="page-footer">
-                <span data-ar="صفحة 4 من 4" data-fr="Page 4 sur 4" data-en="Page 4 of 4">صفحة 4 من 4</span>
-                <span class="page-num-right" id="footerContractNum4">BMP-CONTRACT-____-____</span>
-            </div>
-
-        </section>
-
-    </main>
-
-
-    <script>
-    (function () {
-        'use strict';
-
-        const API_URL =
-            "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
-
-        function setInput(id, value) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            const v = String(value || "").trim();
-            if (v) el.value = v;
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary: #0f2b4b;
+            --primary-light: #1a3f66;
+            --accent: #00b4d8;
+            --text-dark: #0b1a2a;
+            --text-muted: #3e5a76;
+            --line: #c8d3e0;
+            --soft-line: #eaf0f7;
+            --white: #ffffff;
+            --paper-bg: #f4f7fb;
         }
 
-        function formatDate(value) {
-            if (!value) return "";
-            const s = String(value).trim();
-            const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
-            if (iso) return iso[1] + "-" + iso[2] + "-" + iso[3];
-            const d = new Date(s);
-            if (isNaN(d.getTime())) return s;
-            return d.getFullYear() + "-" +
-                String(d.getMonth() + 1).padStart(2, "0") + "-" +
-                String(d.getDate()).padStart(2, "0");
+        body {
+            font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
+            color: var(--text-dark);
+            background: var(--paper-bg);
+            line-height: 1.65;
+            font-size: 12.5px;
+            padding: 16px 0 60px;
         }
 
-        function setText(id, value) {
-            const el = document.getElementById(id);
-            if (!el) return;
-            const v = String(value || "").trim();
-            if (v) el.textContent = v;
+        body.lang-ar { font-family: 'IBM Plex Sans Arabic', sans-serif; }
+        body.lang-fr,
+        body.lang-en { font-family: 'Inter', sans-serif; }
+
+        /* ---------- TOOLBAR ---------- */
+        .toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 5%;
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--line);
+            gap: 14px;
+            flex-wrap: wrap;
         }
 
-        function buildContractNumber(institutionId) {
-            const now  = new Date();
-            const year = now.getFullYear();
-            const rnd  = String(Math.floor(Math.random() * 9000) + 1000);
-            const id   = institutionId || "____";
-            return "BMP-" + id + "-" + year + "-" + rnd;
+        .bmp-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            line-height: 1;
+            text-decoration: none;
         }
 
-        function setContractNumber(num) {
-            setText("contractNumber", num);
-            setText("footerContractNum1", num);
-            setText("footerContractNum2", num);
-            setText("footerContractNum3", num);
-            setText("footerContractNum4", num);
+        .bmp-logo-icon {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
         }
 
-        async function fetchInstitution(institutionId) {
+        .bmp-logo-icon .cube {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            transform: rotate(45deg) skew(-10deg, -10deg);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
 
-            try {
+        .bmp-logo-icon .cube-top {
+            top: 0; left: 10px;
+            background: linear-gradient(135deg, #00d4f5 0%, #00b4d8 100%);
+        }
+        .bmp-logo-icon .cube-left {
+            top: 11px; left: 0;
+            background: linear-gradient(135deg, #00b4d8 0%, #0091b3 100%);
+        }
+        .bmp-logo-icon .cube-right {
+            top: 11px; left: 20px;
+            background: linear-gradient(135deg, #0077b6 0%, #0f2b4b 100%);
+        }
 
-                const res = await fetch(API_URL, {
-                    method: "POST",
-                    headers: { "Content-Type": "text/plain;charset=utf-8" },
-                    body: JSON.stringify({ action: "getInstitutions" })
-                });
+        .bmp-logo-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #0f2b4b;
+            text-transform: uppercase;
+        }
 
-                const data = await res.json();
+        .toolbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
 
-                if (!data.success || !Array.isArray(data.institutions)) return null;
+        .lang-switcher {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px;
+            background: #f0f5fa;
+            border: 1px solid #dbe4ee;
+            border-radius: 40px;
+        }
 
-                return data.institutions.find(function (i) {
-                    return String(i.id) === String(institutionId);
-                }) || null;
+        .lang-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 14px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
 
-            } catch (e) {
-                console.error("Auto-fill fetch error:", e);
-                return null;
+        .lang-btn:hover { color: var(--primary); }
+
+        .lang-btn.active {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(15,43,75,0.2);
+        }
+
+        .print-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 20px;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #1a3f66, #0f2b4b);
+            color: var(--white);
+            font-family: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px rgba(15,43,75,0.22);
+        }
+
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 26px rgba(15,43,75,0.28);
+        }
+
+        /* ---------- PAGE ---------- */
+        .contract-page {
+            width: 100%;
+            max-width: 820px;
+            margin: 20px auto;
+            padding: 0 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .contract-paper {
+            background: var(--white);
+            padding: 38px 44px 26px;
+            box-shadow: 0 8px 32px rgba(15,43,75,0.08);
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            min-height: 1000px;
+        }
+
+        /* ---------- HEADER ---------- */
+        .doc-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .doc-header .bmp-logo-icon { width: 50px; height: 50px; }
+        .doc-header .bmp-logo-icon .cube { width: 22px; height: 22px; border-radius: 4px; }
+        .doc-header .bmp-logo-icon .cube-top   { top: 0;   left: 14px; }
+        .doc-header .bmp-logo-icon .cube-left  { top: 15px; left: 0; }
+        .doc-header .bmp-logo-icon .cube-right { top: 15px; left: 28px; }
+        .doc-header .bmp-logo-text { font-size: 1.85rem; }
+
+        .doc-title h1 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 2px;
+        }
+
+        .doc-subtitle {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* ---------- META ---------- */
+        .doc-meta {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 10px 14px;
+            background: #f6fafd;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.82rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-label {
+            font-weight: 700;
+            color: var(--text-muted);
+            margin-inline-end: 6px;
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.4px;
+        }
+
+        .meta-value {
+            color: var(--primary);
+            font-weight: 600;
+            font-family: 'Inter', monospace;
+        }
+
+        /* ---------- SECTIONS ---------- */
+        .section-num {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: var(--primary);
+            padding: 6px 0;
+            margin: 14px 0 8px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .section-num .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 26px;
+            height: 26px;
+            padding: 0 8px;
+            background: var(--primary);
+            color: var(--white);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            font-family: 'Inter', monospace;
+        }
+
+        /* ---------- PARTY / INFO BLOCKS ---------- */
+        .party-block {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fbfdff;
+        }
+
+        .party-block h3 {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px dashed var(--line);
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+
+        .info-table tr + tr td,
+        .info-table tr + tr th { border-top: 1px solid var(--soft-line); }
+
+        .info-table th {
+            text-align: start;
+            padding: 6px 10px;
+            width: 34%;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: #f4f8fc;
+            vertical-align: middle;
+        }
+
+        .info-table td {
+            padding: 6px 10px;
+            color: var(--text-dark);
+            font-weight: 500;
+            vertical-align: middle;
+        }
+
+        /* ---------- FILL INPUTS ---------- */
+        .fill-input {
+            display: block;
+            width: 100%;
+            padding: 4px 2px;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 600;
+            outline: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s ease;
+        }
+
+        .fill-input:focus {
+            border-bottom-color: var(--accent);
+        }
+
+        /* Print: hidden if empty (border appears only when there is text) */
+        @media print {
+            .fill-input {
+                border-bottom: none !important;
+                padding: 2px 0;
+                min-height: 18px;
+            }
+            .fill-input:empty {
+                border-bottom: 1px solid #666 !important;
+            }
+        }
+
+        /* ---------- TYPE CHOICES ---------- */
+        .type-choices {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 22px;
+            padding: 2px 0;
+        }
+
+        .type-choice {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+        }
+
+        .type-choice .checkbox,
+        .plan-choice .checkbox {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border: 1.5px solid var(--primary);
+            border-radius: 3px;
+            background: #fff;
+            flex-shrink: 0;
+        }
+
+        /* ---------- PLAN CHOICES ---------- */
+        .plan-choices {
+            display: flex;
+            gap: 36px;
+            padding: 8px 0 12px;
+            font-size: 0.9rem;
+            flex-wrap: wrap;
+        }
+
+        .plan-choice {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .plan-table thead th {
+            background: #e6f0fb;
+            text-align: center;
+        }
+        .plan-table thead th:first-child { text-align: start; }
+        .plan-table tbody td { text-align: center; }
+        .plan-table tbody th { width: 32%; }
+
+        .unit {
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            font-weight: 600;
+            margin-inline-start: 4px;
+        }
+
+        /* ---------- CLAUSES ---------- */
+        .clause {
+            font-size: 0.86rem;
+            line-height: 1.7;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            text-align: justify;
+        }
+
+        .bullets {
+            list-style: none;
+            padding-inline-start: 18px;
+            margin-bottom: 8px;
+        }
+
+        .bullets li {
+            position: relative;
+            font-size: 0.83rem;
+            padding: 3px 0;
+            line-height: 1.65;
+            color: var(--text-dark);
+        }
+
+        .bullets li::before {
+            content: "▪";
+            color: var(--accent);
+            position: absolute;
+            inset-inline-start: -16px;
+            font-weight: 700;
+        }
+
+        /* ---------- TERMS LINK BLOCK ---------- */
+        .terms-box {
+            padding: 12px 16px;
+            border: 1px solid var(--line);
+            border-inline-start: 4px solid var(--accent);
+            border-radius: 8px;
+            background: #fbfdff;
+            margin: 10px 0 16px;
+        }
+
+        .terms-box p {
+            font-size: 0.86rem;
+            line-height: 1.7;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .terms-box .terms-url {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            word-break: break-all;
+            font-family: 'Inter', monospace;
+        }
+
+        /* ---------- PAGE FOOTER ---------- */
+        .page-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            margin-top: auto;
+            border-top: 1px solid var(--line);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .page-num-right {
+            font-family: 'Inter', monospace;
+            font-weight: 600;
+        }
+
+        /* ---------- SIGNATURES ---------- */
+        .signature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-top: 18px;
+        }
+
+        .signature-block {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 16px;
+            background: #fbfdff;
+        }
+
+        .signature-block h3 {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--line);
+            text-align: center;
+        }
+
+        .signature-line {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 0.8rem;
+        }
+
+        .line-label {
+            min-width: 55px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.68rem;
+            letter-spacing: 0.4px;
+        }
+
+        .blank-input {
+            flex: 1;
+            padding: 4px 2px;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 600;
+            outline: none;
+        }
+
+        .signature-area { margin-top: 14px; }
+
+        .area-label {
+            display: block;
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 6px;
+        }
+
+        .area-box {
+            height: 70px;
+            border: 1px dashed #8a9bb0;
+            border-radius: 6px;
+            background: #ffffff;
+        }
+
+        /* ---------- FINAL NOTE ---------- */
+        .final-note {
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #f6fafd;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.65;
+        }
+
+        /* ---------- PRINT ---------- */
+        @media print {
+
+            @page {
+                size: A4;
+                margin: 10mm 10mm;
             }
 
+            html, body {
+                background: #ffffff !important;
+                padding: 0;
+                margin: 0;
+                font-size: 10.5px;
+                line-height: 1.5;
+            }
+
+            .no-print, .toolbar { display: none !important; }
+
+            .contract-page {
+                max-width: none;
+                margin: 0;
+                padding: 0;
+                gap: 0;
+            }
+
+            .contract-paper {
+                box-shadow: none;
+                border-radius: 0;
+                padding: 0;
+                margin: 0;
+                min-height: auto;
+                page-break-after: always;
+                break-after: page;
+            }
+
+            .contract-paper:last-child {
+                page-break-after: auto;
+                break-after: auto;
+            }
+
+            .doc-header,
+            .section-num,
+            .party-block,
+            .terms-box,
+            .signature-block,
+            .plan-choices,
+            .plan-table {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            .page-footer {
+                position: absolute;
+                bottom: 4mm;
+                inset-inline: 10mm;
+            }
+
+            * {
+                color: #000 !important;
+                background: transparent !important;
+                box-shadow: none !important;
+                text-shadow: none !important;
+            }
+
+            .section-num .num {
+                background: #eef2f7 !important;
+                color: #000 !important;
+                border: 1px solid #000 !important;
+            }
+
+            .terms-box {
+                border: 1px solid #000 !important;
+                background: #ffffff !important;
+            }
+
+            .area-box { border-color: #666 !important; }
+
+            /* BMP logo solid navy in print */
+            .bmp-logo-icon .cube {
+                background: #0f2b4b !important;
+                box-shadow: none !important;
+            }
+            .bmp-logo-text { color: #000 !important; }
         }
 
-        async function init() {
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 700px) {
+            .contract-paper { padding: 24px 20px 20px; min-height: auto; }
 
-            const urlParams     = new URLSearchParams(window.location.search);
-            const institutionId = urlParams.get("id");
-
-            const today = new Date();
-            setText("contractDate",
-                String(today.getDate()).padStart(2, "0") + " / " +
-                String(today.getMonth() + 1).padStart(2, "0") + " / " +
-                today.getFullYear()
-            );
-
-            setContractNumber(buildContractNumber(institutionId));
-
-            if (!institutionId) return;
-
-            const institution = await fetchInstitution(institutionId);
-            if (!institution) return;
-
-            setInput("clientName",   institution.name  || "");
-            setInput("clientId",     institution.id);
-            setInput("clientPhone",  institution.phone || "");
-            setInput("clientEmail",  institution.email || "");
-            setInput("licenseStart", formatDate(institution.licenseStart));
-            setInput("licenseEnd",   formatDate(institution.licenseEnd));
-
+            .doc-header { flex-direction: column; text-align: center; gap: 10px; }
+            .signature-grid { grid-template-columns: 1fr; }
+            .doc-meta { flex-direction: column; gap: 6px; }
+            .info-table th { width: 42%; font-size: 0.76rem; }
+            .plan-choices { gap: 20px; }
+            .lang-btn { padding: 5px 10px; font-size: 0.72rem; }
+            .print-btn { padding: 8px 14px; font-size: 0.78rem; }
         }
+    </style>
+</head>
 
-        function setupPrint() {
-            const btn = document.getElementById("printBtn");
-            if (!btn) return;
-            btn.addEventListener("click", function () {
-                window.print();
-            });
-        }
 
-        init();
-        setupPrint();
+<body class="lang-ar">
 
-    })();
-    </script>
+    <!-- ============================================= -->
+    <!-- TOOLBAR -->
+    <!-- ============================================= -->
+    <div class="toolbar no-print">
+        <a href="index.html" class="bmp-logo">
+            <div class="bmp-logo-icon">
+                <span class="cube cube-top"></span>
+                <span class="cube cube-left"></span>
+                <span class="cube cube-right"></span>
+            </div>
+            <div class="bmp-logo-text">BMP</div>
+        </a>
 
-</body>
-</html>
+        <div class="toolbar-actions">
+            <div class="lang-switcher" role="group" aria-label="Language">
+                <button type="button" class="lang-btn active" data-lang="ar">عربية</button>
+                <button type="button" class="lang-btn"        data-lang="fr">Français</button>
+                <button type="button" class="lang-btn"        data-lang="en">English</button>
+            </div>
+
+            <button typ
