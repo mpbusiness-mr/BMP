@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>BMP · عقد تقديم خدمات</title>
 
@@ -562,6 +562,68 @@
         }
 
         /* ============================================ */
+        /* INTERACTIVE: contract number + choices       */
+        /* ============================================ */
+
+        /* Editable contract number */
+        .meta-value.editable {
+            display: inline-block;
+            min-width: 190px;
+            padding: 2px 6px;
+            border-bottom: 1px dashed var(--accent);
+            cursor: text;
+            outline: none;
+            transition: background 0.15s ease, border-color 0.15s ease;
+        }
+
+        .meta-value.editable:hover {
+            background: #eef6fd;
+        }
+
+        .meta-value.editable:focus {
+            border-bottom-style: solid;
+            border-bottom-color: var(--primary);
+            background: #f6fafd;
+        }
+
+        /* Clickable choices */
+        .type-choice,
+        .plan-choice {
+            cursor: pointer;
+            user-select: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.15s ease;
+        }
+
+        .type-choice:hover,
+        .plan-choice:hover {
+            background: #eef5fc;
+        }
+
+        /* Checked state: navy background + white ✓ */
+        .type-choice.checked .checkbox,
+        .plan-choice.checked .checkbox {
+            background: var(--primary);
+            border-color: var(--primary);
+            position: relative;
+        }
+
+        .type-choice.checked .checkbox::after,
+        .plan-choice.checked .checkbox::after {
+            content: "✓";
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        /* ============================================ */
         /* PRINT                                        */
         /* ============================================ */
 
@@ -579,10 +641,8 @@
                 font-size: 10.5px;
                 line-height: 1.5;
 
-                /* preserve colors */
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
-                color-adjust: exact !important;
             }
 
             .no-print, .toolbar { display: none !important; }
@@ -621,9 +681,11 @@
             }
 
             .page-footer {
-                position: absolute;
+                position: fixed;
                 bottom: 4mm;
                 inset-inline: 10mm;
+                border-top: none;
+                padding-top: 4px;
             }
 
             /* Force black text everywhere */
@@ -633,7 +695,6 @@
                 text-shadow: none !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
-                color-adjust: exact !important;
             }
 
             /* Neutralize light backgrounds only */
@@ -645,8 +706,13 @@
             .signature-block,
             .info-table th,
             .plan-table thead th,
-            .section-num .num {
+            .section-num .num,
+            .meta-value.editable {
                 background: #ffffff !important;
+            }
+
+            .meta-value.editable {
+                border-bottom: 1px solid #000 !important;
             }
 
             .section-num .num {
@@ -660,12 +726,16 @@
 
             .area-box { border-color: #666 !important; }
 
-            /* ---------- KEEP BMP LOGO IN COLOR ---------- */
+            /* Disable hover backgrounds */
+            .type-choice:hover,
+            .plan-choice:hover {
+                background: transparent !important;
+            }
 
+            /* Keep BMP logo in color */
             .bmp-logo-icon .cube {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
-                color-adjust: exact !important;
                 box-shadow: none !important;
             }
 
@@ -683,11 +753,22 @@
 
             .bmp-logo-text { color: #0f2b4b !important; }
 
-            /* Keep checkbox borders in navy */
+            /* Preserve checkboxes: navy border, navy fill when checked, white ✓ */
             .type-choice .checkbox,
             .plan-choice .checkbox {
                 border-color: #0f2b4b !important;
                 background: #ffffff !important;
+            }
+
+            .type-choice.checked .checkbox,
+            .plan-choice.checked .checkbox {
+                background: #0f2b4b !important;
+                border-color: #0f2b4b !important;
+            }
+
+            .type-choice.checked .checkbox::after,
+            .plan-choice.checked .checkbox::after {
+                color: #ffffff !important;
             }
         }
 
@@ -702,6 +783,8 @@
             .plan-choices { gap: 20px; }
             .lang-btn { padding: 5px 10px; font-size: 0.72rem; }
             .print-btn { padding: 8px 14px; font-size: 0.78rem; }
+
+            .meta-value.editable { min-width: 140px; }
         }
     </style>
 </head>
@@ -768,7 +851,11 @@
             <div class="doc-meta">
                 <div>
                     <span class="meta-label" data-ar="رقم العقد" data-fr="N° du contrat" data-en="Contract No.">رقم العقد</span>
-                    <span class="meta-value" id="contractNumber">BMP-CONTRACT-____-____</span>
+                    <span class="meta-value editable"
+                          id="contractNumber"
+                          contenteditable="true"
+                          spellcheck="false"
+                          title="BMP-CONTRACT-____-____">BMP-CONTRACT-____-____</span>
                 </div>
                 <div>
                     <span class="meta-label" data-ar="التاريخ" data-fr="Date" data-en="Date">التاريخ</span>
@@ -821,16 +908,16 @@
                     <tr>
                         <th data-ar="نوع المؤسسة" data-fr="Type d'organisation" data-en="Organization Type">نوع المؤسسة</th>
                         <td>
-                            <div class="type-choices">
-                                <span class="type-choice">
+                            <div class="type-choices" id="orgTypeChoices">
+                                <span class="type-choice" data-value="school">
                                     <span class="checkbox"></span>
                                     <span data-ar="مدرسة" data-fr="École" data-en="School">مدرسة</span>
                                 </span>
-                                <span class="type-choice">
+                                <span class="type-choice" data-value="restaurant">
                                     <span class="checkbox"></span>
                                     <span data-ar="مطعم" data-fr="Restaurant" data-en="Restaurant">مطعم</span>
                                 </span>
-                                <span class="type-choice">
+                                <span class="type-choice" data-value="store">
                                     <span class="checkbox"></span>
                                     <span data-ar="متجر / سوبرماركت" data-fr="Magasin / Supermarché" data-en="Store / Supermarket">متجر / سوبرماركت</span>
                                 </span>
@@ -920,12 +1007,12 @@
                 يختار الطرف الثاني أحد نظامي الاشتراك التاليين (يُشار إليه بعلامة ✓):
             </p>
 
-            <div class="plan-choices">
-                <span class="plan-choice">
+            <div class="plan-choices" id="planChoices">
+                <span class="plan-choice" data-value="monthly">
                     <span class="checkbox"></span>
                     <span data-ar="اشتراك شهري" data-fr="Abonnement mensuel" data-en="Monthly Subscription">اشتراك شهري</span>
                 </span>
-                <span class="plan-choice">
+                <span class="plan-choice" data-value="yearly">
                     <span class="checkbox"></span>
                     <span data-ar="اشتراك سنوي" data-fr="Abonnement annuel" data-en="Yearly Subscription">اشتراك سنوي</span>
                 </span>
@@ -934,7 +1021,7 @@
             <table class="info-table plan-table">
                 <thead>
                     <tr>
-                        <th></th>
+                        <th aria-hidden="true"></th>
                         <th data-ar="الاشتراك الشهري" data-fr="Mensuel" data-en="Monthly">الاشتراك الشهري</th>
                         <th data-ar="الاشتراك السنوي" data-fr="Annuel" data-en="Yearly">الاشتراك السنوي</th>
                     </tr>
@@ -1150,7 +1237,87 @@
         setLanguage(localStorage.getItem(LANG_KEY) || DEFAULT_LANG);
 
 
-        /* ---------- Contract number & date ---------- */
+        /* ---------- Contract number (editable) + footer sync ---------- */
+
+        const contractNumEl = document.getElementById('contractNumber');
+        const footerNum1    = document.getElementById('footerContractNum1');
+        const footerNum2    = document.getElementById('footerContractNum2');
+
+        function getContractNumber() {
+            const v = (contractNumEl ? contractNumEl.textContent : "").replace(/\s+/g, ' ').trim();
+            return v || "BMP-CONTRACT-____-____";
+        }
+
+        function syncFooterNumbers() {
+            const v = getContractNumber();
+            if (footerNum1) footerNum1.textContent = v;
+            if (footerNum2) footerNum2.textContent = v;
+        }
+
+        if (contractNumEl) {
+            contractNumEl.addEventListener('input', syncFooterNumbers);
+            contractNumEl.addEventListener('blur', function () {
+                contractNumEl.textContent = getContractNumber();
+                syncFooterNumbers();
+            });
+            contractNumEl.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    contractNumEl.blur();
+                }
+            });
+        }
+
+
+        /* ---------- Interactive choices (single-select) ---------- */
+
+        const orgTypeState = { value: "" };
+        const planState    = { value: "" };
+
+        function setupSingleChoiceGroup(containerId, state) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const items = container.querySelectorAll('.type-choice, .plan-choice');
+
+            items.forEach(function (choice) {
+                choice.setAttribute('role', 'checkbox');
+                choice.setAttribute('aria-checked', 'false');
+                choice.setAttribute('tabindex', '0');
+
+                function toggle() {
+                    const val     = choice.dataset.value || "";
+                    const wasOn   = choice.classList.contains('checked');
+
+                    items.forEach(function (c) {
+                        c.classList.remove('checked');
+                        c.setAttribute('aria-checked', 'false');
+                    });
+
+                    if (wasOn) {
+                        state.value = "";
+                    } else {
+                        choice.classList.add('checked');
+                        choice.setAttribute('aria-checked', 'true');
+                        state.value = val;
+                    }
+                }
+
+                choice.addEventListener('click', toggle);
+                choice.addEventListener('keydown', function (e) {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                        e.preventDefault();
+                        toggle();
+                    }
+                });
+            });
+        }
+
+        setupSingleChoiceGroup('orgTypeChoices', orgTypeState);
+        setupSingleChoiceGroup('planChoices',    planState);
+
+
+        /* ---------- Contract date ---------- */
 
         function setText(id, value) {
             const el = document.getElementById(id);
@@ -1196,6 +1363,17 @@
                 String(d.getDate()).padStart(2, "0");
         }
 
+        function markChoice(containerId, value, state) {
+            if (!value) return;
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const el = container.querySelector('[data-value="' + value + '"]');
+            if (!el) return;
+            el.classList.add('checked');
+            el.setAttribute('aria-checked', 'true');
+            state.value = value;
+        }
+
         async function fetchInstitution(institutionId) {
             try {
                 const res = await fetch(API_URL, {
@@ -1220,9 +1398,8 @@
             const institutionId = params.get("id");
 
             const num = buildContractNumber(institutionId);
-            setText("contractNumber",   num);
-            setText("footerContractNum1", num);
-            setText("footerContractNum2", num);
+            if (contractNumEl) contractNumEl.textContent = num;
+            syncFooterNumbers();
 
             if (!institutionId) return;
 
@@ -1235,6 +1412,10 @@
             setInput("clientEmail",  inst.email || "");
             setInput("licenseStart", formatDate(inst.licenseStart));
             setInput("licenseEnd",   formatDate(inst.licenseEnd));
+
+            // Optional — only works if your backend returns these fields
+            markChoice("orgTypeChoices", inst.orgType, orgTypeState);
+            markChoice("planChoices",    inst.plan,    planState);
         }
 
 
