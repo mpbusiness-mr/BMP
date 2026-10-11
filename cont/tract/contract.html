@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BMP · عقد تقديم خدمات وإتفاقية استخدام</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="shortcut icon" type="image/png" href="logo.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="contract.css">
+</head>
+
+<body>
+
+    <!-- ============================================= -->
+    <!-- Screen-only toolbar -->
+    <!-- ============================================= -->
+    <div class="toolbar no-print">
+        <div class="toolbar-left">
+            <div class="bmp-logo">
+                <div class="bmp-logo-icon">
+                    <span class="cube cube-top"></span>
+                    <span class="cube cube-left"></span>
+                    <span class="cube cube-right"></span>
+                </div>
+                <div class="bmp-logo-text">BMP</div>
+            </div>
+        </div>
+        <div class="toolbar-right">
+            <button type="button" id="printBtn" class="toolbar-btn primary">
+                <span data-ar="طباعة / حفظ PDF" data-fr="Imprimer / PDF" data-en="Print / PDF">طباعة / حفظ PDF</span>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ============================================= -->
+    <!-- CONTRACT DOCUMENT -->
+    <!-- ============================================= -->
+    <main class="contract-page" id="contractPage">
+
+
+        <!-- ============================================ -->
+        <!-- PAGE 1 -->
+        <!-- ============================================ -->
+        <section class="contract-paper">
+
+            <header class="doc-header">
+                <div class="doc-logo">
+                    <div class="bmp-logo logo-lg">
+                        <div class="bmp-logo-icon">
+                            <span class="cube cube-top"></span>
+                            <span class="cube cube-left"></span>
+                            <span class="cube cube-right"></span>
+                        </div>
+                        <div class="bmp-logo-text">BMP</div>
+                    </div>
+                </div>
+                <div class="doc-title">
+                    <h1 data-ar="BMP – منصة إدارة الأعمال"
+                        data-fr="BMP – Business Management Platform"
+                        data-en="BMP – Business Management Platform">
+                        BMP – منصة إدارة الأعمال
+                    </h1>
+                    <p class="doc-subtitle" data-ar="عقد تقديم خدمات وإتفاقية استخدام"
+                       data-fr="Contrat de service et conditions d'utilisation"
+                       data-en="Service Contract and Terms of Use">
+                        عقد تقديم خدمات وإتفاقية استخدام
+                    </p>
+                </div>
+            </header>
+
+            <div class="doc-meta">
+                <div>
+                    <span class="meta-label" data-ar="رقم العقد" data-fr="N° du contrat" data-en="Contract No.">رقم العقد</span>
+                    <span class="meta-value" id="contractNumber">BMP-CONTRACT-____-____</span>
+                </div>
+                <div>
+                    <span class="meta-label" data-ar="التاريخ" data-fr="Date" data-en="Date">التاريخ</span>
+                    <span class="meta-value" id="contractDate">____ / ____ / ________</span>
+                </div>
+            </div>
+
+
+            <!-- Section 1 — Parties -->
+            <h2 class="section-num">
+                <span class="num">1.</span>
+                <span data-ar="الأطراف" data-fr="Les parties" data-en="Parties">الأطراف</span>
+            </h2>
+
+            <div class="party-block">
+                <h3 data-ar="الطرف الأول — مقدم الخدمة"
+                    data-fr="Première partie — Prestataire"
+                    data-en="First Party — Provider">
+                    الطرف الأول — مقدم الخدمة
+                </h3>
+                <table class="info-table">
+                    <tr>
+                        <th data-ar="الاسم" data-fr="Nom" data-en="Name">الاسم</th>
+                        <td>BMP – Business Management Platform</td>
+                    </tr>
+                    <tr>
+                        <th data-ar="العنوان / المدينة" data-fr="Adresse / Ville" data-en="Address / City">العنوان / المدينة</th>
+                        <td><span class="fill-line"></span></td>
+                    </tr>
+                    <tr>
+                        <th data-ar="الهاتف" data-fr="Téléphone" data-en="Phone">الهاتف</th>
+                        <td>44362949</td>
+                    </tr>
+                    <tr>
+                        <th data-ar="واتساب" data-fr="WhatsApp" data-en="WhatsApp">واتساب</th>
+                        <td>+222 4436 2949</td>
+                    </tr>
+                    <tr>
+                        <th data-ar="البريد الإلكتروني" data-fr="E-mail" data-en="Email">البريد الإلكتروني</th>
+                        <td>mobusiness.mr@gmail.com</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="party-block">
+                <h3 data-ar="الطرف الثاني — المشترك"
+                    data-fr="Deuxième partie — Client"
+                    data-en="Second Party — Client">
+                    الطرف الثاني — المشترك
+                </h3>
+                <table class="info-table">
+                    <tr>
+                        <th data-ar="اسم المؤسسة" data-fr="Nom de l'organisation" data-en="Organization Name">اسم المؤسسة</th>
+                        <td><span class="fill-line" id="clientName"></span></td>
+                    </tr>
+
+                    <tr>
+                        <th data-ar="نوع المؤسسة" data-fr="Type d'organisation" data-en="Organization Type">نوع المؤسسة</th>
+                        <td>
+                            <!-- PRINT MODE: checkboxes marked by hand -->
+                            <div class="type-choices">
+                                <span class="type-choice">
+                                    <span class="checkbox"></span>
+                                    <span data-ar="مدرسة" data-fr="École" data-en="School">مدرسة</span>
+                                </span>
+                                <span class="type-choice">
+                                    <span class="checkbox"></span>
+                                    <span data-ar="مطعم" data-fr="Restaurant" data-en="Restaurant">مطعم</span>
+                                </span>
+                                <span class="type-choice">
+                                    <span class="checkbox"></span>
+                                    <span data-ar="متجر / سوبرماركت" data-fr="Magasin / Supermarché" data-en="Store / Supermarket">متجر / سوبرماركت</span>
+                                </span>
+                                <span class="type-choice">
+                                    <span class="checkbox"></span>
+                                    <span data-ar="أخرى" data-fr="Autre" data-en="Other">أخرى</span>
+                                </span>
+                            </div>
+
+                            <!-- SCREEN MODE: dropdown for admin -->
+                            <select class="type-select" id="clientTypeSelect">
+                                <option value="" data-ar="— اختر النوع —" data-fr="— Choisir —" data-en="— Choose —">— اختر النوع —</option>
+                                <option value="school"     data-ar="مدرسة" data-fr="École" data-en="School">مدرسة</option>
+                                <option value="restaurant" data-ar="مطعم" data-fr="Restaurant" data-en="Restaurant">مطعم</option>
+                                <option value="store"      data-ar="متجر / سوبرماركت" data-fr="Magasin / Supermarché" data-en="Store / Supermarket">متجر / سوبرماركت</option>
+                                <option value="other"      data-ar="أخرى" data-fr="Autre" data-en="Other">أخرى</option>
+                            </select>
+
+                            <!-- AUTO-FILL MODE: shows text when ?id= present -->
+                            <div class="type-auto" id="clientTypeAuto" style="display:none;"></div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th data-ar="رقم المؤسسة" data-fr="ID de l'organisation" data-en="Institution ID">رقم المؤسسة</th>
+                        <td><span class="fill-line" id="clientId"></span></td>
+                    </tr>
+                    <tr>
+                        <th data-ar="الهاتف" data-fr="Téléphone" data-en="Phone">الهاتف</th>
+                        <td><span class="fill-line" id="clientPhone"></span></td>
+                    </tr>
+                    <tr>
+                        <th data-ar="البريد الإلكتروني" data-fr="E-mail" data-en="Email">البريد الإلكتروني</th>
+                        <td><span class="fill-line" id="clientEmail"></span></td>
+                    </tr>
+                    <tr>
+                        <th data-ar="العنوان / المدينة" data-fr="Adresse / Ville" data-en="Address / City">العنوان / المدينة</th>
+                        <td><span class="fill-line"></span></td>
+                    </tr>
+                    <tr>
+                        <th data-ar="الممثل القانوني" data-fr="Représentant légal" data-en="Legal Representative">الممثل القانوني</th>
+                        <td><span class="fill-line"></span></td>
+                    </tr>
+                </table>
+            </div>
+
+
+            <!-- Section 2 — Purpose -->
+            <h2 class="section-num">
+                <span class="num">2.</span>
+                <span data-ar="الغرض من العقد" data-fr="Objet du contrat" data-en="Purpose of the Contract">الغرض من العقد</span>
+            </h2>
+            <p class="clause">
+                يهدف هذا العقد إلى تحديد الشروط التي بموجبها يمنح الطرف الأول (BMP) للطرف الثاني ترخيصًا لاستخدام منصة BMP لإدارة الأعمال، مع الالتزام ببنود الاستخدام و<b>اتفاقية معالجة البيانات</b> المذكورة أدناه.
+            </p>
+            <p class="clause fr">
+                Le présent contrat définit les conditions dans lesquelles la première partie (BMP) accorde à la deuxième partie une licence d'utilisation de la plateforme BMP pour la gestion d'entreprise, sous réserve des conditions d'utilisation et de l'<b>accord de traitement des données</b> énoncé ci-dessous.
+            </p>
+
+
+            <!-- Section 3 — Service -->
+            <h2 class="section-num">
+                <span class="num">3.</span>
+                <span data-ar="وصف الخدمة" data-fr="Description du service" data-en="Service Description">وصف الخدمة</span>
+            </h2>
+            <p class="clause">
+                يوفر الطرف الأول منصة إدارية متكاملة تتيح للطرف الثاني إدارة عملياته اليومية، من بين ما تشمله:
+            </p>
+            <ul class="bullets">
+                <li>إدارة المستخدمين والصلاحيات</li>
+                <li>إدارة العمليات المالية (المدفوعات / الطلبات / المبيعات) حسب نوع المؤسسة</li>
+                <li>إنشاء التقارير والإحصائيات</li>
+                <li>سجل عمليات كامل</li>
+                <li>بيانات منفصلة لكل مؤسسة على حدة</li>
+                <li>الدعم الفني عبر واتساب والهاتف والبريد الإلكتروني</li>
+            </ul>
+            <p class="clause fr">
+                La première partie fournit une plateforme de gestion intégrée permettant à la deuxième partie de gérer ses opérations quotidiennes, comprenant notamment : la gestion des utilisateurs et des permissions, la gestion des opérations financières (paiements / commandes / ventes) selon le type d'organisation, la génération de rapports et de statistiques, un journal d'activité complet, des données isolées pour chaque organisation, et un support technique via WhatsApp, téléphone et e-mail.
+            </p>
+
+
+            <!-- Section 4 — License -->
+            <h2 class="section-num">
+                <span class="num">4.</span>
+                <span data-ar="مدة الترخيص" data-fr="Durée de la licence" data-en="License Term">مدة الترخيص</span>
+            </h2>
+            <table class="info-table">
+                <tr>
+                    <th data-ar="تاريخ البداية" data-fr="Date de début" data-en="Start Date">تاريخ البداية</th>
+                    <td><span class="fill-line" id="licenseStart"></span></td>
+                </tr>
+                <tr>
+                    <th data-ar="تاريخ الانتهاء" data-fr="Date de fin" data-en="End Date">تاريخ الانتهاء</th>
+                    <td><span class="fill-line" id="licenseEnd"></span></td>
+                </tr>
+                <tr>
+                    <th data-ar="قابل للتجديد" data-fr="Renouvelable" data-en="Renewable">قابل للتجديد</th>
+                    <td data-ar="نعم، باتفاق الطرفين" data-fr="Oui, d'un commun accord" data-en="Yes, by mutual agreement">نعم، باتفاق الطرفين</td>
+                </tr>
+            </table>
+
+
+            <!-- Section 5 — Fees -->
+            <h2 class="section-num">
+                <span class="num">5.</span>
+                <span data-ar="الرسوم وطريقة الدفع" data-fr="Frais et mode de paiement" data-en="Fees and Payment">الرسوم وطريقة الدفع</span>
+            </h2>
+            <table class="info-table">
+                <tr>
+                    <th data-ar="قيمة الترخيص" data-fr="Montant de la licence" data-en="License Amount">قيمة الترخيص</th>
+                    <td><span class="fill-line"></span> <span class="unit">MRU</span></td>
+                </tr>
+                <tr>
+                    <th data-ar="طريقة الدفع" data-fr="Mode de paiement" data-en="Payment Method">طريقة الدفع</th>
+                    <td data-ar="نقداً / بنكيلي / سداد / مصرفي / بيم بانك / جيمتل" data-fr="Espèces / Bankily / Sedad / Masrivi / Bimbank / Gimtel" data-en="Cash / Bankily / Sedad / Masrivi / Bimbank / Gimtel">نقداً / بنكيلي / سداد / مصرفي / بيم بانك / جيمتل</td>
+                </tr>
+                <tr>
+                    <th data-ar="مهلة السداد" data-fr="Délai de paiement" data-en="Payment Deadline">مهلة السداد</th>
+                    <td><span class="fill-line"></span></td>
+                </tr>
+                <tr>
+                    <th data-ar="مهلة السماح" data-fr="Période de grâce" data-en="Grace Period">مهلة السماح</th>
+                    <td data-ar="7 أيام قبل تعليق الحساب" data-fr="7 jours avant suspension" data-en="7 days before suspension">7 أيام قبل تعليق الحساب</td>
+                </tr>
+            </table>
+
+
+            <div class="page-footer">
+                <span data-ar="صفحة 1 من 4" data-fr="Page 1 sur 4" data-en="Page 1 of 4">صفحة 1 من 4</span>
+                <span class="page-num-right" id="footerContractNum1">BMP-CONTRACT-____-____</span>
+            </div>
+
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- PAGE 2 — TERMS OF USE -->
+        <!-- ============================================ -->
+        <section class="contract-paper">
+
+            <h2 class="section-num title-only">
+                <span class="num">6.</span>
+                <span data-ar="شروط الاستخدام" data-fr="Conditions d'utilisation" data-en="Terms of Use">شروط الاستخدام</span>
+            </h2>
+
+            <p class="intro">
+                <span data-ar="بالتوقيع على هذا العقد، يوافق الطرف الثاني على الشروط التالية:"
+                      data-fr="En signant ce contrat, la deuxième partie accepte les conditions suivantes :"
+                      data-en="By signing this contract, the second party agrees to the following terms:">
+                    بالتوقيع على هذا العقد، يوافق الطرف الثاني على الشروط التالية:
+                </span>
+            </p>
+
+            <h3 class="sub-num">
+                <span class="num">6.1</span>
+                <span data-ar="الاستخدام المقبول" data-fr="Utilisation acceptable" data-en="Acceptable Use">الاستخدام المقبول</span>
+            </h3>
+            <p class="clause">يلتزم الطرف الثاني باستخدام المنصة للأغراض المشروعة فقط، ويمنع منعًا باتًا:</p>
+            <ul class="bullets">
+                <li>استخدام المنصة في أي نشاط غير قانوني أو احتيالي</li>
+                <li>محاولة اختراق المنصة أو الوصول إلى بيانات مؤسسة أخرى</li>
+                <li>مشاركة بيانات الدخول مع أي طرف خارج المؤسسة</li>
+            </ul>
+
+            <h3 class="sub-num">
+                <span class="num">6.2</span>
+                <span data-ar="حساب المستخدم" data-fr="Compte utilisateur" data-en="User Account">حساب المستخدم</span>
+            </h3>
+            <p class="clause">
+                الطرف الثاني مسؤول عن الحفاظ على سرية بيانات الدخول الخاصة بجميع مستخدميه، وعن كل نشاط يتم عبر حسابات المؤسسة. يلتزم بإبلاغ الطرف الأول فورًا في حال اكتشاف أي دخول غير مصرح به.
+            </p>
+
+            <h3 class="sub-num">
+                <span class="num">6.3</span>
+                <span data-ar="توفر الخدمة" data-fr="Disponibilité du service" data-en="Service Availability">توفر الخدمة</span>
+            </h3>
+            <p class="clause">
+                يبذل الطرف الأول جهودًا معقولة لضمان استمرارية المنصة، ولا يضمن توفرًا بنسبة 100٪. قد تتوقف الخدمة مؤقتًا لأغراض الصيانة أو التحديثات أو لأسباب خارجة عن إرادته.
+            </p>
+
+            <h3 class="sub-num">
+                <span class="num">6.4</span>
+                <span data-ar="الملكية الفكرية" data-fr="Propriété intellectuelle" data-en="Intellectual Property">الملكية الفكرية</span>
+            </h3>
+            <p class="clause">
+                تبقى منصة BMP وكودها وتصميمها ملكًا حصريًا للطرف الأول. تبقى البيانات التي يُدخلها الطرف الثاني ملكًا له وحده.
+            </p>
+
+            <h3 class="sub-num">
+                <span class="num">6.5</span>
+                <span data-ar="حدود المسؤولية" data-fr="Limitation de responsabilité" data-en="Limitation of Liability">حدود المسؤولية</span>
+            </h3>
+            <p class="clause">
+                لا يتحمل الطرف الأول المسؤولية عن أي أضرار غير مباشرة أو عرضية أو خسارة بيانات ناتجة عن سوء استخدام المنصة من طرف الطرف الثاني. في جميع الأحوال، لا تتجاوز المسؤولية الإجمالية للطرف الأول قيمة الرسوم المدفوعة فعليًا.
+            </p>
+
+            <h3 class="sub-num">
+                <span class="num">6.6</span>
+                <span data-ar="إنهاء العقد" data-fr="Résiliation" data-en="Termination">إنهاء العقد</span>
+            </h3>
+            <p class="clause">
+                يجوز لأي من الطرفين إنهاء هذا العقد بإشعار كتابي مسبق مدته ثلاثون (30) يومًا. يحق للطرف الأول تعليق أو إنهاء الخدمة فورًا في حال الإخلال الجسيم بالالتزامات أو عدم السداد. عند الإنهاء، يتم تسليم بيانات الطرف الثاني إليه بناءً على طلبه.
+            </p>
+
+            <h3 class="sub-num">
+                <span class="num">6.7</span>
+                <span data-ar="تعديل الشروط" data-fr="Modification des conditions" data-en="Modification of Terms">تعديل الشروط</span>
+            </h3>
+            <p class="clause">
+                يحق للطرف الأول تحديث هذه الشروط عند الحاجة، مع إشعار الطرف الثاني. يُعدّ استمرار الطرف الثاني في استخدام المنصة بعد التحديث موافقة ضمنية على الشروط المعدّلة.
+            </p>
+
+
+            <div class="page-footer">
+                <span data-ar="صفحة 2 من 4" data-fr="Page 2 sur 4" data-en="Page 2 of 4">صفحة 2 من 4</span>
+                <span class="page-num-right" id="footerContractNum2">BMP-CONTRACT-____-____</span>
+            </div>
+
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- PAGE 3 — DATA PROCESSING AGREEMENT -->
+        <!-- ============================================ -->
+        <section class="contract-paper">
+
+            <h2 class="section-num title-only">
+                <span class="num">7.</span>
+                <span data-ar="اتفاقية معالجة البيانات"
+                      data-fr="Accord de traitement des données"
+                      data-en="Data Processing Agreement">
+                    اتفاقية معالجة البيانات
+                </span>
+            </h2>
+
+            <div class="dpa-highlight">
+                <p class="clause strong">
+                    بالموافقة على هذا العقد، يمنح الطرف الثاني (المشترك) الطرف الأول (BMP) الموافقة الصريحة والكاملة على معالجة وتخزين جميع بيانات المؤسسة بصفته أمينًا عليها، وفق الشروط المفصلة في هذه الاتفاقية.
+                </p>
+                <p class="clause fr">
+                    En acceptant ce contrat, la deuxième partie (Client) accorde à la première partie (BMP) son consentement explicite et complet pour le traitement et le stockage de toutes les données de l'organisation en tant que dépositaire, selon les conditions détaillées dans cet accord.
+                </p>
+            </div>
+
+            <h3 class="sub-num">
+                <span class="num">7.1</span>
+                <span data-ar="نطاق البيانات المشمولة" data-fr="Champ d'application des données" data-en="Scope of Data Covered">نطاق البيانات المشمولة</span>
+            </h3>
+            <p class="clause">تشمل البيانات التي تتم معالجتها بموجب هذه الاتفاقية:</p>
+            <ul class="bullets">
+                <li>بيانات المؤسسة الأساسية (الاسم، النوع، بيانات التواصل، بيانات الترخيص)</li>
+                <li>بيانات المستخدمين (أسماء المستخدمين، كلمات المرور، الصلاحيات)</li>
+                <li>بيانات الطلاب (الأسماء، الأرقام، المراحل، الأقسام) — للمدارس</li>
+                <li>بيانات المدفوعات والسجلات المالية — لجميع المؤسسات</li>
+                <li>بيانات الطلبات والديون — للمطاعم</li>
+                <li>سجل العمليات (من قام بأي إجراء ومتى)</li>
+            </ul>
+
+            <h3 class="sub-num">
+                <span class="num">7.2</span>
+                <span data-ar="أغراض المعالجة" data-fr="Finalités du traitement" data-en="Purposes of Processing">أغراض المعالجة</span>
+            </h3>
+            <p class="clause">يلتزم الطرف الأول بمعالجة البيانات للأغراض التالية حصرًا:</p>
+            <ul class="bullets">
+                <li>تشغيل المنصة وتقديم الخدمة المتفق عليها</li>
+                <li>تمكين الطرف الثاني من إدارة عملياته اليومية</li>
+                <li>إنشاء التقارير والإحصائيات الخاصة بالطرف الثاني نفسه</li>
+                <li>تقديم الدعم الفني عند الحاجة</li>
+                <li>الامتثال للالتزامات القانونية عند الاقتضاء</li>
+            </ul>
+
+            <h3 class="sub-num">
+                <span class="num">7.3</span>
+                <span data-ar="عدم المشاركة مع أطراف ثالثة" data-fr="Non-partage avec des tiers" data-en="No Third-Party Sharing">عدم المشاركة مع أطراف ثالثة</span>
+            </h3>
+            <p class="clause">
+                يتعهد الطرف الأول بعدم بيع أو تأجير أو مشاركة أو نقل بيانات الطرف الثاني إلى أي طرف ثالث، سواء بشكل مجاني أو مدفوع. تُستثنى من ذلك الحالات التالية فقط:
+            </p>
+            <ul class="bullets">
+                <li>موافقة كتابية صريحة من الطرف الثاني</li>
+                <li>طلب قانوني ملزم من جهة قضائية مختصة</li>
+            </ul>
+
+            <h3 class="sub-num">
+                <span class="num">7.4</span>
+                <span data-ar="أمن البيانات" data-fr="Sécurité des données" data-en="Data Security">أمن البيانات</span>
+            </h3>
+            <p class="clause">
+                يلتزم الطرف الأول بتخزين البيانات في بيئة آمنة، ويطبق تدابير تقنية وتنظيمية معقولة لحماية البيانات من الوصول غير المصرح به أو الفقدان أو التعديل غير المسموح. البيانات محفوظة في بيئة Google Sheets معزولة لكل مؤسسة على حدة.
+            </p>
+
+            <h3 class="sub-num">
+                <span class="num">7.5</span>
+                <span data-ar="الوصول والتصدير والحذف" data-fr="Accès, export et suppression" data-en="Access, Export and Deletion">الوصول والتصدير والحذف</span>
+            </h3>
+            <p class="clause">يحق للطرف الثاني في أي وقت:</p>
+            <ul class="bullets">
+                <li>طلب نسخة من بياناته بصيغة قابلة للقراءة</li>
+                <li>طلب تصحيح أي بيانات غير دقيقة</li>
+                <li>طلب حذف كامل لبياناته بعد إنهاء العقد</li>
+            </ul>
+            <p class="clause">
+                ينفذ الطرف الأول هذه الطلبات خلال مدة معقولة لا تتجاوز 30 يومًا من تاريخ الطلب.
+            </p>
+
+            <h3 class="sub-num">
+                <span class="num">7.6</span>
+                <span data-ar="مدة الاحتفاظ بالبيانات" data-fr="Durée de conservation des données" data-en="Data Retention Period">مدة الاحتفاظ بالبيانات</span>
+            </h3>
+            <p class="clause">
+                يحتفظ الطرف الأول ببيانات الطرف الثاني طوال مدة سريان العقد وما يصل إلى 30 يومًا بعد انتهائه، ما لم يطلب الطرف الثاني حذفها فورًا أو الاحتفاظ بها لمدة أطول لأسباب تنظيمية.
+            </p>
+
+            <h3 class="sub-num">
+                <span class="num">7.7</span>
+                <span data-ar="إشعار الاختراق" data-fr="Notification de violation" data-en="Breach Notification">إشعار الاختراق</span>
+            </h3>
+            <p class="clause">
+                في حال وقوع أي اختراق أو وصول غير مصرح به إلى بيانات الطرف الثاني، يلتزم الطرف الأول بإبلاغ الطرف الثاني فورًا واتخاذ الإجراءات اللازمة للحد من الأثر.
+            </p>
+
+            <h3 class="sub-num">
+                <span class="num">7.8</span>
+                <span data-ar="مسؤولية الطرف الثاني" data-fr="Responsabilité du client" data-en="Client Responsibility">مسؤولية الطرف الثاني</span>
+            </h3>
+            <p class="clause">يقر الطرف الثاني بأنه:</p>
+            <ul class="bullets">
+                <li>المالك القانوني الوحيد للبيانات التي يُدخلها في المنصة</li>
+                <li>مسؤول عن دقة وصحة البيانات التي يُدخلها</li>
+                <li>قد حصل على موافقة أصحاب البيانات (عند الاقتضاء) لمشاركتها مع الطرف الأول</li>
+                <li>ملتزم بعدم إدخال بيانات حساسة غير ضرورية لتشغيل الخدمة</li>
+            </ul>
+
+            <div class="page-footer">
+                <span data-ar="صفحة 3 من 4" data-fr="Page 3 sur 4" data-en="Page 3 of 4">صفحة 3 من 4</span>
+                <span class="page-num-right" id="footerContractNum3">BMP-CONTRACT-____-____</span>
+            </div>
+
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- PAGE 4 — SIGNATURES -->
+        <!-- ============================================ -->
+        <section class="contract-paper">
+
+            <h2 class="section-num title-only">
+                <span class="num">8.</span>
+                <span data-ar="التوقيعات" data-fr="Signatures" data-en="Signatures">التوقيعات</span>
+            </h2>
+
+            <p class="intro">
+                بالتوقيع أدناه، يقر الطرفان بموافقتهما الكاملة على جميع بنود هذا العقد بما فيها اتفاقية معالجة البيانات الواردة في القسم السابع، ويعد التوقيع ملزمًا قانونيًا للطرفين.
+            </p>
+            <p class="intro fr">
+                En signant ci-dessous, les deux parties confirment leur accord complet sur toutes les clauses du présent contrat, y compris l'accord de traitement des données de la section 7. La signature a force obligatoire pour les deux parties.
+            </p>
+
+            <div class="signature-grid">
+
+                <div class="signature-block">
+                    <h3 data-ar="الطرف الأول — BMP" data-fr="Première partie — BMP" data-en="First Party — BMP">الطرف الأول — BMP</h3>
+
+                    <div class="signature-line">
+                        <span class="line-label" data-ar="الاسم" data-fr="Nom" data-en="Name">الاسم</span>
+                        <span class="blank"></span>
+                    </div>
+
+                    <div class="signature-line">
+                        <span class="line-label" data-ar="المنصب" data-fr="Titre" data-en="Title">المنصب</span>
+                        <span class="blank small">Founder &amp; CEO</span>
+                    </div>
+
+                    <div class="signature-line">
+                        <span class="line-label" data-ar="التاريخ" data-fr="Date" data-en="Date">التاريخ</span>
+                        <span class="blank"></span>
+                    </div>
+
+                    <div class="signature-area">
+                        <span class="area-label" data-ar="التوقيع" data-fr="Signature" data-en="Signature">التوقيع</span>
+                        <div class="area-box"></div>
+                    </div>
+
+                    <div class="signature-area">
+                        <span class="area-label" data-ar="الختم" data-fr="Cachet" data-en="Stamp">الختم</span>
+                        <div class="area-box stamp"></div>
+                    </div>
+                </div>
+
+                <div class="signature-block">
+                    <h3 data-ar="الطرف الثاني — المشترك" data-fr="Deuxième partie — Client" data-en="Second Party — Client">الطرف الثاني — المشترك</h3>
+
+                    <div class="signature-line">
+                        <span class="line-label" data-ar="الاسم" data-fr="Nom" data-en="Name">الاسم</span>
+                        <span class="blank"></span>
+                    </div>
+
+                    <div class="signature-line">
+                        <span class="line-label" data-ar="المنصب" data-fr="Titre" data-en="Title">المنصب</span>
+                        <span class="blank"></span>
+                    </div>
+
+                    <div class="signature-line">
+                        <span class="line-label" data-ar="التاريخ" data-fr="Date" data-en="Date">التاريخ</span>
+                        <span class="blank"></span>
+                    </div>
+
+                    <div class="signature-area">
+                        <span class="area-label" data-ar="التوقيع" data-fr="Signature" data-en="Signature">التوقيع</span>
+                        <div class="area-box"></div>
+                    </div>
+
+                    <div class="signature-area">
+                        <span class="area-label" data-ar="الختم" data-fr="Cachet" data-en="Stamp">الختم</span>
+                        <div class="area-box stamp"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <p class="final-note">
+                يُحرَّر هذا العقد في نسختين، نسخة لكل طرف، وتعتبر كلتاهما متساويتين في القيمة القانونية.
+            </p>
+            <p class="final-note fr">
+                Le présent contrat est établi en deux exemplaires, un pour chaque partie, les deux ayant la même valeur légale.
+            </p>
+
+            <div class="page-footer">
+                <span data-ar="صفحة 4 من 4" data-fr="Page 4 sur 4" data-en="Page 4 of 4">صفحة 4 من 4</span>
+                <span class="page-num-right" id="footerContractNum4">BMP-CONTRACT-____-____</span>
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <script>
+    (function () {
+        'use strict';
+
+        const API_URL =
+            "https://script.google.com/macros/s/AKfycbyeIqADYvIS_yynLSYOV3x-Ywn9Uh15O8BteXAyCDMflPcewRfROxDdT_T6k0w0AWWK/exec";
+
+        /* ---------- Helpers ---------- */
+
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const v = String(value || "").trim();
+            if (v) el.textContent = v;
+        }
+
+        function formatDate(value) {
+            if (!value) return "";
+            const s = String(value).trim();
+            const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (iso) return iso[1] + "-" + iso[2] + "-" + iso[3];
+            const d = new Date(s);
+            if (isNaN(d.getTime())) return s;
+            return d.getFullYear() + "-" +
+                String(d.getMonth() + 1).padStart(2, "0") + "-" +
+                String(d.getDate()).padStart(2, "0");
+        }
+
+        function translateType(type) {
+            const t = String(type || "").toLowerCase();
+            if (t === "school")     return "مدرسة / École";
+            if (t === "restaurant") return "مطعم / Restaurant";
+            if (t === "store")      return "متجر / Magasin";
+            if (t === "other")      return "أخرى / Autre";
+            return type || "";
+        }
+
+        /* ---------- Contract number ---------- */
+
+        function buildContractNumber(institutionId) {
+            const now  = new Date();
+            const year = now.getFullYear();
+            const rnd  = String(Math.floor(Math.random() * 9000) + 1000);
+            const id   = institutionId || "____";
+            return "BMP-" + id + "-" + year + "-" + rnd;
+        }
+
+        function setContractNumber(num) {
+            setText("contractNumber", num);
+            setText("footerContractNum1", num);
+            setText("footerContractNum2", num);
+            setText("footerContractNum3", num);
+            setText("footerContractNum4", num);
+        }
+
+        /* ---------- Backend fetch ---------- */
+
+        async function fetchInstitution(institutionId) {
+
+            try {
+
+                const res = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    body: JSON.stringify({ action: "getInstitutions" })
+                });
+
+                const data = await res.json();
+
+                if (!data.success || !Array.isArray(data.institutions)) return null;
+
+                return data.institutions.find(function (i) {
+                    return String(i.id) === String(institutionId);
+                }) || null;
+
+            } catch (e) {
+                console.error("Auto-fill fetch error:", e);
+                return null;
+            }
+
+        }
+
+        /* ---------- Type field display logic ---------- */
+
+        function showTypeAutoFill(typeText) {
+            const auto  = document.getElementById("clientTypeAuto");
+            const sel   = document.getElementById("clientTypeSelect");
+            if (auto) {
+                auto.textContent = typeText;
+                auto.style.display = "block";
+            }
+            if (sel) sel.style.display = "none";
+        }
+
+        function showTypeDropdown() {
+            const auto  = document.getElementById("clientTypeAuto");
+            const sel   = document.getElementById("clientTypeSelect");
+            if (auto) auto.style.display = "none";
+            if (sel)  sel.style.display  = "block";
+        }
+
+        /* ---------- Init ---------- */
+
+        async function init() {
+
+            const urlParams     = new URLSearchParams(window.location.search);
+            const institutionId = urlParams.get("id");
+
+            /* Today's date */
+            const today = new Date();
+            setText("contractDate",
+                String(today.getDate()).padStart(2, "0") + " / " +
+                String(today.getMonth() + 1).padStart(2, "0") + " / " +
+                today.getFullYear()
+            );
+
+            /* Contract number */
+            setContractNumber(buildContractNumber(institutionId));
+
+            /* No ?id= → show dropdown (admin selects type on screen) */
+            if (!institutionId) {
+                showTypeDropdown();
+                return;
+            }
+
+            /* ?id= given → try to auto-fill */
+            const institution = await fetchInstitution(institutionId);
+
+            if (!institution) {
+                /* ID given but not found → fall back to dropdown */
+                showTypeDropdown();
+                return;
+            }
+
+            setText("clientName",   institution.name  || "");
+            setText("clientId",     institution.id);
+            setText("clientPhone",  institution.phone || "");
+            setText("clientEmail",  institution.email || "");
+            setText("licenseStart", formatDate(institution.licenseStart));
+            setText("licenseEnd",   formatDate(institution.licenseEnd));
+
+            showTypeAutoFill(translateType(institution.type));
+
+        }
+
+        /* ---------- Print ---------- */
+
+        function setupPrint() {
+            const btn = document.getElementById("printBtn");
+            if (!btn) return;
+            btn.addEventListener("click", function () {
+                window.print();
+            });
+        }
+
+        /* ---------- Start ---------- */
+
+        init();
+        setupPrint();
+
+    })();
+    </script>
+
+</body>
+</html>
