@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BMP · الشروط والأحكام وسياسة الخصوصية</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="shortcut icon" type="image/png" href="logo.png">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary: #0f2b4b;
+            --primary-light: #1a3f66;
+            --accent: #00b4d8;
+            --accent-soft: #e6f7fd;
+            --text-dark: #0b1a2a;
+            --text-muted: #3e5a76;
+            --line: #dde5ee;
+            --white: #ffffff;
+            --paper-bg: #f4f7fb;
+            --shadow-card: 0 12px 40px rgba(15,43,75,0.06);
+            --radius: 16px;
+            --transition: all 0.25s ease;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans Arabic', 'Inter', sans-serif;
+            color: var(--text-dark);
+            background: var(--paper-bg);
+            line-height: 1.75;
+            font-size: 15px;
+        }
+
+        body.lang-ar { font-family: 'IBM Plex Sans Arabic', sans-serif; }
+        body.lang-fr,
+        body.lang-en { font-family: 'Inter', sans-serif; }
+
+        /* ---------- TOPBAR ---------- */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 5%;
+            background: rgba(255,255,255,0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--line);
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .bmp-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            line-height: 1;
+            text-decoration: none;
+        }
+
+        .bmp-logo-icon {
+            position: relative;
+            width: 34px;
+            height: 34px;
+            flex-shrink: 0;
+        }
+
+        .bmp-logo-icon .cube {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            border-radius: 3px;
+            transform: rotate(45deg) skew(-10deg, -10deg);
+        }
+
+        .bmp-logo-icon .cube-top {
+            top: 0; left: 9px;
+            background: linear-gradient(135deg, #00d4f5 0%, #00b4d8 100%);
+        }
+        .bmp-logo-icon .cube-left {
+            top: 10px; left: 0;
+            background: linear-gradient(135deg, #00b4d8 0%, #0091b3 100%);
+        }
+        .bmp-logo-icon .cube-right {
+            top: 10px; left: 19px;
+            background: linear-gradient(135deg, #0077b6 0%, #0f2b4b 100%);
+        }
+
+        .bmp-logo-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .lang-switcher {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px;
+            background: #f0f5fa;
+            border: 1px solid #dbe4ee;
+            border-radius: 40px;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 12px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .lang-btn:hover { color: var(--primary); }
+
+        .lang-btn.active {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 4px 10px rgba(15,43,75,0.2);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 40px;
+            background: var(--white);
+            border: 1px solid var(--line);
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .back-link:hover { background: #f6fafd; }
+
+        /* ---------- PAGE ---------- */
+        .page-wrap {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px 80px;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 40px 20px 30px;
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+        }
+
+        .page-header p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .page-header .updated {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 14px;
+            background: var(--accent-soft);
+            color: var(--primary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+        }
+
+        /* ---------- TABLE OF CONTENTS ---------- */
+        .toc {
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            margin-bottom: 32px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .toc h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .toc ol {
+            list-style: none;
+            counter-reset: toc;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px 24px;
+        }
+
+        .toc li {
+            counter-increment: toc;
+        }
+
+        .toc a {
+            display: block;
+            padding: 6px 10px;
+            color: var(--text-dark);
+            text-decoration: none;
+            font-size: 0.88rem;
+            border-radius: 6px;
+            transition: var(--transition);
+            border-inline-start: 3px solid transparent;
+        }
+
+        .toc a:hover {
+            background: #f6fafd;
+            border-inline-start-color: var(--accent);
+            color: var(--primary);
+        }
+
+        /* ---------- SECTIONS ---------- */
+        .terms-section {
+            background: var(--white);
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 32px 34px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-card);
+            scroll-margin-top: 90px;
+        }
+
+        .terms-section h2 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--accent-soft);
+        }
+
+        .terms-section h2 .num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 34px;
+            height: 34px;
+            padding: 0 10px;
+            background: var(--primary);
+            color: var(--white);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            flex-shrink: 0;
+        }
+
+        .terms-section h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 22px 0 10px;
+        }
+
+        .terms-section h3 .sub {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 10px;
+            background: #e6f0fb;
+            color: var(--primary);
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+        }
+
+        .terms-section p {
+            font-size: 0.92rem;
+            line-height: 1.85;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+
+        .terms-section p.fr {
+            font-size: 0.86rem;
+            font-style: italic;
+            color: var(--text-muted);
+            margin-top: 2px;
+            margin-bottom: 16px;
+        }
+
+        .terms-section ul {
+            list-style: none;
+            padding-inline-start: 20px;
+            margin: 10px 0 16px;
+        }
+
+        .terms-section ul li {
+            position: relative;
+            font-size: 0.9rem;
+            padding: 4px 0;
+            line-height: 1.8;
+            color: var(--text-dark);
+        }
+
+        .terms-section ul li::before {
+            content: "▪";
+            color: var(--accent);
+            position: absolute;
+            inset-inline-start: -18px;
+            font-weight: 700;
+        }
+
+        .info-box {
+            padding: 16px 20px;
+            border: 1px solid var(--accent);
+            border-inline-start-width: 4px;
+            border-radius: 8px;
+            background: #f4fbff;
+            margin: 14px 0;
+        }
+
+        .info-box p { margin-bottom: 8px; }
+        .info-box p:last-child { margin-bottom: 0; }
+
+        .warn-box {
+            padding: 16px 20px;
+            border: 1px solid #f59e0b;
+            border-inline-start-width: 4px;
+            border-radius: 8px;
+            background: #fffbeb;
+            margin: 14px 0;
+        }
+
+        .warn-box p { margin-bottom: 8px; }
+        .warn-box p:last-child { margin-bottom: 0; }
+
+        /* ---------- CONTACT CARD ---------- */
+        .contact-card {
+            background: linear-gradient(135deg, var(--primary) 0%, #0a1e36 100%);
+            color: var(--white);
+            border-radius: var(--radius);
+            padding: 32px 34px;
+            text-align: center;
+            margin-top: 20px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .contact-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .contact-card p {
+            font-size: 0.9rem;
+            opacity: 0.85;
+            margin-bottom: 20px;
+        }
+
+        .contact-card a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 26px;
+            background: var(--white);
+            color: var(--primary);
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: var(--transition);
+            margin: 4px;
+        }
+
+        .contact-card a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(255,255,255,0.15);
+        }
+
+        /* ---------- BACK TO TOP ---------- */
+        .back-to-top {
+            position: fixed;
+            bottom: 24px;
+            inset-inline-end: 24px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--white);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 10px 24px rgba(15,43,75,0.28);
+            transition: var(--transition);
+            opacity: 0;
+            visibility: hidden;
+            z-index: 40;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        /* ---------- FOOTER ---------- */
+        .page-footer {
+            text-align: center;
+            padding: 40px 20px 20px;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            border-top: 1px solid var(--line);
+            margin-top: 40px;
+        }
+
+        .page-footer .bmp-logo {
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 720px) {
+
+            .page-wrap { padding: 24px 14px 60px; }
+
+            .page-header h1 { font-size: 1.5rem; }
+
+            .toc ol { grid-template-columns: 1fr; }
+
+            .terms-section { padding: 22px 20px; }
+
+            .terms-section h2 { font-size: 1.05rem; }
+
+            .terms-section h2 .num {
+                min-width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+            }
+
+            .topbar { padding: 12px 14px; }
+            .bmp-logo-text { font-size: 1.1rem; }
+            .lang-btn { padding: 5px 9px; font-size: 0.72rem; }
+            .back-link { padding: 7px 12px; font-size: 0.78rem; }
+        }
+
+        /* ---------- PRINT ---------- */
+        @media print {
+
+            @page { size: A4; margin: 15mm 12mm; }
+
+            body { background: #fff; font-size: 11pt; }
+
+            .topbar, .back-to-top, .contact-card,
+            .page-footer .bmp-logo { display: none !important; }
+
+            .toc { page-break-after: always; }
+
+            .terms-section {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                page-break-inside: auto;
+                margin-bottom: 14px;
+                padding: 18px 20px;
+            }
+
+            .terms-section h2 { page-break-after: avoid; }
+            .terms-section h3 { page-break-after: avoid; }
+
+            .info-box, .warn-box { border: 1px solid #999 !important; background: #f9f9f9 !important; }
+        }
+    </style>
+</head>
+
+
+  <body class="lang-ar">
+
+    <!-- ============================================= -->
+    <!-- TOPBAR -->
+    <!-- ============================================= -->
+    <header class="topbar">
+        <a href="index.html" class="bmp-logo">
+            <div class="bmp-logo-icon">
+                <span class="cube cube-top"></span>
+                <span class="cube cube-left"></span>
+                <span class="cube cube-right"></span>
+            </div>
+            <div class="bmp-logo-text">BMP</div>
+        </a>
+
+        <div class="topbar-actions">
+            <div class="lang-switcher" role="group" aria-label="Language">
+                <button type="button" class="lang-btn active" data-lang="ar">عربية</button>
+                <button type="button" class="lang-btn"        data-lang="fr">Français</button>
+                <button type="button" class="lang-btn"        data-lang="en">English</button>
+            </div>
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-right" style="display:none;"></i>
+                <span data-ar="← العودة" data-fr="← Retour" data-en="← Back">← العودة</span>
+            </a>
+        </div>
+    </header>
+
+
+    <!-- ============================================= -->
+    <!-- MAIN CONTENT -->
+    <!-- ============================================= -->
+    <div class="page-wrap">
+
+        <header class="page-header">
+            <h1 data-ar="الشروط والأحكام وسياسة الخصوصية"
+                data-fr="Conditions générales et politique de confidentialité"
+                data-en="Terms of Service & Privacy Policy">
+                الشروط والأحكام وسياسة الخصوصية
+            </h1>
+            <p data-ar="BMP – منصة إدارة الأعمال"
+               data-fr="BMP – Business Management Platform"
+               data-en="BMP – Business Management Platform">
+                BMP – منصة إدارة الأعمال
+            </p>
+            <span class="updated"
+                  data-ar="آخر تحديث: أكتوبر 2026"
+                  data-fr="Dernière mise à jour : Octobre 2026"
+                  data-en="Last updated: October 2026">
+                آخر تحديث: أكتوبر 2026
+            </span>
+        </header>
+
+
+        <!-- ============================================ -->
+        <!-- TABLE OF CONTENTS -->
+        <!-- ============================================ -->
+        <nav class="toc">
+            <h2 data-ar="جدول المحتويات" data-fr="Table des matières" data-en="Table of Contents">جدول المحتويات</h2>
+            <ol>
+                <li><a href="#s1" data-ar="1. مقدمة وتعريفات" data-fr="1. Introduction et définitions" data-en="1. Introduction & Definitions">1. مقدمة وتعريفات</a></li>
+                <li><a href="#s2" data-ar="2. قبول الشروط" data-fr="2. Acceptation des conditions" data-en="2. Acceptance of Terms">2. قبول الشروط</a></li>
+                <li><a href="#s3" data-ar="3. وصف الخدمة" data-fr="3. Description du service" data-en="3. Service Description">3. وصف الخدمة</a></li>
+                <li><a href="#s4" data-ar="4. الحساب والتسجيل" data-fr="4. Compte et inscription" data-en="4. Account & Registration">4. الحساب والتسجيل</a></li>
+                <li><a href="#s5" data-ar="5. الاشتراك والرسوم" data-fr="5. Abonnement et frais" data-en="5. Subscription & Fees">5. الاشتراك والرسوم</a></li>
+                <li><a href="#s6" data-ar="6. الاستخدام المقبول" data-fr="6. Utilisation acceptable" data-en="6. Acceptable Use">6. الاستخدام المقبول</a></li>
+                <li><a href="#s7" data-ar="7. حماية البيانات والخصوصية" data-fr="7. Protection des données et confidentialité" data-en="7. Data Protection & Privacy">7. حماية البيانات والخصوصية</a></li>
+                <li><a href="#s8" data-ar="8. الملكية الفكرية" data-fr="8. Propriété intellectuelle" data-en="8. Intellectual Property">8. الملكية الفكرية</a></li>
+                <li><a href="#s9" data-ar="9. توفر الخدمة والدعم" data-fr="9. Disponibilité du service et support" data-en="9. Service Availability & Support">9. توفر الخدمة والدعم</a></li>
+                <li><a href="#s10" data-ar="10. حدود المسؤولية" data-fr="10. Limitation de responsabilité" data-en="10. Limitation of Liability">10. حدود المسؤولية</a></li>
+                <li><a href="#s11" data-ar="11. الإلغاء والإنهاء" data-fr="11. Annulation et résiliation" data-en="11. Cancellation & Termination">11. الإلغاء والإنهاء</a></li>
+                <li><a href="#s12" data-ar="12. تعديل الشروط" data-fr="12. Modification des conditions" data-en="12. Modification of Terms">12. تعديل الشروط</a></li>
+                <li><a href="#s13" data-ar="13. القوانين الحاكمة" data-fr="13. Droit applicable" data-en="13. Governing Law">13. القوانين الحاكمة</a></li>
+                <li><a href="#s14" data-ar="14. التواصل معنا" data-fr="14. Contact" data-en="14. Contact Us">14. التواصل معنا</a></li>
+            </ol>
+        </nav>
+
+
+        <!-- ============================================ -->
+        <!-- SECTION 1 — INTRODUCTION -->
+        <!-- ============================================ -->
+        <section class="terms-section" id="s1">
+            <h2>
+                <span class="num">1</span>
+                <span data-ar="مقدمة وتعريفات" data-fr="Introduction et définitions" data-en="Introduction & Definitions">مقدمة وتعريفات</span>
+            </h2>
+
+            <p>
+                مرحبًا بك في <b>BMP – Business Management Platform</b> ("المنصة"، "نحن"، "الشركة"). توضح هذه الشروط والأحكام ("الشروط") الحقوق والواجبات المترتبة على استخدامك لمنصتنا وخدماتنا. بإتمام التسجيل أو باستخدام المنصة، فإنك ("المشترك" أو "المؤسسة") توافق على هذه الشروط.
+            </p>
+            <p class="fr">
+                Bienvenue sur <b>BMP – Business Management Platform</b> (« la Plateforme », « nous », « la Société »). Les présentes conditions générales (« Conditions ») définissent les droits et obligations liés à l'utilisation de notre plateforme et de nos services. En vous inscrivant ou en utilisant la Plateforme, vous (« le Client » ou « l'Organisation ») acceptez ces Conditions.
+            </p>
+
+            <h3>
+                <span class="sub">1.1</span>
+                <span data-ar="التعريفات" data-fr="Définitions" data-en="Definitions">التعريفات</span>
+            </h3>
+            <ul>
+                <li><b>المنصة / Plateforme :</b> خدمة إدارة الأعمال المقدمة عبر الإنترنت بواسطة BMP.</li>
+                <li><b>المشترك / Client :</b> المؤسسة التي أنشأت حسابًا على المنصة (مدرسة، مطعم، متجر...).</li>
+                <li><b>المستخدم / Utilisateur :</b> شخص يستخدم المنصة بموجب حساب المشترك (مدير، موظف...).</li>
+                <li><b>البيانات / Données :</b> كل المعلومات التي يُدخلها المشترك في المنصة.</li>
+                <li><b>العقد / Contrat :</b> اتفاقية تقديم الخدمات الموقّعة بين المشترك و BMP.</li>
+            </ul>
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- SECTION 2 — ACCEPTANCE -->
+        <!-- ============================================ -->
+        <section class="terms-section" id="s2">
+            <h2>
+                <span class="num">2</span>
+                <span data-ar="قبول الشروط" data-fr="Acceptation des conditions" data-en="Acceptance of Terms">قبول الشروط</span>
+            </h2>
+
+            <div class="info-box">
+                <p><b>بالنقر على "أوافق" أو باستخدام المنصة، فإنك تُقر بأنك قد قرأت وفهمت وقبلت جميع الشروط الواردة في هذه الصفحة.</b></p>
+                <p class="fr"><b>En cliquant sur « J'accepte » ou en utilisant la Plateforme, vous confirmez avoir lu, compris et accepté l'ensemble des conditions énoncées sur cette page.</b></p>
+            </div>
+
+            <p>
+                يجب أن يكون عمرك 18 عامًا على الأقل أو أن تكون ممثلًا معتمدًا لمؤسسة قانونية لاستخدام المنصة. إذا كنت تستخدم المنصة نيابة عن مؤسسة، فإنك تُقر بأنك مخوَّل بقبول هذه الشروط بالنيابة عنها.
+            </p>
+            <p class="fr">
+                Vous devez avoir au moins 18 ans ou être un représentant dûment autorisé d'une organisation pour utiliser la Plateforme. Si vous utilisez la Plateforme au nom d'une organisation, vous confirmez être habilité à accepter ces Conditions en son nom.
+            </p>
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- SECTION 3 — SERVICE DESCRIPTION -->
+        <!-- ============================================ -->
+        <section class="terms-section" id="s3">
+            <h2>
+                <span class="num">3</span>
+                <span data-ar="وصف الخدمة" data-fr="Description du service" data-en="Service Description">وصف الخدمة</span>
+            </h2>
+
+            <p>توفر BMP منصة إدارية سحابية متكاملة تشمل بشكل أساسي:</p>
+            <ul>
+                <li>إدارة المستخدمين والصلاحيات (Director / User)</li>
+                <li>إدارة الطلاب — للمدارس</li>
+                <li>إدارة المدفوعات والإيصالات — للمدارس</li>
+                <li>إدارة الطلبات والديون — للمطاعم</li>
+                <li>إدارة المخزون والمبيعات — للمتاجر</li>
+                <li>التقارير والإحصائيات المالية</li>
+                <li>سجل العمليات الكامل (Audit Log)</li>
+                <li>فصل البيانات لكل مؤسسة</li>
+                <li>الدعم الفني عبر واتساب والهاتف والبريد الإلكتروني</li>
+            </ul>
+
+            <p class="fr">
+                BMP fournit une plateforme de gestion cloud intégrée, comprenant essentiellement : la gestion des utilisateurs et des permissions, la gestion des élèves et des paiements (écoles), la gestion des commandes et des dettes (restaurants), la gestion du stock et des ventes (magasins), des rapports et statistiques financières, un journal d'activité complet, l'isolation des données par organisation, et un support technique via WhatsApp, téléphone et e-mail.
+            </p>
+
+            <div class="warn-box">
+                <p><b>ملاحظة / Remarque :</b> تحتفظ BMP بحق إضافة أو تعديل أو إيقاف أي ميزة في المنصة دون إشعار مسبق، مع الالتزام بعدم التأثير السلبي على الخدمات الأساسية للمشترك.</p>
+            </div>
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- SECTION 4 — ACCOUNT & REGISTRATION -->
+        <!-- ============================================ -->
+        <section class="terms-section" id="s4">
+            <h2>
+                <span class="num">4</span>
+                <span data-ar="الحساب والتسجيل" data-fr="Compte et inscription" data-en="Account & Registration">الحساب والتسجيل</span>
+            </h2>
+
+            <h3>
+                <span class="sub">4.1</span>
+                <span data-ar="إنشاء الحساب" data-fr="Création de compte" data-en="Account Creation">إنشاء الحساب</span>
+            </h3>
+            <p>
+                لاستخدام المنصة، يجب إنشاء حساب مؤسسة يتم فيه إدخال بيانات صحيحة وكاملة (اسم المؤسسة، بيانات التواصل، بيانات الدخول). يتحمل المشترك مسؤولية صحة هذه البيانات.
+            </p>
+
+            <h3>
+                <span class="sub">4.2</span>
+                <span data-ar="سرية بيانات الدخول" data-fr="Confidentialité des identifiants" data-en="Confidentiality of Credentials">سرية بيانات الدخول</span>
+            </h3>
+            <p>
+                يلتزم المشترك بالحفاظ على سرية اسم المستخدم وكلمة المرور الخاصة به وبكل مستخدمي المؤسسة، ولا يجوز مشاركتها مع أي طرف خارجي. المشترك مسؤول عن كل نشاط يتم عبر حسابات مؤسسته.
+            </p>
+            <p class="fr">
+                Le Client s'engage à préserver la confidentialité du nom d'utilisateur et du mot de passe, tant les siens que ceux de tous les utilisateurs de son organisation, et à ne pas les partager avec des tiers. Le Client est responsable de toute activité effectuée via les comptes de son organisation.
+            </p>
+
+            <h3>
+                <span class="sub">4.3</span>
+                <span data-ar="إشعار الاختراق" data-fr="Notification de compromission" data-en="Breach Notification">إشعار الاختراق</span>
+            </h3>
+            <p>
+                في حال اكتشاف أي وصول غير مصرح به إلى حساب المؤسسة، يلتزم المشترك بإبلاغ BMP فورًا لتتخذ الإجراءات اللازمة.
+            </p>
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- SECTION 5 — SUBSCRIPTION & FEES -->
+        <!-- ============================================ -->
+        <section class="terms-section" id="s5">
+            <h2>
+                <span class="num">5</span>
+                <span data-ar="الاشتراك والرسوم" data-fr="Abonnement et frais" data-en="Subscription & Fees">الاشتراك والرسوم</span>
+            </h2>
+
+            <h3>
+                <span class="sub">5.1</span>
+                <span data-ar="نظاما الاشتراك" data-fr="Formules d'abonnement" data-en="Subscription Plans">نظاما الاشتراك</span>
+            </h3>
+            <p>يوفر BMP نظامين للاشتراك:</p>
+            <ul>
+                <li><b>الاشتراك الشهري:</b> رسوم شهرية + رسوم عقد ثابتة تُدفع مرة واحدة.</li>
+                <li><b>الاشتراك السنوي:</b> رسوم سنوية + رسوم عقد ثابتة تُدفع مرة واحدة.</li>
+            </ul>
+            <p>
+                يحدد المشترك النظام المناسب له في العقد، وتُحدد المبالغ كتابيًا في العقد الموقّع.
+            </p>
+
+            <h3>
+                <span class="sub">5.2</span>
+                <span data-ar="الدفع" data-fr="Paiement" data-en="Payment">الدفع</span>
+            </h3>
+            <p>تُقبل طرق الدفع التالية:</p>
+            <ul>
+                <li>نقدًا / Espèces</li>
+                <li>بنكيلي / Bankily</li>
+                <li>سداد / Sedad</li>
+                <li>مصرفي / Masrivi</li>
+                <li>بيم بانك / Bimbank</li>
+                <li>جيمتل / Gimtel</li>
+            </ul>
+            <p>
+                تُدفع الرسوم الدورية في بداية كل فترة (شهر / سنة). تُدفع رسوم العقد الثابتة مرة واحدة عند التوقيع.
+            </p>
+
+            <h3>
+                <span class="sub">5.3</span>
+                <span data-ar="التأخر في الدفع" data-fr="Retard de paiement" data-en="Late Payment">التأخر في الدفع</span>
+            </h3>
+            <p>
+                في حال التأخر في السداد، يمنح BMP مهلة سماح مدتها <b>سبعة (7) أيام</b>. بعد انقضاء المهلة، يحق لـ BMP تعليق الحساب مؤقتًا حتى استكمال السداد، دون تحمل أي مسؤولية عن التأثير الناتج على عمل المؤسسة.
+            </p>
+
+            <h3>
+                <span class="sub">5.4</span>
+                <span data-ar="عدم الاسترداد" data-fr="Aucun remboursement" data-en="No Refunds">عدم الاسترداد</span>
+            </h3>
+            <div class="warn-box">
+                <p><b>جميع المبالغ المدفوعة غير قابلة للاسترداد.</b></p>
+                <p class="fr"><b>Tous les montants payés ne sont pas remboursables.</b></p>
+            </div>
+        </section>
+
+      
+        <!-- ============================================ -->
+        <!-- SECTION 6 — ACCEPTABLE USE -->
+        <!-- ============================================ -->
+        <section class="terms-section" id="s6">
+            <h2>
+                <span class="num">6</span>
+                <span data-ar="الاستخدام المقبول" data-fr="Utilisation acceptable" data-en="Acceptable Use">الاستخدام المقبول</span>
+            </h2>
+
+            <p>يلتزم المشترك ومستخدموه باستخدام المنصة للأغراض المشروعة فقط. يُمنع منعًا باتًا:</p>
+            <ul>
+                <li>استخدام المنصة في أي نشاط غير قانوني أو احتيالي أو ضار</li>
+                <li>محاولة اختراق المنصة أو تجاوز أنظمة الأمان</li>
+                <li>محاولة الوصول إلى بيانات مؤسسة أخرى</li>
+                <li>مشاركة بيانات الدخول مع أي طرف خارج المؤسسة</li>
+                <li>تحميل أو نشر برمجيات ضارة أو خبيثة</li>
+                <li>انتحال هوية أي شخص أو مؤسسة أخرى</li>
+                <li>إدخال بيانات مزيفة أو مضللة عن قصد</li>
+                <li>استخدام المنصة لأغراض إعادة البيع دون إذن كتابي مسبق</li>
+            </ul>
+
+            <p class="fr">
+                Le Client et ses utilisateurs s'engagent à utiliser la Plateforme uniquement à des fins légitimes. Il est strictement interdit : d'utiliser la Plateforme pour toute activité illégale, frauduleuse ou nuisible ; de tenter de pirater la Plateforme ou de contourner les systèmes de sécurité ; de tenter d'accéder aux données d'une autre organisation ; de partager les identifiants en dehors de l'organisation ; de télécharger ou diffuser des logiciels malveillants ; d'usurper l'identité d'une autre personne ou organisation ; de saisir sciemment des données fausses ou trompeuses ; d'utiliser la Plateforme à des fins de revente sans autorisation écrite préalable.
+            </p>
+
+            <div class="warn-box">
+                <p><b>العواقب:</b> في حال مخالفة هذه الشروط، يحق لـ BMP تعليق الحساب أو إنهاء العقد فورًا، دون أي استرداد للمبالغ المدفوعة، مع الاحتفاظ بحق المطالبة بالتعويض.</p>
+            </div>
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- SECTION 7 — DATA PROTECTION & PRIVACY -->
+        <!-- ============================================ -->
+        <section class="terms-section" id="s7">
+            <h2>
+                <span class="num">7</span>
+                <span data-ar="حماية البيانات والخصوصية" data-fr="Protection des données et confidentialité" data-en="Data Protection & Privacy">حماية البيانات والخصوصية</span>
+            </h2>
+
+            <div class="info-box">
+                <p><b>جميع بيانات المؤسسة ملك حصري للمشترك.</b> يقوم BMP بمعالجتها وتخزينها بصفته أمينًا عليها، فقط لتقديم الخدمة.</p>
+                <p class="fr"><b>Toutes les données de l'organisation appartiennent exclusivement au Client.</b> BMP les traite et les stocke en tant que dépositaire, uniquement pour fournir le service.</p>
+            </div>
+
+            <h3>
+                <span class="sub">7.1</span>
+                <span data-ar="البيانات المشمولة" data-fr="Données concernées" data-en="Data Covered">البيانات المشمولة</span>
+            </h3>
+            <ul>
+                <li>بيانات المؤسسة الأساسية (الاسم، النوع، بيانات التواصل، بيانات الترخيص)</li>
+                <li>بيانات المستخدمين (أسماء المستخدمين، كلمات المرور، الصلاحيات)</li>
+                <li>بيانات الطلاب (الأسماء، الأرقام، المراحل، الأقسام) — للمدارس</li>
+                <li>بيانات المدفوعات والسجلات المالية</li>
+                <li>بيانات الطلبات والديون — للمطاعم</li>
+                <li>بيانات المخزون والمبيعات — للمتاجر</li>
+                <li>سجل العمليات (من قام بأي إجراء ومتى)</li>
+            </ul>
+
+            <h3>
+                <span class="sub">7.2</span>
+                <span data-ar="أغراض المعالجة" data-fr="Finalités du traitement" data-en="Purposes of Processing">أغراض المعالجة</span>
+            </h3>
+            <p>تُعالج البيانات للأغراض التالية حصرًا:</p>
+            <ul>
+                <li>تشغيل المنصة وتقديم الخدمة المتفق عليها</li>
+                <li>تمكين المؤسسة من إدارة عملياتها اليومية</li>
+                <li>إنشاء التقارير والإحصائيات الخاصة بالمؤسسة نفسها</li>
+                <li>تقديم الدعم الفني</li>
+                <li>الامتثال للالتزامات القانونية عند الاقتضاء</li>
+            </ul>
+
+            <h3>
+                <span class="sub">7.3</span>
+                <span data-ar="عدم المشاركة مع أطراف ثالثة" data-fr="Non-partage avec des tiers" data-en="No Third-Party Sharing">عدم المشاركة مع أطراف ثالثة</span>
+            </h3>
+            <p>
+                يتعهد BMP بعدم بيع أو تأجير أو مشاركة أو نقل بيانات المشترك إلى أي طرف ثالث، مجانًا أو مقابل أجر. الاستثناءات الوحيدة:
+            </p>
+            <ul>
+                <li>موافقة كتابية صريحة من المشترك</li>
+                <li>طلب قانوني ملزم من جهة قضائية مختصة</li>
+            </ul>
+
+            <h3>
+                <span class="sub">7.4</span>
+                <span data-ar="أمن البيانات" data-fr="Sécurité des données" data-en="Data Security">أمن البيانات</span>
+            </h3>
+            <p>
+                يطبق BMP تدابير تقنية وتنظيمية معقولة لحماية البيانات من الوصول غير المصرح به أو الفقدان أو التعديل. تُخزَّن البيانات في بيئة Google Sheets معزولة لكل مؤسسة على حدة. كلمات المرور تُحفظ داخل جدول آمن ولا تُشارك مع أي جهة.
+            </p>
+
+            <h3>
+                <span class="sub">7.5</span>
+                <span data-ar="حقوق المشترك" data-fr="Droits du Client" data-en="Client Rights">حقوق المشترك</span>
+            </h3>
+            <p>للمشترك الحق في أي وقت في:</p>
+            <ul>
+                <li>طلب نسخة كاملة من بياناته بصيغة قابلة للقراءة</li>
+                <li>طلب تصحيح أي بيانات غير دقيقة</li>
+                <li>طلب حذف بياناته بالكامل بعد إنهاء العقد</li>
+                <li>الاعتراض على أي معالجة غير مبررة</li>
+            </ul>
+            <p>
+                ينفذ BMP هذه الطلبات خلال مدة معقولة لا تتجاوز <b>ثلاثين (30) يومًا</b> من تاريخ الطلب.
+            </p>
+
+            <h3>
+                <span class="sub">7.6</span>
+                <span data-ar="مدة الاحتفاظ بالبيانات" data-fr="Durée de conservation" data-en="Retention Period">مدة الاحتفاظ بالبيانات</span>
+            </h3>
+            <p>
+                يحتفظ BMP ببيانات المشترك طوال مدة سريان العقد، وما يصل إلى ثلاثين (30) يومًا بعد انتهائه، ما لم يطلب المشترك حذفها فورًا.
+            </p>
+
+            <h3>
+                <span class="sub">7.7</span>
+                <span data-ar="إشعار الاختراق" data-fr="Notification de violation" data-en="Breach Notification">إشعار الاختراق</span>
+            </h3>
+            <p>
+                في حال وقوع أي اختراق أو وصول غير مصرح به إلى البيانات، يلتزم BMP بإبلاغ المشترك فورًا واتخاذ الإجراءات اللازمة.
+            </p>
+
+            <h3>
+                <span class="sub">7.8</span>
+                <span data-ar="مسؤولية المشترك" data-fr="Responsabilité du Client" data-en="Client Responsibility">مسؤولية المشترك</span>
+            </h3>
+            <p>يقر المشترك بأنه:</p>
+            <ul>
+                <li>المالك القانوني الوحيد للبيانات المُدخلة</li>
+                <li>مسؤول عن دقة وصحة البيانات</li>
+                <li>حصل على موافقة أصحاب البيانات (عند الاقتضاء) لمشاركتها مع BMP</li>
+                <li>ملتزم بعدم إدخال بيانات حساسة غير ضرورية</li>
+            </ul>
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- SECTION 8 — INTELLECTUAL PROPERTY -->
+        <!-- ============================================ -->
+        <section class="terms-section" id="s8">
+            <h2>
+                <span class="num">8</span>
+                <span data-ar="الملكية الفكرية" data-fr="Propriété intellectuelle" data-en="Intellectual Property">الملكية الفكرية</span>
+            </h2>
+
+            <p>
+                جميع حقوق الملكية الفكرية المتعلقة بمنصة BMP — بما فيها الكود المصدري، التصميم، الواجهة، الشعار، العلامة التجارية، الوثائق — هي ملك حصري لـ BMP.
+            </p>
+            <p>
+                لا يحق للمشترك نسخ أو إعادة إنتاج أو تعديل أو توزيع أو بيع أي جزء من المنصة دون إذن كتابي مسبق.
+            </p>
+            <p>
+                <b>البيانات التي يُدخلها المشترك</b> تبقى ملكًا حصريًا له ولا تنتقل ملكيتها إلى BMP تحت أي ظرف.
+            </p>
+
+            <p class="fr">
+                Tous les droits de propriété intellectuelle liés à la plateforme BMP — code source, design, interface, logo, marque, documentation — sont la propriété exclusive de BMP. Le Client n'est pas autorisé à copier, reproduire, modifier, distribuer ou vendre une partie de la Plateforme sans autorisation écrite préalable. Les données saisies par le Client restent sa propriété exclusive.
+            </p>
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- SECTION 9 — AVAILABILITY & SUPPORT -->
+        <!-- ============================================ -->
+        <section class="terms-section" id="s9">
+            <h2>
+                <span class="num">9</span>
+                <span data-ar="توفر الخدمة والدعم" data-fr="Disponibilité du service et support" data-en="Service Availability & Support">توفر الخدمة والدعم</span>
+            </h2>
+
+            <h3>
+                <span class="sub">9.1</span>
+                <span data-ar="توفر الخدمة" data-fr="Disponibilité" data-en="Availability">توفر الخدمة</span>
+            </h3>
+            <p>
+                يبذل BMP جهودًا معقولة لضمان استمرارية المنصة، غير أنه لا يضمن توفرًا بنسبة 100٪. قد تتوقف الخدمة مؤقتًا لأغراض الصيانة أو التحديثات أو لأسباب تقنية أو خارجة عن إرادته.
+            </p>
+
+            <h3>
+                <span class="sub">9.2</span>
+                <span data-ar="الدعم الفني" data-fr="Support technique" data-en="Technical Support">الدعم الفني</span>
+            </h3>
+            <p>يقدم BMP الدعم الفني عبر القنوات التالية:</p>
+            <ul>
+                <li>واتساب: +222 4436 2949</li>
+                <li>الهاتف: 44362949</li>
+                <li>البريد الإلكتروني: mobusiness.mr@gmail.com</li>
+            </ul>
+            <p>
+                يُقدَّم الدعم خلال أيام العمل العادية. لا يقدم BMP أي التزام بزمن استجابة محدد، لكنه يبذل جهده للرد في أسرع وقت ممكن.
+            </p>
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- SECTION 10 — LIMITATION OF LIABILITY -->
+        <!-- ============================================ -->
+        <section class="terms-section" id="s10">
+            <h2>
+                <span class="num">10</span>
+                <span data-ar="حدود المسؤولية" data-fr="Limitation de responsabilité" data-en="Limitation of Liability">حدود المسؤولية</span>
+            </h2>
+
+            <p>
+                إلى الحد الذي يسمح به القانون، لا يتحمل BMP أي مسؤولية عن:
+            </p>
+            <ul>
+                <li>أي خسارة غير مباشرة أو عرضية أو تبعية</li>
+                <li>خسارة الأرباح أو البيانات الناتجة عن سوء الاستخدام</li>
+                <li>أي ضرر ناتج عن استخدام بيانات دخول مكشوفة من قبل المشترك</li>
+                <li>أي خطأ في البيانات أدخلها المشترك أو مستخدموه</li>
+                <li>انقطاع الخدمة بسبب عوامل خارجة عن إرادة BMP</li>
+            </ul>
+            <p>
+                في جميع الأحوال، لا تتجاوز المسؤولية الإجمالية لـ BMP قيمة الرسوم المدفوعة فعليًا خلال الاثني عشر شهرًا الأخيرة.
+            </p>
+
+            <p class="fr">
+                Dans la mesure permise par la loi, BMP n'assume aucune responsabilité pour : toute perte indirecte, accessoire ou consécutive ; la perte de profits ou de données résultant d'un mauvais usage ; tout dommage résultant de l'utilisation d'identifiants exposés par le Client ; toute erreur dans les données saisies par le Client ou ses utilisateurs ; toute interruption de service due à des facteurs indépendants de la volonté de BMP. En tout état de cause, la responsabilité totale de BMP ne saurait excéder le montant des frais effectivement payés au cours des douze derniers mois.
+            </p>
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- SECTION 11 — CANCELLATION & TERMINATION -->
+        <!-- ============================================ -->
+        <section class="terms-section" id="s11">
+            <h2>
+                <span class="num">11</span>
+                <span data-ar="الإلغاء والإنهاء" data-fr="Annulation et résiliation" data-en="Cancellation & Termination">الإلغاء والإنهاء</span>
+            </h2>
+
+            <h3>
+                <span class="sub">11.1</span>
+                <span data-ar="إلغاء المشترك" data-fr="Annulation par le Client" data-en="Client Cancellation">إلغاء المشترك</span>
+            </h3>
+            <p>
+                يحق للمشترك إلغاء الاشتراك في أي وقت. <b>لا يتم استرداد أي مبالغ مدفوعة مسبقًا.</b>
+            </p>
+            <p class="fr">
+                Le Client peut annuler son abonnement à tout moment. <b>Aucun montant déjà payé n'est remboursé.</b>
+            </p>
+
+            <h3>
+                <span class="sub">11.2</span>
+                <span data-ar="إنهاء العقد من طرف BMP" data-fr="Résiliation par BMP" data-en="Termination by BMP">إنهاء العقد من طرف BMP</span>
+            </h3>
+            <p>يحق لـ BMP إنهاء العقد في الحالات التالية:</p>
+            <ul>
+                <li><b>الاشتراك الشهري:</b> في بداية كل شهر، قبل استحقاق الدفعة التالية</li>
+                <li><b>الاشتراك السنوي:</b> بعد انتهاء كل سنة</li>
+                <li><b>فورًا:</b> في حال الإخلال الجسيم بالشروط أو عدم السداد</li>
+            </ul>
+            <p>
+                عند نهاية مدة الاشتراك، يمكن لـ BMP:
+            </p>
+            <ul>
+                <li>عدم تجديد العقد، فيتوقف الاشتراك تلقائيًا</li>
+                <li>تجديد العقد بشروط جديدة (مزايا إضافية، تحديثات، تعديل في الرسوم)</li>
+            </ul>
+
+            <h3>
+                <span class="sub">11.3</span>
+                <span data-ar="البيانات عند الإنهاء" data-fr="Données en cas de résiliation" data-en="Data on Termination">البيانات عند الإنهاء</span>
+            </h3>
+            <p>
+                عند إنهاء العقد، يحق للمشترك طلب نسخة كاملة من بياناته، وكذلك طلب حذفها نهائيًا خلال المدة المحددة في القسم 7.6.
+            </p>
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- SECTION 12 — MODIFICATION OF TERMS -->
+        <!-- ============================================ -->
+        <section class="terms-section" id="s12">
+            <h2>
+                <span class="num">12</span>
+                <span data-ar="تعديل الشروط" data-fr="Modification des conditions" data-en="Modification of Terms">تعديل الشروط</span>
+            </h2>
+
+            <p>
+                يحتفظ BMP بحق تحديث أو تعديل هذه الشروط في أي وقت. في حال إجراء تعديلات جوهرية، يتم إشعار المشترك قبل تطبيقها بمدة معقولة.
+            </p>
+            <p>
+                يُعدّ استمرار المشترك في استخدام المنصة بعد تاريخ سريان التعديلات موافقة ضمنية عليها. إذا لم يوافق المشترك على التعديلات، يحق له إلغاء الاشتراك.
+            </p>
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- SECTION 13 — GOVERNING LAW -->
+        <!-- ============================================ -->
+        <section class="terms-section" id="s13">
+            <h2>
+                <span class="num">13</span>
+                <span data-ar="القوانين الحاكمة" data-fr="Droit applicable" data-en="Governing Law">القوانين الحاكمة</span>
+            </h2>
+
+            <p>
+                تخضع هذه الشروط وتُفسَّر وفقًا لقوانين <b>الجمهورية الإسلامية الموريتانية</b>. أي نزاع ينشأ عن هذه الشروط أو يتعلق بها يتم حله أمام المحاكم المختصة في <b>نواكشوط</b>، ما لم يتم الاتفاق على حل ودي مسبق.
+            </p>
+            <p class="fr">
+                Les présentes Conditions sont régies et interprétées conformément aux lois de la <b>République Islamique de Mauritanie</b>. Tout litige découlant de ces Conditions sera soumis aux tribunaux compétents de <b>Nouakchott</b>, sauf accord préalable de règlement amiable.
+            </p>
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- SECTION 14 — CONTACT -->
+        <!-- ============================================ -->
+        <section class="terms-section" id="s14">
+            <h2>
+                <span class="num">14</span>
+                <span data-ar="التواصل معنا" data-fr="Contact" data-en="Contact Us">التواصل معنا</span>
+            </h2>
+
+            <p>
+                لأي استفسار بشأن هذه الشروط أو الخصوصية، يمكنك التواصل معنا عبر:
+            </p>
+
+            <div class="contact-card">
+                <h3 data-ar="BMP – Business Management Platform"
+                    data-fr="BMP – Business Management Platform"
+                    data-en="BMP – Business Management Platform">
+                    BMP – Business Management Platform
+                </h3>
+                <p data-ar="فريقنا جاهز للإجابة على جميع استفساراتك."
+                   data-fr="Notre équipe est à votre disposition pour répondre à toutes vos questions."
+                   data-en="Our team is ready to answer all your questions.">
+                    فريقنا جاهز للإجابة على جميع استفساراتك.
+                </p>
+                <a href="https://wa.me/22244362949" target="_blank" rel="noopener">
+                    WhatsApp · +222 4436 2949
+                </a>
+                <a href="mailto:mobusiness.mr@gmail.com">
+                    mobusiness.mr@gmail.com
+                </a>
+            </div>
+        </section>
+
+
+        <!-- ============================================ -->
+        <!-- BACK TO TOP -->
+        <!-- ============================================ -->
+        <button type="button" class="back-to-top" id="backToTop" aria-label="Back to top">
+            ↑
+        </button>
+
+
+        <!-- ============================================ -->
+        <!-- FOOTER -->
+        <!-- ============================================ -->
+        <footer class="page-footer">
+            <a href="index.html" class="bmp-logo">
+                <div class="bmp-logo-icon">
+                    <span class="cube cube-top"></span>
+                    <span class="cube cube-left"></span>
+                    <span class="cube cube-right"></span>
+                </div>
+                <div class="bmp-logo-text">BMP</div>
+            </a>
+            <p>© 2026 BMP · <span data-ar="جميع الحقوق محفوظة" data-fr="Tous droits réservés" data-en="All rights reserved">جميع الحقوق محفوظة</span></p>
+        </footer>
+
+    </div>
+
+
+    <!-- ============================================= -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================= -->
+    <script>
+    (function () {
+        'use strict';
+
+        const DEFAULT_LANG = 'ar';
+        const STORAGE_KEY  = 'bmp_lang';
+        const SUPPORTED    = ['ar', 'fr', 'en'];
+
+        /* ---------- Language switcher ---------- */
+        function setLanguage(lang) {
+            if (!SUPPORTED.includes(lang)) lang = DEFAULT_LANG;
+
+            const html = document.documentElement;
+            html.lang = lang;
+            html.dir  = (lang === 'ar') ? 'rtl' : 'ltr';
+
+            document.body.classList.remove('lang-ar', 'lang-fr', 'lang-en');
+            document.body.classList.add('lang-' + lang);
+
+            document.querySelectorAll('[data-ar]').forEach(function (el) {
+                const value = el.dataset[lang];
+                if (value !== undefined) el.textContent = value;
+            });
+
+            document.querySelectorAll('.lang-btn').forEach(function (btn) {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+
+            localStorage.setItem(STORAGE_KEY, lang);
+        }
+
+        document.querySelectorAll('.lang-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                setLanguage(btn.dataset.lang);
+            });
+        });
+
+        const savedLang = localStorage.getItem(STORAGE_KEY) || DEFAULT_LANG;
+        setLanguage(savedLang);
+
+        /* ---------- Back to top ---------- */
+        const backToTop = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', function () {
+            if (window.scrollY > 400) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        backToTop.addEventListener('click', function () {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+    })();
+    </script>
+
+</body>
+</html>
+
+      
+  
