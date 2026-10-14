@@ -10,19 +10,14 @@
        ============================================================ */
 
     // ----- EmailJS configuration -----
-    // Fill these three values after creating your EmailJS account.
-    // See the note at the bottom of the file.
     const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';    // ← replace
     const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';    // ← replace
     const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';   // ← replace
 
-    // Where do you want the "new signup" notification delivered?
-    // (This goes into the EmailJS template as {{to_email}}.)
     const NOTIFY_EMAIL = 'mobusiness.mr@gmail.com';
 
     // Set to false while you haven't configured EmailJS —
-    // the form will still show the success state, but no email
-    // will be sent, and a warning is logged in the console.
+    // the form still shows the success state, and logs the payload.
     const EMAILJS_ENABLED = false;
 
     /* ============================================================
@@ -102,10 +97,8 @@
         if (!meta) return;
 
         currentType = type;
-
         chosenIcon.textContent = meta.icon;
 
-        // Update the chosen-type label to match current language
         const lang = document.documentElement.lang || DEFAULT_LANG;
         chosenName.textContent = meta.labels[lang] || meta.labels.en;
 
@@ -127,7 +120,7 @@
     });
 
     /* ============================================================
-       FORM VALIDATION
+       VALIDATION
        ============================================================ */
 
     function showError(msg) {
@@ -147,27 +140,38 @@
         return /^[0-9+\-\s()]{6,20}$/.test(phone);
     }
 
+    function validateUsername(u) {
+        // letters, digits, dot, underscore, dash — 3..30 chars
+        return /^[a-zA-Z0-9._-]{3,30}$/.test(u);
+    }
+
     /* ============================================================
-       SUBMIT
+       DATA
        ============================================================ */
 
     function getFormData() {
         return {
-            businessType: currentType,
-            businessName: document.getElementById('orgName').value.trim(),
-            fullName:     document.getElementById('fullName').value.trim(),
-            phone:        document.getElementById('phone').value.trim(),
-            email:        document.getElementById('email').value.trim().toLowerCase(),
-            city:         document.getElementById('city').value.trim(),
-            notes:        document.getElementById('notes').value.trim(),
-            language:     document.documentElement.lang || DEFAULT_LANG,
-            submittedAt:  new Date().toISOString()
+            businessType:    currentType,
+            businessName:    document.getElementById('orgName').value.trim(),
+            fullName:        document.getElementById('fullName').value.trim(),
+            username:        document.getElementById('username').value.trim(),
+            password:        document.getElementById('password').value,
+            confirmPassword: document.getElementById('confirmPassword').value,
+            phone:           document.getElementById('phone').value.trim(),
+            email:           document.getElementById('email').value.trim().toLowerCase(),
+            language:        document.documentElement.lang || DEFAULT_LANG,
+            submittedAt:     new Date().toISOString()
         };
     }
 
     function validateForm(data) {
-        if (!data.businessName) return 'FORM_ORG_NAME_REQUIRED';
-        if (!data.fullName)     return 'FORM_FULL_NAME_REQUIRED';
+        if (!data.businessName)                return 'FORM_ORG_NAME_REQUIRED';
+        if (!data.fullName)                    return 'FORM_FULL_NAME_REQUIRED';
+        if (!data.username)                    return 'FORM_USERNAME_REQUIRED';
+        if (!validateUsername(data.username))  return 'FORM_USERNAME_INVALID';
+        if (!data.password)                    return 'FORM_PASSWORD_REQUIRED';
+        if (data.password.length < 6)          return 'FORM_PASSWORD_SHORT';
+        if (data.password !== data.confirmPassword) return 'FORM_PASSWORD_MISMATCH';
         if (!data.phone || !validatePhone(data.phone)) return 'FORM_PHONE_INVALID';
         if (!data.email || !validateEmail(data.email)) return 'FORM_EMAIL_INVALID';
         return null;
@@ -183,6 +187,31 @@
             ar: 'يرجى إدخال الاسم الكامل للمسؤول.',
             fr: 'Veuillez saisir le nom complet du responsable.',
             en: 'Please enter the manager full name.'
+        },
+        FORM_USERNAME_REQUIRED: {
+            ar: 'يرجى إدخال اسم المستخدم.',
+            fr: "Veuillez saisir un nom d'utilisateur.",
+            en: 'Please enter a username.'
+        },
+        FORM_USERNAME_INVALID: {
+            ar: 'اسم المستخدم يجب أن يحتوي على 3 إلى 30 حرفًا (حروف، أرقام، ., _, -).',
+            fr: "Le nom d'utilisateur doit contenir 3 à 30 caractères (lettres, chiffres, ., _, -).",
+            en: 'Username must be 3–30 characters (letters, digits, ., _, -).'
+        },
+        FORM_PASSWORD_REQUIRED: {
+            ar: 'يرجى إدخال كلمة المرور.',
+            fr: 'Veuillez saisir un mot de passe.',
+            en: 'Please enter a password.'
+        },
+        FORM_PASSWORD_SHORT: {
+            ar: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.',
+            fr: 'Le mot de passe doit contenir au moins 6 caractères.',
+            en: 'Password must be at least 6 characters.'
+        },
+        FORM_PASSWORD_MISMATCH: {
+            ar: 'كلمتا المرور غير متطابقتين.',
+            fr: 'Les deux mots de passe ne correspondent pas.',
+            en: 'Passwords do not match.'
         },
         FORM_PHONE_INVALID: {
             ar: 'يرجى إدخال رقم هاتف صحيح.',
@@ -207,29 +236,35 @@
         return m ? (m[lang] || m.en) : key;
     }
 
-    /* ------------------------------------------------------------
-       EmailJS — build template params & send
-       ------------------------------------------------------------ */
+    /* ============================================================
+       EMAIL PAYLOAD
+       ============================================================ */
 
     function buildEmailParams(data) {
 
         const typeLabel = TYPE_META[data.businessType].labels;
 
         return {
-            to_email:        NOTIFY_EMAIL,
-            subject:         'New signup — ' + typeLabel.en + ' — ' + data.businessName,
-            business_type:   data.businessType,
-            business_type_en: typeLabel.en,
-            business_type_fr: typeLabel.fr,
-            business_type_ar: typeLabel.ar,
-            business_name:   data.businessName,
-            full_name:       data.fullName,
-            phone:           data.phone,
-            email:           data.email,
-            city:            data.city,
-            notes:           data.notes,
-            language:        data.language,
-            submitted_at:    data.submittedAt
+            to_email:          NOTIFY_EMAIL,
+            subject:           'New signup — ' + typeLabel.en + ' — ' + data.businessName,
+
+            business_type:     data.businessType,
+            business_type_en:  typeLabel.en,
+            business_type_fr:  typeLabel.fr,
+            business_type_ar:  typeLabel.ar,
+
+            business_name:     data.businessName,
+            full_name:         data.fullName,
+            username:          data.username,
+
+            // NOTE: we do NOT send the password in the email.
+            // The account is created only after admin approval,
+            // at which point a secure flow should set the password.
+
+            phone:             data.phone,
+            email:             data.email,
+            language:          data.language,
+            submitted_at:      data.submittedAt
         };
     }
 
@@ -262,9 +297,9 @@
         return { ok: true, result: res };
     }
 
-    /* ------------------------------------------------------------
-       Submit handler
-       ------------------------------------------------------------ */
+    /* ============================================================
+       SUBMIT
+       ============================================================ */
 
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
@@ -294,9 +329,9 @@
         }
     });
 
-    /* ------------------------------------------------------------
-       "Send another request"
-       ------------------------------------------------------------ */
+    /* ============================================================
+       RESET
+       ============================================================ */
 
     newRequest.addEventListener('click', function () {
         form.reset();
@@ -307,7 +342,7 @@
     });
 
     /* ============================================================
-       React to language change to update the "chosen type" label
+       LANGUAGE ↔ CHOSEN TYPE LABEL
        ============================================================ */
 
     document.querySelectorAll('.lang-btn').forEach(function (btn) {
