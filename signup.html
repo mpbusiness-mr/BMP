@@ -58,7 +58,7 @@
                 </p>
             </div>
 
-            <!-- Business Type Step -->
+            <!-- Step 1 — Business type -->
             <section class="step step-type" id="stepType">
 
                 <h2 class="step-title"
@@ -92,7 +92,7 @@
 
             </section>
 
-            <!-- Form Step (hidden until type chosen) -->
+            <!-- Step 2 — Form -->
             <section class="step step-form hidden" id="stepForm">
 
                 <div class="chosen-type">
@@ -109,7 +109,7 @@
                                data-ar="اسم المؤسسة" data-fr="Nom de l'organisation" data-en="Organization name">
                             اسم المؤسسة
                         </label>
-                        <input type="text" id="orgName" name="orgName" required>
+                        <input type="text" id="orgName" name="orgName" autocomplete="organization" required>
                     </div>
 
                     <div class="field">
@@ -117,7 +117,41 @@
                                data-ar="الاسم الكامل للمسؤول" data-fr="Nom complet du responsable" data-en="Manager full name">
                             الاسم الكامل للمسؤول
                         </label>
-                        <input type="text" id="fullName" name="fullName" required>
+                        <input type="text" id="fullName" name="fullName" autocomplete="name" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="username"
+                               data-ar="اسم المستخدم" data-fr="Nom d'utilisateur" data-en="Username">
+                            اسم المستخدم
+                        </label>
+                        <input type="text" id="username" name="username"
+                               autocomplete="username"
+                               autocapitalize="none"
+                               spellcheck="false"
+                               required>
+                    </div>
+
+                    <div class="field">
+                        <label for="password"
+                               data-ar="كلمة المرور" data-fr="Mot de passe" data-en="Password">
+                            كلمة المرور
+                        </label>
+                        <input type="password" id="password" name="password"
+                               autocomplete="new-password"
+                               minlength="6"
+                               required>
+                    </div>
+
+                    <div class="field">
+                        <label for="confirmPassword"
+                               data-ar="تأكيد كلمة المرور" data-fr="Confirmer le mot de passe" data-en="Confirm password">
+                            تأكيد كلمة المرور
+                        </label>
+                        <input type="password" id="confirmPassword" name="confirmPassword"
+                               autocomplete="new-password"
+                               minlength="6"
+                               required>
                     </div>
 
                     <div class="field">
@@ -125,7 +159,7 @@
                                data-ar="رقم الهاتف" data-fr="Numéro de téléphone" data-en="Phone number">
                             رقم الهاتف
                         </label>
-                        <input type="tel" id="phone" name="phone" inputmode="tel" required>
+                        <input type="tel" id="phone" name="phone" inputmode="tel" autocomplete="tel" required>
                     </div>
 
                     <div class="field">
@@ -133,23 +167,7 @@
                                data-ar="البريد الإلكتروني" data-fr="Adresse e-mail" data-en="Email address">
                             البريد الإلكتروني
                         </label>
-                        <input type="email" id="email" name="email" inputmode="email" required>
-                    </div>
-
-                    <div class="field">
-                        <label for="city"
-                               data-ar="المدينة" data-fr="Ville" data-en="City">
-                            المدينة
-                        </label>
-                        <input type="text" id="city" name="city">
-                    </div>
-
-                    <div class="field">
-                        <label for="notes"
-                               data-ar="ملاحظات (اختياري)" data-fr="Remarques (optionnel)" data-en="Notes (optional)">
-                            ملاحظات (اختياري)
-                        </label>
-                        <textarea id="notes" name="notes" rows="3"></textarea>
+                        <input type="email" id="email" name="email" inputmode="email" autocomplete="email" required>
                     </div>
 
                     <div class="actions">
@@ -166,7 +184,7 @@
 
             </section>
 
-            <!-- Success Step (hidden until submitted) -->
+            <!-- Step 3 — Success -->
             <section class="step step-success hidden" id="stepSuccess">
 
                 <div class="success-icon">✓</div>
@@ -213,10 +231,10 @@
         </div>
 
         <footer class="signup-footer">
-            <a href="index.html"
-               data-ar="العودة إلى الصفحة الرئيسية"
-               data-fr="Retour à l'accueil"
-               data-en="Back to home">العودة إلى الصفحة الرئيسية</a>
+            <a href="login.html"
+               data-ar="لديك حساب بالفعل؟ تسجيل الدخول"
+               data-fr="Déjà un compte ? Se connecter"
+               data-en="Already have an account? Log in">لديك حساب بالفعل؟ تسجيل الدخول</a>
         </footer>
 
     </main>
