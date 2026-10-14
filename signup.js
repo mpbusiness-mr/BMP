@@ -6,19 +6,17 @@
     'use strict';
 
     /* ============================================================
-       CONFIG
+       CONFIG — EmailJS
        ============================================================ */
 
-    // ----- EmailJS configuration -----
-    const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';    // ← replace
-    const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';    // ← replace
-    const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';   // ← replace
+    const EMAILJS_PUBLIC_KEY  = 'Cbz2-jhD4tMdBRRhy';
+    const EMAILJS_SERVICE_ID  = 'service_p38d5bj';
+    const EMAILJS_TEMPLATE_ID = 'template_2hzk3lr';
 
     const NOTIFY_EMAIL = 'mobusiness.mr@gmail.com';
 
-    // Set to false while you haven't configured EmailJS —
-    // the form still shows the success state, and logs the payload.
-    const EMAILJS_ENABLED = false;
+    // true = actually send. false = log payload only (useful for testing).
+    const EMAILJS_ENABLED = true;
 
     /* ============================================================
        LANGUAGE
@@ -77,9 +75,9 @@
     const newRequest  = document.getElementById('newRequest');
 
     const TYPE_META = {
-        school:      { icon: '🏫', labels: { ar: 'مدرسة',       fr: 'École',       en: 'School' } },
-        restaurant:  { icon: '🍽️', labels: { ar: 'مطعم',        fr: 'Restaurant',  en: 'Restaurant' } },
-        supermarket: { icon: '🛒', labels: { ar: 'سوبرماركت',   fr: 'Supermarché', en: 'Supermarket' } }
+        school:      { icon: '🏫', labels: { ar: 'مدرسة',     fr: 'École',       en: 'School' } },
+        restaurant:  { icon: '🍽️', labels: { ar: 'مطعم',      fr: 'Restaurant',  en: 'Restaurant' } },
+        supermarket: { icon: '🛒', labels: { ar: 'سوبرماركت', fr: 'Supermarché', en: 'Supermarket' } }
     };
 
     let currentType = null;
@@ -141,12 +139,11 @@
     }
 
     function validateUsername(u) {
-        // letters, digits, dot, underscore, dash — 3..30 chars
         return /^[a-zA-Z0-9._-]{3,30}$/.test(u);
     }
 
     /* ============================================================
-       DATA
+       FORM DATA
        ============================================================ */
 
     function getFormData() {
@@ -165,13 +162,13 @@
     }
 
     function validateForm(data) {
-        if (!data.businessName)                return 'FORM_ORG_NAME_REQUIRED';
-        if (!data.fullName)                    return 'FORM_FULL_NAME_REQUIRED';
-        if (!data.username)                    return 'FORM_USERNAME_REQUIRED';
-        if (!validateUsername(data.username))  return 'FORM_USERNAME_INVALID';
-        if (!data.password)                    return 'FORM_PASSWORD_REQUIRED';
-        if (data.password.length < 6)          return 'FORM_PASSWORD_SHORT';
-        if (data.password !== data.confirmPassword) return 'FORM_PASSWORD_MISMATCH';
+        if (!data.businessName)                       return 'FORM_ORG_NAME_REQUIRED';
+        if (!data.fullName)                           return 'FORM_FULL_NAME_REQUIRED';
+        if (!data.username)                           return 'FORM_USERNAME_REQUIRED';
+        if (!validateUsername(data.username))         return 'FORM_USERNAME_INVALID';
+        if (!data.password)                           return 'FORM_PASSWORD_REQUIRED';
+        if (data.password.length < 6)                 return 'FORM_PASSWORD_SHORT';
+        if (data.password !== data.confirmPassword)   return 'FORM_PASSWORD_MISMATCH';
         if (!data.phone || !validatePhone(data.phone)) return 'FORM_PHONE_INVALID';
         if (!data.email || !validateEmail(data.email)) return 'FORM_EMAIL_INVALID';
         return null;
@@ -237,7 +234,7 @@
     }
 
     /* ============================================================
-       EMAIL PAYLOAD
+       EMAILJS
        ============================================================ */
 
     function buildEmailParams(data) {
@@ -256,11 +253,7 @@
             business_name:     data.businessName,
             full_name:         data.fullName,
             username:          data.username,
-
-            // NOTE: we do NOT send the password in the email.
-            // The account is created only after admin approval,
-            // at which point a secure flow should set the password.
-
+            password:          data.password,     // ← included per your request
             phone:             data.phone,
             email:             data.email,
             language:          data.language,
@@ -272,26 +265,22 @@
 
         if (!EMAILJS_ENABLED) {
             console.warn(
-                '[BMP signup] EmailJS is disabled.\n' +
-                'Set EMAILJS_ENABLED = true and fill the 3 keys in signup.js\n' +
-                'Payload that WOULD have been sent:\n',
+                '[BMP signup] EmailJS disabled. Payload:\n',
                 buildEmailParams(data)
             );
             return { ok: true, simulated: true };
         }
 
         if (typeof emailjs === 'undefined') {
-            throw new Error('EmailJS SDK not loaded. Add the <script> tag from the note.');
+            throw new Error('EmailJS SDK not loaded.');
         }
 
         emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
-        const params = buildEmailParams(data);
-
         const res = await emailjs.send(
             EMAILJS_SERVICE_ID,
             EMAILJS_TEMPLATE_ID,
-            params
+            buildEmailParams(data)
         );
 
         return { ok: true, result: res };
