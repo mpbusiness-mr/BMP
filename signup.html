@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="BMP – إنشاء حساب جديد">
+
+    <title>BMP · إنشاء حساب</title>
+
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <link rel="apple-touch-icon" href="assets/logo.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="signup.css">
+</head>
+
+<body class="lang-ar">
+
+    <!-- ---------- TOOLBAR ---------- -->
+    <header class="toolbar">
+        <a href="index.html" class="bmp-logo">
+            <div class="bmp-logo-icon">
+                <span class="cube cube-top"></span>
+                <span class="cube cube-left"></span>
+                <span class="cube cube-right"></span>
+            </div>
+            <div class="bmp-logo-text">BMP</div>
+        </a>
+
+        <div class="lang-switcher" role="group" aria-label="Language">
+            <button type="button" class="lang-btn active" data-lang="ar">عربية</button>
+            <button type="button" class="lang-btn"        data-lang="fr">Français</button>
+            <button type="button" class="lang-btn"        data-lang="en">English</button>
+        </div>
+    </header>
+
+    <!-- ---------- MAIN ---------- -->
+    <main class="signup-page">
+
+        <div class="signup-card">
+
+            <!-- Header -->
+            <div class="signup-header">
+                <h1 data-ar="إنشاء حساب جديد"
+                    data-fr="Créer un compte"
+                    data-en="Create an account">
+                    إنشاء حساب جديد
+                </h1>
+                <p class="signup-subtitle"
+                   data-ar="اختر نوع النشاط ثم املأ المعلومات"
+                   data-fr="Choisissez votre activité puis remplissez le formulaire"
+                   data-en="Choose your business type then fill the form">
+                    اختر نوع النشاط ثم املأ المعلومات
+                </p>
+            </div>
+
+            <!-- Business Type Step -->
+            <section class="step step-type" id="stepType">
+
+                <h2 class="step-title"
+                    data-ar="نوع النشاط"
+                    data-fr="Type d'activité"
+                    data-en="Business type">
+                    نوع النشاط
+                </h2>
+
+                <div class="type-grid" id="typeGrid">
+
+                    <button type="button" class="type-card" data-type="school">
+                        <span class="type-icon">🏫</span>
+                        <span class="type-name"
+                              data-ar="مدرسة" data-fr="École" data-en="School">مدرسة</span>
+                    </button>
+
+                    <button type="button" class="type-card" data-type="restaurant">
+                        <span class="type-icon">🍽️</span>
+                        <span class="type-name"
+                              data-ar="مطعم" data-fr="Restaurant" data-en="Restaurant">مطعم</span>
+                    </button>
+
+                    <button type="button" class="type-card" data-type="supermarket">
+                        <span class="type-icon">🛒</span>
+                        <span class="type-name"
+                              data-ar="سوبرماركت" data-fr="Supermarché" data-en="Supermarket">سوبرماركت</span>
+                    </button>
+
+                </div>
+
+            </section>
+
+            <!-- Form Step (hidden until type chosen) -->
+            <section class="step step-form hidden" id="stepForm">
+
+                <div class="chosen-type">
+                    <span class="chosen-icon" id="chosenIcon">🏫</span>
+                    <span class="chosen-name" id="chosenName">مدرسة</span>
+                    <button type="button" class="chosen-change" id="changeType"
+                            data-ar="تغيير" data-fr="Changer" data-en="Change">تغيير</button>
+                </div>
+
+                <form id="signupForm" novalidate>
+
+                    <div class="field">
+                        <label for="orgName"
+                               data-ar="اسم المؤسسة" data-fr="Nom de l'organisation" data-en="Organization name">
+                            اسم المؤسسة
+                        </label>
+                        <input type="text" id="orgName" name="orgName" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="fullName"
+                               data-ar="الاسم الكامل للمسؤول" data-fr="Nom complet du responsable" data-en="Manager full name">
+                            الاسم الكامل للمسؤول
+                        </label>
+                        <input type="text" id="fullName" name="fullName" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="phone"
+                               data-ar="رقم الهاتف" data-fr="Numéro de téléphone" data-en="Phone number">
+                            رقم الهاتف
+                        </label>
+                        <input type="tel" id="phone" name="phone" inputmode="tel" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="email"
+                               data-ar="البريد الإلكتروني" data-fr="Adresse e-mail" data-en="Email address">
+                            البريد الإلكتروني
+                        </label>
+                        <input type="email" id="email" name="email" inputmode="email" required>
+                    </div>
+
+                    <div class="field">
+                        <label for="city"
+                               data-ar="المدينة" data-fr="Ville" data-en="City">
+                            المدينة
+                        </label>
+                        <input type="text" id="city" name="city">
+                    </div>
+
+                    <div class="field">
+                        <label for="notes"
+                               data-ar="ملاحظات (اختياري)" data-fr="Remarques (optionnel)" data-en="Notes (optional)">
+                            ملاحظات (اختياري)
+                        </label>
+                        <textarea id="notes" name="notes" rows="3"></textarea>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <span data-ar="إرسال الطلب" data-fr="Envoyer la demande" data-en="Submit request">
+                                إرسال الطلب
+                            </span>
+                        </button>
+                    </div>
+
+                    <p class="form-error hidden" id="formError"></p>
+
+                </form>
+
+            </section>
+
+            <!-- Success Step (hidden until submitted) -->
+            <section class="step step-success hidden" id="stepSuccess">
+
+                <div class="success-icon">✓</div>
+
+                <h2 class="success-title"
+                    data-ar="تم إرسال طلبك بنجاح"
+                    data-fr="Votre demande a été envoyée"
+                    data-en="Your request has been sent">
+                    تم إرسال طلبك بنجاح
+                </h2>
+
+                <p class="success-message"
+                   data-ar="سيتم مراجعة طلبك. يرجى الانتظار أو التواصل مع خدمة العملاء لتفعيل حسابك."
+                   data-fr="Votre demande sera examinée. Veuillez patienter ou contacter le service client pour activer votre compte."
+                   data-en="Your request will be reviewed. Please wait or contact customer service to activate your account.">
+                    سيتم مراجعة طلبك. يرجى الانتظار أو التواصل مع خدمة العملاء لتفعيل حسابك.
+                </p>
+
+                <div class="contact-block">
+                    <div class="contact-row">
+                        <span class="contact-label"
+                              data-ar="واتساب" data-fr="WhatsApp" data-en="WhatsApp">واتساب</span>
+                        <a class="contact-value" href="https://wa.me/22244362949" target="_blank" rel="noopener">
+                            44362949
+                        </a>
+                    </div>
+                    <div class="contact-row">
+                        <span class="contact-label"
+                              data-ar="البريد الإلكتروني" data-fr="E-mail" data-en="Email">البريد الإلكتروني</span>
+                        <a class="contact-value" href="mailto:mobusiness.mr@gmail.com">
+                            mobusiness.mr@gmail.com
+                        </a>
+                    </div>
+                </div>
+
+                <button type="button" class="submit-btn ghost" id="newRequest">
+                    <span data-ar="إرسال طلب آخر" data-fr="Envoyer une autre demande" data-en="Send another request">
+                        إرسال طلب آخر
+                    </span>
+                </button>
+
+            </section>
+
+        </div>
+
+        <footer class="signup-footer">
+            <a href="index.html"
+               data-ar="العودة إلى الصفحة الرئيسية"
+               data-fr="Retour à l'accueil"
+               data-en="Back to home">العودة إلى الصفحة الرئيسية</a>
+        </footer>
+
+    </main>
+
+    <script src="signup.js"></script>
+</body>
+</html>
