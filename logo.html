@@ -12,10 +12,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
 
     <style>
-        /* ============================================================
-           BMP Logo Downloader — single-file version
-           ============================================================ */
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         :root {
@@ -72,52 +68,36 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 180px;
+            min-height: 200px;
         }
 
-        /* ---------- Live preview logo ---------- */
-        .bmp-logo {
-            display: inline-flex;
-            align-items: center;
-            gap: 14px;
-            line-height: 1;
-        }
-
+        /* ---------- Live preview — mark only ---------- */
         .bmp-logo-icon {
             position: relative;
-            width: 52px;
-            height: 52px;
+            width: 90px;
+            height: 90px;
             flex-shrink: 0;
         }
 
         .bmp-logo-icon .cube {
             position: absolute;
-            width: 23px;
-            height: 23px;
-            border-radius: 4px;
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
             transform: rotate(45deg) skew(-10deg, -10deg);
         }
 
         .bmp-logo-icon .cube-top {
-            top: 0; left: 15px;
+            top: 0; left: 25px;
             background: linear-gradient(135deg, #00d4f5 0%, #00b4d8 100%);
         }
         .bmp-logo-icon .cube-left {
-            top: 16px; left: 0;
+            top: 27px; left: 0;
             background: linear-gradient(135deg, #00b4d8 0%, #0091b3 100%);
         }
         .bmp-logo-icon .cube-right {
-            top: 16px; left: 30px;
+            top: 27px; left: 50px;
             background: linear-gradient(135deg, #0077b6 0%, #0f2b4b 100%);
-        }
-
-        .bmp-logo-text {
-            font-family: 'Inter', sans-serif;
-            font-size: 2.2rem;
-            font-weight: 900;
-            letter-spacing: -1px;
-            color: var(--primary);
-            text-transform: uppercase;
         }
 
         /* ---------- Controls ---------- */
@@ -194,14 +174,12 @@
             line-height: 1;
         }
 
-        /* ---------- Hint ---------- */
         .hint {
             margin-top: 18px;
             font-size: 0.78rem;
             color: var(--text-muted);
         }
 
-        /* ---------- Mobile ---------- */
         @media (max-width: 520px) {
             .page { padding: 24px 20px; }
             .page-title { font-size: 1.25rem; }
@@ -215,17 +193,14 @@
     <main class="page">
 
         <h1 class="page-title">BMP Logo</h1>
-        <p class="page-sub">Preview and download the logo as a PNG.</p>
+        <p class="page-sub">Preview and download the logo mark as a PNG.</p>
 
-        <!-- Live preview -->
+        <!-- Live preview — cubes only -->
         <div class="preview-box">
-            <div class="bmp-logo">
-                <div class="bmp-logo-icon">
-                    <span class="cube cube-top"></span>
-                    <span class="cube cube-left"></span>
-                    <span class="cube cube-right"></span>
-                </div>
-                <div class="bmp-logo-text">BMP</div>
+            <div class="bmp-logo-icon">
+                <span class="cube cube-top"></span>
+                <span class="cube cube-left"></span>
+                <span class="cube cube-right"></span>
             </div>
         </div>
 
@@ -250,15 +225,6 @@
                 </select>
             </div>
 
-            <div class="control">
-                <label for="layoutSelect">Layout</label>
-                <select id="layoutSelect">
-                    <option value="horizontal" selected>Horizontal (mark + text)</option>
-                    <option value="mark">Mark only (cubes)</option>
-                    <option value="stacked">Stacked (mark over text)</option>
-                </select>
-            </div>
-
             <button type="button" id="downloadBtn" class="download-btn">
                 <span class="dl-icon">⬇</span>
                 <span>Download PNG</span>
@@ -267,7 +233,7 @@
         </div>
 
         <p class="hint" id="hint">
-            Tip: use transparent + 1024 px for emails, contracts, and screenshots.
+            Tip: use transparent + 1024 px for favicon, emails, and contracts.
         </p>
 
     </main>
@@ -286,11 +252,8 @@
             cubeLeftFrom:  '#00b4d8',
             cubeLeftTo:    '#0091b3',
             cubeRightFrom: '#0077b6',
-            cubeRightTo:   '#0f2b4b',
-            text:          '#0f2b4b'
+            cubeRightTo:   '#0f2b4b'
         };
-
-        const FONT_FAMILY = 'Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif';
 
         /* ============================================================
            DOM
@@ -298,7 +261,6 @@
 
         const sizeSelect   = document.getElementById('sizeSelect');
         const bgSelect     = document.getElementById('bgSelect');
-        const layoutSelect = document.getElementById('layoutSelect');
         const downloadBtn  = document.getElementById('downloadBtn');
         const hint         = document.getElementById('hint');
 
@@ -340,7 +302,12 @@
             ctx.restore();
         }
 
+        /* ============================================================
+           MARK (cubes only)
+           ============================================================ */
+
         function drawMark(ctx, x, y, size) {
+            // Match the proportions of the CSS preview (90px box → 40px cubes at top-left 25/0, 27/0, 27/50)
             const cubeSize = size * 0.44;
             const gap      = size * 0.06;
 
@@ -358,18 +325,6 @@
             drawCube(ctx, rightX, rightY, cubeSize, COLORS.cubeRightFrom, COLORS.cubeRightTo);
         }
 
-        function drawWordmark(ctx, x, y, fontSize) {
-            ctx.save();
-            ctx.font = '900 ' + fontSize + 'px ' + FONT_FAMILY;
-            ctx.fillStyle = COLORS.text;
-            ctx.textBaseline = 'middle';
-            ctx.textAlign = 'left';
-            ctx.fillText('BMP', x, y);
-            const w = ctx.measureText('BMP').width;
-            ctx.restore();
-            return w;
-        }
-
         /* ============================================================
            BACKGROUND
            ============================================================ */
@@ -385,67 +340,10 @@
         }
 
         /* ============================================================
-           LAYOUTS
+           RENDER
            ============================================================ */
 
-        function renderHorizontal(ctx, canvasSize, bg) {
-            paintBackground(ctx, canvasSize, bg);
-
-            const padding = canvasSize * 0.10;
-            const innerW  = canvasSize - padding * 2;
-
-            const f       = innerW / 2.85;
-            const markW   = f;
-            const textW   = f * 1.6;
-            const gap     = f * 0.25;
-            const totalW  = markW + gap + textW;
-            const startX  = (canvasSize - totalW) / 2;
-            const centerY = canvasSize / 2;
-
-            drawMark(ctx, startX, centerY - markW / 2, markW);
-            drawWordmark(ctx, startX + markW + gap, centerY, f);
-        }
-
-        function renderMark(ctx, canvasSize, bg) {
-            paintBackground(ctx, canvasSize, bg);
-
-            const padding  = canvasSize * 0.10;
-            const markSize = canvasSize - padding * 2;
-            drawMark(ctx, padding, padding, markSize);
-        }
-
-        function renderStacked(ctx, canvasSize, bg) {
-            paintBackground(ctx, canvasSize, bg);
-
-            const padding  = canvasSize * 0.12;
-            const innerW   = canvasSize - padding * 2;
-            const innerH   = canvasSize - padding * 2;
-
-            const markSize = innerW * 0.55;
-            const fontSize = innerW * 0.30;
-            const gap      = innerH * 0.08;
-
-            const totalH   = markSize + gap + fontSize;
-            const startY   = (canvasSize - totalH) / 2;
-            const markX    = (canvasSize - markSize) / 2;
-
-            drawMark(ctx, markX, startY, markSize);
-
-            ctx.save();
-            ctx.font = '900 ' + fontSize + 'px ' + FONT_FAMILY;
-            const w = ctx.measureText('BMP').width;
-            ctx.restore();
-
-            const textX = (canvasSize - w) / 2;
-            const textY = startY + markSize + gap + fontSize / 2;
-            drawWordmark(ctx, textX, textY, fontSize);
-        }
-
-        /* ============================================================
-           DISPATCH
-           ============================================================ */
-
-        function renderLogo(canvas, canvasSize, bgMode, layoutMode) {
+        function renderLogo(canvas, canvasSize, bgMode) {
             canvas.width  = canvasSize;
             canvas.height = canvasSize;
 
@@ -453,13 +351,12 @@
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
 
-            if (layoutMode === 'mark') {
-                renderMark(ctx, canvasSize, bgMode);
-            } else if (layoutMode === 'stacked') {
-                renderStacked(ctx, canvasSize, bgMode);
-            } else {
-                renderHorizontal(ctx, canvasSize, bgMode);
-            }
+            paintBackground(ctx, canvasSize, bgMode);
+
+            // Mark fills a square that's 84% of the canvas, centered.
+            const padding  = canvasSize * 0.08;
+            const markSize = canvasSize - padding * 2;
+            drawMark(ctx, padding, padding, markSize);
         }
 
         /* ============================================================
@@ -467,16 +364,14 @@
            ============================================================ */
 
         function download() {
-            const size   = parseInt(sizeSelect.value, 10);
-            const bg     = bgSelect.value;
-            const layout = layoutSelect.value;
+            const size = parseInt(sizeSelect.value, 10);
+            const bg   = bgSelect.value;
 
             const canvas = document.createElement('canvas');
-            renderLogo(canvas, size, bg, layout);
+            renderLogo(canvas, size, bg);
 
-            const parts = ['bmp-logo'];
-            if (layout !== 'horizontal') parts.push(layout);
-            if (bg !== 'transparent')    parts.push(bg);
+            const parts = ['bmp-mark'];
+            if (bg !== 'transparent') parts.push(bg);
             parts.push(size + 'px');
             const filename = parts.join('-') + '.png';
 
@@ -496,10 +391,9 @@
 
         downloadBtn.addEventListener('click', download);
 
-        // Wait for fonts so the first download uses Inter
         if (document.fonts && document.fonts.ready) {
             document.fonts.ready.then(function () {
-                hint.textContent = 'Fonts ready — click Download PNG.';
+                hint.textContent = 'Ready — click Download PNG.';
             });
         }
 
