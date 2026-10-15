@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BMP · Logo Download</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================================
+           BMP Logo Downloader — single-file version
+           ============================================================ */
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --primary: #0f2b4b;
+            --accent: #00b4d8;
+            --text-muted: #3e5a76;
+            --line: #c8d3e0;
+            --paper-bg: #f4f7fb;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--paper-bg);
+            color: var(--primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 16px;
+            line-height: 1.6;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 560px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 12px 40px rgba(15,43,75,0.10);
+            padding: 32px 28px 28px;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .page-sub {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        /* ---------- Preview box ---------- */
+        .preview-box {
+            background: repeating-conic-gradient(#eef2f7 0% 25%, #ffffff 0% 50%) 50% / 20px 20px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 40px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 180px;
+        }
+
+        /* ---------- Live preview logo ---------- */
+        .bmp-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            line-height: 1;
+        }
+
+        .bmp-logo-icon {
+            position: relative;
+            width: 52px;
+            height: 52px;
+            flex-shrink: 0;
+        }
+
+        .bmp-logo-icon .cube {
+            position: absolute;
+            width: 23px;
+            height: 23px;
+            border-radius: 4px;
+            transform: rotate(45deg) skew(-10deg, -10deg);
+        }
+
+        .bmp-logo-icon .cube-top {
+            top: 0; left: 15px;
+            background: linear-gradient(135deg, #00d4f5 0%, #00b4d8 100%);
+        }
+        .bmp-logo-icon .cube-left {
+            top: 16px; left: 0;
+            background: linear-gradient(135deg, #00b4d8 0%, #0091b3 100%);
+        }
+        .bmp-logo-icon .cube-right {
+            top: 16px; left: 30px;
+            background: linear-gradient(135deg, #0077b6 0%, #0f2b4b 100%);
+        }
+
+        .bmp-logo-text {
+            font-family: 'Inter', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        /* ---------- Controls ---------- */
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            text-align: left;
+        }
+
+        .control {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .control label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .control select {
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            background: #fbfdff;
+            color: var(--primary);
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.15s ease;
+        }
+
+        .control select:focus {
+            border-color: var(--accent);
+            background: #ffffff;
+        }
+
+        /* ---------- Download button ---------- */
+        .download-btn {
+            margin-top: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 13px 22px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #1a3f66, #0f2b4b);
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
+            box-shadow: 0 8px 20px rgba(15,43,75,0.22);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 26px rgba(15,43,75,0.28);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        .dl-icon {
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        /* ---------- Hint ---------- */
+        .hint {
+            margin-top: 18px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        /* ---------- Mobile ---------- */
+        @media (max-width: 520px) {
+            .page { padding: 24px 20px; }
+            .page-title { font-size: 1.25rem; }
+            .preview-box { padding: 30px 14px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="page">
+
+        <h1 class="page-title">BMP Logo</h1>
+        <p class="page-sub">Preview and download the logo as a PNG.</p>
+
+        <!-- Live preview -->
+        <div class="preview-box">
+            <div class="bmp-logo">
+                <div class="bmp-logo-icon">
+                    <span class="cube cube-top"></span>
+                    <span class="cube cube-left"></span>
+                    <span class="cube cube-right"></span>
+                </div>
+                <div class="bmp-logo-text">BMP</div>
+            </div>
+        </div>
+
+        <!-- Download controls -->
+        <div class="controls">
+
+            <div class="control">
+                <label for="sizeSelect">Size</label>
+                <select id="sizeSelect">
+                    <option value="512">512 × 512 px</option>
+                    <option value="1024" selected>1024 × 1024 px</option>
+                    <option value="2048">2048 × 2048 px</option>
+                </select>
+            </div>
+
+            <div class="control">
+                <label for="bgSelect">Background</label>
+                <select id="bgSelect">
+                    <option value="transparent" selected>Transparent</option>
+                    <option value="white">White</option>
+                    <option value="navy">Navy</option>
+                </select>
+            </div>
+
+            <div class="control">
+                <label for="layoutSelect">Layout</label>
+                <select id="layoutSelect">
+                    <option value="horizontal" selected>Horizontal (mark + text)</option>
+                    <option value="mark">Mark only (cubes)</option>
+                    <option value="stacked">Stacked (mark over text)</option>
+                </select>
+            </div>
+
+            <button type="button" id="downloadBtn" class="download-btn">
+                <span class="dl-icon">⬇</span>
+                <span>Download PNG</span>
+            </button>
+
+        </div>
+
+        <p class="hint" id="hint">
+            Tip: use transparent + 1024 px for emails, contracts, and screenshots.
+        </p>
+
+    </main>
+
+    <script>
+    (function () {
+        'use strict';
+
+        /* ============================================================
+           CONFIG
+           ============================================================ */
+
+        const COLORS = {
+            cubeTopFrom:   '#00d4f5',
+            cubeTopTo:     '#00b4d8',
+            cubeLeftFrom:  '#00b4d8',
+            cubeLeftTo:    '#0091b3',
+            cubeRightFrom: '#0077b6',
+            cubeRightTo:   '#0f2b4b',
+            text:          '#0f2b4b'
+        };
+
+        const FONT_FAMILY = 'Inter, system-ui, -apple-system, "Segoe UI", Arial, sans-serif';
+
+        /* ============================================================
+           DOM
+           ============================================================ */
+
+        const sizeSelect   = document.getElementById('sizeSelect');
+        const bgSelect     = document.getElementById('bgSelect');
+        const layoutSelect = document.getElementById('layoutSelect');
+        const downloadBtn  = document.getElementById('downloadBtn');
+        const hint         = document.getElementById('hint');
+
+        /* ============================================================
+           CANVAS HELPERS
+           ============================================================ */
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            ctx.lineTo(x + r, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+        }
+
+        function drawCube(ctx, cx, cy, size, colorFrom, colorTo) {
+            ctx.save();
+            ctx.translate(cx, cy);
+
+            const rad = 45 * Math.PI / 180;
+            ctx.rotate(rad);
+            ctx.transform(1, Math.tan(-10 * Math.PI / 180),
+                          Math.tan(-10 * Math.PI / 180), 1, 0, 0);
+
+            const grad = ctx.createLinearGradient(-size / 2, -size / 2, size / 2, size / 2);
+            grad.addColorStop(0, colorFrom);
+            grad.addColorStop(1, colorTo);
+
+            ctx.fillStyle = grad;
+            roundRect(ctx, -size / 2, -size / 2, size, size, size * 0.16);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawMark(ctx, x, y, size) {
+            const cubeSize = size * 0.44;
+            const gap      = size * 0.06;
+
+            const topX   = x + size / 2;
+            const topY   = y + cubeSize / 2 + gap * 0.4;
+
+            const leftX  = x + cubeSize / 2 + gap * 0.4;
+            const leftY  = y + size * 0.62;
+
+            const rightX = x + size - cubeSize / 2 - gap * 0.4;
+            const rightY = leftY;
+
+            drawCube(ctx, topX,   topY,   cubeSize, COLORS.cubeTopFrom,   COLORS.cubeTopTo);
+            drawCube(ctx, leftX,  leftY,  cubeSize, COLORS.cubeLeftFrom,  COLORS.cubeLeftTo);
+            drawCube(ctx, rightX, rightY, cubeSize, COLORS.cubeRightFrom, COLORS.cubeRightTo);
+        }
+
+        function drawWordmark(ctx, x, y, fontSize) {
+            ctx.save();
+            ctx.font = '900 ' + fontSize + 'px ' + FONT_FAMILY;
+            ctx.fillStyle = COLORS.text;
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'left';
+            ctx.fillText('BMP', x, y);
+            const w = ctx.measureText('BMP').width;
+            ctx.restore();
+            return w;
+        }
+
+        /* ============================================================
+           BACKGROUND
+           ============================================================ */
+
+        function paintBackground(ctx, size, mode) {
+            if (mode === 'white') {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, size, size);
+            } else if (mode === 'navy') {
+                ctx.fillStyle = '#0f2b4b';
+                ctx.fillRect(0, 0, size, size);
+            }
+        }
+
+        /* ============================================================
+           LAYOUTS
+           ============================================================ */
+
+        function renderHorizontal(ctx, canvasSize, bg) {
+            paintBackground(ctx, canvasSize, bg);
+
+            const padding = canvasSize * 0.10;
+            const innerW  = canvasSize - padding * 2;
+
+            const f       = innerW / 2.85;
+            const markW   = f;
+            const textW   = f * 1.6;
+            const gap     = f * 0.25;
+            const totalW  = markW + gap + textW;
+            const startX  = (canvasSize - totalW) / 2;
+            const centerY = canvasSize / 2;
+
+            drawMark(ctx, startX, centerY - markW / 2, markW);
+            drawWordmark(ctx, startX + markW + gap, centerY, f);
+        }
+
+        function renderMark(ctx, canvasSize, bg) {
+            paintBackground(ctx, canvasSize, bg);
+
+            const padding  = canvasSize * 0.10;
+            const markSize = canvasSize - padding * 2;
+            drawMark(ctx, padding, padding, markSize);
+        }
+
+        function renderStacked(ctx, canvasSize, bg) {
+            paintBackground(ctx, canvasSize, bg);
+
+            const padding  = canvasSize * 0.12;
+            const innerW   = canvasSize - padding * 2;
+            const innerH   = canvasSize - padding * 2;
+
+            const markSize = innerW * 0.55;
+            const fontSize = innerW * 0.30;
+            const gap      = innerH * 0.08;
+
+            const totalH   = markSize + gap + fontSize;
+            const startY   = (canvasSize - totalH) / 2;
+            const markX    = (canvasSize - markSize) / 2;
+
+            drawMark(ctx, markX, startY, markSize);
+
+            ctx.save();
+            ctx.font = '900 ' + fontSize + 'px ' + FONT_FAMILY;
+            const w = ctx.measureText('BMP').width;
+            ctx.restore();
+
+            const textX = (canvasSize - w) / 2;
+            const textY = startY + markSize + gap + fontSize / 2;
+            drawWordmark(ctx, textX, textY, fontSize);
+        }
+
+        /* ============================================================
+           DISPATCH
+           ============================================================ */
+
+        function renderLogo(canvas, canvasSize, bgMode, layoutMode) {
+            canvas.width  = canvasSize;
+            canvas.height = canvasSize;
+
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+
+            if (layoutMode === 'mark') {
+                renderMark(ctx, canvasSize, bgMode);
+            } else if (layoutMode === 'stacked') {
+                renderStacked(ctx, canvasSize, bgMode);
+            } else {
+                renderHorizontal(ctx, canvasSize, bgMode);
+            }
+        }
+
+        /* ============================================================
+           DOWNLOAD
+           ============================================================ */
+
+        function download() {
+            const size   = parseInt(sizeSelect.value, 10);
+            const bg     = bgSelect.value;
+            const layout = layoutSelect.value;
+
+            const canvas = document.createElement('canvas');
+            renderLogo(canvas, size, bg, layout);
+
+            const parts = ['bmp-logo'];
+            if (layout !== 'horizontal') parts.push(layout);
+            if (bg !== 'transparent')    parts.push(bg);
+            parts.push(size + 'px');
+            const filename = parts.join('-') + '.png';
+
+            canvas.toBlob(function (blob) {
+                const url = URL.createObjectURL(blob);
+                const a   = document.createElement('a');
+                a.href     = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                hint.textContent = 'Downloaded: ' + filename;
+            }, 'image/png');
+        }
+
+        downloadBtn.addEventListener('click', download);
+
+        // Wait for fonts so the first download uses Inter
+        if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(function () {
+                hint.textContent = 'Fonts ready — click Download PNG.';
+            });
+        }
+
+    })();
+    </script>
+</body>
+</html>
