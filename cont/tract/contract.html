@@ -484,6 +484,7 @@
         }
 
         .signature-block {
+            position: relative;
             border: 1px solid var(--line);
             border-radius: 8px;
             padding: 16px;
@@ -559,6 +560,130 @@
             color: var(--text-muted);
             text-align: center;
             line-height: 1.65;
+        }
+
+        /* ============================================ */
+        /* STAMP — electronic seal                       */
+        /* ============================================ */
+
+        .bmp-stamp {
+            position: absolute;
+            bottom: -14px;
+            inset-inline-end: 12px;
+            width: 220px;
+            height: 96px;
+            border: 2px solid #0f2b4b;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 8px 10px 7px;
+            transform: rotate(-3deg);
+            opacity: 0.92;
+            pointer-events: none;
+            z-index: 5;
+            font-family: 'Inter', 'IBM Plex Sans Arabic', sans-serif;
+            color: #0f2b4b;
+            box-shadow: 0 1px 0 rgba(15,43,75,0.15);
+            overflow: hidden;
+        }
+
+        .bmp-stamp::after {
+            /* inner dashed border to feel like a real stamp */
+            content: "";
+            position: absolute;
+            inset: 3px;
+            border: 1px dashed rgba(15,43,75,0.55);
+            border-radius: 7px;
+            pointer-events: none;
+        }
+
+        .bmp-stamp .stamp-head {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 4px;
+            margin-bottom: 5px;
+            border-bottom: 1px solid rgba(15,43,75,0.35);
+        }
+
+        .bmp-stamp .stamp-mark {
+            position: relative;
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .bmp-stamp .stamp-mark .cube {
+            position: absolute;
+            width: 11px;
+            height: 11px;
+            border-radius: 2px;
+            transform: rotate(45deg) skew(-10deg, -10deg);
+        }
+        .bmp-stamp .stamp-mark .cube-top {
+            top: 0; left: 8px;
+            background: linear-gradient(135deg, #00d4f5 0%, #00b4d8 100%);
+        }
+        .bmp-stamp .stamp-mark .cube-left {
+            top: 8px; left: 0;
+            background: linear-gradient(135deg, #00b4d8 0%, #0091b3 100%);
+        }
+        .bmp-stamp .stamp-mark .cube-right {
+            top: 8px; left: 16px;
+            background: linear-gradient(135deg, #0077b6 0%, #0f2b4b 100%);
+        }
+
+        .bmp-stamp .stamp-brand {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.05;
+        }
+
+        .bmp-stamp .stamp-brand-name {
+            font-size: 0.82rem;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .bmp-stamp .stamp-brand-tag {
+            font-size: 0.5rem;
+            font-weight: 700;
+            letter-spacing: 0.6px;
+            opacity: 0.85;
+            text-transform: uppercase;
+        }
+
+        .bmp-stamp .stamp-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+            font-size: 0.58rem;
+            line-height: 1.35;
+            font-family: 'Inter', monospace;
+        }
+
+        .bmp-stamp .stamp-row + .stamp-row { margin-top: 1px; }
+
+        .bmp-stamp .stamp-row .k {
+            font-weight: 700;
+            opacity: 0.85;
+            letter-spacing: 0.3px;
+        }
+
+        .bmp-stamp .stamp-row .v {
+            font-weight: 600;
+            direction: ltr;
+            text-align: end;
+            max-width: 60%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .bmp-stamp .stamp-status {
+            color: #1b8a4a;   /* green check */
+            font-weight: 800;
+            letter-spacing: 0.4px;
         }
 
         /* ============================================ */
@@ -688,7 +813,7 @@
                 padding-top: 4px;
             }
 
-            /* Force black text everywhere */
+            /* Force black text everywhere — EXCEPT the stamp */
             * {
                 color: #000 !important;
                 box-shadow: none !important;
@@ -770,6 +895,38 @@
             .plan-choice.checked .checkbox::after {
                 color: #ffffff !important;
             }
+
+            /* ---------- STAMP — keep colors in print ---------- */
+            .bmp-stamp {
+                background: rgba(255, 255, 255, 0.95) !important;
+                border-color: #0f2b4b !important;
+                opacity: 1 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .bmp-stamp,
+            .bmp-stamp * {
+                color: #0f2b4b !important;
+            }
+
+            .bmp-stamp .stamp-status {
+                color: #1b8a4a !important;
+            }
+
+            .bmp-stamp::after {
+                border-color: rgba(15,43,75,0.55) !important;
+            }
+
+            .bmp-stamp .stamp-mark .cube-top {
+                background: linear-gradient(135deg, #00d4f5 0%, #00b4d8 100%) !important;
+            }
+            .bmp-stamp .stamp-mark .cube-left {
+                background: linear-gradient(135deg, #00b4d8 0%, #0091b3 100%) !important;
+            }
+            .bmp-stamp .stamp-mark .cube-right {
+                background: linear-gradient(135deg, #0077b6 0%, #0f2b4b 100%) !important;
+            }
         }
 
         /* ---------- RESPONSIVE ---------- */
@@ -785,6 +942,15 @@
             .print-btn { padding: 8px 14px; font-size: 0.78rem; }
 
             .meta-value.editable { min-width: 140px; }
+
+            .bmp-stamp {
+                width: 180px;
+                height: 82px;
+                inset-inline-end: 8px;
+                bottom: -10px;
+            }
+            .bmp-stamp .stamp-brand-name { font-size: 0.7rem; }
+            .bmp-stamp .stamp-row { font-size: 0.52rem; }
         }
     </style>
 </head>
@@ -1144,6 +1310,36 @@
                         <span class="area-label" data-ar="التوقيع" data-fr="Signature" data-en="Signature">التوقيع</span>
                         <div class="area-box"></div>
                     </div>
+
+                    <!-- ================= STAMP ================= -->
+                    <div class="bmp-stamp" aria-hidden="true">
+                        <div class="stamp-head">
+                            <div class="stamp-mark">
+                                <span class="cube cube-top"></span>
+                                <span class="cube cube-left"></span>
+                                <span class="cube cube-right"></span>
+                            </div>
+                            <div class="stamp-brand">
+                                <span class="stamp-brand-name">BMP</span>
+                                <span class="stamp-brand-tag">Business Management Platform</span>
+                            </div>
+                        </div>
+
+                        <div class="stamp-row">
+                            <span class="k">CONTRACT</span>
+                            <span class="v" id="stampContractNo">BMP-CONTRACT-____-____</span>
+                        </div>
+                        <div class="stamp-row">
+                            <span class="k">ISSUED</span>
+                            <span class="v" id="stampIssued">__/__/____</span>
+                        </div>
+                        <div class="stamp-row">
+                            <span class="k">STATUS</span>
+                            <span class="v stamp-status">✓ APPROVED</span>
+                        </div>
+                    </div>
+                    <!-- =============== END STAMP =============== -->
+
                 </div>
 
                 <div class="signature-block">
@@ -1237,11 +1433,12 @@
         setLanguage(localStorage.getItem(LANG_KEY) || DEFAULT_LANG);
 
 
-        /* ---------- Contract number (editable) + footer sync ---------- */
+        /* ---------- Contract number (editable) + footer sync + STAMP sync ---------- */
 
-        const contractNumEl = document.getElementById('contractNumber');
-        const footerNum1    = document.getElementById('footerContractNum1');
-        const footerNum2    = document.getElementById('footerContractNum2');
+        const contractNumEl  = document.getElementById('contractNumber');
+        const footerNum1     = document.getElementById('footerContractNum1');
+        const footerNum2     = document.getElementById('footerContractNum2');
+        const stampContractNo = document.getElementById('stampContractNo');   /* STAMP */
 
         function getContractNumber() {
             const v = (contractNumEl ? contractNumEl.textContent : "").replace(/\s+/g, ' ').trim();
@@ -1252,6 +1449,7 @@
             const v = getContractNumber();
             if (footerNum1) footerNum1.textContent = v;
             if (footerNum2) footerNum2.textContent = v;
+            if (stampContractNo) stampContractNo.textContent = v;   /* STAMP */
         }
 
         if (contractNumEl) {
@@ -1317,7 +1515,7 @@
         setupSingleChoiceGroup('planChoices',    planState);
 
 
-        /* ---------- Contract date ---------- */
+        /* ---------- Contract date + STAMP date ---------- */
 
         function setText(id, value) {
             const el = document.getElementById(id);
@@ -1335,11 +1533,21 @@
         }
 
         const today = new Date();
-        setText("contractDate",
+        const todayStr =
             String(today.getDate()).padStart(2, "0") + " / " +
             String(today.getMonth() + 1).padStart(2, "0") + " / " +
-            today.getFullYear()
-        );
+            today.getFullYear();
+
+        setText("contractDate", todayStr);
+
+        /* STAMP: set the issued date inside the stamp too */
+        const stampIssued = document.getElementById('stampIssued');
+        if (stampIssued) {
+            stampIssued.textContent =
+                String(today.getDate()).padStart(2, "0") + "/" +
+                String(today.getMonth() + 1).padStart(2, "0") + "/" +
+                today.getFullYear();
+        }
 
 
         /* ---------- Auto-fill from backend ---------- */
